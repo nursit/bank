@@ -1,0 +1,31 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012 - Distribue sous licence GNU/GPL
+ *
+ */
+]#CACHE{0}
+<form method="post" action="#ENV{action}"[ id="(#ENV{id,''})"]><div>
+	[(#ENV**{hidden})]
+	[<input type="hidden" name="PM" value="(#ENV*{pm,''})" />]
+	[<input type="hidden" name="BRAND" value="(#ENV*{brand,''})" />]
+	[(#REM) layout  information:  see  chapter  6 ----------------]
+	<input type="hidden" name="TITLE" value="#ENV{title,''}" />
+	<input type="hidden" name="BGCOLOR" value="#ENV{bgcolor,'#eeeeee'}" />
+	<input type="hidden" name="TXTCOLOR" value="#ENV{txtcolor,'black'}" />
+	<input type="hidden" name="TBLBGCOLOR" value="#ENV{tblbgcolor,'white'}" />
+	<input type="hidden" name="TBLTXTCOLOR" value="#ENV{tbltxtcolor,'#333333'}" />
+	<input type="hidden" name="BUTTONBGCOLOR" value="#ENV{buttonbgcolor,''}" />
+	<input type="hidden" name="BUTTONTXTCOLOR" value="#ENV{buttontxtcolor,'black'}" />
+	<input type="hidden" name="LOGO" value="#ENV{LOGO,''}" />
+	<input type="hidden" name="FONTTYPE" value="#ENV{fonttype,'Verdana'}" />
+	<input type="hidden" name="backurl" value="#ENV*{backurl}" />
+	<button class="submit" type="submit">#ENV*{logobrand,'Payer'}</button>
+	</div>
+</form>
+#FILTRE{ogone_form_sha_in}

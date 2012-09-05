@@ -1,0 +1,50 @@
+[(#SET{defaut_tri,#ARRAY{
+	id_transaction,-1,
+	date_transaction,#ENV{date_sens,-1},
+	montant_ht,-1,
+	montant,-1,
+	montant_regle,-1,
+	statut,1
+}})
+]<B_transactions>
+<div class='liste-objets transactions'>
+	<table class='spip liste'>
+	[<caption><strong class="caption">(#ENV*{titre,#GRAND_TOTAL|singulier_ou_pluriel{bank:info_1_transaction,bank:info_nb_transactions}})</strong></caption>]
+		<thead>
+			<tr class='first_row'>
+				<th class='id' scope='col'>[(#TRI{id_transaction,<:info_numero_abbreviation:>,ajax})]</th>
+				<th class='id_auteur' scope='col'>[(#TRI{id_auteur,Aut,ajax})]</th>
+				<th class='mode' scope='col'>[(#TRI{mode,mode,ajax})]</th>
+				<th class='autorisation_id' scope='col'>[(#TRI{autorisation_id,autorisation,ajax})]</th>
+				<th class='montant_ht' scope='col'>[(#TRI{montant_ht,HT,ajax})]</th>
+				<th class='montant' scope='col'>[(#TRI{montant,TTC,ajax})]</th>
+				<th class='regle' scope='col'>[(#TRI{montant_regle,Réglé,ajax})]</th>
+				<th class='date' scope='col'>[(#TRI{date_transaction,<:date:>,ajax})]</th>
+				<th class='statut' scope='col'>[(#TRI{statut,statut,ajax})]</th>
+				<th class='parrain' scope='col'>[(#TRI{parrain,Parrain,ajax})]</th>
+				<th class="id_facture">F</th>
+			</tr>
+		</thead>
+		<tbody>
+		<BOUCLE_transactions(transactions){id_transaction?}{where?}{recherche?}{statut==#ENV{statut,'.'}}{tri #ENV{par,id_transaction},#GET{defaut_tri}}{pagination #ENV{nb,10}}>
+			<tr class="[(#COMPTEUR_BOUCLE|alterner{row_odd,row_even})][ (#EXPOSE)]">
+				<td class="id">#ID_TRANSACTION</td>
+				<td class="id_auteur"><a href='[(#ID_AUTEUR|generer_url_entite{auteur})]'>#ID_AUTEUR</a></td>
+				<td class="mode">#MODE</td>
+				<td class="autorisation_id">#AUTORISATION_ID</td>
+				<td class="montant_ht">#MONTANT_HT</td>
+				<td class="montant">#MONTANT</td>
+				<td class="regle">#MONTANT_REGLE</td>
+				<td class="date">#DATE_TRANSACTION</td>
+				<td class="statut">#STATUT[(#STATUT|=={commande}|et{#AUTORISER{regler,transaction,#ID_TRANSACTION}})<a href="[(#URL_ECRIRE{payer,id_transaction=#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]">Payer</a>]</td>
+				<td class="parrain">#PARRAIN</td>
+				<td class="id_facture">[<a href='[(#URL_PAGE{facture}|parametre_url{id_facture,#ID_FACTURE}|parametre_url{hash,#INFO_DETAILS{facture,#ID_FACTURE}|md5})]'(#ID_FACTURE|oui)>#ID_FACTURE</a>]</td>
+			</tr>
+		</BOUCLE_transactions>
+		</tbody>
+	</table>
+	[<p class='pagination'>(#PAGINATION{prive})</p>]
+</div>
+</B_transactions>[
+<div class="liste-objets breves caption-wrap"><strong class="caption">(#ENV*{sinon,''})</strong></div>
+]<//B_transactions>

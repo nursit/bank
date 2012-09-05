@@ -1,0 +1,21 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012 - Distribue sous licence GNU/GPL
+ *
+ */
+]#CACHE{0}
+<div class='payer_mode payer_ogone payer_acte'>
+	<p class="titre"><:bank:choisissez_CB:></p>
+	<div class='boutons'>
+		[(#INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand=VISA,pm=CreditCard,logobrand=#CHEMIN{presta/ogone/logo/VISA.gif}|balise_img{Payer par carte VISA}})]
+		[(#INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand=MasterCard,pm=CreditCard,logobrand=#CHEMIN{presta/ogone/logo/MASTERCARD.gif}|balise_img{Payer par carte MasterCard}})]
+		[(#INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand='American Express',pm=CreditCard,logobrand=#CHEMIN{presta/ogone/logo/AMEX.gif}|balise_img{Payer par carte American Express}})]
+		[(#REM)(# INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand=PAYPAL,pm=PAYPAL,logobrand=#CHEMIN{presta/ogone/logo/PayPal.gif}|balise_img{Payer par PayPal}})]
+	</div>
+</div>

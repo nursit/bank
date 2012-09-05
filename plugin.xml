@@ -1,0 +1,41 @@
+<plugin>
+  <nom>Banque&amp;paiement</nom>
+  <auteur>C&eacute;dric Morin [Nursit.com->http://nursit.com]</auteur>
+	<icon>prive/themes/spip/images/credit-card-32.png</icon>
+  <version>2.1.1</version>
+  <version_base>1.1.0</version_base>
+  <etat>stable</etat>
+  <description>Un module de paiement bancaire multi prestataires</description>
+  <install>base/bank_install.php</install>
+  <fonctions>bank_fonctions.php</fonctions>
+  <options>bank_options.php</options>
+	<lien></lien> <!-- URI de documentation -->
+  <prefix>bank</prefix>
+	<pipeline>
+		<nom>declarer_tables_interfaces</nom>
+		<inclure>base/bank_transactions.php</inclure>
+	</pipeline>
+	<pipeline>
+		<nom>declarer_tables_principales</nom>
+		<inclure>base/bank_transactions.php</inclure>
+	</pipeline>
+
+	<pipeline><nom>bank_inserer_transaction</nom><action></action></pipeline>
+	<pipeline><nom>bank_facturer_reglement</nom><action></action></pipeline>
+	<pipeline><nom>bank_traiter_reglement</nom><action></action></pipeline>
+	<pipeline><nom>bank_editer_ticket_reglement</nom><action></action></pipeline>
+	<pipeline><nom>bank_redirige_apres_retour_transaction</nom><action></action></pipeline>
+	<pipeline><nom>trig_bank_notifier_reglement</nom><action></action></pipeline>
+
+	<bouton id='bank2' parent='bando_configuration'>
+		<icone>images/credit-card-16.png</icone>
+		<titre>bank:titre_menu_configurer</titre>
+		<url>configurer_bank</url>
+	</bouton>
+	<bouton id='transactions' parent='bando_activite'>
+		<icone>images/credit-card-16.png</icone>
+		<titre>bank:titre_menu_transactions</titre>
+	</bouton>
+
+	<necessite id="SPIP" version="[2.1.0;3.0.99]" />
+</plugin>

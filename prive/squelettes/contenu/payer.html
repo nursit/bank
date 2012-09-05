@@ -1,0 +1,34 @@
+[(#AUTORISER{regler,transaction,#ID_TRANSACTION}|sinon_interdire_acces)]
+<B_trans>
+<h1 class="grostitre">Commande #ID_TRANSACTION</h1>
+<BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}{statut=commande}>
+	[(#SET{titre,[Commande #(#ID_TRANSACTION) / [(#DATE_TRANSACTION|affdate_heure)]]})]
+	<INCLURE{fond=modeles/transaction_details,id_transaction,titre=#GET{titre}} />
+	<a class="right small" href="#URL_ACTION_AUTEUR{abandonner_commande,#ID_TRANSACTION,#VAL{transactions}|generer_url_ecrire{id_transaction=#ID_TRANSACTION,0,#EVAL{true}}}">Abandonner cette commande</a>
+
+	#SET{titre,#VAL{Payer la commande #}|concat{#ID_TRANSACTION,'&nbsp;: ',#MONTANT|affiche_monnaie}}
+
+	<BOUCLE_client(AUTEURS){id_auteur}{statut==.*}>
+	#SET{adresse_ok,#NAME|et{#PRENOM}|et{#ADRESSE_1}|et{#ADRESSE_CP}|et{#ADRESSE_VILLE}|oui}<br />
+	[(#GET{adresse_ok}|oui)
+		<p>#INCLURE{fond=modeles/client_adresse_facture,id_auteur}</p>
+		<INCLURE{fond=modeles/payer_acte,id_transaction,transaction_hash,title=#GET{titre}}>
+	][(#GET{adresse_ok}|non)
+		<h1><:nursit:titre_vos_infos:></h1>
+		<p><:nursit:explications_coordonnees_facture:></p>
+		<p><:nursit:explications_coordonnees_2:></p>
+
+		#FORMULAIRE_EDITER_PROFIL{#ID_AUTEUR}
+	]
+	</BOUCLE_client>
+</BOUCLE_trans>
+<p><:paniers:erreur_aucune_commande:></p>
+<//B_trans>
+<style type="text/css">
+.payer_mode {margin-top: 3em;}
+.payer_mode .titre {font-weight: bold;font-size: 1.2em;}
+.payer_mode .boutons form,
+.payer_mode .boutons div {display: inline;}
+a.right {text-align: right;display: block;float: right;}
+
+</style>

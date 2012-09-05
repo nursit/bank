@@ -1,0 +1,29 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012 - Distribue sous licence GNU/GPL
+ *
+ */
+]#CACHE{0}
+<BOUCLE_macommande(TRANSACTIONS){id_transaction=#ENV{id_transaction}}{statut=commande}>
+	[(#REM) confirmer le paiement
+	Cas de Paypal Express ou le debit est execute par le site marchand]
+	[(#ENV{confirmer_paiement}|oui)
+	<div class='confirm_order'>
+		<strong>Vous allez payer avec :</strong>
+		<div class='resume'>
+			<?php echo table_valeur($_SESSION,'order_resume');?>
+		</div>
+		<p>Validez pour effectuer maintenant le paiement avec ce compte</p>
+		<div class='boutons'>
+			#BOUTON_ACTION{Valider,#ENV{checkout}}
+		</div>
+	</div>
+	]
+]
+</BOUCLE_macommande>

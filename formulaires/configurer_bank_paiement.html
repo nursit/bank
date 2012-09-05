@@ -1,0 +1,59 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012 - Distribue sous licence GNU/GPL
+ *
+ */
+]<div class="formulaire_spip formulaire_configurer formulaire_#FORM">
+
+[<p class="reponse_formulaire reponse_formulaire_ok">(#ENV*{message_ok})</p>]
+[<p class="reponse_formulaire reponse_formulaire_erreur">(#ENV*{message_erreur})</p>]
+
+<form method="post" action="#ENV{action}"><div>
+	#ACTION_FORMULAIRE{#ENV{action}}
+	<ul>
+		<li class="fieldset">
+		<fieldset>
+			<legend><:bank:label_mode_paiement:></legend>
+			<ul>
+				<BOUCLE_prestas(POUR){tableau #LISTE{ogone,paybox,paypal,simu,cheque}}>
+					<li class="editer_presta_#VALEUR long_label[(#ENV**{erreurs}|table_valeur{presta_#VALEUR}|oui)erreur]">
+						<label>[(#VAL{bank:label_presta_}|concat{#VALEUR}|_T)]</label>[
+						<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{presta_#VALEUR})</span>]
+						<div class="choix">
+							<input type="radio" name="presta_#VALEUR" value="1" [checked="(#ENV{presta_#VALEUR}?{checked,''})"] id="presta_#VALEUR_1" />
+							<label for='presta_[(#VALEUR)]_1' class="[(#ENV{presta_#VALEUR}?{on})]"><:bank:label_actif:></label>
+						</div>
+						<div class="choix">
+							<input type="radio" name="presta_#VALEUR" value="0" [checked="(#ENV{presta_#VALEUR}?{'',checked})"] id="presta_#VALEUR_0" />
+							<label for='presta_[(#VALEUR)]_0' class="[(#ENV{presta_#VALEUR}?{'',on})]"><:bank:label_inactif:></label>
+						</div>
+					</li>
+				</BOUCLE_prestas>
+			</ul>
+		</fieldset>
+		</li>
+		<li class="fieldset">
+		<fieldset>
+			<legend><:bank:label_notifications:></legend>
+			<ul>
+				<li class="editer_email_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
+					<label><:bank:label_email_ticket_admin:></label>[
+					<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_ticket_admin})</span>]
+					<input type="text" class="text" name="email_ticket_admin" value="#ENV*{email_ticket_admin}" />
+				</li>
+			</ul>
+		</fieldset>
+		</li>
+	</ul>
+
+	<p class="boutons">
+		<input type="submit" name="enregistrer" class="submit" value="<:bouton_enregistrer:>" />
+	</p>
+</div></form>
+</div>

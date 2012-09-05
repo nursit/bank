@@ -1,0 +1,11 @@
+<h1 class="grostitre">Transactions</h1>
+<div class='onglets_simple clearfix'>
+	<ul>
+		<li>[(#SELF|parametre_url{statut|id_transaction,'XXX'}|replace{XXX,''}|lien_ou_expose{Toutes,[(#ENV{statut}|non|et{#ENV{id_transaction,''}|non})],ajax})]</li>
+		<li>[(#SELF|parametre_url{statut,'ok'}|lien_ou_expose{OK,#ENV{statut}|=={ok},ajax})]</li>
+		<li>[(#SELF|parametre_url{statut,'commande'}|lien_ou_expose{Commandes,#ENV{statut}|=={commande},ajax})]</li>
+		<li>[(#SELF|parametre_url{statut,'echec'}|lien_ou_expose{Echec,#ENV{statut}|=={echec},ajax})]</li>
+		<li>[(#SELF|parametre_url{statut,'abandon'}|lien_ou_expose{Abandon,#ENV{statut}|=={abandon},ajax})]</li>
+	</ul>
+</div>
+<INCLURE{fond=prive/objets/liste/transactions,env,ajax,nb=50} />

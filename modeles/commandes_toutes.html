@@ -1,0 +1,71 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012 - Distribue sous licence GNU/GPL
+ *
+ */
+]<B_commandes>
+<ul class='choixstatut verdana2'>
+<li [(#ENV{statutcde,''}|=={commande}|?{class="on"})]><a href='[(#SELF|parametre_url{statutcde,commande})]'>Commandes</a></li>
+<li [(#ENV{statutcde,''}|=={ok}|?{class="on"})]><a href='[(#SELF|parametre_url{statutcde,ok})]'>OK</a></li>
+<li [(#ENV{statutcde,''}|=={echec}|?{class="on"})]><a href='[(#SELF|parametre_url{statutcde,echec})]'>Echec</a></li>
+<li [(#ENV{statutcde,''}|=={''}|?{class="on"})]><a href='[(#SELF|parametre_url{statutcde,''})]'>Toutes</a></li>
+</ul>
+<div class='liste'>
+<div style='position: relative;'>
+	<div style='position: absolute; top: -12px; left: 3px;'><img src='#CHEMIN{img_pack/facture-24.png}' alt="" /></div>
+	<div style='background-color: #ENV{couleur_claire}; color: black; padding: 3px; padding-left: 30px; border-bottom: 1px solid #444444;' class='verdana2'>
+	<b>#ENV*{titre_liste}</b>
+	<div class='pagination' >#PAGINATION</div>
+	</div>
+</div>
+<table class="arial11" width='100%' cellpadding='5' cellspacing='0' border='0'>
+<thead>
+	<tr>
+		<th>id</th>
+		<th>id_auteur</th>	
+		<th>mode</th>	
+		<th>autorisation</th>	
+		<th>HT</th>
+		<th>TTC</th>
+		<th>R&eacute;gl&eacute;</th>
+		<th>date</th>
+		<th>statut</th>
+		<th> </th>
+		<th>facture</th>
+		<th>Parrain</th>
+	</tr>
+</thead>
+<tbody>
+<BOUCLE_commandes(TRANSACTIONS){statut==#ENV{statutcde,'.'}}{par #ENV{tri,date_transaction}}{inverse #ENV{senstri,1}}{pagination 10}>
+	<tr class='tr_liste'>
+		<td>#ID_TRANSACTION</td>
+		<td><a href='#URL_ECRIRE{boutique,page=compte&id_auteur=#ID_AUTEUR}'>#ID_AUTEUR</a></td>
+		<td>#MODE</td>
+		<td>#AUTORISATION_ID</td>
+		<td>#MONTANT_HT</td>
+		<td>#MONTANT</td>
+		<td>#MONTANT_REGLE</td>
+		<td>#DATE_TRANSACTION</td>
+		<td>#STATUT</td>
+		<td>[<span class="formInfo"><a href="[(#URL_PAGE{transaction_tip,id_transaction=#ID_TRANSACTION}|parametre_url{maj,#MAJ|urlencode}|parametre_url{width,200})]" class="jTip" id='message-#ID_TRANSACTION'>(#MESSAGE|?{'?'})</a></span>]</td>
+		<td>#ID_FACTURE</td>
+		<td>#PARRAIN</td>
+	</tr>
+</BOUCLE_commandes>
+</tbody>
+</table>
+</div>
+<script src="[(#CHEMIN{javascript/jtip.js}|url_absolue)]" type="text/javascript"></script>
+<style>
+ul.choixstatut {list-style:none;margin:10px 0 0;padding:0;}
+ul.choixstatut li {display:inline;margin:0 10px 0 0;padding:0;}
+ul.choixstatut li.on a {font-weight:bold;}
+div.liste {margin-bottom:10px;}
+</style>
+</B_commandes>

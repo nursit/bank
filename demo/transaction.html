@@ -1,0 +1,69 @@
+[(#REM)
+* Page de demo, appeler avec spip.php?page=demo/transaction
+* visible uniquement par les webmestres
+*
+*
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012 - Distribue sous licence GNU/GPL
+ *
+ */
+]
+<h3>Creer une transaction</h3>
+#FORMULAIRE_DEMO_CREER_TRANSACTION
+<hr />
+<BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
+	Transaction ##ID_TRANSACTION pour un montant de #MONTANT&euro;
+<INCLURE{fond=modeles/payer_acte,id_transaction,transaction_hash,title=#VAL{Regler la transaction #}|concat{#ID_TRANSACTION}}>
+</BOUCLE_trans>
+<hr />
+<B_transactions>
+<h3>Transactions</h3>
+<p class='pagination' >#PAGINATION</p>
+<table class="spip">
+<thead>
+	<tr>
+		<th>id</th>
+		<th>id_auteur</th>
+		<th>mode</th>
+		<th>autorisation</th>
+		<th>HT</th>
+		<th>TTC</th>
+		<th>R&eacute;gl&eacute;</th>
+		<th>date</th>
+		<th>statut</th>
+		<th> </th>
+		<th>panier</th>
+		<th>facture</th>
+		<th>Parrain</th>
+		<th> </th>
+	</tr>
+</thead>
+<tbody>
+<BOUCLE_transactions(TRANSACTIONS){statut==#ENV{statutcde,'.'}}{!par id_transaction}{pagination 10}>
+	<tr class='[(#COMPTEUR_BOUCLE|alterner{row_even,row_odd})]'>
+		<td>#ID_TRANSACTION</td>
+		<td><a href='#URL_AUTEUR{#ID_AUTEUR}'>#ID_AUTEUR</a></td>
+		<td>#MODE</td>
+		<td>#AUTORISATION_ID</td>
+		<td>#MONTANT_HT</td>
+		<td>#MONTANT</td>
+		<td>#MONTANT_REGLE</td>
+		<td>#DATE_TRANSACTION</td>
+		<td>#STATUT</td>
+		<td> </td>
+		<td>#ID_PANIER</td>
+		<td>#ID_FACTURE</td>
+		<td>#PARRAIN</td>
+		<th><a href="[(#SELF|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]">Payer</a></th>
+	</tr>
+</BOUCLE_transactions>
+</tbody>
+</table>
+</div>
+</B_transactions>

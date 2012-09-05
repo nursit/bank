@@ -1,0 +1,20 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012 - Distribue sous licence GNU/GPL
+ *
+ */
+]#CACHE{0}
+<BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
+<div class='payer_mode payer_simu payer_acte'>
+	<p class="titre">R&egrave;gler [SIMULATION] :</p>
+	<div class='boutons'>
+	#BOUTON_ACTION{'Simuler le paiement',#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}}
+	</div>
+</div>
+</BOUCLE_trans>

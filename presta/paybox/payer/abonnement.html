@@ -1,0 +1,20 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012 - Distribue sous licence GNU/GPL
+ *
+ */
+]#CACHE{0}
+<div class='payer_mode payer_paybox payer_abonnement'>
+	<p class="titre"><:bank:choisissez_CB:></p>
+	<div class='boutons'>
+		<BOUCLE_cb(POUR){tableau #ENV{hidden}}>
+		[(#INCLURE{fond=presta/paybox/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#CHEMIN{#ENV{logo}|table_valeur{#CLE}}|balise_img{[Payer par carte (#CLE)]}|inserer_attribut{title,[Payer par carte (#CLE)]})]})]
+		</BOUCLE_cb>
+	</div>
+</div>
