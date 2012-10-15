@@ -33,7 +33,7 @@
 		<input type="hidden" name="last_name" value="#AUTEUR" />
 		<input type="hidden" name="email" value="#AUTEUR" />
 	<//B_profil>
-	<input type="hidden" name="cancel_return" value="[(#ENV*{url_cancel}|parametre_url{id_transaction=#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]" />
+	<input type="hidden" name="cancel_return" value="[(#ENV*{url_cancel}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]" />
 	<input type="hidden" name="notify_url" value="#ENV*{url_notify}" />
 	<input type="hidden" name="return" value="#ENV*{url_return}" />
 	<input type="hidden" name="rm" value="2" />[(#REM) 1=GET 2=POST]
