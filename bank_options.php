@@ -30,5 +30,17 @@ if (isset($GLOBALS['meta']['bank_paiement'])
 	}
 }
 
+if (!function_exists('affiche_monnaie')) {
+function affiche_monnaie($valeur,$decimales=2,$unite=true){
+	if ($unite===true){
+		$unite = "&nbsp;EUR";
+		if (substr(trim($valeur),-1)=="%")
+			$unite = "&nbsp;%";
+	}
+	if (!$unite)
+		$unite=="";
+	return sprintf("%.{$decimales}f",$valeur).$unite;
+}
+}
 
 ?>
