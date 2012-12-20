@@ -21,7 +21,7 @@
 		<fieldset>
 			<legend><:bank:label_mode_paiement:></legend>
 			<ul>
-				<BOUCLE_prestas(POUR){tableau #LISTE{ogone,paybox,paypal,simu,cheque}}>
+				<BOUCLE_prestas(POUR){tableau #LISTE{ogone,paybox,paypal,cmcic,simu,cheque}}>
 					<li class="editer_presta_#VALEUR long_label[(#ENV**{erreurs}|table_valeur{presta_#VALEUR}|oui)erreur]">
 						<label>[(#VAL{bank:label_presta_}|concat{#VALEUR}|_T)]</label>[
 						<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{presta_#VALEUR})</span>]

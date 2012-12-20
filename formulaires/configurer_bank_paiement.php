@@ -24,6 +24,7 @@ function formulaires_configurer_bank_paiement_charger_dist(){
 		'presta_cheque' => $config['presta']['cheque'],
 		'presta_abo_paybox' => $config['presta']['abo_paybox'],
 		'presta_abo_wha' => $config['presta']['abo_wha'],
+		'presta_cmcic' => $config['presta']['cmcic'],
 		'email_ticket_admin' => $config['email_ticket_admin'],
 	);
 	
