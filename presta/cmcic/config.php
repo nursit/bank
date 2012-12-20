@@ -17,9 +17,10 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 /**
  * Constantes pour CMCIC
  * 
- * Vous pouvez les définir ces constantes dans votre fichier mes_options.php
+ * Vous pouvez définir ces constantes dans votre fichier mes_options.php
  *
- * Il vous faudra obtenir 3 informations à CMCIC et les définir dans les constantes correspondantes :
+ * Il vous faudra obtenir 3 informations de CMCIC et les définir dans
+ * les constantes correspondantes :
  * - le n° de TPE (constante CMCIC_TPE),
  * - le code de société (constante CMCIC_CODESOCIETE),
  * - la clé HMAC-SHA1 (constante CMCIC_CLE)
@@ -33,15 +34,18 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * - là, il peut effectuer 3 actions :
  *   1) annuler : il retourne sur votre site (ce qui annule sa transaction)
  *   2) payer correctement : il reste sur le site de la banque,
- *     MAIS celle-ci a dialoguée avec votre site qui a pris en compte la transaction,
- *     via l'URL CGI2. Il peut alors retourner sur votre site via le lien de retour OK
+ *      MAIS celle-ci a dialoguée avec votre site qui a pris en compte la transaction,
+ *      via l'URL CGI2 (La transaction passe en statut «ok» et réglée).
+ *      Il peut alors retourner sur votre site via le lien de retour OK,
+ *      ou quitter la page, peut importe.
  *   3) rater son paiement : il reste sur le site de la banque,
- *     MAIS celle-ci a dialoguée avec votre site qui prend en compte l'erreur
- *     (la transaction reste «encours»). Il peut soit retenter son paiement, ce qui
- *     revient au point 2) ou 3), soit annuler, ce qui revient au point 1)
+ *      MAIS celle-ci a dialoguée avec votre site qui prend en compte l'erreur
+ *      (la transaction passe en statut «echec»). Il peut soit retenter son paiement,
+ *      ce qui revient au point 2) ou 3), soit annuler, ce qui revient au point 1)
  *
  * C'est donc uniquement l'action bank_autoresponse ici qui valide un paiement réussi.
- * Le lien de retour OK ou NOK est simplement un lien de retour cliqué après le paiement.
+ * Le lien de retour OK ou NOK est simplement un lien de retour cliqué après le paiement,
+ * mais n'ont pas d'action sur les statuts de la transaction.
  * Ces liens constateront que le paiement a bien été effectué ou non, et redirigeront sur
  * le squelette SPIP prévu en conséquence.
  */
