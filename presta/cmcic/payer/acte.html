@@ -1,0 +1,22 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012 - Distribue sous licence GNU/GPL
+ *
+ */
+]#CACHE{0}
+<BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
+	<div class='mode_paiement' id='paiement_cmcic'>
+	<p class="titre">Choisissez CMCIC :</p>
+	<div class='boutons'>
+	<form action="#ENV{action}" method="post">
+	[(#ENV**{hidden})]
+	<button class="submit" type="submit">#ENV*{logobrand,'Payer'}</button>
+	</form></div>
+	</div>
+</BOUCLE_trans>
