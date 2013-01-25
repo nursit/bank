@@ -77,7 +77,7 @@ if (!defined('CMCIC_SERVEUR')) {
 		# define ("CMCIC_SERVEUR", "https://paiement.creditmutuel.fr/test/paiement.cgi");    // Crédit Mutuel
 		# define ("CMCIC_SERVEUR", "https://ssl.paiement.banque-obc.fr/test/paiement.cgi");  // OBC
 	} else {
-		define ("CMCIC_SERVEUR", "https://ssl.paiement.cic-banques.fr/paiement.cgi");   // CIC ancien
+		define ("CMCIC_SERVEUR", "https://ssl.paiement.cic-banques.fr/paiement.cgi");   // CIC
 		# define ("CMCIC_SERVEUR", "https://paiement.creditmutuel.fr/paiement.cgi");    // Crédit Mutuel
 		# define ("CMCIC_SERVEUR", "https://ssl.paiement.banque-obc.fr/paiement.cgi");  // OBC
 	}
