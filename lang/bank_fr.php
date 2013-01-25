@@ -31,6 +31,8 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 'carte_bleu'=>'Carte Bleue',
 'choisissez_cb'=>'Choisissez votre carte bancaire&nbsp;:',
 'abonnement_par_CB' => 'avec ma carte bancaire',
+'payer' => 'Payer',
+'payer_avec' => 'Payer avec @nom@',
 
 
 'titre_reglement_ok'=>'R&egrave;glement r&eacute;ussi',
