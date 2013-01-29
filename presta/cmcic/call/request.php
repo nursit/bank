@@ -97,6 +97,7 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash) {
 	$contenu = array(
 		'id' => $id_transaction,
 		'hash' => $transaction_hash,
+		'lang' => $GLOBALS['spip_lang'], # pour le hit de la banque, pouvoir retrouver la langue utilisateur
 		'contenu' => $row['contenu'], # déjà sérializé en théorie
 	);
 	$contexte['texte-libre'] = serialize($contenu);

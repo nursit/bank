@@ -127,6 +127,13 @@ function cmcic_traite_reponse_transaction($response, $mode = "cmcic") {
 	// id & hash
 	$id_transaction   = $contenu['id'];
 	$transaction_hash = $contenu['hash'];
+	$lang             = $contenu['lang'];
+
+	// remettre la langue de l'utilisateur qui a demandé la transaction
+	// puisque ici c'est le serveur cmcic qui fait le hit
+	include_spip('inc/lang');
+	changer_langue($lang);
+
 
 	// cette ligne id/hash doit exister !
 	if (!$row = sql_fetsel("*","spip_transactions",array(
