@@ -28,22 +28,6 @@ function paybox_shell_args($params){
 	return $res;
 }
 
-function paybox_exec_request($params,$request='modulev2.cgi'){
-	$path_bin = realpath(_DIR_PLUGIN_BANK . "presta/paybox/bin/$request");
-		
-	// signaler le passage en ligne de commande 
-	$params['PBX_MODE'] = '4';
-
-	// transformer la table d'arguments en commande shell
-	$params = paybox_shell_args($params);
-
-	//	Appel du binaire request
-	spip_log("paybox_exec_request : $path_bin $params",'paybox');
-	$result=shell_exec("$path_bin $params");
-
-	return $result;
-}
-
 function paybox_response($response = 'response'){
 
 	$url = parse_url($_SERVER['REQUEST_URI']);
