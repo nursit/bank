@@ -21,17 +21,19 @@
 		<fieldset>
 			<legend><:bank:label_mode_paiement:></legend>
 			<ul>
-				<BOUCLE_prestas(POUR){tableau #LISTE{ogone,paybox,paypal,cmcic,simu,cheque}}>
-					<li class="editer_presta_#VALEUR long_label[(#ENV**{erreurs}|table_valeur{presta_#VALEUR}|oui)erreur]">
-						<label>[(#VAL{bank:label_presta_}|concat{#VALEUR}|_T)]</label>[
-						<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{presta_#VALEUR})</span>]
-						<div class="choix">
-							<input type="radio" name="presta_#VALEUR" value="1" [checked="(#ENV{presta_#VALEUR}?{checked,''})"] id="presta_#VALEUR_1" />
-							<label for='presta_[(#VALEUR)]_1' class="[(#ENV{presta_#VALEUR}?{on})]"><:bank:label_actif:></label>
-						</div>
-						<div class="choix">
-							<input type="radio" name="presta_#VALEUR" value="0" [checked="(#ENV{presta_#VALEUR}?{'',checked})"] id="presta_#VALEUR_0" />
-							<label for='presta_[(#VALEUR)]_0' class="[(#ENV{presta_#VALEUR}?{'',on})]"><:bank:label_inactif:></label>
+				<BOUCLE_prestas(POUR){tableau #LISTE{ogone,paybox,paypal,cmcic,cheque,simu}}>
+					#SET{name,presta_#VALEUR}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+					#SET{disabled,''}
+					[(#AUTORISER{utilisermodepaiement,#VALEUR}|non)#SET{disabled,true}]
+					<li class="editer pleine_largeur editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
+						<span class='erreur_message'>(#GET{erreurs})</span>
+						]
+						#SET{val,0}
+						<input type="hidden" name="#GET{name}" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
+						#SET{val,1}
+						<div class="choix[(#GET{disabled}|oui)muted]">
+							<input type="checkbox" name="#GET{name}" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#GET{name},#GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
+							<label for="#GET{name}_#GET{val}">[(#VAL{bank:label_presta_}|concat{#VALEUR}|_T)]</label>
 						</div>
 					</li>
 				</BOUCLE_prestas>
@@ -57,3 +59,6 @@
 	</p>
 </div></form>
 </div>
+<style type="text/css">
+	.muted {opacity: 0.6;}
+</style>
