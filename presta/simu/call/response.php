@@ -24,7 +24,8 @@ function presta_simu_call_response_dist(){
 	
 	$id_transaction = _request('id_transaction');
 	$transaction_hash = _request('hash');
-	if (!defined('_SIMU_BANK_ALLOWED')) {
+	include_spip('inc/autoriser');
+	if (!autoriser('utilisermodepaiement','simu')) {
 		spip_log('simu pas autorisee','simu');
 		return array($id_transaction,false);
 	}

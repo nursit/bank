@@ -43,4 +43,14 @@ function affiche_monnaie($valeur,$decimales=2,$unite=true){
 }
 }
 
+function autoriser_utilisermodepaiement_dist($faire, $mode='', $id=0, $qui = NULL, $opt = NULL){
+	include_spip("presta/$mode/config");
+	$fonctions = array('autoriser_'.$mode.'_'.$faire,'autoriser_'.$mode.'_'.$faire.'_dist','autoriser_'.$mode,'autoriser_'.$mode.'_dist');
+	foreach ($fonctions as $f) {
+		if (function_exists($f)) {
+			return $f($faire,$mode,$id,$qui,$opt);
+		}
+	}
+	return true;
+}
 ?>
