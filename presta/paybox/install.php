@@ -15,17 +15,21 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * Installation des fichiers de configuration/parametrage PAYBOX
  */
 function presta_paybox_install_dist(){
-	$dir = sous_repertoire(_DIR_ETC,'presta');
-	$dir = sous_repertoire($dir,'paybox');
-
-	if (!file_exists($dir."pbx_ids.php")){
-		$merchant_config = "<"."?php
-		function bank_paybox_pbx_ids(){return array('PBX_IDENTIFIANT'=>'2','PBX_SITE'=>'1999888','PBX_RANG'=>'99');}\n"
-		. "?".">";
-		ecrire_fichier($dir."pbx_ids.php",$merchant_config);
-		ecrire_meta("bank_paybox_pbx_ids",substr($dir,strlen(_DIR_ETC))."pbx_ids.php");
+	if (file_exists($f=_DIR_ETC."presta/paybox/pbx_ids.php")){
+		include_once($f);
+		if (function_exists("bank_paybox_pbx_ids")){
+			$config = bank_paybox_pbx_ids();
+			include_spip('inc/config');
+			ecrire_config("bank_paiement/config_paybox",$config);
+			@unlink($f);
+		}
+	}
+	else {
+		include_spip('inc/config');
+		if (!lire_config("bank_paiement/config_paybox",'')){
+			ecrire_config("bank_paiement/config_paybox",array('PBX_IDENTIFIANT'=>'2','PBX_SITE'=>'1999888','PBX_RANG'=>'99'));
+		}
 	}
 }
-
 
 ?>

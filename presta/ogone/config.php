@@ -26,7 +26,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 // PSPID : il s'agit de l'identifiant unique de marchand fournit par Ogone
 if (!defined('_OGONE_PSPID'))
-	define('_OGONE_PSPID',"ici_monpsid");
+	define('_OGONE_PSPID',$GLOBALS['config_bank_paiement']['config_ogone']['PSPID']);
 
 // Url sur laquelle envoyer les demandes de paiement
 if (!defined('_OGONE_URL'))
@@ -42,12 +42,13 @@ if (!defined('_OGONE_URL'))
 // Algorithme de hachage : SHA-1
 // Pour le charset, utiliser celui du site.
 if (!defined('_OGONE_CLE_SHA_IN'))
-	define('_OGONE_CLE_SHA_IN',"ici_cle_secrete_sha_1n");
+	define('_OGONE_CLE_SHA_IN',$GLOBALS['config_bank_paiement']['config_ogone']['CLE_SHA_IN']);
 
 // Cle de signature des retour depuis Ogone. A renseigner aussi dans la
 // configuration chez Ogone
 if (!defined('_OGONE_CLE_SHA_OUT'))
-	define('_OGONE_CLE_SHA_OUT',"ici_cle_secrete_sha_ou1");
+	define('_OGONE_CLE_SHA_OUT',$GLOBALS['config_bank_paiement']['config_ogone']['CLE_SHA_OUT']);
+
 
 /* ------------------------------------------------------------------------- */
 

@@ -14,8 +14,8 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 /* Paypal Simple ----------------------------------------------------------- */
 // parametres pour paiement standard paypal
 if (!defined('_PAYPAL_BUSINESS_USERNAME'))
-	define('_PAYPAL_BUSINESS_USERNAME', 'your_email_username_for_paypal@example.org');
+	define('_PAYPAL_BUSINESS_USERNAME', $GLOBALS['config_bank_paiement']['config_paypal']['BUSINESS_USERNAME']);
 if (!defined('_PAYPAL_URL_SERVICES'))
-	define('_PAYPAL_URL_SERVICES', 'https://www.sandbox.paypal.com:443/fr/cgi-bin/webscr');
+	define('_PAYPAL_URL_SERVICES', $GLOBALS['config_bank_paiement']['config_paypal']['URL_SERVICES']);
 
 ?>

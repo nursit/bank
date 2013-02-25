@@ -1,0 +1,20 @@
+<ul>
+	#SET{name,#ENV{casier,''}_PSPID}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">PSPID</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[PSPID]" class="text" value="#ENV*{#ENV{casier,''}/PSPID,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	#SET{name,#ENV{casier,''}_CLE_SHA_IN}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">CLE_SHA_IN</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="password" name="#ENV{casier,''}[CLE_SHA_IN]" class="text password" value="#ENV*{#ENV{casier,''}/CLE_SHA_IN,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	#SET{name,#ENV{casier,''}_CLE_SHA_OUT}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">CLE_SHA_OUT</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="password" name="#ENV{casier,''}[CLE_SHA_OUT]" class="text password" value="#ENV*{#ENV{casier,''}/CLE_SHA_OUT,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+</ul>

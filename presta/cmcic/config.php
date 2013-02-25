@@ -57,15 +57,15 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 // Une fois le fichier de clé HMAC-SHA1 téléchargé, la clé se trouve sur la première ligne
 // de ce fichier après le texte "Version 1 ", en majuscule.
 if (!defined('CMCIC_CLE'))
-	define('CMCIC_CLE',  "1234567890ABCDEF1234567890abcdef12345678"); // indiquer sa clé hexa 40 caractères
+	define('CMCIC_CLE',  $GLOBALS['config_bank_paiement']['config_cmcic']['CLE']); // indiquer sa clé hexa 40 caractères
 
 // TPE : il s'agit du numéro de TPE, fournit par CMCIC pour le marchand
 if (!defined('CMCIC_TPE'))
-	define('CMCIC_TPE', "1234567"); // indiquer son numéro de TPE (7 chiffres ?)
+	define('CMCIC_TPE', $GLOBALS['config_bank_paiement']['config_cmcic']['TPE']); // indiquer son numéro de TPE (7 chiffres ?)
 
 // code de société du marchant, fournit par CMCIC
 if (!defined('CMCIC_CODESOCIETE'))
-	define ('CMCIC_CODESOCIETE', "nomsociete"); // indiquer code de société (10 caractères ?)
+	define ('CMCIC_CODESOCIETE', $GLOBALS['config_bank_paiement']['config_cmcic']['CODESOCIETE']); // indiquer code de société (10 caractères ?)
 
 // URL d'accès à la banque.
 // Par défaut, l'adresse CIC de paiement normal.
@@ -77,7 +77,8 @@ if (!defined('CMCIC_SERVEUR')) {
 		# define ("CMCIC_SERVEUR", "https://paiement.creditmutuel.fr/test/paiement.cgi");    // Crédit Mutuel
 		# define ("CMCIC_SERVEUR", "https://ssl.paiement.banque-obc.fr/test/paiement.cgi");  // OBC
 	} else {
-		define ("CMCIC_SERVEUR", "https://ssl.paiement.cic-banques.fr/paiement.cgi");   // CIC
+		define ("CMCIC_SERVEUR", $GLOBALS['config_bank_paiement']['config_cmcic']['SERVEUR']);   // CIC
+		# define ("CMCIC_SERVEUR", "https://ssl.paiement.cic-banques.fr/paiement.cgi");   // CIC
 		# define ("CMCIC_SERVEUR", "https://paiement.creditmutuel.fr/paiement.cgi");    // Crédit Mutuel
 		# define ("CMCIC_SERVEUR", "https://ssl.paiement.banque-obc.fr/paiement.cgi");  // OBC
 	}

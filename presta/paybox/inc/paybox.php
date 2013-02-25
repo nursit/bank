@@ -12,12 +12,11 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function paybox_pbx_ids($boutique=''){
-	include_once(_DIR_ETC . 'presta/paybox/pbx_ids.php');
 	$boutique = $boutique ? "_".$boutique:"";
-	if (function_exists($f = "bank_paybox".$boutique."_pbx_ids")){
-		return $f();
-	}
-	return array();
+	$config = 'config_paybox'.$boutique;
+
+	include_spip('inc/config');
+	return lire_config("bank_paiement/$config");
 }
 
 function paybox_shell_args($params){

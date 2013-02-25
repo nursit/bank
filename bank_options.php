@@ -18,8 +18,8 @@ if (!isset($_COOKIE['accept_cookie'])) {
 }
 
 if (isset($GLOBALS['meta']['bank_paiement'])
-  AND $prestas = unserialize($GLOBALS['meta']['bank_paiement'])
-	AND count($prestas = $prestas['presta'])) {
+  AND $GLOBALS['config_bank_paiement'] = unserialize($GLOBALS['meta']['bank_paiement'])
+	AND count($prestas = $GLOBALS['config_bank_paiement']['presta'])) {
 	// initialiser la config de chaque presta actif
 	foreach($prestas as $p=>$actif){
 		// TODO ajouter une secu !preg_match(',[\W],',$p) ?
@@ -28,6 +28,7 @@ if (isset($GLOBALS['meta']['bank_paiement'])
 			include_spip("presta/$p/config"); // pour la config par defaut
 		}
 	}
+	unset($GLOBALS['config_bank_paiement']);
 }
 
 if (!function_exists('affiche_monnaie')) {

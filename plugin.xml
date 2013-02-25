@@ -2,8 +2,8 @@
   <nom>Banque&amp;paiement</nom>
   <auteur>C&eacute;dric Morin [Nursit.com->http://nursit.com]</auteur>
 	<icon>prive/themes/spip/images/credit-card-32.png</icon>
-  <version>2.3.0</version>
-  <version_base>1.1.0</version_base>
+  <version>2.4.0</version>
+  <version_base>1.1.1</version_base>
   <etat>stable</etat>
   <description>Un module de paiement bancaire multi prestataires</description>
   <install>base/bank_install.php</install>
