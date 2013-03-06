@@ -32,8 +32,8 @@ function paybox_response($response = 'response'){
 	$url = parse_url($_SERVER['REQUEST_URI']);
 	if (function_exists('openssl_pkey_get_public')){
 		// recuperer la cle publique Paybox
-		lire_fichier(_DIR_ETC.'presta/paybox/pubkey.pem',$fichier);
-		$cle = openssl_pkey_get_public($fichier);
+		$config = paybox_pbx_ids();
+		$cle = openssl_pkey_get_public($config['pubkey']);
 
 		// recuperer la signature
 		$sign = _request('sign');

@@ -17,4 +17,11 @@
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[PBX_RANG]" class="text" value="#ENV*{#ENV{casier,''}/PBX_RANG,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
+	#SET{name,#ENV{casier,''}_pubkey}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">Public Key</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<textarea name="#ENV{casier,''}[pubkey]" class="textarea">
+#ENV*{#ENV{casier,''}/pubkey,#GET{defaut}}</textarea>
+	</li>
 </ul>
