@@ -3,24 +3,24 @@
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 		<label for="#GET{name}">CLE</label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
-		]<input type="text" name="#ENV{casier,''}[CLE]" class="text" value="#ENV*{#ENV{casier,''}/CLE,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+		]<input type="text" name="#ENV{casier,''}[CLE]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{CLE,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
 	#SET{name,#ENV{casier,''}_TPE}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 		<label for="#GET{name}">TPE</label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
-		]<input type="text" name="#ENV{casier,''}[TPE]" class="text" value="#ENV*{#ENV{casier,''}/TPE,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+		]<input type="text" name="#ENV{casier,''}[TPE]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{TPE,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
 	#SET{name,#ENV{casier,''}_CODESOCIETE}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 		<label for="#GET{name}">CODESOCIETE</label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
-		]<input type="text" name="#ENV{casier,''}[CODESOCIETE]" class="text" value="#ENV*{#ENV{casier,''}/CODESOCIETE,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+		]<input type="text" name="#ENV{casier,''}[CODESOCIETE]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{CODESOCIETE,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
 	#SET{name,#ENV{casier,''}_SERVEUR}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 		<label for="#GET{name}">SERVEUR</label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
-		]<input type="text" name="#ENV{casier,''}[SERVEUR]" class="text" value="#ENV*{#ENV{casier,''}/SERVEUR,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+		]<input type="text" name="#ENV{casier,''}[SERVEUR]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{SERVEUR,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
 </ul>

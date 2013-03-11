@@ -32,7 +32,7 @@
 						<input type="hidden" name="presta[#VALEUR]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
 						#SET{val,1}
 						<div class="choix[(#GET{disabled}|oui)muted]">
-							<input type="checkbox" name="presta[#VALEUR]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{presta/#VALEUR,#GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
+							<input type="checkbox" name="presta[#VALEUR]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{presta}|table_valeur{#VALEUR, #GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
 							<label for="#GET{name}_#GET{val}">[(#VAL{bank:label_presta_}|concat{#VALEUR}|_T)]</label>
 						</div>
 					</li>
@@ -75,8 +75,13 @@ jQuery(function(){
 	jQuery('.suite').each(function(){
 		var me = jQuery(this);
 		var input = me.prev('.editer').find('input.checkbox');
-		if (!input.prop('checked')) jQuery(this).hide();
-		input.change(function(){if (jQuery(this).prop('checked')) me.show('fast'); else me.hide('fast');})
+		if (jQuery.prop) { /* spip 3 */
+			if (!input.prop('checked')) jQuery(this).hide();
+			input.change(function(){if (jQuery(this).prop('checked')) me.show('fast'); else me.hide('fast');});
+		} else {
+			if (!input.attr('checked')) jQuery(this).hide();
+			input.change(function(){if (jQuery(this).attr('checked')) me.show('fast'); else me.hide('fast');});
+		}
 	})
 });
 </script>
