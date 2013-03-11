@@ -15,6 +15,7 @@
 	<p class="titre">Choisissez Paypal :</p>
 	<div class='boutons'>
 	<form action="#EVAL{_PAYPAL_URL_SERVICES}" method="post">
+	<input TYPE="hidden" name="charset" value="#CHARSET" /> 
 	<input type="hidden" name="cmd" value="_cart" />
 	<input type="hidden" name="upload" value="1" />
 	<input type="hidden" name="business" value="#EVAL{_PAYPAL_BUSINESS_USERNAME}" />
