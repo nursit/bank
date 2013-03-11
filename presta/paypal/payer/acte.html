@@ -12,7 +12,7 @@
 ]#CACHE{0}
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 	<div class='mode_paiement' id='paiement_paypal'>
-	<p class="titre">Choisissez Paypal :</p>
+	<p class="titre"><:bank:payer_avec{nom=Paypal}:></p>
 	<div class='boutons'>
 	<form action="#EVAL{_PAYPAL_URL_SERVICES}" method="post">
 	<input TYPE="hidden" name="charset" value="#CHARSET" /> 
