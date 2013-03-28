@@ -27,6 +27,8 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 'label_notifications' => 'Notifications',
 'label_email_ticket_admin' => 'Administrator\'s email address for reception of transaction tickets',
 
+'label_configuration_ordre' => 'Pay to the order of',
+'label_configuration_adresse' => 'Adress where checks should be sent',
 
 'carte_bleu'=>'Credit Card',
 'choisissez_cb'=>'Select your Credit Card:',
