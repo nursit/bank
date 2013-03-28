@@ -27,6 +27,8 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 'label_notifications' => 'Notifications',
 'label_email_ticket_admin' => 'Email pour l\'envoi des tickets d\'achat admin',
 
+'label_configuration_ordre' => 'Ordre',
+'label_configuration_adresse' => 'Adresse où envoyer les chèques',
 
 'carte_bleu'=>'Carte Bleue',
 'choisissez_cb'=>'Choisissez votre carte bancaire&nbsp;:',
