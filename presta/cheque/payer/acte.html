@@ -20,7 +20,8 @@
 		????<br />
 		????})]
 	</p>
-	<p><:bank:info_cheque_etablir_ordre{ordre=#CONFIG{bank_paiement/config_cheque/ordre,#NOM_SITE_SPIP}}:></p>
+	#SET{ordre,#CONFIG{bank_paiement/config_cheque/ordre,#NOM_SITE_SPIP}}
+	<p><:bank:info_cheque_etablir_ordre{ordre=#GET{ordre}}:></p>
 	<p><:bank:info_cheque_facture:></p>
 	[<p class="small">(#CONFIG{bank_paiement/config_cheque/notice,''}|propre)</p>]
 	]

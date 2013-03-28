@@ -16,7 +16,7 @@
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 		<label for="#GET{name}"><:bank:label_cheque_notice:></label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
-		]<textarea name="#ENV{casier,''}[pubkey]" class="textarea">
+		]<textarea name="#ENV{casier,''}[notice]" class="textarea">
 [(#ENV*{#ENV{casier,''}}|table_valeur{pubkey,#GET{defaut}})]</textarea>
 	</li>
 </ul>
