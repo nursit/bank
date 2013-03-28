@@ -29,12 +29,20 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 'label_configuration_ordre' => 'Ordre',
 'label_configuration_adresse' => 'Adresse où envoyer les chèques',
+'label_cheque_notice' => 'Information complémentaire affichée',
+
+'info_cheque_imprimer' => 'Imprimez cette page et envoyez là avec votre chèque à l&#8217;adresse :',
+'info_cheque_etablir_ordre' => 'Chèque établi à l\'ordre de &laquo;&nbsp;<i>@ordre@</i>&nbsp;&raquo;',
+'info_cheque_facture' => 'La facture sera disponible dans votre espace client dès votre règlement pris en compte.',
+'bouton_enregistrer_reglement_cheque' => 'Enregistrer le réglement par chèque',
+
 
 'carte_bleu'=>'Carte Bleue',
 'choisissez_cb'=>'Choisissez votre carte bancaire&nbsp;:',
 'abonnement_par_CB' => 'avec ma carte bancaire',
 'payer' => 'Payer',
 'payer_avec' => 'Payer avec @nom@',
+'payer_par_cheque' => 'Règlement par chèque :',
 
 
 'titre_reglement_ok'=>'R&egrave;glement r&eacute;ussi',

@@ -12,25 +12,21 @@
 ]#CACHE{0}
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 <div class="payer_mode payer_cheque payer_acte">
-	<p class="titre">Règlement par chèque&nbsp;:</p>
+	<p class="titre"><:bank:payer_par_cheque:></p>
 	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|non|ou{#SESSION{id_auteur}|=={#ID_AUTEUR}})
-	<p>Imprimez cette page et envoyez là avec votre chèque à l&#8217;adresse&nbsp;:</p>
-	<p>
-          [(#CONFIG{bank_paiement/config_cheque/adresse}|propre|sinon{
-		Nursit<br />
-		2 allée du clos des Hydrangeas<br />
-		59700 Marcq-En-Baroeul
-          })]
+	<p><:bank:info_cheque_imprimer:></p>
+	<p>[(#CONFIG{bank_paiement/config_cheque/adresse}|propre|sinon{
+		#NOM_SITE_SPIP<br />
+		????<br />
+		????})]
 	</p>
-	<p>Chèque établi à l'ordre de &laquo;&nbsp;<i>[(#CONFIG{bank_paiement/config_cheque/ordre}|sinon{Nursit})]</i>&nbsp;&raquo;</p>
-	<p>La facture sera disponible dans votre espace client dès votre règlement pris en compte.</p>
-	<p class="small"><strong>Attention</strong> : cette commande ne sera validée par nos services qu&#8217;à <b>encaissement</b> de votre chèque.
-		Il vous appartient de prévoir un délai d&#8217;acheminement et d&#8217;encaissement suffisant avant expiration de vos services
-	<br />Nous ne pourrons pas prendre en compte votre chèque si il n'est pas accompagné de la copie de cette commande.</p>
+	<p><:bank:info_cheque_etablir_ordre{ordre=#CONFIG{bank_paiement/config_cheque/ordre,#NOM_SITE_SPIP}:></p>
+	<p><:bank:info_cheque_facture:></p>
+	[<p class="small">(#CONFIG{bank_paiement/config_cheque/notice,''}|propre)</p>]
 	]
 	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|non|ou{#SESSION{id_auteur}|=={#ID_AUTEUR}}|non)
 	<div class='boutons'>
-	#BOUTON_ACTION{'Enregistrer le réglement par chèque',#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}}
+	[(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_cheque:>,#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}})]
 	</div>
 	]
 </div>
