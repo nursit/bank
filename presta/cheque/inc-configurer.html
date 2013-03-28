@@ -17,6 +17,6 @@
 		<label for="#GET{name}"><:bank:label_cheque_notice:></label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<textarea name="#ENV{casier,''}[notice]" class="textarea">
-[(#ENV*{#ENV{casier,''}}|table_valeur{pubkey,#GET{defaut}})]</textarea>
+[(#ENV*{#ENV{casier,''}}|table_valeur{notice,#GET{defaut}})]</textarea>
 	</li>
 </ul>
