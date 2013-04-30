@@ -1,0 +1,65 @@
+###############################################################################
+#
+#	Fichier des parametres MERCANET BNP PARIBAS
+#
+#	Remarque :	Ce fichier parametre est sous la responsabilite de
+#				BNP PARIBAS
+#
+###############################################################################
+
+
+# Logo central de BNP PARIBAS 
+
+ADVERT!advert.gif!
+
+# couleur du fond d'ecran (blanc)
+
+BGCOLOR!ffffff!
+
+# Mode d'affichage des blocs de paiment
+
+BLOCK_ALIGN!center!
+
+# Ordre d'affichage des blocs de paiement
+
+BLOCK_ORDER!1,2,3,4,5,6,7,8!
+
+# Mode de securite 
+
+CONDITION!SSL!
+
+# Liste des cartes acceptees par le commercant
+
+CARD_LIST!CB,VISA,MASTERCARD!
+
+# flag d'edition des libelles des blocs de paiement
+
+HEADER_FLAG!yes!
+
+# Code langage de l'acheteur (fr=francais)
+
+LANGUAGE!fr!
+
+# Logo BNP PARIBAS
+
+LOGO!mercanet.gif!
+
+# Code pays du commercant
+
+MERCHANT_COUNTRY!fr!
+
+# Code langage du commercant
+
+MERCHANT_LANGUAGE!fr!
+
+# Passage en une seule frame securisee au moment du paiement
+
+TARGET!_top!
+
+# Couleur du texte (noir)
+
+TEXTCOLOR!000000!
+
+
+# END OF FILE
+

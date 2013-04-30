@@ -140,7 +140,7 @@ function cmcic_traite_reponse_transaction($response, $mode = "cmcic") {
 		"id_transaction=".intval($id_transaction),
 		'transaction_hash='.sql_quote($contenu['hash']))))
 	{
-		spip_log($t = "call_response : id_transaction $id_transaction / $hash inconnu:", $mode);
+		spip_log($t = "call_response : id_transaction $id_transaction / $transaction_hash inconnu:", $mode);
 		// on log ca dans un journal dedie
 		spip_log($t, $mode . "_douteux");
 		// on mail le webmestre
@@ -303,19 +303,22 @@ function cmcic_response() {
  *     Réponse de la banque
  * @param array $row
  *     Ligne de transaction
+ * @param bool|string $erreur
+ *    Message d'erreur eventuel
  * @return void
 **/ 
-function cmcic_gerer_transaction_annulee($id_transaction, $response, $row) {
+function cmcic_gerer_transaction_annulee($id_transaction, $response, $row, $erreur=true) {
 	$mode = "cmcic";
 
 	// regarder si l'annulation n'arrive pas apres un reglement
 	// (internaute qui a ouvert 2 fenetres de paiement)
 	if ($row['reglee']!='oui') {
+		$date_paiement = date('Y-m-d H:i:s');
 		// sinon enregistrer l'absence de paiement et l'erreur
 		spip_log($t="call_response : transaction $id_transaction refusée ou annulée pour : $response[motifrefus]", $mode);
 		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;".($erreur===true?"":" ($erreur)");
 		sql_updateq("spip_transactions",
-			array("statut"=>'echec','date_paiement'=>$date_paiement,'message'=>$message),
+			array("statut"=>'echec['.$response['motifrefus'].']','date_paiement'=>$date_paiement,'message'=>$message),
 		  "id_transaction=".intval($id_transaction)
 		);
 		return array($id_transaction, false);
@@ -361,7 +364,7 @@ function cmcic_gerer_transaction_payee($id_transaction, $response, $row, $paieme
 	$transaction     = $response['reference']; # référence de transaction
 
 	sql_updateq("spip_transactions",array(
-		"autorisation_id"=>"$transaction/$authorisation_id",
+		"autorisation_id"=>"$transaction/$autorisation_id",
 		"mode"=>$mode,
 		"montant_regle"=>$montant_regle,
 		"date_paiement"=>$date_paiement,

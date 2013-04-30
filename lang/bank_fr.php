@@ -20,6 +20,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 'label_presta_cheque' => 'Ch&egrave;ques (encaissement manuel)',
 'label_presta_simu' => 'Simulation (necessite une autorisation par define)',
 'label_presta_cmcic' => 'CMCIC <a href="https://www.cmcicpaiement.fr/fr/">cmcicpaiement.fr</a>',
+'label_presta_sips_service' => 'Service',
 
 'label_actif' => 'Activer',
 'label_inactif' => 'D&eacute;sactiver',

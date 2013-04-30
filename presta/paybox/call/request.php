@@ -65,12 +65,12 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $ab
 	}
 	//var_dump($parm);
 	$cartes_possibles = array(
-	'CB'=>'presta/paybox/logo/CB.gif',
-	'VISA'=>'presta/paybox/logo/VISA.gif',
-	'EUROCARD_MASTERCARD'=>'presta/paybox/logo/MASTERCARD.gif',
-	'E_CARD'=>'presta/paybox/logo/E-CB.gif',
-	'AMEX'=>'presta/paybox/logo/AMEX.gif',
-	'AURORE'=>'presta/paybox/logo/AURORE.gif',
+		'CB'=>'presta/paybox/logo/CB.gif',
+		'VISA'=>'presta/paybox/logo/VISA.gif',
+		'EUROCARD_MASTERCARD'=>'presta/paybox/logo/MASTERCARD.gif',
+		'E_CARD'=>'presta/paybox/logo/E-CB.gif',
+		'AMEX'=>'presta/paybox/logo/AMEX.gif',
+		'AURORE'=>'presta/paybox/logo/AURORE.gif',
 	);
 
 
@@ -78,7 +78,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $ab
 	$contexte = array('hidden'=>array(),'action'=>_PAYBOX_URL,'backurl'=>url_absolue(self()),'id_transaction'=>$id_transaction);
 	$paybox_exec_request = charger_fonction("exec_request","presta/paybox");
 	foreach($cartes as $carte){
-		if ($cartes_possibles[$carte]){
+		if (isset($cartes_possibles[$carte])){
 			$parm['PBX_TYPEPAIEMENT'] = 'CARTE';
 			$parm['PBX_TYPECARTE'] = $carte;
 			$contexte['hidden'][$carte] = $paybox_exec_request($parm);

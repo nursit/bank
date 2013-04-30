@@ -107,8 +107,8 @@ function bank_upgrade($nom_meta_base_version,$version_cible){
 			sql_alter("table spip_transactions ADD contenu TEXT NOT NULL DEFAULT ''");
 			ecrire_meta($nom_meta_base_version,$current_version="1.1.0",'non');
 		}
-		if (spip_version_compare($current_version,"1.1.1","<=")){
-			ecrire_meta($nom_meta_base_version,$current_version="1.1.1",'non');
+		if (spip_version_compare($current_version,"1.2.0","<=")){
+			ecrire_meta($nom_meta_base_version,$current_version="1.2.0",'non');
 		}
 
 		bank_presta_install();

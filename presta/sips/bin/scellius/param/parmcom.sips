@@ -1,0 +1,55 @@
+###############################################################################
+#
+#	Fichier des parametres SCELLIUS 
+#
+#	Remarque :	Ce fichier parametre est sous la responsabilite de LA POSTE
+#
+###############################################################################
+
+
+# Mode d'affichage des blocs de paiment
+
+BLOCK_ALIGN!center!
+
+# Ordre d'affichage des blocs de paiement
+
+BLOCK_ORDER!1,2,3,4,5,6,7,8!
+
+# Mode de securite 
+
+CONDITION!SSL!
+
+# Code devise  ( 978=EURO )
+
+CURRENCY!978!
+
+# flag d'edition des libelles des blocs de paiement
+
+HEADER_FLAG!yes!
+
+# Code langage de l'acheteur (fr=francais)
+
+LANGUAGE!fr!
+
+# Code pays du commercant
+
+MERCHANT_COUNTRY!fr!
+
+# Code langage du commercant
+
+MERCHANT_LANGUAGE!fr!
+
+# Passage en une seule frame securisee au moment du paiement
+
+TARGET!_top!
+
+# Nom du template de la page de paiement e-transactions
+
+TEMPLATE!template_scellius!
+
+# Couleur du text (noir)
+
+TEXTCOLOR!000000!
+
+# END OF FILE
+
