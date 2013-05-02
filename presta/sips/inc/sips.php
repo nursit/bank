@@ -40,7 +40,8 @@ function sips_ecrire_config_merchant($service,$merchant_id,$certificat,$dir_logo
 	if (!file_exists($pathfile."parmcom.$merchant_id"))
 		copy(_DIR_PLUGIN_BANK."presta/sips/bin/$service/param/parmcom",$pathfile."parmcom.$merchant_id");
 	// le certificat
-	ecrire_fichier($p=$pathfile."certif.fr.$merchant_id",$certificat);
+	if ($merchant_id)
+		ecrire_fichier($p=$pathfile."certif.fr.$merchant_id",$certificat);
 
 	return $realdir;
 }

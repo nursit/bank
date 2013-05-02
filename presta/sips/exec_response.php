@@ -21,7 +21,11 @@ function presta_sips_exec_response_dist($service,$params,$certificat,$dir_logo,$
 	$path_bin = realpath($path_bin);
 
 	include_spip("presta/sips/inc/sips");
-	$merchant_id = $params['merchant_id'];
+	$merchant_id = 0;
+	if (isset($params['merchant_id'])){
+		$merchant_id = $params['merchant_id'];
+		unset($params['merchant_id']);
+	}
 	$realdir = sips_ecrire_config_merchant($service,$merchant_id,$certificat,$dir_logo);
 	$params['pathfile'] = $realdir."/pathfile";
 
