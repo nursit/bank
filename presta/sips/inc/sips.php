@@ -13,14 +13,14 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 /**
  * Ecrire les fichiers de config/parametres a la volee avant l'appel a un binaire SIPS
- * @param $service
- * @param $merchant_id
- * @param $certificat
+ * @param string $service
+ * @param string $merchant_id
+ * @param string $certificat
+ * @param string $dir_logo
  * @return string
  */
-function sips_ecrire_config_merchant($service,$merchant_id,$certificat){
+function sips_ecrire_config_merchant($service,$merchant_id,$certificat,$dir_logo){
 	// creer les fichiers config pour la transaction
-	$dir_logo = find_in_path("presta/sips/logo/"); // permettre la surcharge des images
 	$pathfile = sous_repertoire(_DIR_TMP,"sips");
 	$pathfile = sous_repertoire($pathfile,$service);
 	$realdir = realpath($pathfile);
@@ -75,8 +75,9 @@ function sips_request($service,$params,$certificat,$request = "request"){
 	// enlever les header moches
 	$params['header_flag'] = 'no';
 
+	$dir_logo = find_in_path("presta/sips/logo/"); // permettre la surcharge des images
 	$sips_exec_request = charger_fonction("exec_request","presta/sips");
-	$result = $sips_exec_request($service,$params,$certificat,$request);
+	$result = $sips_exec_request($service,$params,$certificat,$dir_logo,$request);
 
 	//	sortie de la fonction : $result=!code!error!buffer!
 	//	    - code=0	: la fonction genere une page html contenue dans la variable buffer
@@ -113,8 +114,9 @@ function sips_response($service, $merchant_id, $certificat, $response = 'respons
 	$params = array('message'=>_request('DATA'));
 	$params['merchant_id'] = $merchant_id;
 
+	$dir_logo = find_in_path("presta/sips/logo/"); // permettre la surcharge des images
 	$sips_exec_response = charger_fonction("exec_response","presta/sips");
-	$result = $sips_exec_response($service,$params,$certificat,$response);
+	$result = $sips_exec_response($service,$params,$certificat,$dir_logo,$response);
 
 	//	Sortie de la fonction : !code!error!v1!v2!v3!...!v29
 	//		- code=0	: la fonction retourne les donnees de la transaction dans les variables v1, v2, ...

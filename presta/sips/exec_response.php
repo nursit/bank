@@ -12,7 +12,7 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
 
-function presta_sips_exec_response_dist($service,$params,$certificat,$response = 'response'){
+function presta_sips_exec_response_dist($service,$params,$certificat,$dir_logo,$response = 'response'){
 	$path_bin = _DIR_PLUGIN_BANK . "sips/bin/$service/$response";
 	if (!file_exists($path_bin)){
 		spip_log("Binaire $path_bin non trouve","sips."._LOG_ERREUR);
@@ -22,7 +22,7 @@ function presta_sips_exec_response_dist($service,$params,$certificat,$response =
 
 	include_spip("presta/sips/inc/sips");
 	$merchant_id = $params['merchant_id'];
-	$realdir = sips_ecrire_config_merchant($service,$merchant_id,$certificat);
+	$realdir = sips_ecrire_config_merchant($service,$merchant_id,$certificat,$dir_logo);
 	$params['pathfile'] = $realdir."/pathfile";
 
 	// transformer la table d'arguments en commande shell
