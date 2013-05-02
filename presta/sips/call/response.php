@@ -9,7 +9,7 @@
  *
  */
 
-include_spip('sips/inc/sips');
+include_spip('presta/sips/inc/sips');
 include_spip('inc/date');
 
 // il faut avoir un id_transaction et un transaction_hash coherents
