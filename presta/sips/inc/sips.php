@@ -236,7 +236,7 @@ function sips_traite_reponse_transaction($response,$mode = 'sips') {
 		#sql_updateq("spip_transactions",array("message"=>$message),"id_transaction=".intval($id_transaction));
 		return array($id_transaction,false);
 	}
-	if ($transaction_hash!=modulo($row['transaction_hash'],999999)){
+	if ($transaction_hash!=($row['transaction_hash']%999999)){
 		spip_log($t = "call_response : id_transaction $id_transaction, hash $transaction_hash invalide:".sips_shell_args($response),$mode);
 		// on log ca dans un journal dedie
 		spip_log($t,$mode . '_douteux');
@@ -252,14 +252,15 @@ function sips_traite_reponse_transaction($response,$mode = 'sips') {
 	$date='payment';
 	if ($mode == 'sipsabo')
 		$date='sub';
-	$date_paiement = format_mysql_date(
-	substr($response[$date.'_date'],0,4), //annee
-	substr($response[$date.'_date'],4,2), //mois
-	substr($response[$date.'_date'],6,2), //jour
-	substr($response[$date.'_time'],0,2), //Heures
-	substr($response[$date.'_time'],2,2), //min
+	//"Y-m-d H:i:s"
+	$date_paiement =
+	substr($response[$date.'_date'],0,4)."-". //annee
+	substr($response[$date.'_date'],4,2)."-". //mois
+	substr($response[$date.'_date'],6,2)." ". //jour
+	substr($response[$date.'_time'],0,2).":". //Heures
+	substr($response[$date.'_time'],2,2).":". //min
 	substr($response[$date.'_time'],4,2) //sec
-	);
+	;
 
 	$response_code = sips_response_code($response['response_code']);
 	$bank_response_code = sips_bank_response_code($response['bank_response_code']);
