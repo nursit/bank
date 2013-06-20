@@ -31,6 +31,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 'label_configuration_ordre' => 'Ordre',
 'label_configuration_adresse' => 'Adresse où envoyer les chèques',
 'label_cheque_notice' => 'Information complémentaire affichée',
+'legend_sips_logo_page_paiement' => 'Logos page de paiement',
 
 'info_cheque_imprimer' => 'Imprimez cette page et envoyez là avec votre chèque à l&#8217;adresse :',
 'info_cheque_etablir_ordre' => 'Chèque établi à l\'ordre de &laquo;&nbsp;<i>@ordre@</i>&nbsp;&raquo;',

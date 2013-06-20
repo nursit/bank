@@ -44,6 +44,13 @@ function presta_sips_call_request_dist($id_transaction,$transaction_hash){
 	$parm['cancel_return_url']=generer_url_action('bank_cancel',"bankp=sips",true,true);
 	$parm['automatic_response_url']=generer_url_action('bank_response',"bankp=sips",true,true);
 
+	// ajouter les logos de paiement si configures
+	foreach(array('logo_id','logo_id2','advert') as $logo_key){
+		if ($file = lire_config('bank_paiement/config_sips/'.$logo_key,'')){
+			$parm[$logo_key]=$file;
+		}
+	}
+
 
 	//		Les valeurs suivantes ne sont utilisables qu'en pre-production
 	//		Elles necessitent l'installation de vos fichiers sur le serveur de paiement

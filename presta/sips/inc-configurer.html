@@ -23,4 +23,24 @@
 		]<textarea name="#ENV{casier,''}[certificat]" class="textarea" rows="10">
 #ENV*{#ENV{casier,''}/certificat,#GET{defaut}}</textarea>
 	</li>
+	<li class="fieldset"><fieldset><legend><:bank:legend_sips_logo_page_paiement:></legend><ul>
+	#SET{name,#ENV{casier,''}_logo_id}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">Logo_id</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[logo_id]" class="text" value="#ENV*{#ENV{casier,''}/logo_id,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	#SET{name,#ENV{casier,''}_logo_id2}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">Logo_id2</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[logo_id2]" class="text" value="#ENV*{#ENV{casier,''}/logo_id2,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	#SET{name,#ENV{casier,''}_advert}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">Advert</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[advert]" class="text" value="#ENV*{#ENV{casier,''}/advert,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	</ul></fieldset></li>
 </ul>
