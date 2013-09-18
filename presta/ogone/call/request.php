@@ -76,9 +76,10 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash){
 	$contexte['orderID'] = $id_transaction."/".modulo($row['transaction_hash'],999999);
 	$contexte['operation'] = "SAL"; // c'est un paiement a l'acte immediat
 
-	// passage en centimes d'euros
+	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
 	$contexte['currency'] = "EUR";
-	$contexte['amount'] = intval(100*$row['montant']);
+	$contexte['amount'] = intval(round(100*$row['montant'],0));
+
 	#if (strlen($montant)<3)
 	#	$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
 

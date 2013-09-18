@@ -21,8 +21,8 @@ function presta_sips_call_request_dist($id_transaction,$transaction_hash){
 	if (!$row['id_auteur'] AND !$row['auteur_id'] AND $GLOBALS['visiteur_session']['id_auteur'])
 		sql_updateq("spip_transactions",array("id_auteur"=>$GLOBALS['visiteur_session']['id_auteur']),"id_transaction=".intval($id_transaction));
 
-	// passage en centimes d'euros
-	$montant = intval(100*$row['montant']);
+	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
+	$montant = intval(round(100*$row['montant'],0));
 
 	include_spip('inc/config');
 	$merchant_id = lire_config('bank_paiement/config_sips/merchant_id','');

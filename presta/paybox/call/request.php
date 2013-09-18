@@ -28,8 +28,8 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $ab
 	// recuperer l'email
 	$mail = sql_getfetsel('email','spip_auteurs','id_auteur='.intval($row['id_auteur']));
 
-	// passage en centimes d'euros
-	$montant = intval(100*$row['montant']);
+	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
+	$montant = intval(round(100*$row['montant'],0));
 	if (strlen($montant)<3)
 		$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
 
@@ -47,7 +47,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $ab
 	$parm['PBX_REFUSE']=generer_url_action('bank_cancel',"bankp=paybox",true,true);
 	$parm['PBX_ANNULE']=generer_url_action('bank_cancel',"bankp=paybox",true,true);
 	
-	
+
 	if ($abo
 	  AND $id_abonnement = sql_getfetsel("id_abonnement","spip_abonnements_transactions","id_transaction=".intval($id_transaction))
 	  AND $montant_echeance = sql_getfetsel('prix_echeance','spip_abonnements','id_abonnement='.intval($id_abonnement))
