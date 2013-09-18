@@ -11,8 +11,26 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+/**
+ * @param string $montant
+ * @param string $montant_ht
+ * @param int $id_auteur
+ * @param string $auteur_id
+ * @param string $auteur
+ * @param string $parrain
+ * @param string $tracking_id
+ * @param array $options
+ *   force=false pour recycler une transaction identique encore au statut commande
+ *   autre champs ajoutes a la transaction
+ * @return bool|int|mixed
+ */
 function bank_inserer_transaction_dist($montant,$montant_ht,$id_auteur=0,$auteur_id="",$auteur="",$parrain="",$tracking_id="",$options=array()){
 	include_spip('base/abstract_sql');
+	$force = true;
+	if (isset($options['force'])){
+		$force = $options['force'];
+		unset($options['force']);
+	}
 
 	$montant=round($montant,2);
 	$montant_ht=round($montant_ht,2);
@@ -30,6 +48,19 @@ function bank_inserer_transaction_dist($montant,$montant_ht,$id_auteur=0,$auteur
 
 	if ($options)
 		$set = array_merge($options, $set);
+
+	// si pas insertion forcee, regarder si on a pas deja une transaction identique
+	if (!$force){
+		$where = array();
+		foreach ($set as $k=>$v){
+			if ($k!=="date_transaction")
+				$where[] = "$k=".sql_quote($v);
+		}
+		$where[] = "statut=".sql_quote("commande");
+		$where[] = "date_transaction>".sql_quote(date('Y-m-d H:i:s',strtotime("-1 day")));
+		if ($id_transaction = sql_getfetsel("id_transaction","spip_transactions",$where))
+			return $id_transaction;
+	}
 
 	// Envoyer aux plugins
 	$set = pipeline('pre_insertion',
