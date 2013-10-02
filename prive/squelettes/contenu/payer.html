@@ -4,6 +4,13 @@
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}{statut=commande}>
 	[(#SET{titre,[Commande #(#ID_TRANSACTION) / [(#DATE_TRANSACTION|affdate_heure)]]})]
 	<INCLURE{fond=modeles/transaction_details,id_transaction,titre=#GET{titre}} />
+
+	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|oui)
+	<div class='boutons'>
+	[(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_cheque:>,#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}})]
+	</div>
+	]
+
 	<a class="right small" href="#URL_ACTION_AUTEUR{abandonner_commande,#ID_TRANSACTION,#VAL{transactions}|generer_url_ecrire{id_transaction=#ID_TRANSACTION,0,#EVAL{true}}}">Abandonner cette commande</a>
 
 	#SET{titre,#VAL{Payer la commande #}|concat{#ID_TRANSACTION,'&nbsp;: ',#MONTANT|affiche_monnaie}}
