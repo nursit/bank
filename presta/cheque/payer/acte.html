@@ -14,7 +14,7 @@
 <div class="payer_mode payer_cheque payer_acte">
 	<p class="titre"><:bank:payer_par_cheque:></p>
 	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|non|ou{#SESSION{id_auteur}|=={#ID_AUTEUR}})
-	<p><:bank:info_cheque_imprimer:></p>
+	<p><:bank:info_cheque_imprimer{montant=#MONTANT,transaction=#ID_TRANSACTION}:></p>
 	<p>[(#CONFIG{bank_paiement/config_cheque/adresse}|propre|sinon{
 		#NOM_SITE_SPIP<br />
 		????<br />
