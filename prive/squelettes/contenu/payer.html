@@ -9,17 +9,11 @@
 	#SET{titre,#VAL{Payer la commande #}|concat{#ID_TRANSACTION,'&nbsp;: ',#MONTANT|affiche_monnaie}}
 
 	<BOUCLE_client(AUTEURS){id_auteur}{statut==.*}>
-	#SET{adresse_ok,#NAME|et{#PRENOM}|et{#ADRESSE_1}|et{#ADRESSE_CP}|et{#ADRESSE_VILLE}|oui}<br />
-	[(#GET{adresse_ok}|oui)
+		[(#VAL{client_adresse_facture}|trouver_fond{modeles}|oui)
+		<br />
 		<p>#INCLURE{fond=modeles/client_adresse_facture,id_auteur}</p>
+		]
 		<INCLURE{fond=modeles/payer_acte,id_transaction,transaction_hash,title=#GET{titre}}>
-	][(#GET{adresse_ok}|non)
-		<h1><:nursit:titre_vos_infos:></h1>
-		<p><:nursit:explications_coordonnees_facture:></p>
-		<p><:nursit:explications_coordonnees_2:></p>
-
-		#FORMULAIRE_EDITER_PROFIL{#ID_AUTEUR}
-	]
 	</BOUCLE_client>
 </BOUCLE_trans>
 <p><:paniers:erreur_aucune_commande:></p>
