@@ -8,6 +8,8 @@
 			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>[(#GET{val}|ucfirst)]</option>
 			#SET{val,scellius}
 			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>[(#GET{val}|ucfirst)]</option>
+			#SET{val,sogenactif}
+			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>[(#GET{val}|ucfirst)]</option>
 		</select>
 	</li>
 	#SET{name,#ENV{casier,''}_merchant_id}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}

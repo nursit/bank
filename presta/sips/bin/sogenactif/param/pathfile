@@ -1,0 +1,47 @@
+#########################################################################
+#
+#	Pathfile 
+#
+#	Liste fichiers parametres utilises par le module de paiement
+#
+#########################################################################
+#
+#
+#-------------------------------------------------------------------------
+# Activation (YES) / Désactivation (NO) du mode DEBUG
+#-------------------------------------------------------------------------
+#
+DEBUG!NO!
+#
+# ------------------------------------------------------------------------
+# Chemin vers le répertoire des logos depuis le web alias  
+# Exemple pour le répertoire www.merchant.com/sogenactif/payment/logo/
+# indiquer:
+# ------------------------------------------------------------------------
+#
+D_LOGO!/sogenactif/payment/logo/!
+#
+# --------------------------------------------------------------------------
+#  Fichiers paramètres liés a l'api sogenactif paiement	
+# --------------------------------------------------------------------------
+#
+# certificat du commercant
+#
+F_CERTIFICATE!/home/sogenactif/payment/param/certif!
+#
+# type du certificat
+#
+F_CTYPE!php!
+#
+# fichier paramètre commercant
+#
+F_PARAM!/home/sogenactif/payment/param/parmcom!
+#
+# fichier des paramètres sogenactif
+#
+F_DEFAULT!/home/sogenactif/payment/param/parmcom.sogenactif!
+#
+#########################################################################
+# End of file
+#########################################################################
+
