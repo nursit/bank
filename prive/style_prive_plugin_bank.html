@@ -1,0 +1,16 @@
+[(#REM)
+
+	Ce squelette definit les styles de l'espace prive
+
+	Note: l'entete "Vary:" sert a repousser l'entete par
+	defaut "Vary: Cookie,Accept-Encoding", qui est (un peu)
+	genant en cas de "rotation du cookie de session" apres
+	un changement d'IP (effet de clignotement).
+
+	ATTENTION: il faut absolument le charset sinon Firefox croit que
+	c'est du text/html !
+<style>
+]
+
+.transaction .infos {color:#666;margin-bottom: 1em;}
+.box_modalbox .transaction .message {max-width: 60em;}

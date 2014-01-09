@@ -1,0 +1,20 @@
+<BOUCLE_transaction(TRANSACTIONS){id_transaction}>
+<h1 class="grostitre">Transaction ##ID_TRANSACTION</h1>
+<div class="transaction">
+	#BOITE_OUVRIR{'',infos simple}
+		<BOUCLE_auteur(AUTEURS){id_auteur}{tout}>
+		<div class="qui">Liée à [<a href='[(#ID_AUTEUR|generer_url_entite{auteur})]'>(#NOM)</a>[ \((#EMAIL)\)]]</div>
+		</BOUCLE_auteur>
+		[<div class="date">Date : (#DATE_TRANSACTION|affdate)</div>]
+		[<div class="mode">Mode : (#MODE)</div>]
+		[<div class="autorisation_id">Autorisation : (#AUTORISATION_ID)</div>]
+		[<div class="montant">Montant : (#MONTANT_HT|affiche_monnaie) HT[ / (#MONTANT|affiche_monnaie) TTC]</div>]
+		[<div class="regle on">Montant réglé :(#MONTANT_REGLE|=={#MONTANT}|non)[(#MONTANT_REGLE|affiche_monnaie)]</div>]
+		[<div class="statut">Statut : (#STATUT)</div>]
+		[<div class="parrain">Parrain : (#PARRAIN)</div>]
+		[<div class="id_facture">Facture : <a href='[(#URL_PAGE{facture}|parametre_url{id_facture,#ID_FACTURE}|parametre_url{hash,#INFO_DETAILS{facture,#ID_FACTURE}|md5})]'(#ID_FACTURE|oui)>#ID_FACTURE</a></div>]
+	#BOITE_FERMER
+
+	[<div class="message">(#MESSAGE)</div>]
+</div>
+</BOUCLE_transaction>
