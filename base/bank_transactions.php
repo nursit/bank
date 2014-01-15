@@ -73,4 +73,16 @@ function bank_declarer_tables_principales($tables_principales){
 }
 
 
+function bank_rechercher_liste_des_champs($flux){
+
+	$flux['transaction'] = array(
+		'id_transaction' => 1,
+		'auteur_id' => 1,
+		'autorisation_id' => 1,
+		'tracking_id' => 1,
+		'mode' => 1,
+	);
+	return $flux;
+}
+
 ?>

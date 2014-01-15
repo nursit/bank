@@ -74,4 +74,5 @@ function autoriser_transaction_encaissercheque_dist($faire, $type, $id_transacti
 
 	return false;
 }
+
 ?>
