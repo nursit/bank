@@ -1,0 +1,28 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012 - Distribue sous licence GNU/GPL
+ *
+ */
+]#CACHE{0}
+<BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
+	<div class='mode_paiement' id='paiement_cyberplus'>
+	<div class='boutons'>
+	<form action="#ENV{action}" method="post">
+	[(#ENV**{hidden})]
+	[(#SET{texte,<:bank:payer_avec{nom=CyberPlus}:>})]
+	<button class="submit" type="submit" title="[(#GET{texte}|attribut_html)]">
+		[(#CHEMIN{presta/cyberplus/logo/cyberplus.png}
+			|balise_img{#GET{texte}}
+			|inserer_attribut{title,#GET{texte}}
+			|image_reduire{100}
+			|sinon{#GET{texte}})]
+	</button>
+	</form></div>
+	</div>
+</BOUCLE_trans>
