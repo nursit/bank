@@ -107,7 +107,13 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash){
 	}
 
 	include_spip('inc/filtres_mini');
-	$contexte = array('hidden'=>$hidden,'action'=>_OGONE_URL,'backurl'=>url_absolue(self()),'id_transaction'=>$id_transaction);
+	$contexte = array(
+		'hidden'=>$hidden,
+		'action'=>_OGONE_URL,
+		'backurl'=>url_absolue(self()),
+		'id_transaction'=>$id_transaction,
+		'transaction_hash' => $transaction_hash
+	);
 
 	return $contexte;
 }
