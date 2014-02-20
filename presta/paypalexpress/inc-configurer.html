@@ -1,0 +1,20 @@
+<ul>
+	#SET{name,#ENV{casier,''}_API_USERNAME}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">API_USERNAME</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[API_USERNAME]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{API_USERNAME,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	#SET{name,#ENV{casier,''}_API_PASSWORD}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">API_PASSWORD</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[API_PASSWORD]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{API_PASSWORD,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	#SET{name,#ENV{casier,''}_API_SIGNATURE}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">API_SIGNATURE</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[API_SIGNATURE]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{API_SIGNATURE,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+</ul>

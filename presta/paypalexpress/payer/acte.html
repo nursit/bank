@@ -1,0 +1,19 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012 - Distribue sous licence GNU/GPL
+ *
+ */
+]#CACHE{0}
+<div class='payer_mode payer_paypalexpress payer_acte'>
+	<p class="titre"><:bank:payer_avec{nom=Paypal Express}:></p>
+	<div class='boutons'>
+		<a href='[(#URL_ACTION_AUTEUR{paypalexpress_order,#ID_TRANSACTION}|parametre_url{url_confirm,#ENV{url_confirm}})]'
+			><img src='#CHEMIN{paypal/logo/PayPal_mark_60x38.gif}' alt='Payer avec Paypal' /></a>
+	</div>
+</div>
