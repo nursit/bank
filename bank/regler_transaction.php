@@ -19,9 +19,9 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *
  * @param int $id_transaction
  * @param array $options
- *   string $message
- *   array $row_prec
- *   bool $notifier
+ *   string message
+ *   array row_prec
+ *   bool notifier
  */
 function bank_regler_transaction_dist($id_transaction,$options = array()){
 

@@ -66,10 +66,10 @@ function action_bank_response_dist($cancel=null,$auto=null){
  * cette fonction doit etre appelee avec un $id_transaction securise
  * jamais avec un $id_transaction qui provient directement de l'url sans verification
  *
- * @param <type> $mode
- * @param <type> $acte_ou_abo
- * @param <type> $succes
- * @param <type> $id_transaction
+ * @param string $mode
+ * @param string $acte_ou_abo
+ * @param bool $succes
+ * @param int $id_transaction
  */
 function redirige_apres_retour_transaction($mode,$acte_ou_abo,$succes,$id_transaction=0){
 	$redirect = "";
