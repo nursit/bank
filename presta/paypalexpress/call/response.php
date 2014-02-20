@@ -40,7 +40,7 @@ function presta_paypalexpress_call_response(){
 	call was a success, show the authorization details, and provide
 	an action to complete the payment.  If failed, show the error
 	*/
-	$resArray = bank_paypal_hash_call("GetExpressCheckoutDetails", $nvpstr);
+	$resArray = bank_paypalexpress_hash_call("GetExpressCheckoutDetails", $nvpstr);
 	$_SESSION['reshash'] = $resArray;
 	$ack = strtoupper($resArray["ACK"]);
 

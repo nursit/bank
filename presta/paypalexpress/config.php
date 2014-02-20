@@ -10,6 +10,21 @@
  *
  */
 
+
+/**
+ * Attention, ce mode de paiement fonction un peu differemnt des autres :
+ * - on envoie sur Paypal Express Checkout pour avoir un jeton de paiement et que l'utilisateur se loge sur son compte paypal
+ * - puis on revient ici avec le jeton, et on renvoie sur la page initiale de paiement avec
+ *   &confirm=oui
+ *   &checkout= url finale pour valide le paiement
+ *   $_SESSION['order_resume'] le resume des infos utilisees pour le paiement
+ *
+ * On revient donc une deuxieme fois sur la page de paiement, et le modele payer_acte affiche le form de confirmation
+ * au lieu de la liste des moyens de paiement
+ *
+ *
+ */
+
 session_start();
 
 /****************************************************
@@ -102,7 +117,7 @@ define('_PAYPAL_API_VERSION', '3.0');
 
 
 
-function action_paypalexpress_order_dist($id_transaction){
+function action_paypalexpress_order_dist($id_transaction=null){
 	if (is_null($id_transaction)){
 		$securiser_action = charger_fonction('securiser_action','inc');
 		$id_transaction = $securiser_action();
@@ -118,7 +133,7 @@ function action_paypalexpress_order_dist($id_transaction){
 
 	if(!$token = _request('token')) {
 
-		include_spip("presta/payalexpress/inc/paypalexpress");
+		include_spip("presta/paypalexpress/inc/paypalexpress");
 		$redirect = bank_paypalexpress_order_init($id_transaction,_request('url_confirm'));
 
 		if (!$redirect)
@@ -129,7 +144,7 @@ function action_paypalexpress_order_dist($id_transaction){
 }
 
 
-function action_paypalexpress_checkoutpayment_dist($arg){
+function action_paypalexpress_checkoutpayment_dist($arg=null){
 	if (is_null($arg)){
 		$securiser_action = charger_fonction('securiser_action','inc');
 		$arg = $securiser_action();

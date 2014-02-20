@@ -13,17 +13,16 @@
 <BOUCLE_macommande(TRANSACTIONS){id_transaction=#ENV{id_transaction}}{statut=commande}>
 	[(#REM) confirmer le paiement
 	Cas de Paypal Express ou le debit est execute par le site marchand]
-	[(#ENV{confirmer_paiement}|oui)
-	<div class='confirm_order'>
-		<strong>Vous allez payer avec :</strong>
+	<div id='confirm_order' class="formulaire_spip">
+		<h3>Vous allez payer avec :</h3>
 		<div class='resume'>
-			<?php echo table_valeur($_SESSION,'order_resume');?>
+			[(#ENV**{order_resume})]
 		</div>
 		<p>Validez pour effectuer maintenant le paiement avec ce compte</p>
 		<div class='boutons'>
-			#BOUTON_ACTION{Valider,#ENV{checkout}}
+			#BOUTON_ACTION{Valider,#ENV**{checkout}}
 		</div>
 	</div>
-	]
-]
 </BOUCLE_macommande>
+<p class="error">Impossible de finaliser ce paiement.</p>
+<//B_macommande>

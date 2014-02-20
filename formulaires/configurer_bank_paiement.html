@@ -21,7 +21,15 @@
 		<fieldset>
 			<legend><:bank:label_mode_paiement:></legend>
 			<ul>
-				<BOUCLE_prestas(POUR){tableau #LISTE{ogone,paybox,paypal,cmcic,sips,cheque,simu}}>
+				<BOUCLE_prestas(POUR){tableau #LISTE{
+				ogone,
+				paybox,
+				paypal,
+				paypalexpress,
+				cmcic,
+				sips,
+				cheque,
+				simu}}>
 					#SET{name,presta_#VALEUR}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 					#SET{disabled,''}
 					[(#AUTORISER{utilisermodepaiement,#VALEUR}|non)#SET{disabled,true}]
