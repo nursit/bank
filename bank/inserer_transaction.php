@@ -13,41 +13,62 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 /**
  * @param string $montant
- * @param string $montant_ht
- * @param int $id_auteur
- * @param string $auteur_id
- * @param string $auteur
- * @param string $parrain
- * @param string $tracking_id
  * @param array $options
- *   force=false pour recycler une transaction identique encore au statut commande
- *   autre champs ajoutes a la transaction
+ *   string montant_ht
+ *   int id_auteur
+ *   string auteur_id
+ *   string auteur
+ *   string parrain
+ *   string tracking_id
+ *   bool force
+ *     false pour recycler une transaction identique encore au statut commande
+ *   array champs
+ *     autre champs ajoutes a la transaction
  * @return bool|int|mixed
  */
-function bank_inserer_transaction_dist($montant,$montant_ht,$id_auteur=0,$auteur_id="",$auteur="",$parrain="",$tracking_id="",$options=array()){
+function bank_inserer_transaction_dist($montant,$options=array()){
+
+	// support ancienne syntaxe
+	// bank_inserer_transaction_dist($montant,$montant_ht,$id_auteur=0,$auteur_id="",$auteur="",$parrain="",$tracking_id="",$options=array())
+	$args = func_get_args();
+	if (count($args)>2 OR (isset($args[1]) AND !is_array($args[1]))){
+		$options = array();
+		if (isset($args[7]) AND is_array($args[7])) $options['champs'] = $args[7];
+		if (isset($options['champs']['force'])){
+			$options['force'] = $options['champs']['force'];
+		  unset($options['champs']['force']);
+		}
+		if (isset($args[1])) $options['montant_ht'] = $args[1];
+		if (isset($args[2])) $options['id_auteur'] = $args[2];
+		if (isset($args[3])) $options['auteur_id'] = $args[3];
+		if (isset($args[4])) $options['auteur'] = $args[4];
+		if (isset($args[5])) $options['parrain'] = $args[5];
+		if (isset($args[6])) $options['tracking_id'] = $args[6];
+	}
+
 	include_spip('base/abstract_sql');
 	$force = true;
 	if (isset($options['force'])){
 		$force = $options['force'];
-		unset($options['force']);
 	}
 
 	$montant=round($montant,2);
+	$montant_ht = (isset($options['montant_ht'])?$options['montant_ht']:$montant);
 	$montant_ht=round($montant_ht,2);
 
 	$set = array(
 		'montant'=>round($montant,2),
 		'montant_ht'=>round($montant_ht,2),
-		'id_auteur'=>intval($id_auteur),
-		'auteur_id'=>$auteur_id,
-		'auteur'=>$auteur,
-		'parrain'=>$parrain,
-		'tracking_id'=>$tracking_id,
+		'id_auteur'=>isset($options['id_auteur'])?intval($options['id_auteur']):0,
+		'auteur_id'=>isset($options['auteur_id'])?$options['auteur_id']:"",
+		'auteur'=>isset($options['auteur'])?$options['auteur']:"",
+		'parrain'=>isset($options['parrain'])?$options['parrain']:"",
+		'tracking_id'=>isset($options['tracking_id'])?$options['tracking_id']:"",
 		'date_transaction'=>date('Y-m-d H:i:s'),
 	);
 
-	if ($options)
-		$set = array_merge($options, $set);
+	if (isset($options['champs']) AND is_array($options['champs']))
+		$set = array_merge($options['champs'], $set);
 
 	// si pas insertion forcee, regarder si on a pas deja une transaction identique
 	if (!$force){
@@ -67,6 +88,7 @@ function bank_inserer_transaction_dist($montant,$montant_ht,$id_auteur=0,$auteur
 		array(
 			'args' => array(
 				'table' => 'spip_transactions',
+				'options' => $options,
 			),
 			'data' => $set
 		)
@@ -87,7 +109,8 @@ function bank_inserer_transaction_dist($montant,$montant_ht,$id_auteur=0,$auteur
 		array(
 			'args' => array(
 				'table' => 'spip_transactions',
-				'id_objet' => $id_transaction
+				'id_objet' => $id_transaction,
+	      'options' => $options,
 			),
 			'data' => $set
 		)

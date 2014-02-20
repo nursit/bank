@@ -18,19 +18,34 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * - lors du retour de l'internaute par redirection depuis le presta bancaire
  *
  * @param int $id_transaction
- * @param string $message
- * @param array $row_prec
- * @param bool $notifier
+ * @param array $options
+ *   string $message
+ *   array $row_prec
+ *   bool $notifier
  */
-function bank_regler_transaction_dist($id_transaction,$message="",$row_prec=null,$notifier = true){
+function bank_regler_transaction_dist($id_transaction,$options = array()){
+
+	// support ancienne syntaxe
+	// bank_regler_transaction_dist($id_transaction,$message="",$row_prec=null,$notifier = true)
+	$args = func_get_args();
+	if (count($args)>2 OR (isset($args[1]) AND !is_array($args[1]))){
+		$options = array();
+		if (isset($args[1])) $options['message'] = $args[1];
+		if (isset($args[2])) $options['row_prec'] = $args[2];
+		if (isset($args[3])) $options['notifier'] = $args[3];
+	}
+
+	$message = (isset($options['message'])?$options['message']:"");
+	$notifier = (isset($options['notifier'])?$options['notifier']:true);
 
 	if (!strlen($message)) {
 		$bank_messager_reglement_enregistre = charger_fonction('bank_messager_reglement_enregistre','inc');
 		$message = $bank_messager_reglement_enregistre($id_transaction);
 	}
 
-	if (!$row_prec)
-		$row_prec = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
+	if (!isset($options['row_prec']))
+		$options['row_prec'] = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
+	$row_prec = $options['row_prec'];
 
 	// on pose un flag dans la session pour permettre la pose eventuelle de tag
 	// sur la prochaine page
@@ -52,7 +67,9 @@ function bank_regler_transaction_dist($id_transaction,$message="",$row_prec=null
 			'new'=>$row_prec['reglee']!=='oui',
 			'confirm'=>$row_prec['reglee']=='oui',
 			'notifier'=>$notifier,
-			'avant'=>$row_prec),
+			'avant'=>$row_prec,
+			'options' => $options,
+		),
 		'data'=>$message)
 	);
 
@@ -63,7 +80,9 @@ function bank_regler_transaction_dist($id_transaction,$message="",$row_prec=null
 			'new'=>$row_prec['reglee']!=='oui',
 			'confirm'=>$row_prec['reglee']=='oui',
 			'notifier'=>$notifier,
-			'avant'=>$row_prec),
+			'avant'=>$row_prec,
+			'options' => $options,
+		),
 		'data'=>$message)
 	);
 
@@ -80,7 +99,14 @@ function bank_regler_transaction_dist($id_transaction,$message="",$row_prec=null
 		// cela permet de factoriser le code
 		$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction));
 		pipeline('trig_bank_notifier_reglement',array(
-			'args' => array('mode'=>$row['mode'],'type'=>'acte','succes'=>true,'id_transaction'=>$id_transaction,'row'=>$row),
+			'args' => array(
+				'mode'=>$row['mode'],
+				'type'=>'acte',
+				'succes'=>true,
+				'id_transaction'=>$id_transaction,
+				'row'=>$row,
+				'options' => $options,
+			),
 			'data' => '')
 		);
 	}
