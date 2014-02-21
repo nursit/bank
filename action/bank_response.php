@@ -25,7 +25,9 @@ function action_bank_response_dist($cancel=null,$auto=null){
 			 ((isset($prestas[$p]) AND $prestas[$p]) OR $p=='gratuit')
 		){
 
-			$call_response = charger_fonction('response',"presta/$p/call");
+			if (!$auto OR !$call_response = charger_fonction('autoresponse',"presta/$p/call",true))
+				$call_response = charger_fonction('response',"presta/$p/call");
+
 			spip_log('call_'.$auto.'response : '.$_SERVER['REQUEST_URI'],"$p$auto");
 			list($id_transaction,$result)=$call_response();
 			spip_log('call_'.$auto.'response : '."$id_transaction/$result","$p$auto");
@@ -124,8 +126,15 @@ function redirige_apres_retour_transaction($mode,$acte_ou_abo,$succes,$id_transa
 
 
 	// permettre de definir autrement l'url de redirection
-	$redirect = pipeline('bank_redirige_apres_retour_transaction',array(
-		'args' => array('mode'=>$mode,'type'=>$acte_ou_abo,'succes'=>$succes,'id_transaction'=>$id_transaction,'row'=>$row),
+	$redirect = pipeline('bank_redirige_apres_retour_transaction',
+		array(
+		'args' => array(
+			'mode'=>$mode,
+			'type'=>$acte_ou_abo,
+			'succes'=>$succes,
+			'id_transaction'=>$id_transaction,
+			'row'=>$row
+		),
 		'data' => $redirect)
 	);
 
