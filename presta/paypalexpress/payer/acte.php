@@ -18,6 +18,7 @@ function presta_paypalexpress_payer_acte_dist($id_transaction,$transaction_hash)
 			'id_transaction' => $id_transaction,
 			'transaction_hash' => $transaction_hash,
 			'url_confirm' => parametre_url(self(),'confirm','oui'),
+			'sandbox' => defined('_PAYPAL_API_SANDBOX')?' ':'',
 		)
 	);
 }
