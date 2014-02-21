@@ -9,7 +9,9 @@
  * (c) 2012 - Distribue sous licence GNU/GPL
  *
  */
-]<div class="formulaire_spip formulaire_configurer formulaire_#FORM">
+]
+[(#AUTORISER{configurer,bank}|sinon_interdire_acces)]
+<div class="formulaire_spip formulaire_configurer formulaire_#FORM">
 
 [<p class="reponse_formulaire reponse_formulaire_ok">(#ENV*{message_ok})</p>]
 [<p class="reponse_formulaire reponse_formulaire_erreur">(#ENV*{message_erreur})</p>]
@@ -22,13 +24,14 @@
 			<legend><:bank:label_mode_paiement:></legend>
 			<ul>
 				<BOUCLE_prestas(POUR){tableau #LISTE{
+				cheque,
+				cmcic,
+				internetplus,
 				ogone,
 				paybox,
 				paypal,
 				paypalexpress,
-				cmcic,
 				sips,
-				cheque,
 				simu}}>
 					#SET{name,presta_#VALEUR}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 					#SET{disabled,''}

@@ -16,7 +16,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 'label_presta_paypal' => 'Paypal non s&eacute;curis&eacute; <a href="http://www.paypal.fr/">http://www.paypal.fr/</a>',
 'label_presta_paypalexpress' => 'Paypal Express Checkout <a href="http://www.paypal.fr/">http://www.paypal.fr/</a>',
 'label_presta_sips' => 'SIPS',
-'label_presta_wha' => 'Internet +',
+'label_presta_internetplus' => 'Internet +',
 'label_presta_cheque' => 'Ch&egrave;ques (encaissement manuel)',
 'label_presta_simu' => 'Simulation (necessite une autorisation par define)',
 'label_presta_cmcic' => 'CMCIC <a href="https://www.cmcicpaiement.fr/fr/">cmcicpaiement.fr</a>',
@@ -43,7 +43,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 'choisissez_cb'=>'Choisissez votre carte bancaire&nbsp;:',
 'abonnement_par_CB' => 'avec ma carte bancaire',
 'payer' => 'Payer',
-'payer_avec' => 'Payer avec @nom@',
+'payer_avec' => 'Payer avec <i>@nom@</i>',
 'payer_par_cheque' => 'Règlement par chèque :',
 
 
