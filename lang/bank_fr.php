@@ -11,6 +11,11 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 'label_mode_paiement' => 'Modes de paiements a l\'acte',
 'label_mode_paiement_abo' => 'Modes de paiements des abonnements',
+
+'label_presta_abo_paybox' => 'Paybox <a href="http://www.paybox.com/">http://www.paybox.com/</a>',
+'label_presta_abo_simu' => 'Simulation (necessite une autorisation par define)',
+
+
 'label_presta_ogone' => 'Ogone <a href="http://www.ogone.fr/">http://www.ogone.fr/</a>',
 'label_presta_paybox' => 'Paybox <a href="http://www.paybox.com/">http://www.paybox.com/</a>',
 'label_presta_paypal' => 'Paypal non s&eacute;curis&eacute; <a href="http://www.paypal.fr/">http://www.paypal.fr/</a>',
@@ -54,6 +59,9 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 'info_1_transaction' => '1 transaction',
 'info_nb_transactions' => '@nb@ transactions',
+
+'label_resilier_abonnement' => 'Résilier',
+
 
 );
 

@@ -11,14 +11,13 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-include_spip('bank_options');
 include_spip('presta/paybox/inc/paybox');
 
 // il faut avoir un id_transaction et un transaction_hash coherents
 // pour se premunir d'une tentative d'appel exterieur
-function presta_paybox_payer_resilier_dist($uid){
+function presta_paybox_call_resilier_abonnement_dist($uid){
 
-	$parm = paybox_pbx_ids();
+	$parm = paybox_pbx_ids('abo');
 	
 	$args = 
 	  "VERSION=001"
@@ -40,4 +39,3 @@ function presta_paybox_payer_resilier_dist($uid){
 		
 	return false;
 }
-?>

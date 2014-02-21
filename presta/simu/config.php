@@ -15,3 +15,7 @@ function autoriser_simu_utilisermodepaiement_dist($faire, $mode='', $id=0, $qui 
 	if (defined('_SIMU_BANK_ALLOWED') AND _SIMU_BANK_ALLOWED) return true;
 	return false;
 }
+function autoriser_simu_utilisermodepaiementabo_dist($faire, $mode='', $id=0, $qui = NULL, $opt = NULL){
+	if (defined('_SIMU_BANK_ALLOWED') AND _SIMU_BANK_ALLOWED) return true;
+	return false;
+}

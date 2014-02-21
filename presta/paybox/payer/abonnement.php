@@ -11,12 +11,13 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-function presta_paybox_payer_abonnement_dist($id_transaction,$transaction_hash){
+function presta_paybox_payer_abonnement_dist($id_transaction, $transaction_hash, $titre=''){
 
 	$call_request = charger_fonction('request','presta/paybox/call');
-	echo $call_request($id_transaction,$transaction_hash,1,array('CB','VISA','EUROCARD_MASTERCARD'));
-	
-	return recuperer_fond('presta/paybox/formulaires/abonnement',array('form'=>$form));
+	$contexte = $call_request($id_transaction,$transaction_hash,'abo');
+	$contexte['title'] = $titre;
+
+	return recuperer_fond('presta/paybox/payer/abonnement',$contexte);
 }
 
 ?>

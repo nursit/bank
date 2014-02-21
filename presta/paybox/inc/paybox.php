@@ -31,10 +31,6 @@ function paybox_response($response = 'response'){
 
 	$url = parse_url($_SERVER['REQUEST_URI']);
 	if (function_exists('openssl_pkey_get_public')){
-		// recuperer la cle publique Paybox
-		$config = paybox_pbx_ids();
-		$cle = openssl_pkey_get_public($config['pubkey']);
-
 		// recuperer la signature
 		$sign = _request('sign');
 		$sign = base64_decode($sign);
@@ -49,11 +45,26 @@ function paybox_response($response = 'response'){
 		$vars1 = preg_replace(',^[^?]*?action=[^&]*&,','',$vars);
 		$vars1 = preg_replace(',^[^?]*?bankp=[^&]*&,','',$vars1);
 
+		// recuperer la cle publique Paybox
+		$config = paybox_pbx_ids();
 		// verifier la signature avec $vars ou $vars1
-		$t = (openssl_verify( $vars, $sign, $cle ) OR openssl_verify($vars1, $sign, $cle));
-		if (!$t){
+		if (!$config['pubkey']
+		  OR !$cle = openssl_pkey_get_public($config['pubkey'])
+			OR !(openssl_verify( $vars, $sign, $cle ) OR openssl_verify($vars1, $sign, $cle))
+		){
+
 			spip_log('call_response : signature invalide: '.var_export($url,true),'paybox');
-			return false;
+			// recuperer la cle publique Paybox abo
+			$config = paybox_pbx_ids('abo');
+			// verifier la signature avec $vars ou $vars1
+			if (!$config['pubkey']
+			  OR !$cle = openssl_pkey_get_public($config['pubkey'])
+				OR !(openssl_verify( $vars, $sign, $cle ) OR openssl_verify($vars1, $sign, $cle))
+			){
+				spip_log('call_response : signature invalide: '.var_export($url,true),'payboxabo');
+
+				return false;
+			}
 		}
 	}
 	else {
@@ -61,6 +72,7 @@ function paybox_response($response = 'response'){
 			spip_log('call_response : reponse sans signature: '.var_export($url,true),'paybox');
 			return false;
 		}
+		// on ne sait pas verifier la signature, on fait comme si elle etait OK (hum)
 	}
 
 	parse_str($url['query'],$response);
@@ -130,16 +142,22 @@ function paybox_traite_reponse_transaction($response,$mode = 'paybox') {
 		spip_log($t,$mode . '_reglements_partiels');
 	}
 
+	$set = array(
+			"autorisation_id"=>"$transaction/$authorisation_id",
+			"mode"=>$mode,
+			"montant_regle"=>$montant_regle,
+			"date_paiement"=>$date_paiement,
+			"statut"=>'ok',
+			"reglee"=>'oui');
+
+	// si on a envoye un U il faut recuperer les donnees CB et les stocker sur le compte client
+	$ppps = "";
+	if (isset($response['ppps'])){
+		$set['refcb'] = $response['ppps'];
+	}
+
 	// il faudrait stocker le $transaction aussi pour d'eventuels retour vers paybox ?
-	sql_updateq("spip_transactions",array(
-		"autorisation_id"=>"$transaction/$authorisation_id",
-		"mode"=>$mode,
-		"montant_regle"=>$montant_regle,
-		"date_paiement"=>$date_paiement,
-		"statut"=>'ok',
-		"reglee"=>'oui'),
-		"id_transaction=".intval($id_transaction)
-	);
+	sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
 	spip_log("call_response : id_transaction $id_transaction, reglee",$mode);
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');

@@ -35,6 +35,7 @@ function bank_declarer_tables_principales($tables_principales){
 
 		"mode" => "varchar(25) NOT NULL DEFAULT ''", // mode de paiement (prestataire)
 		"autorisation_id" 	=> "varchar(55) NOT NULL DEFAULT ''", // numero d'autorisation de debit envoye par le presta bancaire
+		"refcb" 	=> "varchar(100) NOT NULL DEFAULT ''", // reference CB partielle pour declencher un nouveau paiement
 		"montant_regle" 	=> "varchar(25) NOT NULL DEFAULT ''", // montant regle (renvoye par le presta) en euros
 		"date_paiement" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
 		"statut" => "varchar(25) NOT NULL DEFAULT ''", // commande, ok (ok si est passee en reglement)

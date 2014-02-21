@@ -34,14 +34,13 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $ab
 		$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
 
 	//		Affectation des parametres obligatoires
-	$parm = paybox_pbx_ids();
+	$parm = paybox_pbx_ids($abo?'abo':'');
 	$parm['PBX_OUTPUT']="C"; // recuperer uniquement les hidden
 	$parm['PBX_LANGUE']="FRA";
 	$parm['PBX_DEVISE']="978";
 	$parm['PBX_TOTAL']=$montant;
 	$parm['PBX_PORTEUR']=defined('_PBX_PORTEUR')?_PBX_PORTEUR:$mail;
 	$parm['PBX_CMD']=intval($id_transaction);
-	$parm['PBX_RETOUR'] = 'montant:M;id_transaction:R;auth:A;trans:S;abo:B;erreur:E;valid:D;sign:K';
 
 	$parm['PBX_EFFECTUE']=generer_url_action('bank_response',"bankp=paybox",true,true);
 	$parm['PBX_REFUSE']=generer_url_action('bank_cancel',"bankp=paybox",true,true);
@@ -49,21 +48,35 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $ab
  	$parm['PBX_REPONDRE_A']=generer_url_action('bank_autoresponse',"bankp=paybox",true,true);
 	
 
-	if ($abo
-	  AND $id_abonnement = sql_getfetsel("id_abonnement","spip_abonnements_transactions","id_transaction=".intval($id_transaction))
-	  AND $montant_echeance = sql_getfetsel('prix_echeance','spip_abonnements','id_abonnement='.intval($id_abonnement))
-	  ){
-		$montant_echeance = str_pad(intval(100*$montant_echeance), 10, "0", STR_PAD_LEFT);
-		// infos de l'abonnement :
-		// montant identique recurrent, frequence mensuelle, a date anniversaire, sans delai
-		$parm['PBX_CMD'] .= 
-		"IBS_2MONT$montant_echeance"
-		. "IBS_NBPAIE00"
-		. "IBS_FREQ01"
-		. "IBS_QUAND00"
-		//. "IBS_DELAIS000"
-		;
+	$parm['PBX_RETOUR'] = 'montant:M;id_transaction:R;auth:A;trans:S;abo:B;erreur:E;valid:D;';
+
+	if ($abo){
+		$decrire_echeance = charger_fonction("decrire_echeance","abos");
+		// on decrit l'echeance, en indiquant qu'on peut la gerer manuellement grace a PayBoxDirectPlus
+		if ($echeance = $decrire_echeance($id_transaction, false)){
+			if ($echeance['montant']>0){
+				$montant_echeance = str_pad(intval(round(100*$echeance['montant'])), 10, "0", STR_PAD_LEFT);
+
+				// infos de l'abonnement :
+				// montant identique recurrent, frequence mensuelle, a date anniversaire, sans delai
+				$parm['PBX_CMD'] .=
+				"IBS_2MONT$montant_echeance"
+				. "IBS_NBPAIE00"
+				. "IBS_FREQ01"
+				. "IBS_QUAND00"
+				//. "IBS_DELAIS000"
+				;
+			}
+			else
+				$parm['PBX_RETOUR'] .= 'ppps:U;';
+		}
 	}
+
+	// fermer le retour avec la signature
+	$parm['PBX_RETOUR'] .= 'sign:K';
+
+
+
 	//var_dump($parm);
 	$cartes_possibles = array(
 		'CB'=>'presta/paybox/logo/CB.gif',
