@@ -27,7 +27,7 @@ function balise_PAYER_ACTE_dist($p){
 	$p->code = "";
 
 	if ($_mode AND $_id AND $_hash)
-		$p->code = "( (\$f=charger_fonction('acte','presta/'.$_mode.'/payer'))?\$f($_id,$_hash,$_titre):'')";
+		$p->code = "( (\$f=charger_fonction('acte','presta/'.$_mode.'/payer',true))?\$f($_id,$_hash,$_titre):vide(spip_log('Pas de payer/acte pour '.$_mode,'bank')))";
 
 	$p->interdire_scripts = false;
 	return $p;
@@ -48,7 +48,7 @@ function balise_PAYER_ABONNEMENT_dist($p){
 	$p->code = "";
 
 	if ($_mode AND $_id AND $_hash)
-		$p->code = "( (\$f=charger_fonction('abonnement','presta/'.$_mode.'/payer'))?\$f($_id,$_hash):'')";
+		$p->code = "( (\$f=charger_fonction('abonnement','presta/'.$_mode.'/payer',true))?\$f($_id,$_hash):vide(spip_log('Pas de payer/abonnement pour '.$_mode,'bank')))";
 
 	$p->interdire_scripts = false;
 	return $p;
