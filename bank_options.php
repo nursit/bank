@@ -17,17 +17,24 @@ if (!isset($_COOKIE['accept_cookie'])) {
 	spip_setcookie('accept_cookie',$_COOKIE['accept_cookie']=1);
 }
 
+// securite : on initialise une globale le temps de la config des prestas
 if (isset($GLOBALS['meta']['bank_paiement'])
-  AND $GLOBALS['config_bank_paiement'] = unserialize($GLOBALS['meta']['bank_paiement'])
-	AND count($prestas = $GLOBALS['config_bank_paiement']['presta'])) {
+  AND $GLOBALS['config_bank_paiement'] = unserialize($GLOBALS['meta']['bank_paiement'])){
+
+	$prestas = (is_array($GLOBALS['config_bank_paiement']['presta'])?$GLOBALS['config_bank_paiement']['presta']:array());
+	$prestas = array_filter($prestas);
+	if (is_array($GLOBALS['config_bank_paiement']['presta_abo']))
+		$prestas = array_merge($prestas,array_filter($GLOBALS['config_bank_paiement']['presta_abo']));
 	// initialiser la config de chaque presta actif
-	foreach($prestas as $p=>$actif){
-		// TODO ajouter une secu !preg_match(',[\W],',$p) ?
-		if ($actif) {
-			#_chemin(_DIR_PLUGIN_BANK."presta/$p"); // pour les pages de retour
-			include_spip("presta/$p/config"); // pour la config par defaut
+	if (count($prestas))
+		foreach($prestas as $p=>$actif){
+			// TODO ajouter une secu !preg_match(',[\W],',$p) ?
+			if ($actif) {
+				#_chemin(_DIR_PLUGIN_BANK."presta/$p"); // pour les pages de retour
+				include_spip("presta/$p/config"); // pour la config par defaut
+			}
 		}
-	}
+	// securite : on ne conserve pas la globale en memoire car elle contient des donnees sensibles
 	unset($GLOBALS['config_bank_paiement']);
 }
 

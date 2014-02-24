@@ -63,6 +63,7 @@
 			<legend><:bank:label_mode_paiement_abo:></legend>
 			<ul>
 				<BOUCLE_prestasabo(POUR){tableau #LISTE{
+				internetplus,
 				paybox,
 				simu}}>
 					#SET{name,presta_abo_#VALEUR}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
@@ -72,7 +73,7 @@
 						<span class='erreur_message'>(#GET{erreurs})</span>
 						]
 						#SET{val,0}
-						<input type="hidden" name="presta[#VALEUR]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
+						<input type="hidden" name="presta_abo[#VALEUR]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
 						#SET{val,1}
 						<div class="choix[(#GET{disabled}|oui)muted]">
 							<input type="checkbox" name="presta_abo[#VALEUR]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{presta_abo}|table_valeur{#VALEUR, #GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
