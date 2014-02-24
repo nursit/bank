@@ -1,7 +1,0 @@
-#CACHE{0}
-[(#SET{image,[(#CHEMIN{landing/images/logos_operateurs/[(#ENV{logo_detecte})].png})]})]
-
-
-<a href="[(#WHA_OID|wha_url_abonnement{#ENV{id_transaction,0},#ENV{partner,#EVAL{_WHA_MERCHANT_ID}},#ENV{key,#EVAL{_WHA_KEY_ID}}})]"
-class="bouton_paiement">
-<img src='#GET{image}' width='[(#GET{image}|largeur)]' height='[(#GET{image}|hauteur)]' alt='Abonnement avec Internet+' /></a>

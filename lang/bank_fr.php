@@ -14,6 +14,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 'label_presta_abo_paybox' => 'Paybox <a href="http://www.paybox.com/">http://www.paybox.com/</a>',
 'label_presta_abo_simu' => 'Simulation (necessite une autorisation par define)',
+'label_presta_abo_internetplus' => 'Internet +',
 
 
 'label_presta_ogone' => 'Ogone <a href="http://www.ogone.fr/">http://www.ogone.fr/</a>',
@@ -49,6 +50,9 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 'abonnement_par_CB' => 'avec ma carte bancaire',
 'payer' => 'Payer',
 'payer_avec' => 'Payer avec <i>@nom@</i>',
+'abonnement_avec' => 'Abonnement par <i>@nom@</i>',
+'abonnement_choisissez_CB' => 'Choisissez votre carte bancaire&nbsp;:',
+
 'payer_par_cheque' => 'Règlement par chèque :',
 
 

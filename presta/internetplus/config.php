@@ -28,3 +28,15 @@ if (!defined('_WHA_SECRET_'._WHA_MERCHANT_ID))
 	define('_WHA_SECRET_'._WHA_MERCHANT_ID, $GLOBALS['config_bank_paiement']['config_internetplus']['WHA_SECRET']);
 
 
+
+if (!defined('_WHA_NODE_ABO_URL'))
+	define('_WHA_NODE_ABO_URL', defined('_INTERNETPLUS_SANDBOX')?'https://qualif-marchand.w-ha.com/app-bundlepurchase/node':'https://route.w-ha.com/app-bundlepurchase/node');
+
+if (!defined('_WHA_ABO_MERCHANT_ID'))
+	define('_WHA_ABO_MERCHANT_ID', $GLOBALS['config_bank_paiement']['config_abo_internetplus']['MERCHANT_ID']);
+
+if (!defined('_WHA_ABO_KEY_ID'))
+	define('_WHA_ABO_KEY_ID', $GLOBALS['config_bank_paiement']['config_abo_internetplus']['KEY_ID']);
+
+if (!defined('_WHA_SECRET_'._WHA_ABO_MERCHANT_ID))
+	define('_WHA_SECRET_'._WHA_ABO_MERCHANT_ID, $GLOBALS['config_bank_paiement']['config_abo_internetplus']['WHA_SECRET']);

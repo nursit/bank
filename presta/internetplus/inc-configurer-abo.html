@@ -1,0 +1,20 @@
+<ul>
+	#SET{name,#ENV{casier,''}_MERCHANT_ID}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">MERCHANT_ID</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[MERCHANT_ID]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{MERCHANT_ID,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	#SET{name,#ENV{casier,''}_KEY_ID}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">KEY_ID</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[KEY_ID]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{KEY_ID,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	#SET{name,#ENV{casier,''}_SECRET}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">SECRET</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[SECRET]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{SECRET,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+</ul>

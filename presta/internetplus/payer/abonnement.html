@@ -1,0 +1,11 @@
+#CACHE{0}
+<div class='payer_mode payer_internetplus payer_abonnement'>
+	<p class="titre"><:bank:abonnement_avec{nom=Internet +}:></p>
+	<div class='boutons'>
+		<a rel="nofollow"
+		   href="#ENV{url_payer}"
+			><img src='#ENV{logo}' width='[(#ENV{logo}|largeur)]' height='[(#ENV{logo}|hauteur)]' alt='Abonnement avec Internet+' /></a>
+	</div>
+	<div class="info">30 &euro; maximum</div>
+	[(#ENV{sandbox}|oui)<div class="info">Mode Qualif</div>]
+</div>
