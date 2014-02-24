@@ -11,9 +11,14 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+/**
+ * @param string $boutique
+ *   string : abo ou ''
+ * @return array
+ */
 function paybox_pbx_ids($boutique=''){
 	$boutique = $boutique ? "_".$boutique:"";
-	$config = 'config_paybox'.$boutique;
+	$config = 'config'.$boutique.'_paybox';
 
 	include_spip('inc/config');
 	return lire_config("bank_paiement/$config");
