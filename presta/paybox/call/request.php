@@ -82,11 +82,12 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $ab
 		'CB'=>'presta/paybox/logo/CB.gif',
 		'VISA'=>'presta/paybox/logo/VISA.gif',
 		'EUROCARD_MASTERCARD'=>'presta/paybox/logo/MASTERCARD.gif',
-		'E_CARD'=>'presta/paybox/logo/E-CB.gif',
-		'AMEX'=>'presta/paybox/logo/AMEX.gif',
-		'AURORE'=>'presta/paybox/logo/AURORE.gif',
 	);
-
+	if (!$abo){
+		$cartes_possibles['E_CARD']='presta/paybox/logo/E-CB.gif';
+		$cartes_possibles['AMEX']='presta/paybox/logo/AMEX.gif';
+		$cartes_possibles['AURORE']='presta/paybox/logo/AURORE.gif';
+	}
 
 	include_spip('inc/filtres_mini');
 	$contexte = array('hidden'=>array(),'action'=>_PAYBOX_URL,'backurl'=>url_absolue(self()),'id_transaction'=>$id_transaction);
