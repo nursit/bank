@@ -13,8 +13,13 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 include_spip('presta/paybox/inc/paybox');
 
-// il faut avoir un id_transaction et un transaction_hash coherents
-// pour se premunir d'une tentative d'appel exterieur
+/**
+ * Jamais appele directement dans le plugin bank/
+ * mais par une eventuelle methode abos/resilier d'un plugin externe
+ *
+ * @param string $uid
+ * @return bool
+ */
 function presta_paybox_call_resilier_abonnement_dist($uid){
 
 	$parm = paybox_pbx_ids('abo');

@@ -27,13 +27,12 @@ function presta_paybox_call_response_dist($response=null){
 	}
 
 	if ($response['ETAT_PBX']=='PBX_RECONDUCTION'){
-		// c'est un revouvellement initie par paybox : creer la transaction maintenant !
-		if ($row = sql_fetsel("id_abonnement","spip_abonnements","abonne_uid=".sql_quote($response['abo'])))
-			$id_abonnement = $row['id_abonnement'];
-		if ($id_abonnement){
-			$renouveler = charger_fonction('renouveler','abos');
-			// on reinjecte le bon id de transaction ici
-			$response['id_transaction'] = $renouveler($id_abonnement);
+		// c'est un revouvellement initie par paybox : creer la transaction maintenant si besoin !
+		if ($renouveler = charger_fonction('renouveler','abos',true)){
+			// on reinjecte le bon id de transaction ici si fourni
+			if ($id_transaction = $renouveler("uid:".$response['abo'])){
+				$response['id_transaction'] = $id_transaction;
+			}
 		}
 	}
 	
