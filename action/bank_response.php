@@ -14,8 +14,12 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 function action_bank_response_dist($cancel=null,$auto=null){
 	
 	if (isset($GLOBALS['meta']['bank_paiement'])
-		AND $prestas = unserialize($GLOBALS['meta']['bank_paiement'])
-		AND count($prestas = $prestas['presta'])) {
+		AND $config = unserialize($GLOBALS['meta']['bank_paiement'])){
+
+		$prestas = (is_array($config['presta'])?$config['presta']:array());
+		$prestas = array_filter($prestas);
+		if (is_array($config['presta_abo']))
+			$prestas = array_merge($prestas,array_filter($config['presta_abo']));
 
 		$auto = ($auto ? "auto":"");
 		$result = false;
