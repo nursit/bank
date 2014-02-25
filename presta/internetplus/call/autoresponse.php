@@ -19,7 +19,7 @@ function presta_internetplus_call_autoresponse_dist(){
 
 	if ($uoid AND $resil){
 		$resilier = charger_fonction('resilier','abos');
-		$resilier($uoid,reset($resil),end($resil));
+		$resilier("uid:$uoid",array('immediat'=>reset($resil),'message'=>end($resil)));
 	}
 
 	// peu importe, on die() apres car c'est une autoresponse silencieuse
