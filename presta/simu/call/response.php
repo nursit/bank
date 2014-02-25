@@ -55,6 +55,12 @@ function presta_simu_call_response_dist(){
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
 	$regler_transaction($id_transaction,"",$row);
+
+	if (_request('abo')){
+		$activer_abonement = charger_fonction('activer_abonnement','abos');
+		// numero d'abonne = numero de transaction
+		$activer_abonement($id_transaction,$id_transaction,'simu');
+	}
+
 	return array($id_transaction,true);
 }
-?>
