@@ -42,6 +42,10 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $ab
 	$parm['PBX_PORTEUR']=defined('_PBX_PORTEUR')?_PBX_PORTEUR:$mail;
 	$parm['PBX_CMD']=intval($id_transaction);
 
+	// temps de validite de la page de paiement paybox (par defaut 900s)
+	if (defined('_PBX_DISPLAY'))
+		$parm['PBX_DISPLAY'] = _PBX_DISPLAY;
+
 	$parm['PBX_EFFECTUE']=generer_url_action('bank_response',"bankp=paybox",true,true);
 	$parm['PBX_REFUSE']=generer_url_action('bank_cancel',"bankp=paybox",true,true);
 	$parm['PBX_ANNULE']=generer_url_action('bank_cancel',"bankp=paybox",true,true);
