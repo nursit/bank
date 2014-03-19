@@ -26,8 +26,8 @@
 			</tr>
 		</thead>
 		<tbody>
-		<BOUCLE_transactions(transactions){id_transaction?}{where?}{recherche?}{statut==#ENV{statut,'.'}}{tri #ENV{par,id_transaction},#GET{defaut_tri}}{pagination #ENV{nb,10}}>
-			<tr class="[(#COMPTEUR_BOUCLE|alterner{row_odd,row_even})][ (#EXPOSE)]">
+		<BOUCLE_transactions(transactions){id_transaction?}{id_facture?}{where?}{recherche?}{statut==#ENV{statut,'.'}}{tri #ENV{par,id_transaction},#GET{defaut_tri}}{pagination #ENV{nb,10}}>
+			<tr class="[(#COMPTEUR_BOUCLE|alterner{row_odd,row_even})][(#ENV{id_transaction}|is_array|non)[ (#EXPOSE)]]">
 				<td class="id"><a href="#URL_ECRIRE{transaction,id_transaction=#ID_TRANSACTION}" class="popin">#ID_TRANSACTION</a></td>
 				<td class="id_auteur"><a href='[(#ID_AUTEUR|generer_url_entite{auteur})]'>#ID_AUTEUR</a></td>
 				<td class="mode">#MODE</td>
