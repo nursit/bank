@@ -11,18 +11,19 @@
  */
 ]#CACHE{0}
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
-	<div class='mode_paiement' id='paiement_cmcic'>
-	<div class='boutons'>
-	<form action="#ENV{action}" method="post">
-	[(#ENV**{hidden})]
-	[(#SET{texte,<:bank:payer_avec{nom=CMCIC}:>})]
-	<button class="submit" type="submit" title="[(#GET{texte}|attribut_html)]">
-		[(#CHEMIN{presta/cmcic/logo/cmcic.png}
-			|balise_img{#GET{texte}}
-			|inserer_attribut{title,#GET{texte}}
-			|image_reduire{100}
-			|sinon{#GET{texte}})]
-	</button>
-	</form></div>
+	<div class='payer_mode payer_cmcic payer_acte' id='paiement_cmcic'>
+		<p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
+		<div class='boutons'>
+		<form action="#ENV{action}" method="post">
+		[(#ENV**{hidden})]
+		[(#SET{texte,<:bank:payer_avec{nom=CMCIC}:>})]
+		<button class="submit" type="submit" title="[(#GET{texte}|attribut_html)]">
+			[(#CHEMIN{presta/cmcic/logo/cmcic.png}
+				|balise_img{#GET{texte}}
+				|inserer_attribut{title,#GET{texte}}
+				|image_reduire{100}
+				|sinon{#GET{texte}})]
+		</button>
+		</form></div>
 	</div>
 </BOUCLE_trans>

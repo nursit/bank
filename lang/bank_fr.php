@@ -53,7 +53,8 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 'abonnement_avec' => 'Abonnement par <i>@nom@</i>',
 'abonnement_choisissez_CB' => 'Choisissez votre carte bancaire&nbsp;:',
 
-'payer_par_cheque' => 'Règlement par chèque :',
+'payer_par_cheque' => 'Payer par chèque :',
+'payer_par_carte_bancaire' => 'Payer par carte bancaire :',
 
 
 'titre_reglement_ok'=>'R&egrave;glement r&eacute;ussi',

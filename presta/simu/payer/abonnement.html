@@ -12,7 +12,7 @@
 ]#CACHE{0}
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 <div class='payer_mode payer_simu payer_abonnement'>
-	<p class="titre">S'abonner [SIMULATION] :</p>
+	<p class="titre h4">S'abonner [SIMULATION] :</p>
 	<div class='boutons'>
 	#BOUTON_ACTION{'Simuler l&#39;abonnement',#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}}
 	</div>

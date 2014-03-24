@@ -11,7 +11,7 @@
  */
 ]#CACHE{0}
 <div class='payer_mode payer_sips [payer_sips_(#ENV{service})] payer_acte'>
-	<p class="titre">[(#ENV{code,''}|?{'Erreur appel API de paiement.',<:bank:choisissez_CB:>})]</p>
+	<p class="titre h4">[(#ENV{code,''}|?{'Erreur appel API de paiement.',<:bank:choisissez_CB:>})]</p>
 	[<div class="error">(#ENV*{error})</div>]
 	[<div class='boutons'>
 		(#ENV*{buffer})
