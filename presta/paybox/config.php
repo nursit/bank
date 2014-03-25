@@ -25,6 +25,25 @@ if (!defined('_PAYBOX_URL_RESIL'))
 
 /* ------------------------------------------------------------------------- */
 
+/**
+ * Donnees de test :
+ *
+
+Paybox pour CA
+PBX_IDENTIFIANT : 3
+PBX_SITE : 1999888
+PBX_RANG : 98
+
+Certificat :
+-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDe+hkicNP7ROHUssGNtHwiT2Ew
+HFrSk/qwrcq8v5metRtTTFPE/nmzSkRnTs3GMpi57rBdxBBJW5W9cpNyGUh0jNXc
+VrOSClpD5Ri2hER/GcNrxVRP7RlWOqB1C03q4QYmwjHZ+zlM4OUhCCAtSWflB4wC
+Ka1g88CjFwRw/PB9kwIDAQAB
+-----END PUBLIC KEY-----
+
+
+*/
+
 
 //_PAYBOX_DIRECT_CLE
-?>
