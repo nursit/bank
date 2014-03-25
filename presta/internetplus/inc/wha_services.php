@@ -12,8 +12,11 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function wha_secret_key($partnerId,$keyId){
-	if (defined($s = '_WHA_SECRET_'.intval($partnerId)))
+	if (defined($s = '_WHA_SECRET_'.intval($partnerId)) AND constant($s))
 		return constant($s);
+	// sinon on log l'absence de cle
+	spip_log("wha_secret_key : $s non definie","internetplus"._LOG_ERREUR);
+	return "nokey";
 }
 
 // Calculate HMAC according to RFC2104

@@ -25,7 +25,7 @@ if (!defined('_WHA_KEY_ID'))
 	define('_WHA_KEY_ID_', $GLOBALS['config_bank_paiement']['config_internetplus']['KEY_ID']);
 
 if (!defined('_WHA_SECRET_'._WHA_MERCHANT_ID))
-	define('_WHA_SECRET_'._WHA_MERCHANT_ID, $GLOBALS['config_bank_paiement']['config_internetplus']['WHA_SECRET']);
+	define('_WHA_SECRET_'._WHA_MERCHANT_ID, $GLOBALS['config_bank_paiement']['config_internetplus']['SECRET']);
 
 
 
@@ -39,4 +39,4 @@ if (!defined('_WHA_ABO_KEY_ID'))
 	define('_WHA_ABO_KEY_ID', $GLOBALS['config_bank_paiement']['config_abo_internetplus']['KEY_ID']);
 
 if (!defined('_WHA_SECRET_'._WHA_ABO_MERCHANT_ID))
-	define('_WHA_SECRET_'._WHA_ABO_MERCHANT_ID, $GLOBALS['config_bank_paiement']['config_abo_internetplus']['WHA_SECRET']);
+	define('_WHA_SECRET_'._WHA_ABO_MERCHANT_ID, $GLOBALS['config_bank_paiement']['config_abo_internetplus']['SECRET']);
