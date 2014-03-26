@@ -21,7 +21,10 @@ function paybox_pbx_ids($boutique=''){
 	$config = 'config'.$boutique.'_paybox';
 
 	include_spip('inc/config');
-	return lire_config("bank_paiement/$config");
+	$v = lire_config("bank_paiement/$config");
+	if (isset($v['pubkey']))
+		unset($v['pubkey']);
+	return $v;
 }
 
 function paybox_shell_args($params){
@@ -31,6 +34,89 @@ function paybox_shell_args($params){
 	}
 	return $res;
 }
+
+/**
+ * Generer les hidden du formulaire d'envoi a paybox
+ * selon methode cle secrete + hash ou binaire executable
+ *
+ * @param $params
+ * @return array|string
+ */
+function paybox_form_hidden($params){
+
+	if (isset($params['PBX_HMAC_KEY']) AND !trim($params['PBX_HMAC_KEY']))
+		unset($params['PBX_HMAC_KEY']);
+
+	// methode hash avec cle secrete partagee fournie
+	if (isset($params['PBX_HMAC_KEY'])){
+		$key = trim($params['PBX_HMAC_KEY']);
+		unset($params['PBX_HMAC_KEY']);
+
+		if (isset($params['DIRECT_PLUS_CLE']))
+			unset($params['DIRECT_PLUS_CLE']);
+
+		if (!isset($params['PBX_TIME']))
+			$params['PBX_TIME'] = date("c");
+
+		// On calcule l?empreinte (a renseigner dans le parametre PBX_HMAC) grace à la fonction hash_hmac et
+		// la cle binaire
+		// On envoie via la variable PBX_HASH l'algorithme de hachage qui a ete utilise (SHA512 dans ce cas)
+		// Pour afficher la liste des algorithmes disponibles sur votre environnement, decommentez la ligne
+		// suivante
+		// print_r(hash_algos());
+		$hash_method = "sha512";
+		if (function_exists("hash_algos")){
+			$algos = hash_algos();
+			foreach(array("sha512","sha256","sha1","md5") as $method){
+				if (in_array($method,$algos)){
+					$hash_method = $method;
+					break;
+				}
+			}
+		}
+		$params['PBX_HASH'] = strtoupper($hash_method);
+
+
+		// On cree la chaine a hacher sans URLencodage
+		$message = array();
+		$params_att = array();
+		foreach($params as $k=>$v){
+			if (strncmp($k,"PBX_",4)==0){
+				$params_att[$k] = str_replace('"','&#034;', $v);
+				$message[] = "$k=".$params_att[$k];
+			}
+		}
+		$message = implode("&",$message);
+
+		// la cle secrete HMAC
+		// Si la cle est en ASCII, On la transforme en binaire
+		$binKey = pack("H*", $key);
+
+		// La chaîne sera envoyée en majuscules, d'où l'utilisation de strtoupper()
+		$hmac = strtoupper(hash_hmac($hash_method, $message, $binKey));
+
+		$params_att['PBX_HMAC'] = $hmac;
+
+		// On cree les hidden du formulaire a envoyer a Paybox System
+		// ATTENTION : l'ordre des champs est extremement important, il doit
+		// correspondre exactement a l'ordre des champs dans la chaine hachee
+		$hidden = array();
+		foreach($params_att as $k=>$v){
+			$hidden[] = "<input type=\"hidden\" name=\"$k\" value=\"$v\" />";
+		}
+		$hidden = implode("\n",$hidden);
+		return $hidden;
+	}
+
+	// sinon methode encodage par binaire
+	// depreciee mais permet transition en douceur et iso-fonctionnelle
+	$paybox_exec_request = charger_fonction("exec_request","presta/paybox");
+	$hidden = $paybox_exec_request($params);
+	// modulev2.cgi injecte une balise Form dont on ne veut pas ici
+	$hidden = preg_replace(",<form[^>]*>,Uims","",$hidden);
+	return $hidden;
+}
+
 
 function paybox_response($response = 'response'){
 
@@ -51,25 +137,19 @@ function paybox_response($response = 'response'){
 		$vars1 = preg_replace(',^[^?]*?bankp=[^&]*&,','',$vars1);
 
 		// recuperer la cle publique Paybox
-		$config = paybox_pbx_ids();
+		// on utilise find_in_path pour permettre surcharge au cas ou la cle changerait
+		$pubkey = "";
+		if ($keyfile = find_in_path("presta/paybox/inc/pubkey.pem")){
+			lire_fichier($keyfile,$pubkey);
+		}
 		// verifier la signature avec $vars ou $vars1
-		if (!$config['pubkey']
-		  OR !$cle = openssl_pkey_get_public($config['pubkey'])
+		if (!$pubkey
+		  OR !$cle = openssl_pkey_get_public($pubkey)
 			OR !(openssl_verify( $vars, $sign, $cle ) OR openssl_verify($vars1, $sign, $cle))
 		){
 
 			spip_log('call_response : signature invalide: '.var_export($url,true),'paybox');
-			// recuperer la cle publique Paybox abo
-			$config = paybox_pbx_ids('abo');
-			// verifier la signature avec $vars ou $vars1
-			if (!$config['pubkey']
-			  OR !$cle = openssl_pkey_get_public($config['pubkey'])
-				OR !(openssl_verify( $vars, $sign, $cle ) OR openssl_verify($vars1, $sign, $cle))
-			){
-				spip_log('call_response : signature invalide: '.var_export($url,true),'payboxabo');
-
-				return false;
-			}
+			return false;
 		}
 	}
 	else {

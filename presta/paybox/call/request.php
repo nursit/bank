@@ -95,12 +95,11 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $ab
 
 	include_spip('inc/filtres_mini');
 	$contexte = array('hidden'=>array(),'action'=>_PAYBOX_URL,'backurl'=>url_absolue(self()),'id_transaction'=>$id_transaction);
-	$paybox_exec_request = charger_fonction("exec_request","presta/paybox");
 	foreach($cartes as $carte){
 		if (isset($cartes_possibles[$carte])){
 			$parm['PBX_TYPEPAIEMENT'] = 'CARTE';
 			$parm['PBX_TYPECARTE'] = $carte;
-			$contexte['hidden'][$carte] = $paybox_exec_request($parm);
+			$contexte['hidden'][$carte] = paybox_form_hidden($parm);
 			$contexte['logo'][$carte] = $cartes_possibles[$carte];
 		}
 	}

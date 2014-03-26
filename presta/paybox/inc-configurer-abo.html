@@ -17,12 +17,11 @@
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[PBX_RANG]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{PBX_RANG,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
-	#SET{name,#ENV{casier,''}_pubkey}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	#SET{name,#ENV{casier,''}_PBX_HMAC_KEY}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-		<label for="#GET{name}">Public Key</label>[
+		<label for="#GET{name}">PBX_HMAC_KEY</label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
-		]<textarea name="#ENV{casier,''}[pubkey]" class="textarea">
-[(#ENV*{#ENV{casier,''}}|table_valeur{pubkey,#GET{defaut}})]</textarea>
+		]<input type="text" name="#ENV{casier,''}[PBX_HMAC_KEY]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{PBX_HMAC_KEY,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
 	#SET{name,#ENV{casier,''}_DIRECT_PLUS_CLE}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
