@@ -24,7 +24,6 @@
 			<legend><:bank:label_mode_paiement:></legend>
 			<ul>
 				<BOUCLE_prestas(POUR){tableau #LISTE{
-				cheque,
 				cmcic,
 				internetplus,
 				ogone,
@@ -32,6 +31,7 @@
 				paypal,
 				paypalexpress,
 				sips,
+				cheque,
 				simu}}>
 					#SET{name,presta_#VALEUR}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 					#SET{disabled,''}
