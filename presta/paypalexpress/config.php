@@ -88,7 +88,7 @@ if (!defined('_PAYPAL_API_ENDPOINT'))
    For the live site, the URL is
    https://www.paypal.com/webscr&cmd=_express-checkout&token=
    */
-if (!defined('_PAYPAL_PAYPAL_URL'))
+if (!defined('_PAYPAL_API_PAYPAL_URL'))
 	define('_PAYPAL_API_PAYPAL_URL', $sandbox?'https://www.sandbox.paypal.com/webscr&cmd=_express-checkout':'https://www.paypal.com/webscr&cmd=_express-checkout');
 
 

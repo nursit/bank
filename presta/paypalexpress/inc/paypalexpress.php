@@ -79,7 +79,7 @@ function bank_paypalexpress_order_init($id_transaction, $url_confirm=null){
 	if ($ack=="SUCCESS"){
 		// Redirect to paypal.com here
 		$token = urldecode($resArray["TOKEN"]);
-		$payPalURL = parametre_url(_PAYPAL_PAYPAL_URL, 'token', $token, '&');
+		$payPalURL = parametre_url(_PAYPAL_API_PAYPAL_URL, 'token', $token, '&');
 
 		return $payPalURL;
 	}
