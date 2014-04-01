@@ -58,6 +58,13 @@ function bank_regler_transaction_dist($id_transaction,$options = array()){
 		(($row_prec['reglee']=='oui') AND $row_prec['finie']))
 		return;
 
+	// verification du flag 'finie' pour ne pas jouer 2 fois
+	if (sql_getfetsel('finie','spip_transactions',"id_transaction=".intval($id_transaction)))
+		return;
+	// et on le pose aussitot
+	sql_updateq('spip_transactions',array('finie'=>1),"id_transaction=".intval($id_transaction));
+
+
 	$notifier = ($notifier AND $row_prec['reglee']!='oui');
 
 	// d'abord un pipeline de facturation
