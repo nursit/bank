@@ -11,19 +11,12 @@
  */
 ]#CACHE{0}
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
-<div class='payer_mode payer_cmcic payer_acte'>
+<div class='payer_mode payer_cyberplus payer_acte'>
 	<p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
 	<div class='boutons'>
-	<form action="#ENV{action}" method="post">
-	[(#ENV**{hidden})]
-	[(#SET{texte,<:bank:payer_avec{nom=CyberPlus}:>})]
-	<button class="submit" type="submit" title="[(#GET{texte}|attribut_html)]">
-		[(#CHEMIN{presta/cyberplus/logo/cyberplus.png}
-			|balise_img{#GET{texte}}
-			|inserer_attribut{title,#GET{texte}}
-			|image_reduire{100}
-			|sinon{#GET{texte}})]
-	</button>
-	</form></div>
+	<BOUCLE_cb(POUR){tableau #ENV{hidden}}>
+		[(#INCLURE{fond=presta/cyberplus/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#CHEMIN{#ENV{logo}|table_valeur{#CLE}}|balise_img{[Payer par carte (#CLE)]}|inserer_attribut{title,[Payer par carte (#CLE)]})]})]
+	</BOUCLE_cb>
 	</div>
+</div>
 </BOUCLE_trans>

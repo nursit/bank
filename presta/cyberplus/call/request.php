@@ -379,9 +379,17 @@ vads_redirect_error_message = Redirection vers la boutique dans quelques instant
  *
  * @param int $id_transaction
  * @param string $transaction_hash
+ * @param array $options
+ *   array cartes
  * @return array
  */
-function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash){
+function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, $options = array()){
+
+
+	$cartes = array('CB','VISA','MASTERCARD','E-CARTEBLEUE');
+	if (isset($options['cartes']) AND $options['cartes'])
+		$cartes = $options['cartes'];
+
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash)))
 		return array();
 
@@ -393,57 +401,67 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash){
 
 	include_spip('inc/filtres');
 
-	$contexte = array();
+	$parm = array();
 
-	$contexte['vads_site_id'] = cyberplus_site_id();
-	$contexte['vads_ctx_mode'] = _CYBERPLUS_MODE;
-	$contexte['vads_version'] = _CYBERPLUS_VERSION;
+	$parm['vads_site_id'] = cyberplus_site_id();
+	$parm['vads_ctx_mode'] = _CYBERPLUS_MODE;
+	$parm['vads_version'] = _CYBERPLUS_VERSION;
 
-	$contexte['vads_trans_id'] = str_pad(modulo($row['id_transaction'],899999),6,"0",STR_PAD_RIGHT);
-	$contexte['vads_order_id'] = $row['id_transaction'];
-	$contexte['vads_trans_date'] = gmdate ("YmdHis", time());
+	$parm['vads_trans_id'] = str_pad(modulo($row['id_transaction'],899999),6,"0",STR_PAD_RIGHT);
+	$parm['vads_order_id'] = $row['id_transaction'];
+	$parm['vads_trans_date'] = gmdate ("YmdHis", time());
 
-	$contexte['vads_page_action'] = "PAYMENT";
-	$contexte['vads_action_mode'] = "INTERACTIVE";
-	$contexte['vads_payment_config'] = "SINGLE";
-	//$contexte['vads_capture_delay'] = 0;
-	//$contexte['vads_validation_mode'] = 0;
+	$parm['vads_page_action'] = "PAYMENT";
+	$parm['vads_action_mode'] = "INTERACTIVE";
+	$parm['vads_payment_config'] = "SINGLE";
+	//$parm['vads_capture_delay'] = 0;
+	//$parm['vads_validation_mode'] = 0;
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$contexte['vads_currency'] = 978;
-	$contexte['vads_amount'] = intval(round(100*$row['montant'],0));
+	$parm['vads_currency'] = 978;
+	$parm['vads_amount'] = intval(round(100*$row['montant'],0));
 
-	$contexte['vads_language'] = $GLOBALS['spip_lang'];
+	$parm['vads_language'] = $GLOBALS['spip_lang'];
 
 	// recuperer l'email
 	if (intval($row['id_auteur']))
-		$contexte['vads_cust_email'] = sql_getfetsel('email','spip_auteurs','id_auteur='.intval($row['id_auteur']));
+		$parm['vads_cust_email'] = sql_getfetsel('email','spip_auteurs','id_auteur='.intval($row['id_auteur']));
 
 	// Urls de retour
 
-	$contexte['vads_return_mode'] = "GET";//"POST";
-	$contexte['vads_url_return'] = generer_url_action('bank_response',"bankp=cyberplus",true,true);
+	$parm['vads_return_mode'] = "GET";//"POST";
+	$parm['vads_url_return'] = generer_url_action('bank_response',"bankp=cyberplus",true,true);
 
-	#$contexte['vads_redirect_success_timeout'] = 1;
-	#$contexte['vads_redirect_success_message'] = "OK";
-	#$contexte['vads_redirect_error_timeout'] = 1;
-	#$contexte['vads_redirect_error_message'] = "Echec";
+	#$parm['vads_redirect_success_timeout'] = 1;
+	#$parm['vads_redirect_success_message'] = "OK";
+	#$parm['vads_redirect_error_timeout'] = 1;
+	#$parm['vads_redirect_error_message'] = "Echec";
 
-	$contexte['signature'] = cybperplus_signe_contexte($contexte,_CYBERPLUS_CLE);
 
-	$hidden = "";
-	foreach($contexte as $k=>$v){
-		$hidden .= "<input type='hidden' name='$k' value='".str_replace("'", "&#39;", $v)."' />";
-	}
+	$cartes_possibles = array(
+		'CB'=>'presta/cyberplus/logo/CB.gif',
+		'VISA'=>'presta/cyberplus/logo/VISA.gif',
+		'MASTERCARD'=>'presta/cyberplus/logo/MASTERCARD.gif',
+	);
 
-	include_spip('inc/filtres_mini');
+	// cartes pour paiement a l'acte uniquement
+	$cartes_possibles['E-CARTEBLEUE']='presta/cyberplus/logo/E-CB.gif';
+	$cartes_possibles['AMEX']='presta/cyberplus/logo/AMEX.gif';
+
 	$contexte = array(
-		'hidden'=>$hidden,
+		'hidden'=>array(),
 		'action'=>_CYBERPLUS_SERVEUR,
 		'backurl'=>url_absolue(self()),
 		'id_transaction'=>$id_transaction,
 		'transaction_hash' => $transaction_hash
 	);
+	foreach($cartes as $carte){
+		if (isset($cartes_possibles[$carte])){
+			$parm['vads_payment_cards'] = $carte;
+			$contexte['hidden'][$carte] = cyberplus_form_hidden($parm);
+			$contexte['logo'][$carte] = $cartes_possibles[$carte];
+		}
+	}
 
 	return $contexte;
 }

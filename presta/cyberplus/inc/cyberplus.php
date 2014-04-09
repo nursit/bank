@@ -16,6 +16,22 @@ function cyberplus_site_id(){
 }
 
 /**
+ * Generer les hidden du form en signant les parametres au prealable
+ * @param array $parms
+ * @return string
+ */
+function cyberplus_form_hidden($parms){
+	$parms['signature'] = cybperplus_signe_contexte($parms,_CYBERPLUS_CLE);
+	$hidden = "";
+	foreach($parms as $k=>$v){
+		$hidden .= "<input type='hidden' name='$k' value='".str_replace("'", "&#39;", $v)."' />";
+	}
+
+	return $hidden;
+}
+
+
+/**
  * Signer le contexte en SHA, avec une cle secrete $key
  * @param array $contexte
  * @param string $key
