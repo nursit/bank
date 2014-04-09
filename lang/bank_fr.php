@@ -11,6 +11,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 'label_mode_paiement' => 'Modes de paiements a l\'acte',
 'label_mode_paiement_abo' => 'Modes de paiements des abonnements',
+'label_mode_test' => 'Mode Test',
 
 'label_presta_abo_paybox' => 'Paybox <a href="http://www.paybox.com/">http://www.paybox.com/</a>',
 'label_presta_abo_simu' => 'Simulation (necessite une autorisation par define)',
@@ -23,6 +24,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 'label_presta_paypalexpress' => 'Paypal Express Checkout <a href="http://www.paypal.fr/">http://www.paypal.fr/</a>',
 'label_presta_sips' => 'SIPS',
 'label_presta_internetplus' => 'Internet +',
+'label_presta_cyberplus' => 'CyberPlus',
 'label_presta_cheque' => 'Ch&egrave;ques (encaissement manuel)',
 'label_presta_simu' => 'Simulation (necessite une autorisation par define)',
 'label_presta_cmcic' => 'CMCIC <a href="https://www.cmcicpaiement.fr/fr/">cmcicpaiement.fr</a>',
