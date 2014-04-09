@@ -21,7 +21,7 @@ function cyberplus_site_id(){
  * @return string
  */
 function cyberplus_form_hidden($parms){
-	$parms['signature'] = cybperplus_signe_contexte($parms,_CYBERPLUS_CLE);
+	$parms['signature'] = cyberplus_signe_contexte($parms,_CYBERPLUS_CLE);
 	$hidden = "";
 	foreach($parms as $k=>$v){
 		$hidden .= "<input type='hidden' name='$k' value='".str_replace("'", "&#39;", $v)."' />";
@@ -37,7 +37,7 @@ function cyberplus_form_hidden($parms){
  * @param string $key
  * @return string
  */
-function cybperplus_signe_contexte($contexte,$key) {
+function cyberplus_signe_contexte($contexte,$key) {
 
 	// on ne prend que les infos vads_*
 	// a signer
@@ -62,8 +62,8 @@ function cybperplus_signe_contexte($contexte,$key) {
  * @param $key
  * @return bool
  */
-function cybperplus_verifie_signature($values,$key) {
-	$signature = cybperplus_signe_contexte($values,$key);
+function cyberplus_verifie_signature($values,$key) {
+	$signature = cyberplus_signe_contexte($values,$key);
 
 	if(isset($values['signature'])
 		AND ($values['signature'] == $signature))	{
@@ -72,4 +72,33 @@ function cybperplus_verifie_signature($values,$key) {
 	}
 
 	return false;
+}
+
+/**
+ * Recuperer le POST/GET de la reponse dans un tableau
+ * en verifiant la signature
+ *
+ * @param $key
+ * @return array|bool
+ */
+function cyberplus_recupere_reponse($key){
+	$reponse = array();
+	foreach($_REQUEST as $k=>$v){
+		if (strncmp($k,'vads_',5)==0){
+			$reponse[$k] = $v;
+		}
+	}
+	$reponse['signature'] = (isset($_REQUEST['signature'])?$_REQUEST['signature']:'');
+
+	if (!cyberplus_verifie_signature($reponse,$key))
+		return false;
+
+	return $reponse;
+}
+
+
+function cyberplus_traite_reponse_transaction($response){
+	// TODO
+	var_dump($response);
+	die();
 }
