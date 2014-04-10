@@ -26,12 +26,19 @@
 			</tr>
 		</thead>
 		<tbody>
-		<BOUCLE_transactions(transactions){id_transaction?}{id_facture?}{where?}{recherche?}{statut==#ENV{statut,'.'}}{tri #ENV{par,id_transaction},#GET{defaut_tri}}{pagination #ENV{nb,10}}>
+		<BOUCLE_transactions(transactions)
+			{id_transaction?}
+			{id_auteur?}
+			{id_facture?}
+			{where?}
+			{recherche?}
+			{statut==#ENV{statut,'.'}}
+			{tri #ENV{par,id_transaction},#GET{defaut_tri}}{pagination #ENV{nb,10}}>
 			<tr class="[(#COMPTEUR_BOUCLE|alterner{row_odd,row_even})][(#ENV{id_transaction}|is_array|non)[ (#EXPOSE)]]">
 				<td class="id"><a href="#URL_ECRIRE{transaction,id_transaction=#ID_TRANSACTION}" class="popin">#ID_TRANSACTION</a></td>
 				<td class="id_auteur"><a href='[(#ID_AUTEUR|generer_url_entite{auteur})]'>#ID_AUTEUR</a></td>
 				<td class="mode">#MODE</td>
-				<td class="autorisation_id">#AUTORISATION_ID</td>
+				<td class="autorisation_id"><abbr title="#AUTORISATION_ID">[(#AUTORISATION_ID|couper{15})]</abbr></td>
 				<td class="montant_ht">#MONTANT_HT</td>
 				<td class="montant">#MONTANT</td>
 				<td class="regle">#MONTANT_REGLE</td>
