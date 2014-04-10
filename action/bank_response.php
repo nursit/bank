@@ -11,7 +11,7 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-function action_bank_response_dist($cancel=null,$auto=null){
+function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 	
 	if (isset($GLOBALS['meta']['bank_paiement'])
 		AND $config = unserialize($GLOBALS['meta']['bank_paiement'])){
@@ -24,7 +24,7 @@ function action_bank_response_dist($cancel=null,$auto=null){
 		$auto = ($auto ? "auto":"");
 		$result = false;
 		// intercepter les retours depuis un presta actif
-		if ($p = _request('bankp')
+		if ($p = ($presta?$presta:_request('bankp'))
 			AND
 			 ((isset($prestas[$p]) AND $prestas[$p]) OR $p=='gratuit')
 		){
