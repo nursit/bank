@@ -93,4 +93,16 @@ function autoriser_transaction_encaissercheque_dist($faire, $type, $id_transacti
 	return false;
 }
 
-?>
+/**
+ * Transformer un tableau d'argument en liste arg=value pour le shell
+ * (en echappant de maniere securisee)
+ * @param $params
+ * @return string
+ */
+function bank_shell_args($params){
+	$res = "";
+	foreach($params as $k=>$v){
+		$res .= " ".escapeshellcmd($k)."=".escapeshellcmd($v);
+	}
+	return $res;
+}

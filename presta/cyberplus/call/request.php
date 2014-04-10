@@ -409,7 +409,7 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, 
 
 	$parm['vads_trans_id'] = str_pad(modulo($row['id_transaction'],899999),6,"0",STR_PAD_RIGHT);
 	$parm['vads_order_id'] = $row['id_transaction'];
-	$parm['vads_trans_date'] = gmdate ("YmdHis", time());
+	$parm['vads_trans_date'] = gmdate ("YmdHis", strtotime($row['date_transaction']));
 
 	$parm['vads_page_action'] = "PAYMENT";
 	$parm['vads_action_mode'] = "INTERACTIVE";
