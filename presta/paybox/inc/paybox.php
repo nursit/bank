@@ -28,11 +28,7 @@ function paybox_pbx_ids($boutique=''){
 }
 
 function paybox_shell_args($params){
-	$res = "";
-	foreach($params as $k=>$v){
-		$res .= " ".escapeshellcmd($k)."=".escapeshellcmd($v);
-	}
-	return $res;
+	return bank_shell_args($params);
 }
 
 /**
@@ -178,7 +174,12 @@ function paybox_traite_reponse_transaction($response,$mode = 'paybox') {
 		$envoyer_mail($GLOBALS['meta']['email_webmaster'],"[$mode]Transaction Frauduleuse",$t,"$mode@".$_SERVER['HTTP_HOST']);
 		$message = "Une erreur est survenue, les donn&eacute;es re&ccedil;ues de la banque ne sont pas conformes. ";
 		$message .= "Votre r&egrave;glement n'a pas &eacute;t&eacute; pris en compte (Ref : $id_transaction)";
-		sql_updateq("spip_transactions",array("message"=>$message,'statut'=>'echec'),"id_transaction=".intval($id_transaction));
+		$set = array(
+			"mode" => $mode,
+			"message"=>$message,
+			'statut'=>'echec'
+		);
+		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
 		return array($id_transaction,false);
 	}
 	// ok, on traite le reglement
@@ -204,9 +205,12 @@ function paybox_traite_reponse_transaction($response,$mode = 'paybox') {
 	 	if ($row['reglee']=='oui') return array($id_transaction,true);
 	 	// sinon enregistrer l'absence de paiement et l'erreur
 		spip_log($t="call_response : transaction $id_transaction refusee :[$erreur]:".paybox_shell_args($response),$mode);
-		sql_updateq("spip_transactions",array("statut"=>'echec['.$response['erreur'].']','date_paiement'=>$date_paiement),
-		  "id_transaction=".intval($id_transaction)
+		$set = array(
+			"mode" => $mode,
+			"statut" => 'echec['.$response['erreur'].']',
+			'date_paiement' => $date_paiement
 		);
+		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
 		if ($response['erreur']==3 OR $response['erreur']==6){
 			// Erreur paybox, avertir le webmestre
 			$envoyer_mail = charger_fonction('envoyer_mail','inc');

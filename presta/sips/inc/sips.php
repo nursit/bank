@@ -273,11 +273,12 @@ function sips_traite_reponse_transaction($response,$mode = 'sips') {
 
 	 	// sinon enregistrer l'absence de paiement et l'erreur
 		spip_log($t="call_response : transaction $id_transaction refusee :[$response_code][$bank_response_code]:".sips_shell_args($response),$mode);
-		sql_updateq("spip_transactions",array(
-				'statut'=>'echec['.$response['response_code'].']['.$response['bank_response_code'].']',
-				'date_paiement'=>$date_paiement
-
-			),"id_transaction=".intval($id_transaction));
+		$set = array(
+			'mode' => $mode,
+			'statut'=>'echec['.$response['response_code'].']['.$response['bank_response_code'].']',
+			'date_paiement'=>$date_paiement
+		);
+		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
 		if ($response['response_code']=='03'){
 			// le contrat SIPS ne fonctionne plus ? avertir le webmaster
 			$envoyer_mail = charger_fonction('envoyer_mail','inc');
@@ -302,14 +303,15 @@ function sips_traite_reponse_transaction($response,$mode = 'sips') {
 	// pour ne pas creer des problemes hasardeux
 	// (il y a des fois une erreur d'un centime)
 	$authorisation_id = $response['authorisation_id'];
-	sql_updateq("spip_transactions",array(
+	$set = array(
 		"autorisation_id"=>$authorisation_id,
 		"mode"=>$mode,
 		"montant_regle"=>$montant_regle,
 		"date_paiement"=>$date_paiement,
 		"statut"=>'ok',
 		"reglee"=>'oui'
-		),"id_transaction=".intval($id_transaction));
+	);
+	sql_updateq("spip_transactions", $set,"id_transaction=".intval($id_transaction));
 	spip_log("call_response : id_transaction $id_transaction, reglee",$mode);
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');

@@ -172,7 +172,12 @@ function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
 		$envoyer_mail($GLOBALS['meta']['email_webmaster'],"[$mode]Transaction Frauduleuse",$t,"$mode@".$_SERVER['HTTP_HOST']);
 		$message = "Une erreur est survenue, les donn&eacute;es re&ccedil;ues de la banque ne sont pas conformes. ";
 		$message .= "Votre r&egrave;glement n'a pas &eacute;t&eacute; pris en compte (Ref : $id_transaction)";
-		sql_updateq("spip_transactions",array("message"=>$message,'statut'=>'echec'),"id_transaction=".intval($id_transaction));
+		$set = array(
+			"mode" => $mode,
+			"message"=>$message,
+			'statut'=>'echec'
+		);
+		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
 		return array($id_transaction,false);
 	}
 
@@ -193,10 +198,13 @@ function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
 	 	// sinon enregistrer l'absence de paiement et l'erreur
 		spip_log($t="call_response : transaction $id_transaction refusee :[$erreur]:".var_export($response,true),$mode);
 		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;".($erreur===true?"":" ($erreur)");
-		sql_updateq("spip_transactions",
-			array("statut"=>'echec['.$response['STATUS'].':'.$response['NCERROR'].']','date_paiement'=>$date_paiement,'message'=>$message),
-		  "id_transaction=".intval($id_transaction)
+		$set = array(
+			"mode" => $mode,
+			"statut"=>'echec['.$response['STATUS'].':'.$response['NCERROR'].']',
+			'date_paiement'=>$date_paiement,
+			'message'=>$message
 		);
+		sql_updateq("spip_transactions", $set,"id_transaction=".intval($id_transaction));
 		return array($id_transaction,false);
 	}
 

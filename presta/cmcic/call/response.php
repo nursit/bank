@@ -305,7 +305,7 @@ function cmcic_response() {
  *     Ligne de transaction
  * @param bool|string $erreur
  *    Message d'erreur eventuel
- * @return void
+ * @return array
 **/ 
 function cmcic_gerer_transaction_annulee($id_transaction, $response, $row, $erreur=true) {
 	$mode = "cmcic";
@@ -317,10 +317,13 @@ function cmcic_gerer_transaction_annulee($id_transaction, $response, $row, $erre
 		// sinon enregistrer l'absence de paiement et l'erreur
 		spip_log($t="call_response : transaction $id_transaction refusée ou annulée pour : $response[motifrefus]", $mode);
 		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;".($erreur===true?"":" ($erreur)");
-		sql_updateq("spip_transactions",
-			array("statut"=>'echec['.$response['motifrefus'].']','date_paiement'=>$date_paiement,'message'=>$message),
-		  "id_transaction=".intval($id_transaction)
+		$set = array(
+			'mode' => $mode,
+			"statut" => 'echec['.$response['motifrefus'].']',
+			'date_paiement' => $date_paiement,
+			'message' => $message,
 		);
+		sql_updateq("spip_transactions", $set, "id_transaction=".intval($id_transaction));
 		return array($id_transaction, false);
 	}
 
@@ -338,7 +341,7 @@ function cmcic_gerer_transaction_annulee($id_transaction, $response, $row, $erre
  *     Ligne de transaction
  * @param bool $paiement_test
  *     Est-ce un paiement via le serveur de test ?
- * @return void
+ * @return array
 **/ 
 function cmcic_gerer_transaction_payee($id_transaction, $response, $row, $paiement_test = false) {
 	$mode = "cmcic";
@@ -363,15 +366,15 @@ function cmcic_gerer_transaction_payee($id_transaction, $response, $row, $paieme
 	$autorisation_id = $response['numauto'];   # numéro d'autorisation de la banque
 	$transaction     = $response['reference']; # référence de transaction
 
-	sql_updateq("spip_transactions",array(
+	$set = array(
 		"autorisation_id"=>"$transaction/$autorisation_id",
 		"mode"=>$mode,
 		"montant_regle"=>$montant_regle,
 		"date_paiement"=>$date_paiement,
 		"statut"=>'ok',
-		"reglee"=>'oui'),
-		"id_transaction=".intval($id_transaction)
+		"reglee"=>'oui'
 	);
+	sql_updateq("spip_transactions", $set, "id_transaction=".intval($id_transaction));
 	spip_log("call_response : id_transaction $id_transaction, reglee", $mode);
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');

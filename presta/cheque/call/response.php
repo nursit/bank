@@ -45,17 +45,15 @@ function presta_cheque_call_response_dist(){
 	}
 
 	// OK, on peut accepter le reglement
-	sql_update("spip_transactions",
-		array(
+	$set = array(
 		"mode"=>sql_quote('cheque'),
 		"autorisation_id"=>sql_quote($autorisation),
 		"montant_regle"=>'montant',
 		"date_paiement"=>sql_quote(date('Y-m-d H:i:s')),
 		"statut"=>sql_quote('ok'),
 		"reglee"=>sql_quote('oui')
-		),
-		"id_transaction=".intval($id_transaction)
 	);
+	sql_update("spip_transactions", $set,	"id_transaction=".intval($id_transaction));
 	spip_log("cheque_response : id_transaction $id_transaction, reglee",'cheque');
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
