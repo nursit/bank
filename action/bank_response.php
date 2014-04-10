@@ -50,11 +50,14 @@ function action_bank_response_dist($cancel=null,$auto=null){
 		 AND $id_transaction=reset($id)
 		 AND $hash=end($id)) {
 			$id_transaction = sql_getfetsel ("id_transaction","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($hash));
-			if ($id_transaction)
-				sql_updateq("spip_transactions",
-						array('message'=>'Transaction annul&eacute;e','statut'=>'echec','mode'=>$p),
-						'id_transaction='.intval($id_transaction)." AND statut='commande'"
+			if ($id_transaction){
+				$set = array(
+					'mode'=>$p,
+					'statut'=>'echec',
+					'message'=>'Transaction annul&eacute;e',
 				);
+				sql_updateq("spip_transactions", $set, 'id_transaction='.intval($id_transaction)." AND statut=".sql_quote('commande'));
+			}
 		}
 
 		if (!$auto)
@@ -117,10 +120,12 @@ function redirige_apres_retour_transaction($mode,$acte_ou_abo,$succes,$id_transa
 
 
 		if (strlen($redirect)){
+			$row = false;
 			$redirect = parametre_url($redirect,'type',$acte_ou_abo,'&');
-			if ($id_transaction = intval($id_transaction))
+			if ($id_transaction = intval($id_transaction)){
 				// attraper les infos sur la transaction
 				$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction));
+			}
 			if ($row AND $row['transaction_hash']) {
 				$redirect = parametre_url($redirect,'id_transaction',$id_transaction,'&');
 				$redirect = parametre_url($redirect,'transaction_hash',$row['transaction_hash'],'&');
