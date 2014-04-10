@@ -24,4 +24,4 @@
 		</div>
 	</li>
 </ul>
-<p class="explication">URL Serveur&nbsp;: <br /><input type="text" class="text" readonly="readonly" value="[(#VAL{bank.api/cyberplus/autoresponse/}|url_absolue)]" /></p>
+<p class="explication">URL Serveur&nbsp;: <br /><input type="text" class="text" readonly="readonly" value="[(#EVAL{_DIR_RACINE}|concat{bank.api/cyberplus/autoresponse/}|url_absolue)]" /></p>
