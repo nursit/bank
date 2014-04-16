@@ -13,20 +13,35 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 /* Paybox ------------------------------------------------------------------ */
 
+define('_PAYBOX_SANDBOX',
+	(	   (isset($GLOBALS['config_bank_paiement']['config_paybox']['mode_test']) AND $GLOBALS['config_bank_paiement']['config_paybox']['mode_test'])
+	  OR (isset($GLOBALS['config_bank_paiement']['config_abo_paybox']['mode_test']) AND $GLOBALS['config_bank_paiement']['config_abo_paybox']['mode_test'])
+	)?true:false);
+
 /**
  * Constantes pour paybox
  * plateforme de test
  * 
  */
 if (!defined('_PAYBOX_URL'))
-	define('_PAYBOX_URL',"https://tpeweb.paybox.com/cgi/MYchoix_pagepaiement.cgi");
+	define('_PAYBOX_URL',
+		_PAYBOX_SANDBOX?
+			"https://preprod-tpeweb.paybox.com/cgi/MYchoix_pagepaiement.cgi"
+		:
+			"https://tpeweb.paybox.com/cgi/MYchoix_pagepaiement.cgi");
 if (!defined('_PAYBOX_URL_RESIL'))
-	define('_PAYBOX_URL_RESIL',"https://tpeweb.paybox.com/cgi-bin/ResAbon.cgi");
+	define('_PAYBOX_URL_RESIL',
+		_PAYBOX_SANDBOX?
+			"https://preprod-tpeweb.paybox.com/cgi-bin/ResAbon.cgi"
+		:
+			"https://tpeweb.paybox.com/cgi-bin/ResAbon.cgi");
 
 /* ------------------------------------------------------------------------- */
 
 /**
  * Donnees de test :
+ * utiliser les donnees de la boutique avec le mode test actif
+ * Back-office : https://preprod-admin.paybox.com/ ou https://admin.paybox.com/
  *
 
 Paybox pour CA

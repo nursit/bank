@@ -17,6 +17,8 @@ function presta_paybox_payer_abonnement_dist($id_transaction, $transaction_hash,
 	$contexte = $call_request($id_transaction,$transaction_hash,'abo');
 	$contexte['title'] = $titre;
 
+	$contexte['sandbox'] = (_PAYBOX_SANDBOX?' ':'');
+
 	return recuperer_fond('presta/paybox/payer/abonnement',$contexte);
 }
 
