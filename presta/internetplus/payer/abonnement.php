@@ -15,9 +15,9 @@ include_spip('presta/internetplus/inc/wha_services');
 
 function presta_internetplus_payer_abonnement_dist($id_transaction,$transaction_hash){
 
-	$decrire_echeance = charger_fonction("decrire_echeance","abos");
 	// on decrit l'echeance, en indiquant qu'on peut la gerer manuellement grace a PayBoxDirectPlus
-	if ($echeance = $decrire_echeance($id_transaction)){
+	if ($decrire_echeance = charger_fonction("decrire_echeance","abos",true)
+	  AND $echeance = $decrire_echeance($id_transaction)){
 		if ($echeance['montant']<=0
 			OR $echeance['montant']>=30){
 

@@ -66,8 +66,9 @@ function presta_internetplus_inc_traiter_reponse_wha_abo_dist($m,$args,$partnerI
 		);
 
 		// activer l'abonnement
-		$activer_abonnement = charger_fonction('activer_abonnement','abos');
-		$activer_abonnement($id_transaction,$uoid,"wha/$partnerId");
+		if ($activer_abonnement = charger_fonction('activer_abonnement','abos',true)){
+			$activer_abonnement($id_transaction,$uoid,"wha/$partnerId");
+		}
 
 	}
 

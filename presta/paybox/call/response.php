@@ -55,8 +55,9 @@ function presta_paybox_call_response_dist($response=null){
 		// on ne retient que la valeur entiere
 		$id_transaction = intval($id_transaction);
 
-		$activer_abonement = charger_fonction('activer_abonnement','abos');
-		$activer_abonement($id_transaction,$response['abo'],'paybox',$date_fin);
+		if ($activer_abonement = charger_fonction('activer_abonnement','abos',true)){
+			$activer_abonement($id_transaction,$response['abo'],'paybox',$date_fin);
+		}
 	}
 	return array($id_transaction,$success);	
 }

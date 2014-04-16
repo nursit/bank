@@ -55,9 +55,10 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $ab
 	$parm['PBX_RETOUR'] = 'montant:M;id_transaction:R;auth:A;trans:S;abo:B;erreur:E;valid:D;';
 
 	if ($abo){
-		$decrire_echeance = charger_fonction("decrire_echeance","abos");
 		// on decrit l'echeance, en indiquant qu'on peut la gerer manuellement grace a PayBoxDirectPlus
-		if ($echeance = $decrire_echeance($id_transaction, false)){
+		if (
+			$decrire_echeance = charger_fonction("decrire_echeance","abos",true)
+		  AND $echeance = $decrire_echeance($id_transaction, false)){
 			if ($echeance['montant']>0){
 				$montant_echeance = str_pad(intval(round(100*$echeance['montant'])), 10, "0", STR_PAD_LEFT);
 

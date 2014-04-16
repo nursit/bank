@@ -17,8 +17,9 @@ function presta_internetplus_call_autoresponse_dist(){
 	$wha_responder = charger_fonction('responder','presta/internetplus/inc');
 	list($uoid,$resil)=$wha_responder();
 
-	if ($uoid AND $resil){
-		$resilier = charger_fonction('resilier','abos');
+	if ($uoid
+		AND $resil
+	  AND $resilier = charger_fonction('resilier','abos',true)){
 		$resilier("uid:$uoid",array('immediat'=>reset($resil),'message'=>end($resil)));
 	}
 
