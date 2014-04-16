@@ -17,6 +17,8 @@ function presta_cyberplus_payer_acte_dist($id_transaction,$transaction_hash, $ti
 	$contexte = $call_request($id_transaction,$transaction_hash);
 	$contexte['title'] = $titre;
 
+	$contexte['sandbox'] = (_CYBERPLUS_MODE=="TEST"?' ':'');
+
 	return recuperer_fond('presta/cyberplus/payer/acte',$contexte);
 }
 

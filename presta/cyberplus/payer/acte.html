@@ -18,5 +18,6 @@
 		[(#INCLURE{fond=presta/cyberplus/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#CHEMIN{#ENV{logo}|table_valeur{#CLE}}|balise_img{[Payer par carte (#CLE)]}|inserer_attribut{title,[Payer par carte (#CLE)]})]})]
 	</BOUCLE_cb>
 	</div>
+	[(#ENV{sandbox}|oui)<div class="info">Mode TEST</div>]
 </div>
 </BOUCLE_trans>
