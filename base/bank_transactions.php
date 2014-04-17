@@ -79,7 +79,9 @@ function bank_rechercher_liste_des_champs($flux){
 	$flux['transaction'] = array(
 		'id_transaction' => 1,
 		'auteur_id' => 1,
+		'auteur' => 1,
 		'autorisation_id' => 1,
+		'parrain' => 1,
 		'tracking_id' => 1,
 		'mode' => 1,
 	);
