@@ -41,7 +41,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 'label_cheque_notice' => 'Information complémentaire affichée',
 'legend_sips_logo_page_paiement' => 'Logos page de paiement',
 
-'info_cheque_imprimer' => 'Imprimez cette page et envoyez là avec votre chèque d&#8217;un montant de @montant@&nbsp;€ à l&#8217;adresse :',
+'info_cheque_imprimer' => 'Envoyez votre chèque d&#8217;un montant de <b>@montant@&nbsp;€</b> avec la référence &laquo; <b>Commande #@transaction@</b> &raquo;<br /> à l&#8217;adresse :',
 'info_cheque_etablir_ordre' => 'Chèque établi à l\'ordre de &laquo;&nbsp;<i>@ordre@</i>&nbsp;&raquo;',
 'info_cheque_facture' => 'La facture sera disponible dans votre espace client dès votre règlement pris en compte.',
 'bouton_enregistrer_reglement_cheque' => 'Enregistrer le réglement par chèque',
