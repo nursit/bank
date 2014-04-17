@@ -10,7 +10,15 @@
  *
  */
 ]
-<BOUCLE_payer(TRANSACTIONS){id_transaction}>
-	#AUTEUR <br /> Montant <strong>#MONTANT &euro;</strong>
-	[(#PAYER_ACTE{sips,#ID_TRANSACTION,#TRANSACTION_HASH})]
+<BOUCLE_payer(TRANSACTIONS){id_transaction}{transaction_hash}>
+	<h1>Je règle ma commande</h1>
+	<p>Montant : <strong>[(#MONTANT|affiche_monnaie)]</strong>
+	<br />#AUTEUR
+	</p>
+	<INCLURE{fond=modeles/payer_acte,id_transaction,transaction_hash,title='Je choisis mon mode de paiement sécurisé'}>
+	<style>
+	.payer_mode {margin:1em 0;border-bottom: 1px solid #eee;}
+	.payer_mode .boutons {margin-bottom: 1.5em;}
+	.payer_mode .boutons>form,.payer_mode .boutons>form>div {display: inline}
+	</style>
 </BOUCLE_payer>
