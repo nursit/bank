@@ -67,20 +67,43 @@ if (!defined('CMCIC_TPE'))
 if (!defined('CMCIC_CODESOCIETE'))
 	define ('CMCIC_CODESOCIETE', $GLOBALS['config_bank_paiement']['config_cmcic']['CODESOCIETE']); // indiquer code de société (10 caractères ?)
 
+
+if (!defined('CMCIC_TEST'))
+	define('CMCIC_TEST',
+		(isset($GLOBALS['config_bank_paiement']['config_cmcic']['mode_test'])
+			AND $GLOBALS['config_bank_paiement']['config_cmcic']['mode_test'])?true:false);
+
 // URL d'accès à la banque.
 // Par défaut, l'adresse CIC de paiement normal.
 // vous pouvez indiquer, soit la constante CMCIC_SERVEUR directement,
 // soit définir CMCIC_TEST à TRUE pour utiliser l'adresse de test de CMCIC
 if (!defined('CMCIC_SERVEUR')) {
-	if (defined('CMCIC_TEST') and CMCIC_TEST) {
-		define ("CMCIC_SERVEUR", "https://ssl.paiement.cic-banques.fr/test/paiement.cgi");   // CIC
-		# define ("CMCIC_SERVEUR", "https://paiement.creditmutuel.fr/test/paiement.cgi");    // Crédit Mutuel
-		# define ("CMCIC_SERVEUR", "https://ssl.paiement.banque-obc.fr/test/paiement.cgi");  // OBC
-	} else {
-		define ("CMCIC_SERVEUR", $GLOBALS['config_bank_paiement']['config_cmcic']['SERVEUR']);   // CIC
-		# define ("CMCIC_SERVEUR", "https://ssl.paiement.cic-banques.fr/paiement.cgi");   // CIC
-		# define ("CMCIC_SERVEUR", "https://paiement.creditmutuel.fr/paiement.cgi");    // Crédit Mutuel
-		# define ("CMCIC_SERVEUR", "https://ssl.paiement.banque-obc.fr/paiement.cgi");  // OBC
+	switch($GLOBALS['config_bank_paiement']['config_cmcic']['service']){
+		case "CMUT":
+			define ("CMCIC_SERVEUR",
+				CMCIC_TEST?
+					"https://paiement.creditmutuel.fr/test/paiement.cgi"
+					:
+					"https://paiement.creditmutuel.fr/paiement.cgi"
+			);
+			break;
+		case "OBC":
+			define ("CMCIC_SERVEUR",
+				CMCIC_TEST?
+					"https://ssl.paiement.banque-obc.fr/test/paiement.cgi"
+					:
+					"https://ssl.paiement.banque-obc.fr/paiement.cgi"
+			);
+			break;
+		case "CIC":
+		default:
+			define ("CMCIC_SERVEUR",
+				CMCIC_TEST?
+					"https://ssl.paiement.cic-banques.fr/test/paiement.cgi"
+					:
+					"https://ssl.paiement.cic-banques.fr/paiement.cgi"
+			);
+			break;
 	}
 }
 
