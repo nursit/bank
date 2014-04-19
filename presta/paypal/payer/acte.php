@@ -19,7 +19,8 @@ function presta_paypal_payer_acte_dist($id_transaction,$transaction_hash){
 			'url_notify' => generer_url_action('bank_autoresponse', 'bankp=paypal', true, true),
 			'url_cancel' => generer_url_action('bank_cancel', 'bankp=paypal', true, true),
 			'id_transaction'=>$id_transaction,
-			'transaction_hash'=>$transaction_hash
+			'transaction_hash'=>$transaction_hash,
+			'sandbox' => _PAYPAL_SANDBOX,
 		)
 	);
 }
