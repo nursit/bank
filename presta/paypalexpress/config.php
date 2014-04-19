@@ -71,13 +71,17 @@ if (!defined('_PAYPAL_API_PASSWORD'))
 if (!defined('_PAYPAL_API_SIGNATURE'))
 	define('_PAYPAL_API_SIGNATURE', $GLOBALS['config_bank_paiement']['config_paypalexpress']['API_SIGNATURE']);
 
-$sandbox = (defined('_PAYPAL_API_SANDBOX')?true:false);
+if (!defined('_PAYPAL_API_SANDBOX'))
+	define('_PAYPAL_API_SANDBOX',
+		(isset($GLOBALS['config_bank_paiement']['config_paypalexpress']['mode_test'])
+			AND $GLOBALS['config_bank_paiement']['config_paypalexpress']['mode_test'])?true:false);
+
 
 /**
 # Endpoint: this is the server URL which you have to connect for submitting your API request.
 */
 if (!defined('_PAYPAL_API_ENDPOINT'))
-	define('_PAYPAL_API_ENDPOINT', $sandbox?'https://api-3t.sandbox.paypal.com:443/nvp':'https://api-3t.paypal.com:443/nvp');
+	define('_PAYPAL_API_ENDPOINT', _PAYPAL_API_SANDBOX?'https://api-3t.sandbox.paypal.com:443/nvp':'https://api-3t.paypal.com:443/nvp');
 
 /* Define the PayPal URL. This is the URL that the buyer is
    first sent to to authorize payment with their paypal account
@@ -89,7 +93,7 @@ if (!defined('_PAYPAL_API_ENDPOINT'))
    https://www.paypal.com/webscr&cmd=_express-checkout&token=
    */
 if (!defined('_PAYPAL_API_PAYPAL_URL'))
-	define('_PAYPAL_API_PAYPAL_URL', $sandbox?'https://www.sandbox.paypal.com/webscr&cmd=_express-checkout':'https://www.paypal.com/webscr&cmd=_express-checkout');
+	define('_PAYPAL_API_PAYPAL_URL', _PAYPAL_API_SANDBOX?'https://www.sandbox.paypal.com/webscr&cmd=_express-checkout':'https://www.paypal.com/webscr&cmd=_express-checkout');
 
 
 /**
