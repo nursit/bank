@@ -45,7 +45,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'label_presta_internetplus' => 'Internet +',
 	'label_presta_ogone' => 'Ogone <a href="http://www.ogone.fr/">http://www.ogone.fr/</a>',
 	'label_presta_paybox' => 'Paybox <a href="http://www.paybox.com/">http://www.paybox.com/</a>',
-	'label_presta_paypal' => 'Paypal non s&eacute;curis&eacute; <a href="http://www.paypal.fr/">http://www.paypal.fr/</a>',
+	'label_presta_paypal' => 'Paypal (faiblement s&eacute;curis&eacute;) <a href="http://www.paypal.fr/">http://www.paypal.fr/</a>',
 	'label_presta_paypalexpress' => 'Paypal Express Checkout <a href="http://www.paypal.fr/">http://www.paypal.fr/</a>',
 	'label_presta_simu' => 'Simulation (necessite une autorisation par define)',
 	'label_presta_sips' => 'SIPS',
