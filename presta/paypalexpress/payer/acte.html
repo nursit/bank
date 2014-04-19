@@ -17,5 +17,5 @@
 		   href='[(#URL_ACTION_AUTEUR{paypalexpress_order,#ID_TRANSACTION}|parametre_url{url_confirm,#ENV{url_confirm}})]'
 			><img src='#CHEMIN{presta/paypalexpress/logo/PayPal_mark_60x38.gif}' alt='Payer avec Paypal' /></a>
 	</div>
-	[(#ENV{sandbox}|oui)<div class="info">Mode TEST</div>]
+	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test:></div>]
 </div>

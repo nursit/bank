@@ -11,7 +11,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 'label_mode_paiement' => 'Modes de paiements a l\'acte',
 'label_mode_paiement_abo' => 'Modes de paiements des abonnements',
-'label_mode_test' => 'Mode Test',
+'label_mode_test' => 'Utiliser en mode TEST (aucun paiement réel)',
 
 'label_presta_abo_paybox' => 'Paybox <a href="http://www.paybox.com/">http://www.paybox.com/</a>',
 'label_presta_abo_simu' => 'Simulation (necessite une autorisation par define)',
@@ -45,6 +45,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 'info_cheque_imprimer' => 'Envoyez votre chèque d&#8217;un montant de <b>@montant@&nbsp;€</b> avec la référence &laquo; <b>Commande #@transaction@</b> &raquo;<br /> à l&#8217;adresse :',
 'info_cheque_etablir_ordre' => 'Chèque établi à l\'ordre de &laquo;&nbsp;<i>@ordre@</i>&nbsp;&raquo;',
 'info_cheque_facture' => 'La facture sera disponible dans votre espace client dès votre règlement pris en compte.',
+'info_mode_test' => 'Mode TEST (paiement fictif)',
 'bouton_enregistrer_reglement_cheque' => 'Enregistrer le réglement par chèque',
 
 

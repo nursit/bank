@@ -39,6 +39,6 @@
 	<input type="hidden" name="return" value="#ENV*{url_return}" />
 	<input type="hidden" name="rm" value="2" />[(#REM) 1=GET 2=POST]
 	</form></div>
-	[(#ENV{sandbox}|oui)<div class="info">Mode TEST</div>]
+	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test:></div>]
 </div>
 </BOUCLE_trans>
