@@ -12,7 +12,7 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
 /**
- * Installation des fichiers de configuration/parametrage PAYBOX
+ * Installation des fichiers de configuration/parametrage SIPS
  */
 function presta_sips_install_dist(){
 	$merchant_id = "";
