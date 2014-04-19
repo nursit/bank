@@ -213,7 +213,7 @@ function cmcic_notifier_banque_ok() {
 	// Send receipt to CMCIC server
 	header("Pragma: no-cache");
 	header("Content-type: text/plain");
-	printf(CMCIC_CGI2_RECEIPT, CMCIC_CGI2_MACOK);
+	printf(_CMCIC_CGI2_RECEIPT, _CMCIC_CGI2_MACOK);
 	spip_log("call_response : notification pour banque : OK.", "cmcic");
 }
 
@@ -227,7 +227,7 @@ function cmcic_notifier_banque_erreur() {
 	// Send receipt to CMCIC server
 	header("Pragma: no-cache");
 	header("Content-type: text/plain");
-	printf(CMCIC_CGI2_RECEIPT, CMCIC_CGI2_MACNOTOK);
+	printf(_CMCIC_CGI2_RECEIPT, _CMCIC_CGI2_MACNOTOK);
 	spip_log("call_response : notification pour banque : ERREUR.", "cmcic");
 }
 
@@ -258,7 +258,7 @@ function cmcic_response() {
 	$oHmac = new CMCIC_Hmac($oTpe);
 
 	// Message Authentication
-	$cgi2_fields = sprintf(CMCIC_CGI2_FIELDS, $oTpe->sNumero,
+	$cgi2_fields = sprintf(_CMCIC_CGI2_FIELDS, $oTpe->sNumero,
 		$CMCIC_bruteVars["date"],
 		$CMCIC_bruteVars['montant'],
 		$CMCIC_bruteVars['reference'],

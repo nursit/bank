@@ -70,10 +70,10 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash) {
 	$oHmac = new CMCIC_Hmac($oTpe);   
 
 	// Control String for support
-	$CtlHmac = sprintf(CMCIC_CTLHMAC,
+	$CtlHmac = sprintf(_CMCIC_CTLHMAC,
 		$oTpe->sVersion,
 		$oTpe->sNumero,
-		$oHmac->computeHmac(sprintf(CMCIC_CTLHMACSTR, $oTpe->sVersion, $oTpe->sNumero)));
+		$oHmac->computeHmac(sprintf(_CMCIC_CTLHMACSTR, $oTpe->sVersion, $oTpe->sNumero)));
 
 	// Currency : ISO 4217 compliant
 	$devise = "EUR";
@@ -106,7 +106,7 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash) {
  
 
 	// Data to certify
-	$PHP1_FIELDS = sprintf(CMCIC_CGI1_FIELDS,
+	$PHP1_FIELDS = sprintf(_CMCIC_CGI1_FIELDS,
 		$contexte['TPE'],
 		$contexte['date'],
 		$montant, # montant
@@ -151,7 +151,7 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash) {
 	include_spip('inc/filtres_mini');
 	$contexte = array(
 		'hidden' => $hidden,
-		'action' => CMCIC_SERVEUR,
+		'action' => _CMCIC_SERVEUR,
 		'backurl' => url_absolue(self()),
 		'id_transaction' => $id_transaction,
 		'transaction_hash' => $transaction_hash);

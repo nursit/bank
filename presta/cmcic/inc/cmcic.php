@@ -28,14 +28,14 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *
  *****************************************************************************/
 
-define("CMCIC_CTLHMAC","V1.04.sha1.php--[CtlHmac%s%s]-%s");
-define("CMCIC_CTLHMACSTR", "CtlHmac%s%s");
-define("CMCIC_CGI2_RECEIPT","version=2\ncdr=%s");
-define("CMCIC_CGI2_MACOK","0");
-define("CMCIC_CGI2_MACNOTOK","1\n");
-define("CMCIC_CGI2_FIELDS", "%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*");
-define("CMCIC_CGI1_FIELDS", "%s*%s*%s%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s");
-define("CMCIC_URLPAIEMENT", "paiement.cgi");
+define("_CMCIC_CTLHMAC","V1.04.sha1.php--[CtlHmac%s%s]-%s");
+define("_CMCIC_CTLHMACSTR", "CtlHmac%s%s");
+define("_CMCIC_CGI2_RECEIPT","version=2\ncdr=%s");
+define("_CMCIC_CGI2_MACOK","0");
+define("_CMCIC_CGI2_MACNOTOK","1\n");
+define("_CMCIC_CGI2_FIELDS", "%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*");
+define("_CMCIC_CGI1_FIELDS", "%s*%s*%s%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s");
+define("_CMCIC_URLPAIEMENT", "paiement.cgi");
 
 
 /*****************************************************************************
@@ -67,19 +67,19 @@ class CMCIC_Tpe {
 	function __construct($sLangue = "FR") {
 
 		// contrôle de l'existence des constantes de paramétrages.
-		$aRequiredConstants = array('CMCIC_CLE', 'CMCIC_VERSION', 'CMCIC_TPE', 'CMCIC_CODESOCIETE');
+		$aRequiredConstants = array('_CMCIC_CLE', '_CMCIC_VERSION', '_CMCIC_TPE', '_CMCIC_CODESOCIETE');
 		$this->_checkTpeParams($aRequiredConstants);
 
-		$this->sVersion = CMCIC_VERSION;
-		$this->_sCle = CMCIC_CLE;
-		$this->sNumero = CMCIC_TPE;
-		$this->sUrlPaiement = CMCIC_SERVEUR . CMCIC_URLPAIEMENT;
+		$this->sVersion = _CMCIC_VERSION;
+		$this->_sCle = _CMCIC_CLE;
+		$this->sNumero = _CMCIC_TPE;
+		$this->sUrlPaiement = _CMCIC_SERVEUR . _CMCIC_URLPAIEMENT;
 
-		$this->sCodeSociete = CMCIC_CODESOCIETE;
+		$this->sCodeSociete = _CMCIC_CODESOCIETE;
 		$this->sLangue = $sLangue;
 
-		$this->sUrlOK = CMCIC_URLOK;
-		$this->sUrlKO = CMCIC_URLKO;
+		$this->sUrlOK = (defined('_CMCIC_URLOK')?_CMCIC_URLOK:"");
+		$this->sUrlKO = (defined('_CMCIC_URLKO')?_CMCIC_URLKO:"");
 
 	}
 

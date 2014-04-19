@@ -17,7 +17,7 @@ function presta_cmcic_payer_acte_dist($id_transaction,$transaction_hash, $titre=
 	$contexte = $call_request($id_transaction,$transaction_hash);
 	$contexte['title'] = $titre;
 
-	$contexte['sandbox'] = (CMCIC_TEST?' ':'');
+	$contexte['sandbox'] = (_CMCIC_TEST?' ':'');
 
 	return recuperer_fond('presta/cmcic/payer/acte',$contexte);
 }
