@@ -18,4 +18,5 @@
 		[(#INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand='American Express',pm=CreditCard,logobrand=#CHEMIN{presta/ogone/logo/AMEX.gif}|balise_img{Payer par carte American Express}})]
 		[(#REM)(# INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand=PAYPAL,pm=PAYPAL,logobrand=#CHEMIN{presta/ogone/logo/PayPal.gif}|balise_img{Payer par PayPal}})]
 	</div>
+	[(#ENV{sandbox}|oui)<div class="info">Mode TEST</div>]
 </div>

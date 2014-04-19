@@ -28,12 +28,20 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 if (!defined('_OGONE_PSPID'))
 	define('_OGONE_PSPID',$GLOBALS['config_bank_paiement']['config_ogone']['PSPID']);
 
+if (!defined('_OGONE_TEST'))
+	define('_OGONE_TEST',
+		(isset($GLOBALS['config_bank_paiement']['config_ogone']['mode_test'])
+			AND $GLOBALS['config_bank_paiement']['config_ogone']['mode_test'])?true:false);
+
 // Url sur laquelle envoyer les demandes de paiement
 if (!defined('_OGONE_URL'))
-	// Tests
-	define('_OGONE_URL',"https://secure.ogone.com/ncol/test/orderstandard.asp");
-	// Production
-	#define('_OGONE_URL',"https://secure.ogone.com/ncol/prod/orderstandard.asp ");
+	define('_OGONE_URL',_OGONE_TEST?
+		// Tests
+		"https://secure.ogone.com/ncol/test/orderstandard.asp"
+	:
+		// Production
+		"https://secure.ogone.com/ncol/prod/orderstandard.asp"
+	);
 
 // Cle de signature des demandes envoyees a Ogone. A renseigner aussi dans la
 // configuration chez Ogone

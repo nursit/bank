@@ -17,6 +17,8 @@ function presta_ogone_payer_acte_dist($id_transaction,$transaction_hash, $titre=
 	$contexte = $call_request($id_transaction,$transaction_hash);
 	$contexte['title'] = $titre;
 
+	$contexte['sandbox'] = (_OGONE_TEST?' ':'');
+
 	return recuperer_fond('presta/ogone/payer/acte',$contexte);
 }
 
