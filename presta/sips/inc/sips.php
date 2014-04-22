@@ -98,6 +98,15 @@ function sips_request($service,$params,$certificat,$request = "request"){
  		spip_log("erreur appel $request : executable $request non trouve",'sips');
 	}
 
+	if (preg_match_all(",<form\b[^>]*>,UimsS",$result['buffer'], $regs, PREG_PATTERN_ORDER)){
+		foreach($regs as $reg){
+			$class = extraire_attribut($reg[0],"class");
+			$class .= ($class?" ":"") . "noajax";
+			$form = inserer_attribut($reg[0],"class",$class);
+			$result['buffer'] = str_replace($reg[0],$form,$result['buffer']);
+		}
+	}
+
 	return $result;
 }
 

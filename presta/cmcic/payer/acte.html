@@ -14,7 +14,7 @@
 	<div class='payer_mode payer_cmcic payer_acte' id='paiement_cmcic'>
 		<p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
 		<div class='boutons'>
-		<form action="#ENV{action}" method="post">
+		<form action="#ENV{action}" method="post" class="noajax">
 		[(#ENV**{hidden})]
 		[(#SET{texte,<:bank:payer_avec{nom=CMCIC}:>})]
 		<button class="submit" type="submit" title="[(#GET{texte}|attribut_html)]">

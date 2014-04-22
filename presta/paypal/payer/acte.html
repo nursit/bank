@@ -14,7 +14,7 @@
 <div class='payer_mode payer_paypal payer_acte'>
 	<p class="titre h4"><:bank:payer_avec{nom=Paypal}:></p>
 	<div class='boutons'>
-	<form action="#EVAL{_PAYPAL_URL_SERVICES}" method="post">
+	<form action="#EVAL{_PAYPAL_URL_SERVICES}" method="post" class="noajax">
 	<input TYPE="hidden" name="charset" value="#CHARSET" /> 
 	<input type="hidden" name="cmd" value="_cart" />
 	<input type="hidden" name="upload" value="1" />
