@@ -15,7 +15,7 @@ include_spip('presta/internetplus/inc/wha_services');
 
 function presta_internetplus_payer_abonnement_dist($id_transaction,$transaction_hash){
 
-	// on decrit l'echeance, en indiquant qu'on peut la gerer manuellement grace a PayBoxDirectPlus
+	// on decrit l'echeance
 	if ($decrire_echeance = charger_fonction("decrire_echeance","abos",true)
 	  AND $echeance = $decrire_echeance($id_transaction)){
 		if ($echeance['montant']<=0
@@ -25,7 +25,7 @@ function presta_internetplus_payer_abonnement_dist($id_transaction,$transaction_
 			return false;
 		}
 
-		if (!isset($echeance['wha_oid'])){
+		if (!isset($echeance['wha_oid']) OR !$echeance['wha_oid']){
 			spip_log("Payer abo transaction #$id_transaction : pas de wha_oid dans l'echeance " . var_export($echeance,true),"internetplus_abo"._LOG_INFO_IMPORTANTE);
 			return false;
 		}

@@ -57,9 +57,9 @@ function presta_simu_call_response_dist(){
 	$regler_transaction($id_transaction,"",$row);
 
 	if (_request('abo')
-	  AND $activer_abonement = charger_fonction('activer_abonnement','abos',true)){
+	  AND $activer_abonnement = charger_fonction('activer_abonnement','abos',true)){
 		// numero d'abonne = numero de transaction
-		$activer_abonement($id_transaction,$id_transaction,'simu');
+		$activer_abonnement($id_transaction,$id_transaction,'simu');
 	}
 
 	return array($id_transaction,true);
