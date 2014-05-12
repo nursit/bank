@@ -5,8 +5,8 @@
 $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 	'abonnement_avec' => 'Subscription with <i>@nom@</i>',
-	'abonnement_choisissez_CB' => 'Select your Credit Card:',
-	'abonnement_par_CB' => 'with Credit Card',
+	'abonnement_choisissez_cb' => 'Select your Credit Card:',
+	'abonnement_par_cb' => 'with Credit Card',
 
 	'bouton_enregistrer_reglement_cheque' => 'Record check remittance',
 
