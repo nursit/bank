@@ -1,0 +1,42 @@
+#########################################################################
+#
+#	Pathfile 
+#
+#	Liste fichiers parametres utilises par le module de paiement
+#
+#########################################################################
+#
+#
+#-------------------------------------------------------------------------
+# Activation (YES) / Désactivation (NO) du mode DEBUG
+#-------------------------------------------------------------------------
+#
+DEBUG!NO!
+#
+# ------------------------------------------------------------------------
+# Chemin vers le répertoire des logos depuis le web alias  
+# Exemple pour le répertoire www.merchant.com/elysnet/payment/logo/
+# indiquer:
+# ------------------------------------------------------------------------
+#
+D_LOGO!/elysnet/payment/logo/!
+#
+# --------------------------------------------------------------------------
+#  Fichiers parametres lies a l'api elysnet paiement
+# --------------------------------------------------------------------------
+#
+# fichier des  parametres elysnet
+#
+F_DEFAULT!/home/elysnet/payment/param/parmcom.elysnet!
+#
+# fichier parametre commercant
+#
+F_PARAM!/home/elysnet/payment/param/parmcom!
+#
+# certificat du commercant
+#
+F_CERTIFICATE!/home/elysnet/payment/param/certif!
+#
+# --------------------------------------------------------------------------
+# 	end of file
+# --------------------------------------------------------------------------
