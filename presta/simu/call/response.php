@@ -40,17 +40,20 @@ function presta_simu_call_response_dist(){
 	}
 
 	// Ouf, le reglement a ete accepte
-	
-	sql_update("spip_transactions",
-		array(
+	$set = array(
 		"mode"=>sql_quote('simu'),
 		"montant_regle"=>'montant',
 		"date_paiement"=>'NOW()',
 		"statut"=>sql_quote('ok'),
 		"reglee"=>sql_quote('oui')
-		),
-		"id_transaction=".intval($id_transaction)
 	);
+	// generer un numero d'abonne simule
+	if (_request('abo')){
+		$abo_uid = substr(md5("$id_transaction-".time()),0,10);
+		$set['abo_uid'] = sql_quote($abo_uid);
+	}
+
+	sql_update("spip_transactions", $set,	"id_transaction=".intval($id_transaction));
 	spip_log("simu_response : id_transaction $id_transaction, reglee",'simu');
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
@@ -59,7 +62,7 @@ function presta_simu_call_response_dist(){
 	if (_request('abo')
 	  AND $activer_abonnement = charger_fonction('activer_abonnement','abos',true)){
 		// numero d'abonne = numero de transaction
-		$activer_abonnement($id_transaction,$id_transaction,'simu');
+		$activer_abonnement($id_transaction,$abo_uid,'simu');
 	}
 
 	return array($id_transaction,true);

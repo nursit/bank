@@ -60,7 +60,8 @@ function presta_internetplus_inc_traiter_reponse_wha_abo_dist($m,$args,$partnerI
 				"mode"=>'wha_abo',
 				"date_paiement"=>date('Y-m-d H:i:s'),
 				"statut"=>'ok',
-				"reglee"=>'oui'
+				"reglee"=>'oui',
+				'abo_uid'=>$uoid,
 			),
 			"id_transaction=".intval($id_transaction)
 		);

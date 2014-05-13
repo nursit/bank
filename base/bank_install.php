@@ -114,6 +114,11 @@ function bank_upgrade($nom_meta_base_version,$version_cible){
 			sql_alter("table spip_transactions ADD refcb varchar(100) NOT NULL DEFAULT ''");
 			ecrire_meta($nom_meta_base_version,$current_version="1.3.0",'non');
 		}
+		if (spip_version_compare($current_version,"1.4.0","<=")){
+			sql_alter("table spip_transactions ADD abo_uid varchar(55) NOT NULL DEFAULT ''");
+			sql_alter("table spip_transactions ADD validite varchar(10) NOT NULL DEFAULT ''");
+			ecrire_meta($nom_meta_base_version,$current_version="1.4.0",'non');
+		}
 
 		bank_presta_install();
 	}

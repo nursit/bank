@@ -245,6 +245,14 @@ function paybox_traite_reponse_transaction($response,$mode = 'paybox') {
 		$set['refcb'] = $response['ppps'];
 	}
 
+	// si abonnement, stocker les 2 infos importantes : uid et validite
+	if (isset($response['abo']) AND $response['abo']){
+		$set['abo_uid'] = $response['abo'];
+		if (isset($response['valid']) AND $response['valid']){
+			$set['validite'] = "20" . substr($response['valid'],0,2) . "-" . substr($response['valid'],2,2);
+		}
+	}
+
 	// il faudrait stocker le $transaction aussi pour d'eventuels retour vers paybox ?
 	sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
 	spip_log("call_response : id_transaction $id_transaction, reglee",$mode);

@@ -60,8 +60,10 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 			}
 		}
 
-		if (!$auto)
-			redirige_apres_retour_transaction($p,'acte',$cancel?false:$result,$id_transaction);
+		if (!$auto){
+			$abo = sql_getfetsel("abo_uid","spip_transactions","id_transaction=".intval($id_transaction));
+			redirige_apres_retour_transaction($p,!$abo?'acte':'abo',$cancel?false:$result,$id_transaction);
+		}
 		die(); // mourir silencieusement
 	}
 	else {
@@ -121,7 +123,7 @@ function redirige_apres_retour_transaction($mode,$acte_ou_abo,$succes,$id_transa
 
 		if (strlen($redirect)){
 			$row = false;
-			$redirect = parametre_url($redirect,'type',$acte_ou_abo,'&');
+			$redirect = parametre_url($redirect,'type',strtolower($acte_ou_abo),'&');
 			if ($id_transaction = intval($id_transaction)){
 				// attraper les infos sur la transaction
 				$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction));

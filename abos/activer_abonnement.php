@@ -29,7 +29,6 @@ function abos_activer_abonnement_dist($id_transaction,$abo_uid,$mode_paiement,$v
 
 	$id_abonnement = 0;
 
-
 	// TODO :
 	// recuperer la transaction et son abonnement associe par id_transaction ou par abo_uid
 	// et verifier que c'est bien le bon
