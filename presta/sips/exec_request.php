@@ -13,7 +13,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 
 function presta_sips_exec_request_dist($service,$params,$certificat,$dir_logo,$request = "request"){
-	$path_bin = _DIR_PLUGIN_BANK . "sips/bin/$service/$request";
+	$path_bin = _DIR_PLUGIN_BANK . "sips/bin/$request";
 	if (!file_exists($path_bin)){
 		spip_log("Binaire $path_bin non trouve","sips."._LOG_ERREUR);
 		return false;
