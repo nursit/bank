@@ -77,20 +77,18 @@ function autoriser_utilisermodepaiementabo_dist($faire, $mode='', $id=0, $qui = 
 	return true;
 }
 
-/* Par défaut, on interdit la personne qui a payé d'encaisser son
- * propre chèque, même si la personne en question dispose des droits
- * webmaster. */
+/**
+ * Seuls les webmestres peuvent encaisser un cheque
+ * webmaster.
+ * @param $faire
+ * @param $type
+ * @param $id_transaction
+ * @param $qui
+ * @param $opt
+ * @return bool
+ */
 function autoriser_transaction_encaissercheque_dist($faire, $type, $id_transaction, $qui, $opt) { 
-	if(autoriser('webmestre')) {
-		include_spip('base/abstract_sql');
-
-		$id_auteur = sql_getfetsel("id_auteur", "spip_transactions", "id_transaction=" . intval($id_transaction));
-		if($id_auteur != $qui['id_auteur']) {
-			return true;
-		}
-	}
-
-	return false;
+	return autoriser('webmestre');
 }
 
 /**
