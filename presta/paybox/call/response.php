@@ -16,7 +16,7 @@ include_spip('inc/date');
 
 // il faut avoir un id_transaction et un transaction_hash coherents
 // pour se premunir d'une tentative d'appel exterieur
-function presta_paybox_call_response_dist($response=null){
+function presta_paybox_call_response_dist($response=null, $mode='paybox'){
 
 	if (!$response)
 		// recuperer la reponse en post et la decoder
@@ -37,7 +37,7 @@ function presta_paybox_call_response_dist($response=null){
 	}
 	
 	// depouillement de la transaction
-	list($id_transaction,$success) =  paybox_traite_reponse_transaction($response);
+	list($id_transaction,$success) =  paybox_traite_reponse_transaction($response, $mode);
 
 	if ($response['abo'] AND $id_transaction AND $success) {
 	
@@ -48,15 +48,15 @@ function presta_paybox_call_response_dist($response=null){
 		$date_fin = mktime(0,0,0,date('m',$date_fin),date('d'),date('Y',$date_fin));
 		$date_fin = date('Y-m-d H:i:s',$date_fin);
 
-		spip_log('response:'.var_export($response,true),'payboxdb');
-		spip_log('date_fin:'.$date_fin,'payboxdb');
+		spip_log('response:'.var_export($response,true),$mode.'db');
+		spip_log('date_fin:'.$date_fin,$mode.'db');
 		
 		// id_transaction contient toute la trame IDB_xx deriere le numero
 		// on ne retient que la valeur entiere
 		$id_transaction = intval($id_transaction);
 
 		if ($activer_abonnement = charger_fonction('activer_abonnement','abos',true)){
-			$activer_abonnement($id_transaction,$response['abo'],'paybox',$date_fin);
+			$activer_abonnement($id_transaction,$response['abo'],$mode,$date_fin);
 		}
 	}
 	return array($id_transaction,$success);	

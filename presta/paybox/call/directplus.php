@@ -30,8 +30,16 @@ include_spip('presta/paybox/inc/paybox');
  */
 function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, $refabonne, $ppps){
 
-	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".intval($transaction_hash)))
+	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash))){
+		spip_log("Transaction inconnue $id_transaction/$transaction_hash","payboxdplus");
 		return "";
+	}
+
+	// securite : eviter de faire payer plusieurs fois une meme transaction si bug en amont
+	if ($row['statut']=='ok'){
+		spip_log("Transaction $id_transaction/$transaction_hash deja reglee","payboxdplus");
+		return "";
+	}
 
 	if (!$row['id_auteur'] AND $GLOBALS['visiteur_session']['id_auteur'])
 		sql_updateq("spip_transactions",array("id_auteur"=>$row['id_auteur'] = $GLOBALS['visiteur_session']['id_auteur']),"id_transaction=".intval($id_transaction));
@@ -69,17 +77,13 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 
 
 	include_spip('inc/distant');
-	#spip_log("Appel de "._PAYBOX_DIRECT_URL." avec ".var_export($parm,true),'dbdp');
 
 	// numero de question incremental
 	// dans spip_meta
 	// on recommence si collision par concurence...
 	$maxtry=5;
 	do {
-		$num_question=0;
-		if ($num_question = sql_getfetsel("valeur","spip_meta","nom=".sql_quote('payboxnumquestion'))){
-			$num_question = intval(reset($r));
-		}
+		$num_question = intval(sql_getfetsel("valeur","spip_meta","nom=".sql_quote('payboxnumquestion')));
 		$num_question++;
 		ecrire_meta('payboxnumquestion',$num_question);
 
@@ -87,6 +91,7 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 		#var_dump($parm);
 
 		// requete en POST sur PAYBOX DIRECT PLUS
+		#spip_log("Appel de "._PAYBOX_DIRECT_URL." avec ".var_export($parm,true),'dbdp');
 		$res = recuperer_page(_PAYBOX_DIRECT_URL,false,false,1048576,$parm);
 		parse_str($res,$r);
 
