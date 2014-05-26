@@ -36,6 +36,10 @@ if (!defined('_PAYBOX_URL_RESIL'))
 		:
 			"https://tpeweb.paybox.com/cgi-bin/ResAbon.cgi");
 
+// Appels demande de paiement DIRECTPLUS
+if (!defined('_PAYBOX_DIRECT_URL'))
+	define('_PAYBOX_DIRECT_URL',"https://ppps.paybox.com/PPPS.php");
+
 /* ------------------------------------------------------------------------- */
 
 /**

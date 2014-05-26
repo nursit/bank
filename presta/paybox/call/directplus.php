@@ -48,7 +48,7 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	$p = paybox_pbx_ids('abo');
 	$parm = array('VERSION'=>'00104','SITE'=>$p['PBX_SITE'],'RANG'=>$p['PBX_RANG'],'IDENTIFIANT'=>'');
 
-	$parm['CLE'] = _PAYBOX_DIRECT_PLUS_CLE;
+	$parm['CLE'] = $p['DIRECT_PLUS_CLE'];
 	$parm['DATEQ'] = date('dmYHis');
 	$parm['TYPE'] = _PAYBOX_DIRECTPLUS_AUTHDEBIT_ABONNE;
 	$parm['DEVISE'] = "978";
@@ -68,6 +68,7 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	$parm['CVV'] = $ppps[2]; // CCV CB
 
 
+	include_spip('inc/distant');
 	#spip_log("Appel de "._PAYBOX_DIRECT_URL." avec ".var_export($parm,true),'dbdp');
 
 	// numero de question incremental
@@ -83,7 +84,6 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 		ecrire_meta('payboxnumquestion',$num_question);
 
 		$parm['NUMQUESTION'] = $num_question;
-		include_spip('inc/distant');
 		#var_dump($parm);
 
 		// requete en POST sur PAYBOX DIRECT PLUS
