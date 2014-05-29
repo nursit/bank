@@ -26,8 +26,7 @@ function presta_paybox_call_response_dist($response=null, $mode='paybox'){
 		return array(0,false);
 	}
 
-	if ($response['ETAT_PBX']=='PBX_RECONDUCTION'
-		OR $response['ETAT_PBX']=='PBX_RECONDUCTION_ABT'){
+	if ($response['ETAT_PBX']=='PBX_RECONDUCTION_ABT'){
 		// c'est un revouvellement initie par paybox : creer la transaction maintenant si besoin !
 		if ($renouveler = charger_fonction('renouveler','abos',true)){
 			// on reinjecte le bon id de transaction ici si fourni
