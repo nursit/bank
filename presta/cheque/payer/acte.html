@@ -13,7 +13,7 @@
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 <div class="payer_mode payer_cheque payer_acte">
 	<p class="titre h4"><:bank:payer_par_cheque:></p>
-	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|non)
+	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive}|non)
 	<p><:bank:info_cheque_imprimer{montant=#MONTANT,transaction=#ID_TRANSACTION}:></p>
 	<p>[(#CONFIG{bank_paiement/config_cheque/adresse}|propre|PtoBR|sinon{
 		#NOM_SITE_SPIP<br />
@@ -24,7 +24,7 @@
 	<p><:bank:info_cheque_etablir_ordre{ordre=#GET{ordre}}:></p>
 	[<p class="small">(#CONFIG{bank_paiement/config_cheque/notice,''}|propre|PtoBR)</p>]
 	]
-	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION})
+	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive})
 	<div class='boutons'>
 	[(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_cheque:>,#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}})]
 	</div>
