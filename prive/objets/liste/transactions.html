@@ -43,7 +43,7 @@
 				<td class="montant">#MONTANT</td>
 				<td class="regle">#MONTANT_REGLE</td>
 				<td class="date">#DATE_TRANSACTION</td>
-				<td class="statut">#STATUT[(#STATUT|=={commande}|et{#AUTORISER{regler,transaction,#ID_TRANSACTION}})<a href="[(#URL_ECRIRE{payer,id_transaction=#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]">Payer</a>]</td>
+				<td class="statut">[(#STATUT|match{echec|ok}|et{#MESSAGE|trim|strlen}|?{[<abbr title="[(#MESSAGE|attribut_html)]">(#STATUT)</abbr>],#STATUT})][(#STATUT|=={commande}|et{#AUTORISER{regler,transaction,#ID_TRANSACTION}})<a href="[(#URL_ECRIRE{payer,id_transaction=#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]">Payer</a>]</td>
 				<td class="parrain">#PARRAIN</td>
 				<td class="id_facture">[<a href='[(#URL_PAGE{facture}|parametre_url{id_facture,#ID_FACTURE}|parametre_url{hash,#INFO_DETAILS{facture,#ID_FACTURE}|md5})]'(#ID_FACTURE|oui)>#ID_FACTURE</a>]</td>
 			</tr>
