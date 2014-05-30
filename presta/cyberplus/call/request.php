@@ -424,8 +424,7 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, 
 	$parm['vads_language'] = $GLOBALS['spip_lang'];
 
 	// recuperer l'email
-	if (intval($row['id_auteur']))
-		$parm['vads_cust_email'] = sql_getfetsel('email','spip_auteurs','id_auteur='.intval($row['id_auteur']));
+	$parm['vads_cust_email'] = bank_email_porteur($row);
 
 	// Urls de retour
 

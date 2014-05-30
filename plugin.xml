@@ -2,7 +2,7 @@
   <nom>Banque&amp;paiement</nom>
   <auteur>C&eacute;dric Morin [Nursit.com->http://nursit.com]</auteur>
 	<icon>prive/themes/spip/images/credit-card-32.png</icon>
-  <version>2.21.9</version>
+  <version>2.22.0</version>
 	<categorie>outil</categorie>
   <version_base>1.4.0</version_base>
   <etat>stable</etat>

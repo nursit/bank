@@ -24,9 +24,8 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $ab
 		  array("id_auteur"=>intval($row['id_auteur'] = $GLOBALS['visiteur_session']['id_auteur'])),
 			"id_transaction=".intval($id_transaction)
 		);
-	
-	// recuperer l'email
-	$mail = sql_getfetsel('email','spip_auteurs','id_auteur='.intval($row['id_auteur']));
+
+	$mail = bank_email_porteur($row);
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
 	$montant = intval(round(100*$row['montant'],0));

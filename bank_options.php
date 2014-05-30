@@ -104,3 +104,28 @@ function bank_shell_args($params){
 	}
 	return $res;
 }
+
+/**
+ * @param array $transaction
+ * @return string
+ */
+function bank_email_porteur($transaction){
+	$mail = '';
+
+	// recuperer l'email
+	if (!$transaction['id_auteur']
+		OR !$mail = sql_getfetsel('email','spip_auteurs','id_auteur='.intval($transaction['id_auteur']))){
+
+		if (strpos($transaction['auteur'],"@")!==false
+			AND include_spip('inc/filtres')
+		  AND email_valide($transaction['auteur'])){
+			$mail = $transaction['auteur'];
+		}
+	}
+
+	// fallback : utiliser l'email du webmetre du site pour permettre le paiement coute que coute
+	if (!$mail)
+		$mail = $GLOBALS['meta']['email_webmaster'];
+
+	return $mail;
+}

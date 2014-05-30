@@ -102,7 +102,7 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash) {
 	);
 	$contexte['texte-libre'] = serialize($contenu);
 
-	$contexte['mail']        = sql_getfetsel('email','spip_auteurs','id_auteur='.intval($row['id_auteur']));
+	$contexte['mail']        = bank_email_porteur($row);
  
 
 	// Data to certify
