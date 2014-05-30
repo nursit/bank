@@ -72,7 +72,7 @@ function presta_paybox_call_response_dist($response=null, $mode='paybox'){
 				$options = array(
 					'notify_bank' => false, // pas la peine : paybox a deja resilie l'abo vu paiement refuse
 					'immediat' => true,
-					'message' => "[bank] Transaction $id_transaction refusee",
+					'message' => "[bank] Transaction #$id_transaction refusee",
 				);
 				$resilier("uid:".$response['abo'],$options);
 			}
