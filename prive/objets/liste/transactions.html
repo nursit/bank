@@ -36,7 +36,7 @@
 			{tri #ENV{par,id_transaction},#GET{defaut_tri}}{pagination #ENV{nb,10}}>
 			<tr class="[(#COMPTEUR_BOUCLE|alterner{row_odd,row_even})][(#ENV{id_transaction}|is_array|non)[ (#EXPOSE)]]">
 				<td class="id"><a href="#URL_ECRIRE{transaction,id_transaction=#ID_TRANSACTION}" class="popin">#ID_TRANSACTION</a></td>
-				<td class="id_auteur"><a href='[(#ID_AUTEUR|generer_url_entite{auteur})]'>#ID_AUTEUR</a></td>
+				<td class="id_auteur">[(#ID_AUTEUR|?{[<a href='[(#ID_AUTEUR|generer_url_entite{auteur})]'>(#ID_AUTEUR)</a>],[<abbr title="(#AUTEUR|attribut_html)">@</abbr>]})]</td>
 				<td class="mode">#MODE</td>
 				<td class="autorisation_id"><abbr title="#AUTORISATION_ID">[(#AUTORISATION_ID|couper{15})]</abbr></td>
 				<td class="montant_ht">#MONTANT_HT</td>
@@ -44,7 +44,7 @@
 				<td class="regle">#MONTANT_REGLE</td>
 				<td class="date">#DATE_TRANSACTION</td>
 				<td class="statut">[(#STATUT|match{echec|ok}|et{#MESSAGE|trim|strlen}|?{[<abbr title="[(#MESSAGE|attribut_html)]">(#STATUT)</abbr>],#STATUT})][(#STATUT|=={commande}|et{#AUTORISER{regler,transaction,#ID_TRANSACTION}})<a href="[(#URL_ECRIRE{payer,id_transaction=#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]">Payer</a>]</td>
-				<td class="parrain">#PARRAIN</td>
+				<td class="parrain">[(#PARRAIN)<br />#TRACKING_ID]</td>
 				<td class="id_facture">[<a href='[(#URL_PAGE{facture}|parametre_url{id_facture,#ID_FACTURE}|parametre_url{hash,#INFO_DETAILS{facture,#ID_FACTURE}|md5})]'(#ID_FACTURE|oui)>#ID_FACTURE</a>]</td>
 			</tr>
 		</BOUCLE_transactions>
