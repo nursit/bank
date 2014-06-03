@@ -1,0 +1,45 @@
+<ul>
+	#SET{name,#ENV{casier,''}_ordre}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}"><:bank:label_configuration_ordre:></label>[
+		<span class="erreur_message">(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[ordre]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{ordre,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+
+	#SET{name,#ENV{casier,''}_banque}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}"><:bank:label_configuration_banque:></label>[
+		<span class="erreur_message">(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[banque]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{banque,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+
+	#SET{name,#ENV{casier,''}_adresse_banque}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}"><:bank:label_configuration_virement_adresse_banque:></label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<textarea name="#ENV{casier,''}[adresse_banque]" class="textarea">
+[(#ENV*{#ENV{casier,''}}|table_valeur{adresse_banque,#GET{defaut}})]</textarea>
+	</li>
+
+	#SET{name,#ENV{casier,''}_iban}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}"><:bank:label_configuration_iban:></label>[
+		<span class="erreur_message">(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[iban]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{iban,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+
+	#SET{name,#ENV{casier,''}_bic}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}"><:bank:label_configuration_bic:></label>[
+		<span class="erreur_message">(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[bic]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{bic,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+
+	#SET{name,#ENV{casier,''}_notice}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}"><:bank:label_configuration_virement_notice:></label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<textarea name="#ENV{casier,''}[notice]" class="textarea">
+[(#ENV*{#ENV{casier,''}}|table_valeur{notice,#GET{defaut}})]</textarea>
+	</li>
+</ul>
