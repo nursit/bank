@@ -9,6 +9,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'abonnement_par_cb' => 'avec ma carte bancaire',
 
 	'bouton_enregistrer_reglement_cheque' => 'Enregistrer le r&eacute;glement par ch&egrave;que',
+	'bouton_enregistrer_reglement_virement' => 'Enregistrer le virement bancaire',
 
 	'carte_bleu' => 'Carte Bleue',
 	'choisissez_cb' => 'Choisissez votre carte bancaire&nbsp;:',
@@ -23,12 +24,24 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'info_cheque_imprimer' => 'Envoyez votre ch&egrave;que d&#8217;un montant de <b>@montant@&nbsp;€</b> avec la r&eacute;f&eacute;rence &laquo;&nbsp;<b>Commande #@transaction@</b>&nbsp;&raquo;<br /> &agrave; l&#8217;adresse :',
 	'info_cheque_facture' => 'La facture sera disponible dans votre espace client d&egrave;s votre r&egrave;glement pris en compte.',
 	'info_mode_test' => 'Mode TEST (paiement fictif)',
+	'info_virement' => 'Merci de nous faire un virement bancaire d’un montant de @montant@ € sur le compte suivant&nbsp;:
+-* Bénéficiaire&nbsp;: @ordre@
+-* Banque&nbsp;: @banque@ / @adressebanque@
+-* IBAN&nbsp;: @iban@
+-* BIC&nbsp;: @bic@
 
+Merci d’indiquer la référence «&nbsp;<b>Commande #@transaction@</b>&nbsp;» dans le sujet de votre virement.',
 
 	'label_actif' => 'Activer',
 	'label_cheque_notice' => 'Information compl&eacute;mentaire affich&eacute;e',
 	'label_configuration_ordre' => 'Ordre',
 	'label_configuration_adresse' => 'Adresse o&ugrave; envoyer les ch&egrave;ques',
+	'label_configuration_banque' => 'Nom de la banque',
+	'label_configuration_bic' => 'BIC',
+	'label_configuration_iban' => 'IBAN',
+	'label_configuration_ordre' => 'Compte bénéficiaire&nbsp;:',
+	'label_configuration_virement_adresse_banque' => 'Adresse de la banque',
+	'label_configuration_virement_notice' => 'Remarques complémentaires&nbsp;:',
 	'label_email_ticket_admin' => 'Email pour l\'envoi des tickets d\'achat admin',
 	'label_inactif' => 'D&eacute;sactiver',
 	'label_mode_paiement' => 'Modes de paiements a l\'acte',
@@ -50,6 +63,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'label_presta_simu' => 'Simulation (necessite une autorisation par define)',
 	'label_presta_sips' => 'SIPS',
 	'label_presta_sips_service' => 'Service',
+	'label_presta_virement' => 'Virement bancaire',
 	'label_resilier_abonnement' => 'R&eacute;silier',
 
 
@@ -59,6 +73,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'payer_avec' => 'Payer avec <i>@nom@</i>',
 	'payer_par_cheque' => 'Payer par ch&egrave;que :',
 	'payer_par_carte_bancaire' => 'Payer par carte bancaire :',
+	'payer_par_virement' => 'Payer par virement bancaire :',
 
 
 	'titre_reglement_ok' => 'R&egrave;glement r&eacute;ussi',

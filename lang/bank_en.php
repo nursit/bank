@@ -23,6 +23,14 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'info_cheque_imprimer' => 'Send your check of <b>@montant@&nbsp;?</b> with reference "<b>Order #@transaction@</b>"<br /> to the adress:',
 	'info_cheque_facture' => 'Invoice will be available in your client account as soon as your payment would be taken in account.',
 	'info_mode_test' => 'TEST mode (fake payment)',
+	'info_virement' => 'Please do a bank transfer of <b>@montant&nbsp;€</b> to the following bank account:
+
+-* Beneficiary Name: @ordre@
+-* Beneficiary bank: @banque@ / @adressebanque@
+-* IBAN: @iban@
+-* BIC: @bic@
+
+Please add the reference “<b>Order @transaction@</b>” in the transfer object.',
 
 
 	'label_actif' => 'Activate',
@@ -59,6 +67,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'payer_avec' => 'Pay with <i>@nom@</i>',
 	'payer_par_cheque' => 'Pay by check:',
 	'payer_par_carte_bancaire' => 'Pay by credit card:',
+	'payer_par_virement' => 'Payer with bank transfer:',
 
 
 	'titre_reglement_ok' => 'Successfull payment',

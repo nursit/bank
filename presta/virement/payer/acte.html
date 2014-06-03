@@ -1,0 +1,38 @@
+[(#REM)
+/*
+* Paiement Bancaire
+* module de paiement bancaire multi prestataires
+* stockage des transactions
+*
+* Auteurs :
+* Cedric Morin, Nursit.com
+* (c) 2012 - Distribue sous licence GNU/GPL
+*
+*/
+]#CACHE{0}
+<BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
+  <div class="payer_mode payer_virement payer_acte">
+    <p class="titre h4"><:bank:payer_par_virement:></p>
+    [(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive}|non)
+    #SET{iban,#CONFIG{bank_paiement/config_virement/iban}}
+    #SET{bic,#CONFIG{bank_paiement/config_virement/bic}}
+    #SET{ordre,#CONFIG{bank_paiement/config_virement/ordre}}
+    #SET{banque,#CONFIG{bank_paiement/config_virement/banque}}
+    #SET{adressebanque,#CONFIG{bank_paiement/config_virement/adresse_banque}}
+
+    [(#VAL{bank:info_virement}|_T{#ARRAY{ordre, #GET{ordre},
+    					 montant, #MONTANT,
+                                         transaction, #ID_TRANSACTION,
+					 iban, #GET{iban},
+					 bic, #GET{bic},
+					 banque, #GET{banque},
+					 adressebanque, #GET{adressebanque}}}|propre)]
+    [<p class="small">(#CONFIG{bank_paiement/config_virement/notice,''}|propre|PtoBR)</p>]
+    ]
+    [(#AUTORISER{encaisservirement,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive})
+    <div class='boutons'>
+      [(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_virement:>,#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}})]
+    </div>
+    ]
+  </div>
+</BOUCLE_trans>
