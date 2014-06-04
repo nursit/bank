@@ -53,4 +53,17 @@ function balise_PAYER_ABONNEMENT_dist($p){
 	$p->interdire_scripts = false;
 	return $p;
 }
-?>
+
+/**
+ * Une fonction pour expliciter le mode de paiement en fonction du prestataire bancaire
+ * par defaut c'est Carte Bancaire
+ * sauf si une chaine de langue specifique existe
+ * @param $presta
+ * @return mixed|string
+ */
+function bank_titre_type_paiement($presta){
+	$titre = _T("bank:label_type_paiement_$presta",array('presta'=>$presta),array('force'=>false));
+	if (!$titre)
+		$titre = _T("bank:label_type_paiement_cb_generique",array('presta'=>$presta));
+	return $titre;
+}

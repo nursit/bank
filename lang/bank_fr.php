@@ -66,6 +66,11 @@ Merci d’indiquer la référence «&nbsp;<b>Commande #@transaction@</b>&nbsp;»
 	'label_presta_virement' => 'Virement bancaire',
 	'label_resilier_abonnement' => 'R&eacute;silier',
 
+	'label_type_paiement_cb_generique' => 'Carte bancaire',
+	'label_type_paiement_cheque' => 'Chèque',
+	'label_type_paiement_paypal' => 'Compte Paypal',
+	'label_type_paiement_simu' => 'Paiement fictif',
+	'label_type_paiement_virement' => 'Virement',
 
 	'legend_sips_logo_page_paiement' => 'Logos page de paiement',
 
