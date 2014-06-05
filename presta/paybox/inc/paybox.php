@@ -164,7 +164,8 @@ function paybox_response($response = 'response'){
 }
 
 function paybox_traite_reponse_transaction($response,$mode = 'paybox') {
-	$id_transaction = $response['id_transaction'];
+	// $response['id_transaction'] Peut contenir /email ou IBSxx... en cas d'abo
+	$id_transaction = intval($response['id_transaction']);
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
 		spip_log($t = "call_response : id_transaction $id_transaction inconnu:".paybox_shell_args($response),$mode);
 		// on log ca dans un journal dedie

@@ -41,6 +41,11 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $ab
 	$parm['PBX_PORTEUR']=defined('_PBX_PORTEUR')?_PBX_PORTEUR:$mail;
 	$parm['PBX_CMD']=intval($id_transaction);
 
+	// si le porteur est generique, on ajoute l'email au numero de commande
+	// pour la tracabilite dans l'admin paybox
+	if (defined('_PBX_PORTEUR'))
+		$parm['PBX_CMD'] .= "/".$mail;
+
 	// temps de validite de la page de paiement paybox (par defaut 900s)
 	if (defined('_PBX_DISPLAY'))
 		$parm['PBX_DISPLAY'] = _PBX_DISPLAY;
