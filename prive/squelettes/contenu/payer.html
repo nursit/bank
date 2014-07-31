@@ -13,8 +13,10 @@
 		<br />
 		<p>#INCLURE{fond=modeles/client_adresse_facture,id_auteur}</p>
 		]
-		<INCLURE{fond=modeles/payer_acte,id_transaction,transaction_hash,title=#GET{titre}}>
 	</BOUCLE_client>
+		[<p><strong>(#AUTEUR)</strong></p>]
+	<//B_client>
+	<INCLURE{fond=modeles/payer_acte,id_transaction,transaction_hash,title=#GET{titre}}>
 </BOUCLE_trans>
 <p><:paniers:erreur_aucune_commande:></p>
 <//B_trans>
