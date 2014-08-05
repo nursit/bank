@@ -8,9 +8,9 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'abonnement_choisissez_cb' => 'Choisissez votre carte bancaire&nbsp;:',
 	'abonnement_par_cb' => 'avec ma carte bancaire',
 
-	'bouton_enregistrer_reglement_cheque' => 'Enregistrer le r&eacute;glement par ch&egrave;que',
+	'bouton_enregistrer_reglement_cheque' => 'R&eacute;gler par ch&egrave;que',
 	'bouton_enregistrer_reglement_ok' => 'Le r&eacute;glement a bien &eacute;t&eacute; re&ccedil;u',
-	'bouton_enregistrer_reglement_virement' => 'Enregistrer le virement bancaire',
+	'bouton_enregistrer_reglement_virement' => 'R&eacute;gler par virement bancaire',
 
 	'carte_bleu' => 'Carte Bleue',
 	'choisissez_cb' => 'Choisissez votre carte bancaire&nbsp;:',
@@ -28,19 +28,22 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 -* compensable dans une agence bancaire situ&eacute;e en France&nbsp;;
 -* accompagn&eacute; du num&eacute;ro de transaction &agrave; noter au dos du ch&egrave;que (pas sur la partie d&eacute;tachable).
 
-Transaction : #@transaction@
-_ Montant : @montant@',
+Transaction&nbsp;: #@transaction@
+_ Montant&nbsp;: @montant@',
 	'info_cheque_envoyer_adresse' => 'Merci d\'envoyer votre ch&egrave;que à l\'adresse&nbsp;:',
 	'info_cheque_facture' => 'La facture sera disponible dans votre espace client d&egrave;s votre r&egrave;glement pris en compte.',
 	'info_mode_reglement_enregistre' => 'Nous avons bien enregistré votre choix de mode de r&egrave;glement.',
 	'info_mode_test' => 'Mode TEST (paiement fictif)',
-	'info_virement' => 'Merci de nous faire un virement bancaire d’un montant de @montant@ € sur le compte suivant&nbsp;:
--* B&eacute;n&eacute;ficiaire&nbsp;: &laquo;&nbsp;@ordre@&nbsp;&raquo;
--* Banque&nbsp;: @banque@ / @adressebanque@
--* IBAN&nbsp;: @iban@
--* BIC&nbsp;: @bic@
+	'info_virement' => 'Vous pouvez payer par virement bancaire.
 
-Merci d’indiquer la r&eacute;f&eacute;rence «&nbsp;<b>Commande #@transaction@</b>&nbsp;» dans le sujet de votre virement.',
+Libéllé de votre virement : #@transaction@
+_ Montant&nbsp;: @montant@
+_ Compte bancaire&nbsp;:
+-* B&eacute;n&eacute;ficiaire&nbsp;: &laquo;&nbsp;@ordre@&nbsp;&raquo;
+-* Banque&nbsp;: @banque@<br/>
+@adressebanque@
+-* IBAN&nbsp;: @iban@
+-* BIC&nbsp;: @bic@',
 
 	'label_actif' => 'Activer',
 	'label_cheque_notice' => 'Information compl&eacute;mentaire affich&eacute;e',
