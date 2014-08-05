@@ -9,6 +9,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'abonnement_par_cb' => 'avec ma carte bancaire',
 
 	'bouton_enregistrer_reglement_cheque' => 'Enregistrer le r&eacute;glement par ch&egrave;que',
+	'bouton_enregistrer_reglement_ok' => 'Le r&eacute;glement a bien &eacute;t&eacute; re&ccedil;u',
 	'bouton_enregistrer_reglement_virement' => 'Enregistrer le virement bancaire',
 
 	'carte_bleu' => 'Carte Bleue',
@@ -21,16 +22,25 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'info_1_transaction' => '1 transaction',
 	'info_nb_transactions' => '@nb@ transactions',
 	'info_cheque_etablir_ordre' => 'Ch&egrave;que &eacute;tabli &agrave; l\'ordre de &laquo;&nbsp;<i>@ordre@</i>&nbsp;&raquo;',
-	'info_cheque_imprimer' => 'Envoyez votre ch&egrave;que d&#8217;un montant de <b>@montant@&nbsp;€</b> avec la r&eacute;f&eacute;rence &laquo;&nbsp;<b>Commande #@transaction@</b>&nbsp;&raquo;<br /> &agrave; l&#8217;adresse :',
+	'info_cheque_imprimer' => 'Envoyez votre ch&egrave;que libell&eacute; en euros
+-* &agrave; l\'ordre de &laquo;&nbsp;@ordre@&nbsp;&raquo;&nbsp;;
+-* du montant exact&nbsp;;
+-* compensable dans une agence bancaire situ&eacute;e en France&nbsp;;
+-* accompagn&eacute; du num&eacute;ro de transaction &agrave; noter au dos du ch&egrave;que (pas sur la partie d&eacute;tachable).
+
+Transaction : #@transaction@
+_ Montant : @montant@',
+	'info_cheque_envoyer_adresse' => 'Merci d\'envoyer votre ch&egrave;que à l\'adresse&nbsp;:',
 	'info_cheque_facture' => 'La facture sera disponible dans votre espace client d&egrave;s votre r&egrave;glement pris en compte.',
+	'info_mode_reglement_enregistre' => 'Nous avons bien enregistré votre choix de mode de r&egrave;glement.',
 	'info_mode_test' => 'Mode TEST (paiement fictif)',
 	'info_virement' => 'Merci de nous faire un virement bancaire d’un montant de @montant@ € sur le compte suivant&nbsp;:
--* Bénéficiaire&nbsp;: @ordre@
+-* B&eacute;n&eacute;ficiaire&nbsp;: &laquo;&nbsp;@ordre@&nbsp;&raquo;
 -* Banque&nbsp;: @banque@ / @adressebanque@
 -* IBAN&nbsp;: @iban@
 -* BIC&nbsp;: @bic@
 
-Merci d’indiquer la référence «&nbsp;<b>Commande #@transaction@</b>&nbsp;» dans le sujet de votre virement.',
+Merci d’indiquer la r&eacute;f&eacute;rence «&nbsp;<b>Commande #@transaction@</b>&nbsp;» dans le sujet de votre virement.',
 
 	'label_actif' => 'Activer',
 	'label_cheque_notice' => 'Information compl&eacute;mentaire affich&eacute;e',
@@ -39,9 +49,9 @@ Merci d’indiquer la référence «&nbsp;<b>Commande #@transaction@</b>&nbsp;»
 	'label_configuration_banque' => 'Nom de la banque',
 	'label_configuration_bic' => 'BIC',
 	'label_configuration_iban' => 'IBAN',
-	'label_configuration_ordre' => 'Compte bénéficiaire&nbsp;:',
+	'label_configuration_ordre' => 'Compte b&eacute;n&eacute;ficiaire&nbsp;:',
 	'label_configuration_virement_adresse_banque' => 'Adresse de la banque',
-	'label_configuration_virement_notice' => 'Remarques complémentaires&nbsp;:',
+	'label_configuration_virement_notice' => 'Remarques compl&eacute;mentaires&nbsp;:',
 	'label_email_ticket_admin' => 'Email pour l\'envoi des tickets d\'achat admin',
 	'label_inactif' => 'D&eacute;sactiver',
 	'label_mode_paiement' => 'Modes de paiements a l\'acte',
@@ -67,7 +77,7 @@ Merci d’indiquer la référence «&nbsp;<b>Commande #@transaction@</b>&nbsp;»
 	'label_resilier_abonnement' => 'R&eacute;silier',
 
 	'label_type_paiement_cb_generique' => 'Carte bancaire',
-	'label_type_paiement_cheque' => 'Chèque',
+	'label_type_paiement_cheque' => 'Ch&egrave;que',
 	'label_type_paiement_paypal' => 'Compte Paypal',
 	'label_type_paiement_simu' => 'Paiement fictif',
 	'label_type_paiement_virement' => 'Virement',

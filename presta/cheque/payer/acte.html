@@ -14,20 +14,35 @@
 <div class="payer_mode payer_cheque payer_acte">
 	<p class="titre h4"><:bank:payer_par_cheque:></p>
 	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive}|non)
-	<p><:bank:info_cheque_imprimer{montant=#MONTANT,transaction=#ID_TRANSACTION}:></p>
-	<p>[(#CONFIG{bank_paiement/config_cheque/adresse}|propre|PtoBR|sinon{
-		#NOM_SITE_SPIP<br />
-		????<br />
-		????})]
-	</p>
-	#SET{ordre,#CONFIG{bank_paiement/config_cheque/ordre,#NOM_SITE_SPIP}}
-	<p><:bank:info_cheque_etablir_ordre{ordre=#GET{ordre}}:></p>
-	[<p class="small">(#CONFIG{bank_paiement/config_cheque/notice,''}|propre|PtoBR)</p>]
+		#SET{ordre,#CONFIG{bank_paiement/config_cheque/ordre,#NOM_SITE_SPIP}|wrap{'<b>'}}
+		#SET{montant,#MONTANT|affiche_monnaie|wrap{'<b>'}}
+		#SET{transaction,#ID_TRANSACTION|wrap{'<b>'}}
+		<:bank:info_cheque_imprimer{montant=#GET{montant},transaction=#GET{transaction},ordre=#GET{ordre}}|propre:>
+
+		[(#ENV{attente_mode,''}|=={cheque}|oui)
+			<div class="success">
+				<p><:bank:info_mode_reglement_enregistre:>
+					<:bank:info_cheque_envoyer_adresse:></p>
+				<p>
+					[<strong>(#CONFIG{bank_paiement/config_cheque/adresse}|propre|PtoBR|sinon{
+					#NOM_SITE_SPIP<br />
+					????<br />
+					????})</strong>]
+				</p>
+				[<p class="small">(#CONFIG{bank_paiement/config_cheque/notice,''}|propre|PtoBR)</p>]
+			</div>
+		]
+		[(#ENV{attente_mode,''}|=={cheque}|non)
+			<div class='boutons'>
+			[(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_cheque:>,#URL_ACTION_AUTEUR{bank_enregistrer_modereglement,cheque-#ID_TRANSACTION,#SELF},ajax})]
+			</div>
+		]
+
 	]
 	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive})
-	<div class='boutons'>
-	[(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_cheque:>,#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}})]
-	</div>
+		<div class='boutons'>
+		[(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_ok:>,#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}})]
+		</div>
 	]
 </div>
 </BOUCLE_trans>
