@@ -31,7 +31,6 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 Transaction&nbsp;: #@transaction@
 _ Montant&nbsp;: @montant@',
 	'info_cheque_envoyer_adresse' => 'Merci d\'envoyer votre ch&egrave;que à l\'adresse&nbsp;:',
-	'info_cheque_facture' => 'La facture sera disponible dans votre espace client d&egrave;s votre r&egrave;glement pris en compte.',
 	'info_mode_reglement_enregistre' => 'Nous avons bien enregistré votre choix de mode de r&egrave;glement.',
 	'info_mode_test' => 'Mode TEST (paiement fictif)',
 	'info_virement' => 'Vous pouvez payer par virement bancaire.
@@ -44,7 +43,6 @@ _ Compte bancaire&nbsp;:
 @adressebanque@
 -* IBAN&nbsp;: @iban@
 -* BIC&nbsp;: @bic@',
-
 	'label_actif' => 'Activer',
 	'label_cheque_notice' => 'Information compl&eacute;mentaire affich&eacute;e',
 	'label_configuration_ordre' => 'Ordre',
@@ -52,7 +50,7 @@ _ Compte bancaire&nbsp;:
 	'label_configuration_banque' => 'Nom de la banque',
 	'label_configuration_bic' => 'BIC',
 	'label_configuration_iban' => 'IBAN',
-	'label_configuration_ordre' => 'Compte b&eacute;n&eacute;ficiaire&nbsp;:',
+	'label_configuration_virement_ordre' => 'Compte b&eacute;n&eacute;ficiaire&nbsp;:',
 	'label_configuration_virement_adresse_banque' => 'Adresse de la banque',
 	'label_configuration_virement_notice' => 'Remarques compl&eacute;mentaires&nbsp;:',
 	'label_email_ticket_admin' => 'Email pour l\'envoi des tickets d\'achat admin',
@@ -101,4 +99,3 @@ _ Compte bancaire&nbsp;:
 	'titre_reglement_annule' => 'Annulation',
 
 );
-

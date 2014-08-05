@@ -1,7 +1,7 @@
 <ul>
 	#SET{name,#ENV{casier,''}_ordre}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-		<label for="#GET{name}"><:bank:label_configuration_ordre:></label>[
+		<label for="#GET{name}"><:bank:label_configuration_virement_ordre:></label>[
 		<span class="erreur_message">(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[ordre]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{ordre,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>

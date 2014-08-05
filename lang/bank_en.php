@@ -8,7 +8,9 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'abonnement_choisissez_cb' => 'Select your Credit Card:',
 	'abonnement_par_cb' => 'with Credit Card',
 
-	'bouton_enregistrer_reglement_cheque' => 'Record check remittance',
+	'bouton_enregistrer_reglement_cheque' => 'Pay by check',
+	'bouton_enregistrer_reglement_ok' => 'Record payment achieved',
+	'bouton_enregistrer_reglement_virement' => 'Pay by bank transfer',
 
 	'carte_bleu' => 'Credit Card',
 	'choisissez_cb' => 'Select your Credit Card:',
@@ -20,23 +22,37 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'info_1_transaction' => '1 transaction',
 	'info_nb_transactions' => '@nb@ transactions',
 	'info_cheque_etablir_ordre' => 'Check to the order of "<i>@ordre@</i>"',
-	'info_cheque_imprimer' => 'Send your check of <b>@montant@&nbsp;?</b> with reference "<b>Order #@transaction@</b>"<br /> to the adress:',
-	'info_cheque_facture' => 'Invoice will be available in your client account as soon as your payment would be taken in account.',
+	'info_cheque_imprimer' => 'Send your check made out in Euros
+-* to the order of “@ordre@&nbsp;”
+-* for the exact amount
+-* drawn from a bank located in France
+-* accompanied by the transaction number, written on the back of the check.
+
+Transaction: #@transaction@
+_ Amount: @montant@',
+	'info_cheque_envoyer_adresse' => 'Thanks to send your check to the following address:',
+	'info_mode_reglement_enregistre' => 'Your choice for your payment mode has been recorded.',
 	'info_mode_test' => 'TEST mode (fake payment)',
-	'info_virement' => 'Please do a bank transfer of <b>@montant&nbsp;€</b> to the following bank account:
+	'info_virement' => 'You can pay via bank transfer.
 
--* Beneficiary Name: @ordre@
--* Beneficiary bank: @banque@ / @adressebanque@
+Reference for your transfer: #@transaction@
+_ Amount: @montant@
+_ Bank account:
+-* Beneficiary Name: “@ordre@”
+-* Beneficiary bank: @banque@<br/>
+@adressebanque@
 -* IBAN: @iban@
--* BIC: @bic@
-
-Please add the reference “<b>Order @transaction@</b>” in the transfer object.',
-
-
+-* BIC: @bic@',
 	'label_actif' => 'Activate',
 	'label_cheque_notice' => 'Additional displayed information',
 	'label_configuration_ordre' => 'Pay to the order of',
-	'label_configuration_adresse' => 'Adress where checks should be sent',
+	'label_configuration_adresse' => 'Address where checks should be sent',
+	'label_configuration_banque' => 'Beneficiary bank name',
+	'label_configuration_bic' => 'BIC',
+	'label_configuration_iban' => 'IBAN',
+	'label_configuration_virement_ordre' => 'Beneficiary Account Name',
+	'label_configuration_virement_adresse_banque' => 'Bank Address',
+	'label_configuration_virement_notice' => 'Additional displayed information',
 	'label_email_ticket_admin' => 'Administrator\'s email address for reception of transaction tickets',
 	'label_inactif' => 'Disable',
 	'label_mode_paiement' => 'Transaction payment modes',
@@ -58,8 +74,14 @@ Please add the reference “<b>Order @transaction@</b>” in the transfer object
 	'label_presta_simu' => 'Simulation (requires authorisation by define)',
 	'label_presta_sips' => 'SIPS',
 	'label_presta_sips_service' => 'Service',
+	'label_presta_virement' => 'Bank Transfer',
 	'label_resilier_abonnement' => 'Cancel subscription',
 
+	'label_type_paiement_cb_generique' => 'Credit Card',
+	'label_type_paiement_cheque' => 'Check',
+	'label_type_paiement_paypal' => 'Paypal Account',
+	'label_type_paiement_simu' => 'Fake payment',
+	'label_type_paiement_virement' => 'Bank Transfer',
 
 	'legend_sips_logo_page_paiement' => 'Logos for payment page',
 
@@ -77,6 +99,3 @@ Please add the reference “<b>Order @transaction@</b>” in the transfer object
 	'titre_reglement_annule' => 'Cancellation',
 
 );
-
-
-?>
