@@ -8,7 +8,7 @@
 
 	#SET{name,#ENV{casier,''}_banque}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-		<label for="#GET{name}"><:bank:label_configuration_banque:></label>[
+		<label for="#GET{name}"><:bank:label_configuration_virement_banque:></label>[
 		<span class="erreur_message">(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[banque]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{banque,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
@@ -23,14 +23,14 @@
 
 	#SET{name,#ENV{casier,''}_iban}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-		<label for="#GET{name}"><:bank:label_configuration_iban:></label>[
+		<label for="#GET{name}"><:bank:label_configuration_virement_iban:></label>[
 		<span class="erreur_message">(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[iban]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{iban,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
 
 	#SET{name,#ENV{casier,''}_bic}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-		<label for="#GET{name}"><:bank:label_configuration_bic:></label>[
+		<label for="#GET{name}"><:bank:label_configuration_virement_bic:></label>[
 		<span class="erreur_message">(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[bic]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{bic,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
