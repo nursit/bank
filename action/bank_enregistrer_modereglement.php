@@ -18,7 +18,6 @@ function action_bank_enregistrer_modereglement_dist($arg=null){
 		$arg = $securiser_action();
 	}
 
-	var_dump($arg);
 	$arg = explode("-",$arg);
 	$id_transaction = intval(array_pop($arg));
 	$presta = implode("-",$arg);
