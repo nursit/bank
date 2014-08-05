@@ -54,6 +54,7 @@ _ Compte bancaire&nbsp;:
 	'label_configuration_virement_adresse_banque' => 'Adresse de la banque',
 	'label_configuration_virement_notice' => 'Remarques compl&eacute;mentaires&nbsp;:',
 	'label_email_ticket_admin' => 'Email pour l\'envoi des tickets d\'achat admin',
+	'label_enregistrer_reglement_reference' => 'Reference',
 	'label_inactif' => 'D&eacute;sactiver',
 	'label_mode_paiement' => 'Modes de paiements a l\'acte',
 	'label_mode_paiement_abo' => 'Modes de paiements des abonnements',

@@ -44,9 +44,7 @@
 			]
     ]
     [(#AUTORISER{encaisservirement,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive})
-    <div class='boutons'>
-      [(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_ok:>,#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}})]
-    </div>
+		  #FORMULAIRE_ENCAISSER_REGLEMENT{#ID_TRANSACTION,virement}
     ]
   </div>
 </BOUCLE_trans>

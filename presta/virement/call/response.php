@@ -28,16 +28,18 @@ function presta_virement_call_response_dist(){
 	$transaction_hash = _request('hash');
 
 	if(!$row = sql_fetsel('*', 'spip_transactions', 'id_transaction='.sql_quote(intval($id_transaction)))) {
-		spip_log("id_transaction $id_transaction non trouve", 'gratuit.'._LOG_ERREUR);
+		spip_log("id_transaction $id_transaction non trouve", 'virement.'._LOG_ERREUR);
 		return array($id_transaction,false);
 	}
 	if($transaction_hash != $row['transaction_hash']) {
-		spip_log("id_transaction $id_transaction, hash $transaction_hash non conforme", 'gratuit.'._LOG_ERREUR);
+		spip_log("id_transaction $id_transaction, hash $transaction_hash non conforme", 'virement.'._LOG_ERREUR);
 		return array($id_transaction, false);
 	}
 
-	// l'autorisation refere l'id_auteur et le nom de celui qui accepte le virement
-	$autorisation = $GLOBALS['visiteur_session']['id_auteur']."/".$GLOBALS['visiteur_session']['nom'];
+	$autorisation = _request('autorisation_id');
+	// si rien fourni l'autorisation refere l'id_auteur et le nom de celui qui accepte le cheque
+	if (!$autorisation)
+		$autorisation = $GLOBALS['visiteur_session']['id_auteur']."/".$GLOBALS['visiteur_session']['nom'];
 
 	include_spip("inc/autoriser");
 	if(!autoriser('encaisservirement', 'transaction', $id_transaction)) {
