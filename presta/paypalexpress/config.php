@@ -120,7 +120,6 @@ define('_PAYPAL_API_PROXY_PORT', '808');
 define('_PAYPAL_API_VERSION', '3.0');
 
 
-
 function action_paypalexpress_order_dist($id_transaction=null){
 	if (is_null($id_transaction)){
 		$securiser_action = charger_fonction('securiser_action','inc');
@@ -148,14 +147,14 @@ function action_paypalexpress_order_dist($id_transaction=null){
 }
 
 
-function action_paypalexpress_checkoutpayment_dist($arg=null){
-	if (is_null($arg)){
+function action_paypalexpress_checkoutpayment_dist($payerid=null){
+	if (is_null($payerid)){
 		$securiser_action = charger_fonction('securiser_action','inc');
-		$arg = $securiser_action();
+		$payerid = $securiser_action();
 	}
 
-	include_spip("presta/payalexpress/inc/paypalexpress");
-	$res = bank_paypalexpress_checkoutpayment();
+	include_spip("presta/paypalexpress/inc/paypalexpress");
+	$res = bank_paypalexpress_checkoutpayment($payerid);
 
 	list($id_transaction, $success) = $res;
 

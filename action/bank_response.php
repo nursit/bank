@@ -32,6 +32,8 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 			if (!$auto OR !$call_response = charger_fonction('autoresponse',"presta/$p/call",true))
 				$call_response = charger_fonction('response',"presta/$p/call");
 
+			if ($cancel)
+				define('_BANK_CANCEL_TRANSACTION',true);
 			spip_log('call_'.$auto.'response : '.$_SERVER['REQUEST_URI'],"$p$auto");
 			list($id_transaction,$result)=$call_response();
 			spip_log('call_'.$auto.'response : '."$id_transaction/$result","$p$auto");

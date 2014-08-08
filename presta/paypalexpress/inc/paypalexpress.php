@@ -90,7 +90,7 @@ function bank_paypalexpress_order_init($id_transaction, $url_confirm=null){
 }
 
 
-function bank_paypalexpress_checkoutpayment(){
+function bank_paypalexpress_checkoutpayment($payerid){
 
 	include_spip('inc/date');
 
@@ -109,6 +109,23 @@ function bank_paypalexpress_checkoutpayment(){
 		spip_log("Erreur transaction $id_transaction deja reglee", 'paypalexpress' . _LOG_INFO_IMPORTANTE);
 		return array($id_transaction,true);
 	}
+
+	// verifier que le payerid est conforme
+	if ($payerid!==$_SESSION['payer_id']){
+		$trace = "Payerid:$payerid\n".var_export($_SESSION,true);
+		spip_log($t="bank_paypalexpress_checkoutpayment ($id_transaction) : transaction $id_transaction annulee :".$trace,'paypalexpress' . _LOG_ERREUR);
+		$set = array(
+			"mode" => 'paypalexpress',
+			"statut" => 'echec',
+			'date_paiement' => date('Y-m-d H:i:s')
+		);
+		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
+
+		$message = "Une erreur est survenue, aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;";
+		sql_updateq("spip_transactions",array("message"=>$message),"id_transaction=".intval($id_transaction));
+		return array($id_transaction,false);
+	}
+
 
 	/* Gather the information to make the final call to
 	finalize the PayPal payment.  The variable nvpstr
