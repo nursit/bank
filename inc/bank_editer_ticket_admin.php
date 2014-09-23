@@ -34,7 +34,7 @@ function inc_bank_editer_ticket_admin_dist($id_transaction){
 		$montant = $row['montant_regle'];
 		$ticket .= "<h2>Transaction $id_transaction</h2>\n<table border='1'>";
 		foreach($row as $k=>$v)
-			$ticket .= "<tr><td>$k</td><td>$v</td>";
+			$ticket .= "<tr><td>$k</td><td>$v</td></tr>";
 		$ticket .="</table>";
 	}
 
