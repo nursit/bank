@@ -2,7 +2,9 @@
 /*
  * Paiement Bancaire
  * module de paiement bancaire multi prestataires
- * stockage des transactions
+ * Encaisser le reglement differe d'une transaction
+ * (on a recu le cheque, le virement)
+ * Utilise dans le back-office sur les transactions en attente de paiement
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
