@@ -34,7 +34,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *   string montant_ht : montant ht en euros
  *   int id_auteur : auteur (spip) loge qui realise la transaction
  *   string auteur_id : autre identifiant auteur a defaut
- *   string auteur : a defaut info auteur autre (email, n°...)
+ *   string auteur : a defaut info auteur autre (email, nÂ°...)
  *   string parrain : sponsor de la transaction (apporteur affilie, url site source..)
  *   int tracking_id : numero de tracking affiliateur
  *   int id_panier : numero de panier eventuel
@@ -55,7 +55,7 @@ function formulaires_payer_acte_charger_dist($montant,$options = array()){
 	// mais on mets un message au cas ou, pour ne pas empecher un humain de payer
 
 	if (defined('_IS_BOT') AND _IS_BOT){
-		$message = _L('Le paiement n\'est pas accessible aux robots. Si vous n\'êtes pas un robot, essayez avec un autre navigateur.');
+		$message = _L('Le paiement n\'est pas accessible aux robots. Si vous n\'Ãªtes pas un robot, essayez avec un autre navigateur.');
 		return "<div class='info'>$message</div>";
 	}
 
@@ -101,7 +101,7 @@ function formulaires_payer_acte_charger_dist($montant,$options = array()){
 
 	// si pas de transaction cree, on retourne une erreur
 	if (!$id_transaction){
-		$message = _L('Une erreur technique est survenue. Il n\'est pas possible de procéder au paiement.');
+		$message = _L('Une erreur technique est survenue. Il n\'est pas possible de procÃ©der au paiement.');
 		return "<div class='error'>$message</div>";
 	}
 
