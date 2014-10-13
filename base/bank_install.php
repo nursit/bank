@@ -119,6 +119,10 @@ function bank_upgrade($nom_meta_base_version,$version_cible){
 			sql_alter("table spip_transactions ADD validite varchar(10) NOT NULL DEFAULT ''");
 			ecrire_meta($nom_meta_base_version,$current_version="1.4.0",'non');
 		}
+		if (spip_version_compare($current_version,"1.4.1","<=")){
+			sql_alter("table spip_transactions ADD id_commande bigint(21) NOT NULL DEFAULT 0");
+			ecrire_meta($nom_meta_base_version,$current_version="1.4.1",'non');
+		}
 
 		bank_presta_install();
 	}

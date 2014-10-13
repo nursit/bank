@@ -51,6 +51,7 @@ function bank_declarer_tables_principales($tables_principales){
 		"tracking_id" => "bigint(21) NOT NULL DEFAULT 0", // numero de tracking affiliateur
 
 		"id_panier" 	=> "bigint(21) NOT NULL DEFAULT 0", // possibilite de referencer un panier ici, mais a gerer hors du plugin
+		"id_commande" => "bigint(21) NOT NULL DEFAULT 0", // possibilite de referencer une commande ici, mais a gerer hors du plugin
 		"id_facture" 	=> "bigint(21) NOT NULL DEFAULT 0", // factures non gerees par ce plugin, mais champ prevu pour
 
 		"cadeau_email" 	=> "varchar(100) NOT NULL DEFAULT ''", // achat a l'attention d'une tierce personne
