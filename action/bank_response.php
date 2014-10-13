@@ -100,36 +100,47 @@ function redirige_apres_retour_transaction($mode,$acte_ou_abo,$succes,$id_transa
 	}
 
 	if (!$redirect){
+		$row = false;
+		if ($id_transaction = intval($id_transaction)){
+			// attraper les infos sur la transaction
+			$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction));
+		}
+
+		// si des urls retour ok ou echec sont definies pour cette transaction
+		// fournies par #FORMULAIRE_PAYER_ACTE
+		if ($row['url_retour'] AND $urls = unserialize($row['url_retour'])){
+			if ($succes AND isset($urls['url_retour_ok']))
+				$redirect = $urls['url_retour_ok'];
+			elseif (!$succes AND isset($urls['url_retour_echec']))
+				$redirect = $urls['url_retour_echec'];
+		}
+
 		// par defaut on revient sur une des pages reglees en define()
+		if (!strlen($redirect)){
+			// _BANK_ACTE_NORMAL_RETURN_URL
+			// _BANK_ACTE_CANCEL_RETURN_URL
+			// _BANK_ABO_NORMAL_RETURN_URL
+			// _BANK_ABO_CANCEL_RETURN_URL
+			$acte_ou_abo = ($acte_ou_abo=='acte' ? 'ACTE' : 'ABO');
+			$c = "_BANK_" . $acte_ou_abo . "_NORMAL_RETURN_URL";
 
-		// _BANK_ACTE_NORMAL_RETURN_URL
-		// _BANK_ACTE_CANCEL_RETURN_URL
-		// _BANK_ABO_NORMAL_RETURN_URL
-		// _BANK_ABO_CANCEL_RETURN_URL
-		$acte_ou_abo = ($acte_ou_abo=='acte'?'ACTE':'ABO');
-		$c = "_BANK_".$acte_ou_abo."_NORMAL_RETURN_URL";
-
-		if ($succes){
-			if (defined($c))
-				$redirect = constant($c);
-			else
-				$redirect = generer_url_public('bank_retour_ok');
-		}
-		else {
-			if (defined($c))
-				$redirect = constant($c);
-			else
-				$redirect = generer_url_public('bank_retour_echec');
-		}
-
-
-		if (strlen($redirect)){
-			$row = false;
-			$redirect = parametre_url($redirect,'type',strtolower($acte_ou_abo),'&');
-			if ($id_transaction = intval($id_transaction)){
-				// attraper les infos sur la transaction
-				$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction));
+			if ($succes){
+				if (defined($c))
+					$redirect = constant($c);
+				else
+					$redirect = generer_url_public('bank_retour_ok');
+			} else {
+				if (defined($c))
+					$redirect = constant($c);
+				else
+					$redirect = generer_url_public('bank_retour_echec');
 			}
+		}
+
+
+		// ajouter id_transaction et transaction_hash sur l'url de retour dans tous les cas
+		if (strlen($redirect)){
+			$redirect = parametre_url($redirect,'type',strtolower($acte_ou_abo),'&');
 			if ($row AND $row['transaction_hash']) {
 				$redirect = parametre_url($redirect,'id_transaction',$id_transaction,'&');
 				$redirect = parametre_url($redirect,'transaction_hash',$row['transaction_hash'],'&');
