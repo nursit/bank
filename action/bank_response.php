@@ -16,6 +16,8 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 	if (isset($GLOBALS['meta']['bank_paiement'])
 		AND $config = unserialize($GLOBALS['meta']['bank_paiement'])){
 
+		$id_transaction = 0;
+
 		$prestas = (is_array($config['presta'])?$config['presta']:array());
 		$prestas = array_filter($prestas);
 		if (is_array($config['presta_abo']))
@@ -62,6 +64,23 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 			}
 		}
 
+		// notifier les reglement en echec/annule
+		if (!$result
+			AND $id_transaction
+		  AND $row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction))){
+			pipeline('trig_bank_reglement_en_echec', array(
+					'args' => array(
+						'statut'=>'echec',
+						'mode' => $row['mode'],
+						'type' => $row['abo_uid']?'abo':'acte',
+						'id_transaction' => $id_transaction,
+						'row' => $row,
+					),
+					'data' => '')
+			);
+		}
+
+
 		if (!$auto){
 			$abo = sql_getfetsel("abo_uid","spip_transactions","id_transaction=".intval($id_transaction));
 			return redirige_apres_retour_transaction($p,!$abo?'acte':'abo',$cancel?false:$result,$id_transaction);
@@ -83,9 +102,15 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
  * @param string $acte_ou_abo
  * @param bool $succes
  * @param int $id_transaction
+ * @return string|void
  */
 function redirige_apres_retour_transaction($mode,$acte_ou_abo,$succes,$id_transaction=0){
 	$redirect = "";
+	$row = false;
+	if ($id_transaction = intval($id_transaction)){
+		// attraper les infos sur la transaction
+		$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction));
+	}
 
 	// cas de paiement par un admin (cheque...)
 	// renvoyer dans le prive
@@ -100,12 +125,6 @@ function redirige_apres_retour_transaction($mode,$acte_ou_abo,$succes,$id_transa
 	}
 
 	if (!$redirect){
-		$row = false;
-		if ($id_transaction = intval($id_transaction)){
-			// attraper les infos sur la transaction
-			$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction));
-		}
-
 		// si des urls retour ok ou echec sont definies pour cette transaction
 		// fournies par #FORMULAIRE_PAYER_ACTE
 		if ($row['url_retour'] AND $urls = unserialize($row['url_retour'])){

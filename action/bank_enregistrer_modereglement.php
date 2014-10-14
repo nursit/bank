@@ -40,6 +40,20 @@ function action_bank_enregistrer_modereglement_dist($arg=null){
 
 		if ($transaction['statut']=='commande'){
 			sql_updateq("spip_transactions",array('mode'=>$presta,'autorisation_id'=>date('d/m/Y-H:i:s')."/".$GLOBALS['ip']),'id_transaction='.intval($id_transaction));
+			// trigger le regelement en attente
+			// cela permet de factoriser le code
+			$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction));
+			pipeline('trig_bank_reglement_en_attente',array(
+				'args' => array(
+					'statut'=>'attente',
+					'mode'=>$row['mode'],
+					'type'=>$row['abo_uid']?'abo':'acte',
+					'id_transaction'=>$id_transaction,
+					'row'=>$row,
+				),
+				'data' => '')
+			);
+
 			$GLOBALS['redirect'] = _request('redirect');
 			$GLOBALS['redirect'] = parametre_url($GLOBALS['redirect'],"attente_mode",$presta,"&");
 		}
