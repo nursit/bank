@@ -92,8 +92,9 @@ function formulaires_payer_acte_charger_dist($montant,$options = array()){
 			$url_retour[$var] = $options[$var];
 		}
 	}
-	if (count($url_retour)>1)
+	if (count($url_retour)>0){
 		$opts['champs']['url_retour'] = serialize($url_retour);
+	}
 
 	// ok on recupere la transaction
 	$inserer_transaction = charger_fonction("inserer_transaction","bank");
