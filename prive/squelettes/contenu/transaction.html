@@ -12,6 +12,7 @@
 		[<div class="regle on">Montant réglé :(#MONTANT_REGLE|=={#MONTANT}|non)[(#MONTANT_REGLE|affiche_monnaie)]</div>]
 		[<div class="statut">Statut : (#STATUT)</div>]
 		[<div class="parrain">Parrain : (#PARRAIN)</div>]
+		[<div class="id_commande">Commande : <a href='[(#ID_COMMANDE|generer_url_entite{commande})]'(#ID_COMMANDE|oui)>##ID_COMMANDE[ - (#INFO_TITRE{commande,#ID_COMMANDE})]</a></div>]
 		[<div class="id_facture">Facture : <a href='[(#URL_PAGE{facture}|parametre_url{id_facture,#ID_FACTURE}|parametre_url{hash,#INFO_DETAILS{facture,#ID_FACTURE}|md5})]'(#ID_FACTURE|oui)>#ID_FACTURE</a></div>]
 	#BOITE_FERMER
 
