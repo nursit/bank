@@ -39,27 +39,41 @@ function presta_simu_call_response_dist(){
 		return array($id_transaction,false);
 	}
 
+	// est-ce une simulation d'echec ?
+	if (_request('status')=='fail'){
+		$set = array(
+			"mode"=>'simu',
+			"date_paiement"=>date('Y-m-d H:i:s'),
+			"statut"=>'echec[simu]',
+		);
+		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
+		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute; (Simulation du paiement echou&eacute;)";
+		sql_updateq("spip_transactions",array("message"=>$message),"id_transaction=".intval($id_transaction));
+		return array($id_transaction,false);
+	}
+
 	// Ouf, le reglement a ete accepte
 	$set = array(
-		"mode"=>sql_quote('simu'),
-		"montant_regle"=>'montant',
-		"date_paiement"=>'NOW()',
-		"statut"=>sql_quote('ok'),
-		"reglee"=>sql_quote('oui')
+		"mode"=>'simu',
+		"montant_regle"=>$row['montant'],
+		"date_paiement"=>date('Y-m-d H:i:s'),
+		"statut"=>'ok',
+		"reglee"=>'oui',
 	);
 	// generer un numero d'abonne simule
 	if (_request('abo')){
 		$abo_uid = substr(md5("$id_transaction-".time()),0,10);
-		$set['abo_uid'] = sql_quote($abo_uid);
+		$set['abo_uid'] = $abo_uid;
 	}
 
-	sql_update("spip_transactions", $set,	"id_transaction=".intval($id_transaction));
+	sql_updateq("spip_transactions", $set,	"id_transaction=".intval($id_transaction));
 	spip_log("simu_response : id_transaction $id_transaction, reglee",'simu');
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
 	$regler_transaction($id_transaction,"",$row);
 
 	if (_request('abo')
+		AND $abo_uid
 	  AND $activer_abonnement = charger_fonction('activer_abonnement','abos',true)){
 		// numero d'abonne = numero de transaction
 		$activer_abonnement($id_transaction,$abo_uid,'simu');
