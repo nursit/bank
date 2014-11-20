@@ -97,10 +97,16 @@
 		<fieldset>
 			<legend><:bank:label_notifications:></legend>
 			<ul>
-				<li class="editer_email_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
+				<li class="editer long_label editer_email_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
 					<label><:bank:label_email_ticket_admin:></label>[
 					<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_ticket_admin})</span>]
 					<input type="text" class="text" name="email_ticket_admin" value="#ENV*{email_ticket_admin}" />
+				</li>
+				<li class="editer long_label editer_email_from_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
+					<label><:bank:label_email_from_ticket_admin:></label>[
+					<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_ticket_admin})</span>]
+					#SET{default,#CONFIG{adresse_site}|parse_url|table_valeur{host}|ltrim{w.}}
+					<input type="text" class="text" name="email_from_ticket_admin" value="#ENV*{email_from_ticket_admin}" placeholder="reglements@#GET{default}"/>
 				</li>
 			</ul>
 		</fieldset>
@@ -108,7 +114,7 @@
 	</ul>
 
 	<p class="boutons">
-		<input type="submit" name="enregistrer" class="submit" value="<:bouton_enregistrer:>" />
+		<input type="submit" name="enregistrer" class="submit" value="<:bouton_enregistrer|attribut_html:>" />
 	</p>
 </div></form>
 </div>

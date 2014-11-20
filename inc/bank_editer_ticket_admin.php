@@ -23,7 +23,7 @@ include_spip('base/abstract_sql');
 function inc_bank_editer_ticket_admin_dist($id_transaction){
 	// il faut avoir configure un ou des emails de notification
 	$c = unserialize($GLOBALS['meta']['bank_paiement']);
-	if (!strlen($email = $c['email_ticket_admin'])){
+	if (!isset($c['email_ticket_admin']) OR !strlen($email = $c['email_ticket_admin'])){
 		spip_log(var_export($GLOBALS['meta']['bank_paiement'],true),'bank_ticket');
 		return;
 	}
@@ -50,10 +50,14 @@ function inc_bank_editer_ticket_admin_dist($id_transaction){
 		"Content-Type: text/html; charset=".$GLOBALS['meta']['charset']."\n".
 		"Content-Transfer-Encoding: 8bit\n";
 	$sujet = "Transaction OK #$id_transaction [".affiche_monnaie($montant)."]";
-	$url = parse_url($GLOBALS['meta']['adresse_site']);
+
+	if (!isset($c['email_from_ticket_admin']) OR !strlen($email_from = $c['email_from_ticket_admin'])){
+		$url = parse_url($GLOBALS['meta']['adresse_site']);
+		$email_from = "reglements@".ltrim($url['host'],'w.');
+	}
 
 	$envoyer_mail = charger_fonction('envoyer_mail','inc');
-	$envoyer_mail($email,$sujet,$ticket,'reglements@'.$url['host'],$header);
+	$envoyer_mail($email,$sujet,$ticket,$email_from,$header);
 }
 
 ?>
