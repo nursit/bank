@@ -35,7 +35,7 @@ _ Montant&nbsp;: @montant@',
 	'info_mode_test' => 'Mode TEST (paiement fictif)',
 	'info_virement' => 'Vous pouvez payer par virement bancaire.
 
-Libéllé de votre virement : #@transaction@
+Libellé de votre virement : #@transaction@
 _ Montant&nbsp;: @montant@
 _ Compte bancaire&nbsp;:
 -* B&eacute;n&eacute;ficiaire&nbsp;: &laquo;&nbsp;@ordre@&nbsp;&raquo;
