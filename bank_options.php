@@ -12,10 +12,11 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
 // verifier qu'on sait poser un cookie
-if (!isset($_COOKIE['accept_cookie'])) {
-	include_spip('inc/cookie');
-	spip_setcookie('accept_cookie',$_COOKIE['accept_cookie']=1);
-}
+// code mort ? (mais qui empeche le caching des pages)
+#if (!isset($_COOKIE['accept_cookie'])) {
+#	include_spip('inc/cookie');
+#	spip_setcookie('accept_cookie',$_COOKIE['accept_cookie']=1);
+#}
 
 // securite : on initialise une globale le temps de la config des prestas
 if (isset($GLOBALS['meta']['bank_paiement'])
