@@ -10,7 +10,7 @@
  *
  */
 ]#CACHE{0}
-<form action='#ENV{action}' methode='post'[ id="(#ENV{id,''})"] class="noajax"><div>
+<form action='#ENV{action}' method='post'[ id="(#ENV{id,''})"] class="noajax"><div>
 	[(#ENV**{hidden})]
 	<button class="submit" type="submit"[ title="(#ENV*{logobrand,'Payer'}|extraire_attribut{title}|attribut_html)"]>#ENV*{logobrand,'Payer'}</button>
 </div></form>
