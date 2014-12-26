@@ -34,6 +34,18 @@
 		  [(#ENV{attente_mode,''}|=={virement}|oui)
 				<div class="success">
 					<p><:bank:info_mode_reglement_enregistre:></p>
+                    <p>
+                        [(#VAL{bank:info_virement_etablir}|
+                        _T{#ARRAY{
+                        ordre, #GET{ordre},
+                        montant, #GET{montant},
+                        transaction, #GET{transaction},
+                        iban, #GET{iban},
+                        bic, #GET{bic},
+                        banque, #GET{banque},
+                        adressebanque, #GET{adressebanque}}
+                        }|propre)]
+                    </p>
 					[<p class="small">(#CONFIG{bank_paiement/config_virement/notice,''}|propre|PtoBR)</p>]
 				</div>
 			]

@@ -21,8 +21,12 @@
 
 		[(#ENV{attente_mode,''}|=={cheque}|oui)
 			<div class="success">
-				<p><:bank:info_mode_reglement_enregistre:>
-					<:bank:info_cheque_envoyer_adresse:></p>
+				<p><:bank:info_mode_reglement_enregistre:></p>
+                <p>
+                    <:bank:info_cheque_envoyer{montant=#GET{montant},transaction=#GET{transaction},ordre=#GET{ordre}}|propre:>
+                </p>
+                <p>
+                    <:bank:info_cheque_envoyer_adresse:></p>
 				<p>
 					[<strong>(#CONFIG{bank_paiement/config_cheque/adresse}|propre|PtoBR|sinon{
 					#NOM_SITE_SPIP<br />

@@ -22,7 +22,11 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'info_1_transaction' => '1 transaction',
 	'info_nb_transactions' => '@nb@ transactions',
 	'info_cheque_etablir_ordre' => 'Ch&egrave;que &eacute;tabli &agrave; l\'ordre de &laquo;&nbsp;<i>@ordre@</i>&nbsp;&raquo;',
-	'info_cheque_imprimer' => 'Envoyez votre ch&egrave;que libell&eacute; en euros
+    'info_cheque_imprimer' => "Les instructions concernant l'établissement du chèque seront fournies après avoir cliqué sur 'Régler par chèque'.
+
+Transaction&nbsp;: #@transaction@
+_ Montant&nbsp;: @montant@",
+    'info_cheque_envoyer' => 'Envoyez votre ch&egrave;que libell&eacute; en euros
 -* &agrave; l\'ordre de &laquo;&nbsp;@ordre@&nbsp;&raquo;&nbsp;;
 -* du montant exact&nbsp;;
 -* compensable dans une agence bancaire situ&eacute;e en France&nbsp;;
@@ -33,8 +37,13 @@ _ Montant&nbsp;: @montant@',
 	'info_cheque_envoyer_adresse' => 'Merci d\'envoyer votre ch&egrave;que à l\'adresse&nbsp;:',
 	'info_mode_reglement_enregistre' => 'Nous avons bien enregistré votre choix de mode de r&egrave;glement.',
 	'info_mode_test' => 'Mode TEST (paiement fictif)',
-	'info_virement' => 'Vous pouvez payer par virement bancaire.
+    'info_virement' => 'Vous pouvez payer par virement bancaire.
+Les instructions concernant l’établissement du virement seront fournies après avoir cliqué sur ’Régler par virement bancaire’.
 
+Transaction&nbsp;: #@transaction@
+_ Montant&nbsp;: @montant@
+',
+    'info_virement_etablir' => '
 Libellé de votre virement : #@transaction@
 _ Montant&nbsp;: @montant@
 _ Compte bancaire&nbsp;:
