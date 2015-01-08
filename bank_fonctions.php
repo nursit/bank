@@ -67,3 +67,22 @@ function bank_titre_type_paiement($presta){
 		$titre = _T("bank:label_type_paiement_cb_generique",array('presta'=>$presta));
 	return $titre;
 }
+
+
+/**
+ * Afficher la liste des transactions d'un auteur sur la page auteur de l'espace prive
+ *
+ * @pipeline affiche_auteurs_interventions
+ * @param  array $flux Données du pipeline
+ * @return array       Données du pipeline
+ */
+function bank_affiche_auteurs_interventions($flux) {
+	if ($id_auteur = intval($flux['args']['id_auteur'])) {
+
+		$flux['data'] .= recuperer_fond('prive/objets/liste/transactions', array(
+			'id_auteur' => $id_auteur,
+		), array('ajax' => true));
+
+	}
+	return $flux;
+}
