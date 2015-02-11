@@ -93,6 +93,20 @@ function autoriser_transaction_encaissercheque_dist($faire, $type, $id_transacti
 }
 
 /**
+ * Seuls les webmestres peuvent rembourser une transaction
+ * webmaster.
+ * @param $faire
+ * @param $type
+ * @param $id_transaction
+ * @param $qui
+ * @param $opt
+ * @return bool
+ */
+function autoriser_transaction_rembourser_dist($faire, $type, $id_transaction, $qui, $opt) {
+	return autoriser('webmestre');
+}
+
+/**
  * Transformer un tableau d'argument en liste arg=value pour le shell
  * (en echappant de maniere securisee)
  * @param $params
