@@ -8,6 +8,7 @@
 		<li>[(#SELF|parametre_url{statut,'commande'}|lien_ou_expose{Commandes,#ENV{statut}|=={commande},ajax})]</li>
 		<li>[(#SELF|parametre_url{statut,'echec'}|lien_ou_expose{Echec,#ENV{statut}|=={echec},ajax})]</li>
 		<li>[(#SELF|parametre_url{statut,'abandon'}|lien_ou_expose{Abandon,#ENV{statut}|=={abandon},ajax})]</li>
+		<li>[(#SELF|parametre_url{statut,'rembourse'}|lien_ou_expose{Remboursées,#ENV{statut}|=={rembourse},ajax})]</li>
 	</ul>
 </div>
 <INCLURE{fond=prive/objets/liste/transactions,env,ajax,nb=50} />

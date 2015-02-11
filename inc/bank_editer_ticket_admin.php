@@ -17,10 +17,10 @@ include_spip('base/abstract_sql');
  * Generer un ticket resume de la transaction
  * pour les admins indiques dans la configuration
  * 
- * @param <type> $id_transaction
- * @return <type>
+ * @param int $id_transaction
+ * @param string $sujet
  */
-function inc_bank_editer_ticket_admin_dist($id_transaction){
+function inc_bank_editer_ticket_admin_dist($id_transaction, $sujet="Transaction OK"){
 	// il faut avoir configure un ou des emails de notification
 	$c = unserialize($GLOBALS['meta']['bank_paiement']);
 	if (!isset($c['email_ticket_admin']) OR !strlen($email = $c['email_ticket_admin'])){
@@ -29,8 +29,7 @@ function inc_bank_editer_ticket_admin_dist($id_transaction){
 	}
 	$ticket = "";
 
-	$res = sql_select("*","spip_transactions","id_transaction=".intval($id_transaction));
-	if ($row = sql_fetch($res)){
+	if ($row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
 		$montant = $row['montant_regle'];
 		$ticket .= "<h2>Transaction $id_transaction</h2>\n<table border='1'>";
 		foreach($row as $k=>$v)
@@ -44,12 +43,11 @@ function inc_bank_editer_ticket_admin_dist($id_transaction){
 		'data'=>$ticket)
 	);
 
-
 	$ticket = "<html>$ticket</html>";
 	$header = "MIME-Version: 1.0\n".
 		"Content-Type: text/html; charset=".$GLOBALS['meta']['charset']."\n".
 		"Content-Transfer-Encoding: 8bit\n";
-	$sujet = "Transaction OK #$id_transaction [".affiche_monnaie($montant)."]";
+	$sujet = "$sujet #$id_transaction [".affiche_monnaie($montant)."]";
 
 	if (!isset($c['email_from_ticket_admin']) OR !strlen($email_from = $c['email_from_ticket_admin'])){
 		$url = parse_url($GLOBALS['meta']['adresse_site']);

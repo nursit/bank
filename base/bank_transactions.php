@@ -77,6 +77,14 @@ function bank_declarer_tables_principales($tables_principales){
 	return $tables_principales;
 }
 
+function bank_declarer_tables_objets_sql($tables){
+	$tables['spip_transactions'] = array(
+		'page' => false,
+		'field' => &$GLOBALS['tables_principales']['spip_transactions']['field'],
+		'key' => &$GLOBALS['tables_principales']['spip_transactions']['key'],
+	);
+	return $tables;
+}
 
 function bank_rechercher_liste_des_champs($flux){
 

@@ -11,6 +11,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'bouton_enregistrer_reglement_cheque' => 'R&eacute;gler par ch&egrave;que',
 	'bouton_enregistrer_reglement_ok' => 'Le r&eacute;glement a bien &eacute;t&eacute; re&ccedil;u',
 	'bouton_enregistrer_reglement_virement' => 'R&eacute;gler par virement bancaire',
+	'bouton_rembourser' => 'Marquer comme remboursée',
 
 	'carte_bleu' => 'Carte Bleue',
 	'choisissez_cb' => 'Choisissez votre carte bancaire&nbsp;:',
@@ -86,6 +87,7 @@ _ Compte bancaire&nbsp;:
 	'label_presta_sips' => 'SIPS',
 	'label_presta_sips_service' => 'Service',
 	'label_presta_virement' => 'Virement bancaire',
+	'label_remboursement_raison' => 'Raison du remboursement',
 	'label_resilier_abonnement' => 'R&eacute;silier',
 
 	'label_type_paiement_cb_generique' => 'Carte bancaire',

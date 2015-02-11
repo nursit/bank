@@ -1,0 +1,32 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012 - Distribue sous licence GNU/GPL
+ *
+ */
+]
+<div class="formulaire_spip formulaire_#FORM">
+	[<p class="reponse_formulaire reponse_formulaire_ok">(#ENV**{message_ok})</p>]
+	[<p class="reponse_formulaire reponse_formulaire_erreur">(#ENV**{message_erreur})</p>]
+
+	<form method="post" action="#ENV{action}"><div>
+		#ACTION_FORMULAIRE{#ENV{action}}
+		<ul>
+			#SET{name,raison}#SET{obli,'obligatoire'}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	   <li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+	     <label for="#GET{name}"><:bank:label_remboursement_raison:></label>[
+	     <span class='erreur_message'>(#GET{erreurs})</span>
+	     ][<b>(#ENV{_autorisation_id_prefixe})</b>]
+		   <input type="text" name="#GET{name}" class="text email" value="#ENV*{#GET{name},#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required'] />
+	   </li>
+		</ul>
+		<p class="boutons">
+			<input type="submit" name="enregistrer" class="submit" value="<:bank:bouton_rembourser|attribut_html:>" />
+		</p>
+	</div></form>
+</div>
