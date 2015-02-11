@@ -55,7 +55,7 @@ function formulaires_rembourser_transaction_verifier_dist($id_transaction){
 function formulaires_rembourser_transaction_traiter_dist($id_transaction){
 
 	$raison = _request('raison');
-	$raison = "-\n".date('Y-m-d H:i:s').' REMBOURSEMENT '.remboursement_prefixe()." : ".$raison;
+	$raison = "<hr />\n".date('Y-m-d H:i:s').' REMBOURSEMENT '.remboursement_prefixe()." : ".$raison;
 
 	$res = array();
 	$rembourser_transaction = charger_fonction('rembourser_transaction','bank');
