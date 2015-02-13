@@ -108,6 +108,11 @@
 					#SET{default,#CONFIG{adresse_site}|parse_url|table_valeur{host}|ltrim{w.}}
 					<input type="text" class="text" name="email_from_ticket_admin" value="#ENV*{email_from_ticket_admin}" placeholder="reglements@#GET{default}"/>
 				</li>
+				<li class="editer long_label editer_email_reporting[ (#ENV**{erreurs}|table_valeur{email_reporting}|oui)erreur]">
+					<label><:bank:label_email_reporting:></label>[
+					<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_reporting})</span>]
+					<input type="text" class="text" name="email_reporting" value="#ENV*{email_reporting}" />
+				</li>
 			</ul>
 		</fieldset>
 		</li>

@@ -65,6 +65,7 @@ _ Compte bancaire&nbsp;:
 	'label_configuration_virement_notice' => 'Remarques compl&eacute;mentaires&nbsp;:',
 	'label_email_ticket_admin' => 'Email destinataire des tickets d\'achat',
 	'label_email_from_ticket_admin' => 'Email <i>from</i> des tickets d\'achat',
+	'label_email_reporting' => 'Envoyer un reporting quotidien à l\'adresse mail',
 	'label_enregistrer_reglement_reference' => 'Reference',
 	'label_inactif' => 'D&eacute;sactiver',
 	'label_mode_paiement' => 'Modes de paiements a l\'acte',

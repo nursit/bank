@@ -86,3 +86,17 @@ function bank_affiche_auteurs_interventions($flux) {
 	}
 	return $flux;
 }
+
+/**
+ * Declarer les CRON
+ *
+ * @param array $taches_generales
+ * @return array
+ */
+function bank_taches_generales_cron($taches_generales){
+	$c = unserialize($GLOBALS['meta']['bank_paiement']);
+	if (isset($c['email_reporting']) AND strlen($email = $c['email_reporting'])){
+		$taches_generales['bank_daily_reporting'] = 3600*6; // toutes les 6H
+	}
+	return $taches_generales;
+}
