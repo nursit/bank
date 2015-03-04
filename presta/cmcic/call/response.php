@@ -118,7 +118,9 @@ function cmcic_traite_reponse_transaction($response, $mode = "cmcic") {
 	
 	// on verifie que notre transaction existe bien
 	$contenu = $response['texte-libre'];
-	if (!$contenu = @unserialize($contenu)) {
+	$contenu = urldecode($contenu);
+	$contenu = @unserialize($contenu);
+	if ($contenu===false) {
 		spip_log("call_response : contenu non désérialisable !", $mode);
 		cmcic_notifier_banque_erreur();
 		return array(0, false);

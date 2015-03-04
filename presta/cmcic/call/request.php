@@ -94,7 +94,9 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash) {
 		'lang' => $GLOBALS['spip_lang'], # pour le hit de la banque, pouvoir retrouver la langue utilisateur
 		'contenu' => $row['contenu'], # déjà sérializé en théorie
 	);
-	$contexte['texte-libre'] = serialize($contenu);
+	// texte-libre doit etre protege car le formulaire est parfois reinjecte par Cmcic
+	// dans une page de redirection pour les mobiles
+	$contexte['texte-libre'] = urlencode(serialize($contenu));
 
 	$contexte['mail']        = bank_email_porteur($row);
  
