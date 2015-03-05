@@ -407,7 +407,15 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, 
 	$parm['vads_ctx_mode'] = _CYBERPLUS_MODE;
 	$parm['vads_version'] = _CYBERPLUS_VERSION;
 
-	$parm['vads_trans_id'] = str_pad(modulo($row['id_transaction'],899999),6,"0",STR_PAD_RIGHT);
+	// pour vads_trans_id on utilise
+	// le nombre de secondes depuis le debut de la journee x 10 + id_transaction%10
+	// soit 864009
+	// ce qui autorise 10 paiements/secondes. Au pire si collision il suffit de recommencer
+	// deux presentations de la meme transaction donnent 2 vads_trans_id differents
+	$now = time();
+	$id = 10*(date('s',$now)+60*(date('i',$now))+60*date('H',$now));
+	$id += modulo($row['id_transaction'],10);
+	$parm['vads_trans_id'] = str_pad($id,6,"0",STR_PAD_LEFT);
 	$parm['vads_order_id'] = $row['id_transaction'];
 	$parm['vads_trans_date'] = gmdate ("YmdHis", strtotime($row['date_transaction']));
 
