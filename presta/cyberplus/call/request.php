@@ -435,11 +435,17 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, 
 	$parm['vads_cust_email'] = bank_email_porteur($row);
 
 	// Urls de retour
-
 	$parm['vads_shop_url'] = $GLOBALS['meta']['adresse_site'];
 	$parm['vads_return_mode'] = "GET";//"POST";
 	$parm['vads_url_return'] = generer_url_action('bank_response',"bankp=cyberplus",true,true);
 	$parm['vads_url_cancel'] = generer_url_action('bank_cancel',"bankp=cyberplus",true,true);
+
+	// this is SPIP + bank
+	include_spip('inc/filtres');
+	$parm['vads_contrib'] = "SPIP ".$GLOBALS['spip_version_branche']." + https://github.com/nursit/bank";
+	if ($info_plugin = chercher_filtre("info_plugin")){
+		$parm['vads_contrib'] .= " " . $info_plugin("bank","version");
+	}
 
 	#$parm['vads_redirect_success_timeout'] = 1;
 	#$parm['vads_redirect_success_message'] = "OK";
