@@ -24,7 +24,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *     false pour recycler une transaction identique encore au statut commande
  *   array champs
  *     autre champs ajoutes a la transaction
- * @return bool|int|mixed
+ * @return int
  */
 function bank_inserer_transaction_dist($montant,$options=array()){
 
