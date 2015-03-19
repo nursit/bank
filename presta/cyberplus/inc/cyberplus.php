@@ -157,21 +157,8 @@ function cyberplus_traite_reponse_transaction($response, $mode="cyberplus"){
 	 	// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
 	 	if ($row['reglee']=='oui') return array($id_transaction,true);
 	 	// sinon enregistrer l'absence de paiement et l'erreur
-		spip_log($t="call_response : transaction $id_transaction refusee :[$erreur]:".bank_shell_args($response),$mode);
-		$set = array(
-			"mode"=>$mode,
-			"statut"=>'echec['.$response['vads_result'].']',
-			'date_paiement'=>$date_paiement
-		);
-		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
-		if (intval($response['vads_result'])==2){
-			// avertir le webmestre
-			$envoyer_mail = charger_fonction('envoyer_mail','inc');
-			$envoyer_mail($GLOBALS['meta']['email_webmaster'],"[$mode]Transaction Impossible",$t,"$mode@".$_SERVER['HTTP_HOST']);
-		}
-		// TODO : stocker l'erreur en base pour l'admin
-		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;";/*.($erreur?" ($erreur)":"")*/
-		sql_updateq("spip_transactions",array("message"=>$message),"id_transaction=".intval($id_transaction));
+		include_spip('inc/bank');
+		bank_echec_transaction($id_transaction,$mode,$date_paiement,$response['vads_result'],$erreur,bank_shell_args($response),intval($response['vads_result'])==2);
 		return array($id_transaction,false);
 	}
 

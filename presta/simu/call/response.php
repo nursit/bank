@@ -41,14 +41,9 @@ function presta_simu_call_response_dist(){
 
 	// est-ce une simulation d'echec ?
 	if (_request('status')=='fail'){
-		$set = array(
-			"mode"=>'simu',
-			"date_paiement"=>date('Y-m-d H:i:s'),
-			"statut"=>'echec[simu]',
-		);
-		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
-		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute; (Simulation du paiement echou&eacute;)";
-		sql_updateq("spip_transactions",array("message"=>$message),"id_transaction=".intval($id_transaction));
+	 	// sinon enregistrer l'absence de paiement et l'erreur
+		include_spip('inc/bank');
+		bank_echec_transaction($id_transaction,"simu",date('Y-m-d H:i:s'),'simu','Simulation du paiement echou&eacute;');
 		return array($id_transaction,false);
 	}
 

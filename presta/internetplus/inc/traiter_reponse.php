@@ -41,22 +41,23 @@ function presta_internetplus_inc_traiter_reponse_dist($mode='wha'){
 		if (isset($args['v'])
 		 AND is_array($mp=$v=$args['v'])
 		 AND $id_transaction=intval($v['id_transaction'])) {
-			$res = spip_query("SELECT * FROM spip_transactions WHERE id_transaction="._q($id_transaction));
-			if ($row = spip_fetch_array($res) && $row['reglee']=='oui') return array($id_transaction,true,$mp);
-
-			$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute; (Annulation)";
-			spip_query("UPDATE spip_transactions SET statut='echec',mode="._q($mode).",message="._q($message)." WHERE id_transaction="._q($id_transaction));
+			$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
+			if ($row['reglee']=='oui') return array($id_transaction,true,$mp);
+			// sinon enregistrer echec transaction
+			$date_paiement = date('Y-m-d H:i:s');
+			include_spip('inc/bank');
+			bank_echec_transaction($id_transaction,$mode,$date_paiement,"","Annulation",var_export($args,true));
 		}
 		return array($id_transaction,false,$mp);		
 	}
 	
-	// Code inconnu
+	// Code inconnu : on ne fait rien ?
 	if (!preg_match(",^(OfferAuthorization|Authorize)Success$,i",$c)) {
 		spip_log($t = "wha_traiter_reponse : code reponse c inconnu, traitement impossible : $m",$mode);
 		return array($id_transaction,false,$mp);
 	}
 
-	// OK
+	// Numero de transaction inconnue : on ne fait rien
 	if (!isset($args['v'])
 	 OR !is_array($v=$args['v'])
 	 OR !isset($v['mp'])
@@ -64,6 +65,8 @@ function presta_internetplus_inc_traiter_reponse_dist($mode='wha'){
 		spip_log($t = "wha_traiter_reponse : traitement impossible : $m",$mode);
 		return array($id_transaction,false,$mp);
 	}
+
+	// OK
 	$traiter_reponse = charger_fonction("traiter_reponse_$mode",'presta/internetplus/inc');
 	return $traiter_reponse($m,$args,$partnerId,$keyId);
 }

@@ -190,22 +190,14 @@ function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
 	$transaction = $response['PAYID'];
 
 	if (!$transaction
-	 OR !$authorisation_id
-//	 OR $authorisation_id=='XXXXXX'
-	 OR $erreur!==true){
+	  OR !$authorisation_id
+	  //OR $authorisation_id=='XXXXXX' // debug purpose
+	  OR $erreur!==true){
 	 	// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
 	 	if ($row['reglee']=='oui') return array($id_transaction,true);
-	 	// sinon enregistrer l'absence de paiement et l'erreur
-		spip_log($t="call_response : transaction $id_transaction refusee :[$erreur]:".var_export($response,true),$mode);
-		// TODO : stocker l'erreur en base pour l'admin
-		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;";//.($erreur===true?"":" ($erreur)");
-		$set = array(
-			"mode" => $mode,
-			"statut"=>'echec['.$response['STATUS'].':'.$response['NCERROR'].']',
-			'date_paiement'=>$date_paiement,
-			'message'=>$message
-		);
-		sql_updateq("spip_transactions", $set,"id_transaction=".intval($id_transaction));
+
+		include_spip('inc/bank');
+		bank_echec_transaction($id_transaction,$mode,$date_paiement,$response['STATUS'].':'.$response['NCERROR'],$erreur,var_export($response,true));
 		return array($id_transaction,false);
 	}
 

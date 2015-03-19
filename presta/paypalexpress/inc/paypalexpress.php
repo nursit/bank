@@ -113,16 +113,9 @@ function bank_paypalexpress_checkoutpayment($payerid){
 	// verifier que le payerid est conforme
 	if ($payerid!==$_SESSION['payer_id']){
 		$trace = "Payerid:$payerid\n".var_export($_SESSION,true);
-		spip_log($t="bank_paypalexpress_checkoutpayment ($id_transaction) : transaction $id_transaction annulee :".$trace,'paypalexpress' . _LOG_ERREUR);
-		$set = array(
-			"mode" => 'paypalexpress',
-			"statut" => 'echec',
-			'date_paiement' => date('Y-m-d H:i:s')
-		);
-		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
-
-		$message = "Une erreur est survenue, aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;";
-		sql_updateq("spip_transactions",array("message"=>$message),"id_transaction=".intval($id_transaction));
+	 	// sinon enregistrer l'absence de paiement et l'erreur
+		include_spip('inc/bank');
+		bank_echec_transaction($id_transaction,"paypalexpress",date('Y-m-d H:i:s'),"","Annulee",$trace);
 		return array($id_transaction,false);
 	}
 

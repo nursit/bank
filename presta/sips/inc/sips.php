@@ -281,21 +281,9 @@ function sips_traite_reponse_transaction($response,$mode = 'sips') {
 			return array($id_transaction,true);
 
 	 	// sinon enregistrer l'absence de paiement et l'erreur
-		spip_log($t="call_response : transaction $id_transaction refusee :[$response_code][$bank_response_code]:".sips_shell_args($response),$mode);
-		$set = array(
-			'mode' => $mode,
-			'statut'=>'echec['.$response['response_code'].']['.$response['bank_response_code'].']',
-			'date_paiement'=>$date_paiement
-		);
-		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
-		if ($response['response_code']=='03'){
-			// le contrat SIPS ne fonctionne plus ? avertir le webmaster
-			$envoyer_mail = charger_fonction('envoyer_mail','inc');
-			$envoyer_mail($GLOBALS['meta']['email_webmaster'],"[$mode]Transaction Impossible",$t,"$mode@".$_SERVER['HTTP_HOST']);
-		}
-		// TODO : stocker l'erreur en base pour l'admin
-		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;";// ($response_code)";
-		sql_updateq("spip_transactions",array("message"=>$message),"id_transaction=".intval($id_transaction));
+		include_spip('inc/bank');
+		bank_echec_transaction($id_transaction,$mode,$date_paiement,$response['response_code'].":".$response['bank_response_code'],trim($response_code." ".$bank_response_code),sips_shell_args($response),$response['response_code']=='03');
+
 		return array($id_transaction,false);
 	}
 

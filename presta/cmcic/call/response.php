@@ -316,17 +316,8 @@ function cmcic_gerer_transaction_annulee($id_transaction, $response, $row, $erre
 	// (internaute qui a ouvert 2 fenetres de paiement)
 	if ($row['reglee']!='oui') {
 		$date_paiement = date('Y-m-d H:i:s');
-		// sinon enregistrer l'absence de paiement et l'erreur
-		spip_log($t="call_response : transaction $id_transaction refusée ou annulée pour : $response[motifrefus]", $mode);
-		// TODO : stocker l'erreur en base pour l'admin
-		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;";/*.($erreur===true?"":" ($erreur)")*/
-		$set = array(
-			'mode' => $mode,
-			"statut" => 'echec['.$response['motifrefus'].']',
-			'date_paiement' => $date_paiement,
-			'message' => $message,
-		);
-		sql_updateq("spip_transactions", $set, "id_transaction=".intval($id_transaction));
+		include_spip('inc/bank');
+		bank_echec_transaction($id_transaction,$mode,$date_paiement,$response['motifrefus'],$erreur===true?"":$erreur,bank_shell_args($response));
 		return array($id_transaction, false);
 	}
 
