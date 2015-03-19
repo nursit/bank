@@ -197,7 +197,8 @@ function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
 	 	if ($row['reglee']=='oui') return array($id_transaction,true);
 	 	// sinon enregistrer l'absence de paiement et l'erreur
 		spip_log($t="call_response : transaction $id_transaction refusee :[$erreur]:".var_export($response,true),$mode);
-		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;".($erreur===true?"":" ($erreur)");
+		// TODO : stocker l'erreur en base pour l'admin
+		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;";//.($erreur===true?"":" ($erreur)");
 		$set = array(
 			"mode" => $mode,
 			"statut"=>'echec['.$response['STATUS'].':'.$response['NCERROR'].']',

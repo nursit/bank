@@ -318,7 +318,8 @@ function cmcic_gerer_transaction_annulee($id_transaction, $response, $row, $erre
 		$date_paiement = date('Y-m-d H:i:s');
 		// sinon enregistrer l'absence de paiement et l'erreur
 		spip_log($t="call_response : transaction $id_transaction refusée ou annulée pour : $response[motifrefus]", $mode);
-		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;".($erreur===true?"":" ($erreur)");
+		// TODO : stocker l'erreur en base pour l'admin
+		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;";/*.($erreur===true?"":" ($erreur)")*/
 		$set = array(
 			'mode' => $mode,
 			"statut" => 'echec['.$response['motifrefus'].']',

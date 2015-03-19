@@ -169,7 +169,8 @@ function cyberplus_traite_reponse_transaction($response, $mode="cyberplus"){
 			$envoyer_mail = charger_fonction('envoyer_mail','inc');
 			$envoyer_mail($GLOBALS['meta']['email_webmaster'],"[$mode]Transaction Impossible",$t,"$mode@".$_SERVER['HTTP_HOST']);
 		}
-		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;".($erreur?" ($erreur)":"");
+		// TODO : stocker l'erreur en base pour l'admin
+		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;";/*.($erreur?" ($erreur)":"")*/
 		sql_updateq("spip_transactions",array("message"=>$message),"id_transaction=".intval($id_transaction));
 		return array($id_transaction,false);
 	}
