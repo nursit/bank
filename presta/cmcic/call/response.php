@@ -389,7 +389,7 @@ function cmcic_gerer_transaction_payee($id_transaction, $response, $row, $paieme
 	spip_log("call_response : id_transaction $id_transaction, reglee", $mode);
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
-	$regler_transaction($id_transaction,"",$row);
+	$regler_transaction($id_transaction,array('row_prec'=>$row));
 	return array($id_transaction, true);
 }
 ?>

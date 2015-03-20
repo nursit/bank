@@ -59,7 +59,7 @@ function presta_cheque_call_response_dist(){
 	spip_log("cheque_response : id_transaction $id_transaction, reglee",'cheque');
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
-	$regler_transaction($id_transaction,"",$row);
+	$regler_transaction($id_transaction,array('row_prec'=>$row));
 	return array($id_transaction,true);
 }
 ?>

@@ -85,7 +85,7 @@ function presta_simu_call_response_dist(){
 	spip_log("simu_response : id_transaction $id_transaction, reglee",'simu');
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
-	$regler_transaction($id_transaction,"",$row);
+	$regler_transaction($id_transaction,array('row_prec'=>$row));
 
 	if (_request('abo')
 		AND $abo_uid

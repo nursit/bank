@@ -108,7 +108,7 @@ function bank_paypal_recoit_notification(){
 	spip_log("simple_reponse : id_transaction $id_transaction, reglee",'paypal');
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
-	$regler_transaction($id_transaction,"",$row);
+	$regler_transaction($id_transaction,array('row_prec'=>$row));
 	return array($id_transaction,true);
 }
 

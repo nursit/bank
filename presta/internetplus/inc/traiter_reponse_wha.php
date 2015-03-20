@@ -94,7 +94,7 @@ function presta_internetplus_inc_traiter_reponse_wha_dist($m,$args,$partnerId,$k
 	}
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
-	$regler_transaction($id_transaction,"",$row);
+	$regler_transaction($id_transaction,array('row_prec'=>$row));
 
 	return array($id_transaction,true,$mp);
 }

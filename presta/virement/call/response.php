@@ -59,6 +59,6 @@ function presta_virement_call_response_dist(){
 	spip_log("virement_response : id_transaction $id_transaction, reglee", 'virement');
 
 	$regler_transaction = charger_fonction('regler_transaction', 'bank');
-	$regler_transaction($id_transaction, "", $row);
+	$regler_transaction($id_transaction, array('row_prec'=>$row));
 	return array($id_transaction, true);
 }
