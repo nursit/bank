@@ -26,7 +26,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *   bool send_mail : avertir le webmestre par mail
  * @return array
  */
-function bank_echec_transaction($id_transaction,$args=array()){
+function bank_transaction_echec($id_transaction,$args=array()){
 
 	$default = array(
 		'mode'=>'defaut',

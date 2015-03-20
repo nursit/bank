@@ -46,7 +46,7 @@ function presta_internetplus_inc_traiter_reponse_dist($mode='wha'){
 			// sinon enregistrer echec transaction
 			$date_paiement = date('Y-m-d H:i:s');
 			include_spip('inc/bank');
-			bank_echec_transaction($id_transaction,
+			bank_transaction_echec($id_transaction,
 				array(
 					'mode'=>$mode,
 					'date_paiement' => $date_paiement,

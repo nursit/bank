@@ -115,7 +115,7 @@ function bank_paypalexpress_checkoutpayment($payerid){
 		$trace = "Payerid:$payerid\n".var_export($_SESSION,true);
 	 	// sinon enregistrer l'absence de paiement et l'erreur
 		include_spip('inc/bank');
-		return bank_echec_transaction($id_transaction,
+		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>"paypalexpress",
 				'code_erreur' => '',

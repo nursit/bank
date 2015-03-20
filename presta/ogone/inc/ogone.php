@@ -197,7 +197,7 @@ function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
 	 	if ($row['reglee']=='oui') return array($id_transaction,true);
 
 		include_spip('inc/bank');
-		return bank_echec_transaction($id_transaction,
+		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,
 				'date_paiement' => $date_paiement,

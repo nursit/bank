@@ -317,7 +317,7 @@ function cmcic_gerer_transaction_annulee($id_transaction, $response, $row, $erre
 	if ($row['reglee']!='oui') {
 		$date_paiement = date('Y-m-d H:i:s');
 		include_spip('inc/bank');
-		return bank_echec_transaction($id_transaction,
+		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,
 				'date_paiement' => $date_paiement,

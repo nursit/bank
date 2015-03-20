@@ -43,7 +43,7 @@ function presta_simu_call_response_dist(){
 	if (_request('status')=='fail'){
 	 	// sinon enregistrer l'absence de paiement et l'erreur
 		include_spip('inc/bank');
-		return bank_echec_transaction($id_transaction,
+		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>"simu",
 				'code_erreur' => "simu",
