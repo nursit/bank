@@ -49,8 +49,8 @@ function bank_transaction_invalide($id_transaction="",$args=array()){
 	}
 
 	if (intval($id_transaction) AND $args['update']){
-		$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;. (Transaction Ref. #$id_transaction)";
-		$message .= "<br />Une erreur est survenue, les donn&eacute;es re&ccedil;ues ne sont pas conformes.";
+		$message = _T("bank:erreur_transaction_echec",array("ref"=>"#$id_transaction"));
+		$message .= "<br />"._T('bank:erreur_transaction_invalide');
 		$set = array(
 			"mode" => $args['mode'],
 			"statut" => 'echec[invalide]',
@@ -106,7 +106,7 @@ function bank_transaction_echec($id_transaction,$args=array()){
 		"statut" => 'echec'.($args['code_erreur']?'['.$args['code_erreur'].']':''),
 		"date_paiement" => $args['date_paiement'],
 		"erreur" => $args['erreur'],
-		"message" => "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;. (Transaction Ref. #$id_transaction)",
+		"message" => _T("bank:erreur_transaction_echec",array("ref"=>"#$id_transaction")),
 	);
 	// verifier que le champ erreur existe pour ne pas risquer de planter l'enregistrement si l'up de base n'a pas encore ete fait
 	if($row=sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))

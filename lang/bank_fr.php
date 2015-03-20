@@ -19,11 +19,13 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'confirme_reglement_pris_en_compte' => 'Votre r&egrave;glement a bien &eacute;t&eacute; pris en compte, et nous vous en remercions.',
 
 	'explication_page_configurer_paiement' => 'Configurez les syst&egrave;mes de paiement actifs',
+	'erreur_transaction_echec' => 'Aucun r&egrave;glement n\'a &eacute;t&eacute; r&eacute;alis&eacute;. (Transaction Ref. @ref@)',
+	'erreur_transaction_invalide' => 'Une erreur est survenue, les donn&eacute;es re&ccedil;ues ne sont pas conformes.',
 
 	'info_1_transaction' => '1 transaction',
 	'info_nb_transactions' => '@nb@ transactions',
 	'info_cheque_etablir_ordre' => 'Ch&egrave;que &eacute;tabli &agrave; l\'ordre de &laquo;&nbsp;<i>@ordre@</i>&nbsp;&raquo;',
-    'info_cheque_imprimer' => "Les instructions concernant l'établissement du chèque seront fournies après avoir cliqué sur 'Régler par chèque'.
+	'info_cheque_imprimer' => "Les instructions concernant l'établissement du chèque seront fournies après avoir cliqué sur 'Régler par chèque'.
 
 Transaction&nbsp;: #@transaction@
 _ Montant&nbsp;: @montant@",
