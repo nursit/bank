@@ -1,0 +1,39 @@
+<paquet
+	prefix="bank"
+	categorie="outil"
+	version="3.0.0"
+	etat="dev"
+	compatibilite="[3.0.0;3.1.*]"
+	logo="prive/themes/spip/images/credit-card-32.png"
+	documentation="http://contrib.spip.net/4627"
+	schema="1.5.0"
+>
+
+	<nom>Banque&amp;paiement</nom>
+	<!-- Un module de paiement bancaire multi prestataires -->
+
+	<auteur lien="http://nursit.com">Nursit.com</auteur>
+
+	<pipeline nom="declarer_tables_interfaces" inclure="base/bank_transactions.php" />
+	<pipeline nom="declarer_tables_principales" inclure="base/bank_transactions.php" />
+	<pipeline nom="declarer_tables_objets_sql" inclure="base/bank_transactions.php" />
+	<pipeline nom="rechercher_liste_des_champs" inclure="base/bank_transactions.php" />
+	<pipeline nom="affiche_auteurs_interventions" inclure="bank_fonctions.php" />
+	<pipeline nom="taches_generales_cron" inclure="bank_fonctions.php" />
+
+	<pipeline nom="bank_abos_activer_abonnement" action="" />
+	<pipeline nom="bank_abos_decrire_echeance" action="" />
+	<pipeline nom="bank_abos_renouveler" action="" />
+	<pipeline nom="bank_abos_resilier" action="" />
+	<pipeline nom="bank_facturer_reglement" action="" />
+	<pipeline nom="bank_traiter_reglement" action="" />
+	<pipeline nom="bank_traiter_remboursement" action="" />
+	<pipeline nom="bank_editer_ticket_reglement" action="" />
+	<pipeline nom="bank_redirige_apres_retour_transaction" action="" />
+	<pipeline nom="trig_bank_notifier_reglement" action="" />
+	<pipeline nom="trig_bank_reglement_en_attente" action="" />
+	<pipeline nom="trig_bank_reglement_en_echec" action="" />
+
+	<menu nom="configurer_bank" titre="bank:titre_menu_configurer" parent="menu_configuration" icone="images/credit-card-16.png" action="configurer_bank" />
+	<menu nom="transactions" titre="bank:titre_menu_transactions" parent="menu_activite" icone="images/credit-card-16.png" />
+</paquet>
