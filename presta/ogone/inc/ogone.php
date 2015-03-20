@@ -114,7 +114,14 @@ function ogone_get_response(){
 
 	// si pas de signature dans la reponse, la refuser
 	if (!isset($response['SHASIGN'])){
-		spip_log('reponse recue sans signature '.var_export($response),'ogone');
+		include_spip('inc/bank');
+		bank_transaction_invalide(0,
+			array(
+				'mode'=>"ogone",
+				'erreur' => "reponse recue sans signature",
+				'log' => var_export($response,true)
+			)
+		);
 		return false;
 	}
 
@@ -124,8 +131,17 @@ function ogone_get_response(){
 		// il est double encode, donc on garde la reponse initiale qui est moins moche...
 		// mais on accepte la reponse ainsi signee
 	  AND $response['SHASIGN']!==ogone_sha_out(array_map('utf8_encode',$response))
-	)
+	){
+		include_spip('inc/bank');
+		bank_transaction_invalide(0,
+			array(
+				'mode'=>"ogone",
+				'erreur' => "signature invalide",
+				'log' => var_export($response,true)
+			)
+		);
 		return false;
+	}
 
 	unset($response['action']);
 	unset($response['bankp']);
@@ -152,7 +168,7 @@ function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
   'STATUS' => string '9' (length=1)
   'CARDNO' => string 'XXXXXXXXXXXX1111' (length=16)
   'ED' => string '1110' (length=4)
-  'CN' => string 'Cedric MORIN' (length=12)
+  'CN' => string 'John Doe' (length=12)
   'TRXDATE' => string '06/28/10' (length=8)
   'PAYID' => string '7599709' (length=7)
   'NCERROR' => string '0' (length=1)
@@ -164,21 +180,14 @@ function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
 
 	$id_transaction = intval($response['orderID']);
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
-		spip_log($t = "call_response : id_transaction $id_transaction inconnu:".var_export($response,true),$mode);
-		// on log ca dans un journal dedie
-		spip_log($t,$mode . "_douteux");
-		// on mail le webmestre
-		$envoyer_mail = charger_fonction('envoyer_mail','inc');
-		$envoyer_mail($GLOBALS['meta']['email_webmaster'],"[$mode]Transaction Frauduleuse",$t,"$mode@".$_SERVER['HTTP_HOST']);
-		$message = "Une erreur est survenue, les donn&eacute;es re&ccedil;ues de la banque ne sont pas conformes. ";
-		$message .= "Votre r&egrave;glement n'a pas &eacute;t&eacute; pris en compte (Ref : $id_transaction)";
-		$set = array(
-			"mode" => $mode,
-			"message"=>$message,
-			'statut'=>'echec'
+		include_spip('inc/bank');
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode'=>$mode,
+				'erreur' => "transaction inconnue",
+				'log' => var_export($response,true)
+			)
 		);
-		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
-		return array($id_transaction,false);
 	}
 
 	// ok, on traite le reglement

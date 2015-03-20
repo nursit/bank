@@ -143,17 +143,39 @@ function paybox_response($response = 'response'){
 		  OR !$cle = openssl_pkey_get_public($pubkey)
 			OR !(openssl_verify( $vars, $sign, $cle ) OR openssl_verify($vars1, $sign, $cle))
 		){
-
-			spip_log('call_response : signature invalide: '.var_export($url,true),'paybox');
+			include_spip('inc/bank');
+			bank_transaction_invalide(0,
+				array(
+					'mode'=>"paybox",
+					'erreur' => "signature invalide",
+					'log' => var_export($url,true)
+				)
+			);
 			return false;
 		}
 	}
 	else {
 		if (!_request('sign')){
-			spip_log('call_response : reponse sans signature: '.var_export($url,true),'paybox');
+			include_spip('inc/bank');
+			bank_transaction_invalide(0,
+				array(
+					'mode'=>"paybox",
+					'erreur' => "reponse sans signature",
+					'log' => var_export($url,true)
+				)
+			);
 			return false;
 		}
-		// on ne sait pas verifier la signature, on fait comme si elle etait OK (hum)
+		// on ne sait pas verifier la signature, on laisse passer mais on mail le webmestre
+		include_spip('inc/bank');
+		bank_transaction_invalide(0,
+			array(
+				'mode'=>"paybox",
+				'erreur' => "Impossible de verifier la signature, fonction openssl_pkey_get_public inconnue",
+				'log' => var_export($url,true),
+				'sujet' => 'Paiement non securise',
+			)
+		);
 	}
 
 	parse_str($url['query'],$response);
@@ -167,22 +189,16 @@ function paybox_traite_reponse_transaction($response,$mode = 'paybox') {
 	// $response['id_transaction'] Peut contenir /email ou IBSxx... en cas d'abo
 	$id_transaction = intval($response['id_transaction']);
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
-		spip_log($t = "call_response : id_transaction $id_transaction inconnu:".paybox_shell_args($response),$mode);
-		// on log ca dans un journal dedie
-		spip_log($t,$mode . "_douteux");
-		// on mail le webmestre
-		$envoyer_mail = charger_fonction('envoyer_mail','inc');
-		$envoyer_mail($GLOBALS['meta']['email_webmaster'],"[$mode]Transaction Frauduleuse",$t,"$mode@".$_SERVER['HTTP_HOST']);
-		$message = "Une erreur est survenue, les donn&eacute;es re&ccedil;ues de la banque ne sont pas conformes. ";
-		$message .= "Votre r&egrave;glement n'a pas &eacute;t&eacute; pris en compte (Ref : $id_transaction)";
-		$set = array(
-			"mode" => $mode,
-			"message"=>$message,
-			'statut'=>'echec'
+		include_spip('inc/bank');
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode'=>$mode,
+				'erreur' => "transaction inconnue",
+				'log' => paybox_shell_args($response)
+			)
 		);
-		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
-		return array($id_transaction,false);
 	}
+
 	// ok, on traite le reglement
 	$date=time();
 	$date_paiement = sql_format_date(

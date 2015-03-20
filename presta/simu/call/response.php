@@ -26,17 +26,32 @@ function presta_simu_call_response_dist(){
 	$transaction_hash = _request('hash');
 	include_spip('inc/autoriser');
 	if (!autoriser('utilisermodepaiement','simu')) {
-		spip_log('simu pas autorisee','simu');
-		return array($id_transaction,false);
+		include_spip('inc/bank');
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => "simu",
+				'erreur' => "simu pas autorisee",
+			)
+		);
 	}
 	
 	if (!$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction))){
-		spip_log("id_transaction $id_transaction non trouve",'simu');
-		return array($id_transaction,false);
+		include_spip('inc/bank');
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => "simu",
+				'erreur' => "transaction inconnue",
+			)
+		);
 	}
 	if ($transaction_hash!=$row['transaction_hash']){
-		spip_log("id_transaction $id_transaction, hash $transaction_hash non conforme",'simu');
-		return array($id_transaction,false);
+		include_spip('inc/bank');
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => "simu",
+				'erreur' => "hash $transaction_hash non conforme",
+			)
+		);
 	}
 
 	// est-ce une simulation d'echec ?

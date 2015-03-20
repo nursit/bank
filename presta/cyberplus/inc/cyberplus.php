@@ -102,32 +102,28 @@ function cyberplus_traite_reponse_transaction($response, $mode="cyberplus"){
 
 	$id_transaction = $response['vads_order_id'];
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
-		spip_log($t = "call_response : id_transaction $id_transaction inconnu:".bank_shell_args($response),$mode);
-		// on log ca dans un journal dedie
-		spip_log($t,$mode . "_douteux");
-		// on mail le webmestre
-		$envoyer_mail = charger_fonction('envoyer_mail','inc');
-		$envoyer_mail($GLOBALS['meta']['email_webmaster'],"[$mode]Transaction Frauduleuse",$t,"$mode@".$_SERVER['HTTP_HOST']);
-		$message = "Une erreur est survenue, les donn&eacute;es re&ccedil;ues de la banque ne sont pas conformes. ";
-		$message .= "Votre r&egrave;glement n'a pas &eacute;t&eacute; pris en compte (Ref : $id_transaction)";
-		$set = array(
-			"mode" => $mode,
-			"message" => $message,
-			'statut' => 'echec',
+		include_spip('inc/bank');
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "transaction inconnue",
+				'log' => bank_shell_args($response)
+			)
 		);
-		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
-		return array($id_transaction,false);
 	}
 
 	// est-ce bien un debit
 	if ($response['vads_operation_type']!=="DEBIT"){
-		spip_log($t = "call_response : vads_operation_type=".$response['vads_operation_type']." non pris en charge sur id_transaction $id_transaction :".bank_shell_args($response),$mode);
-		// on log ca dans un journal dedie
-		spip_log($t,$mode . "_operations");
-		// on mail le webmestre
-		$envoyer_mail = charger_fonction('envoyer_mail','inc');
-		$envoyer_mail($GLOBALS['meta']['email_webmaster'],"[$mode]Transaction non prise en charge",$t,"$mode@".$_SERVER['HTTP_HOST']);
-		return array($id_transaction,false);
+		include_spip('inc/bank');
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "vads_operation_type=".$response['vads_operation_type']." non prise en charge",
+				'log' => bank_shell_args($response),
+				'sujet' => "Operation invalide",
+				'update' => true,
+			)
+		);
 	}
 
 	// ok, on traite le reglement

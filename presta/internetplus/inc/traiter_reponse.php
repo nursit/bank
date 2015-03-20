@@ -19,12 +19,14 @@ function presta_internetplus_inc_traiter_reponse_dist($mode='wha'){
 	$mp = false;
 	
 	if (!$decode=wha_unsign($m)) {
-		spip_log($t = "wha_traiter_reponse : signature invalide : $m",$mode);
-		// on log ca dans un journal dedie
-		spip_log($t,'wha_douteux');
-		// on mail le webmestre
-		$envoyer_mail = charger_fonction('envoyer_mail','inc');
-		$envoyer_mail($GLOBALS['meta']['email_webmaster'],'[WHA]Transaction Frauduleuse',$t,"sips@".$_SERVER['HTTP_HOST']);
+		include_spip('inc/bank');
+		bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "signature invalide",
+				'log' => $m
+			)
+		);
 		return array($id_transaction,false,false);
 	}
 	list($unsign,$partnerId,$keyId) = $decode;
@@ -32,6 +34,7 @@ function presta_internetplus_inc_traiter_reponse_dist($mode='wha'){
 	$args = wha_extract_args($unsign);
 	
 	$mp = $args['v']['mp'];
+
 	#var_dump($args);
 	// recuperer le code de resultat
 	$c = isset($args['c'])?$args['c']:"";
@@ -56,21 +59,45 @@ function presta_internetplus_inc_traiter_reponse_dist($mode='wha'){
 				)
 			);
 		}
+		else {
+			include_spip('inc/bank');
+			bank_transaction_invalide($id_transaction,
+				array(
+					'mode' => $mode,
+					'erreur' => "id_transaction inconnu dans args[v] lors de l'annulation, traitement impossible",
+					'log' => $m
+				)
+			);
+		}
 		return array($id_transaction,false,$mp);		
 	}
 	
 	// Code inconnu : on ne fait rien ?
 	if (!preg_match(",^(OfferAuthorization|Authorize)Success$,i",$c)) {
-		spip_log($t = "wha_traiter_reponse : code reponse c inconnu, traitement impossible : $m",$mode);
+		include_spip('inc/bank');
+		bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "code reponse c inconnu, traitement impossible",
+				'log' => $m
+			)
+		);
 		return array($id_transaction,false,$mp);
 	}
-
-	// Numero de transaction inconnue : on ne fait rien
+	// Verifier le numero de transaction, dans mp
 	if (!isset($args['v'])
 	 OR !is_array($v=$args['v'])
 	 OR !isset($v['mp'])
 	 OR !is_array($mp = $v['mp'])){
-		spip_log($t = "wha_traiter_reponse : traitement impossible : $m",$mode);
+		include_spip('inc/bank');
+		bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "mp inconnu, traitement impossible",
+				'log' => $m
+			)
+		);
+
 		return array($id_transaction,false,$mp);
 	}
 

@@ -25,12 +25,24 @@
 function bank_paypalexpress_order_init($id_transaction, $url_confirm=null){
 
 	if (!$row = sql_fetsel('*', 'spip_transactions', 'id_transaction=' . intval($id_transaction))){
-		spip_log("Erreur transaction $id_transaction introuvable", 'paypalexpress' . _LOG_ERREUR);
+		include_spip('inc/bank');
+		bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => 'paypalexpress',
+				'erreur' => "transaction inconnue",
+			)
+		);
 		return false;
 	}
 
 	if ($row['reglee']=='oui'){
-		spip_log("Erreur transaction $id_transaction deja reglee", 'paypalexpress' . _LOG_ERREUR);
+		include_spip('inc/bank');
+		bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => 'paypalexpress',
+				'erreur' => "transaction $id_transaction deja reglee",
+			)
+		);
 		return false;
 	}
 
@@ -84,7 +96,15 @@ function bank_paypalexpress_order_init($id_transaction, $url_confirm=null){
 		return $payPalURL;
 	}
 	else {
-		spip_log("Erreur SetExpressCheckout ($id_transaction) :" . var_export($resArray, true), 'paypalexpress' . _LOG_ERREUR);
+		include_spip('inc/bank');
+		bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => 'paypalexpress',
+				'erreur' => "erreur lors de la demande du jeton",
+				'log' => var_export($resArray, true),
+				'where' => 'SetExpressCheckout'
+			)
+		);
 		return false;
 	}
 }
@@ -95,13 +115,25 @@ function bank_paypalexpress_checkoutpayment($payerid){
 	include_spip('inc/date');
 
 	if (!$id_transaction = $_SESSION['id_transaction']){
-		spip_log('Erreur id_transaction absent de la session', 'paypalexpress' . _LOG_ERREUR);
-		return array(0,false);
+		include_spip('inc/bank');
+		return bank_transaction_invalide(0,
+			array(
+				'mode' => "paypalexpress",
+				'erreur' => "id_transaction absent de la session",
+				'log' => var_export($_SESSION,true)
+			)
+		);
 	}
 
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=" . intval($id_transaction))){
-		spip_log("Erreur transaction $id_transaction introuvable", 'paypalexpress' . _LOG_ERREUR);
-		return array(0,false);
+		include_spip('inc/bank');
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => "paypalexpress",
+				'erreur' => "transaction inconnue",
+				'log' => var_export($_SESSION,true)
+			)
+		);
 	}
 
 	// hmm bizare, double hit ? On fait comme si c'etait OK
@@ -153,16 +185,18 @@ function bank_paypalexpress_checkoutpayment($payerid){
 	$ack = strtoupper($resArray["ACK"]);
 
 	if ($ack!="SUCCESS"){
-		spip_log("Erreur DoExpressCheckoutPayment ($id_transaction) :" . var_export($resArray, true), 'paypalexpress' . _LOG_ERREUR);
-
-		$message = "Erreur lors de la transaction avec Paypal. Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;.";
-		sql_updateq("spip_transactions",array(
-			"reglee"=>'non',
-			"statut"=>'echec',
-			"message"=>$message,
-			"date_paiement"=>$date_paiement),"id_transaction=".intval($id_transaction));
 		$_SESSION['reshash'] = $resArray;
-		return array($id_transaction,false);
+		include_spip('inc/bank');
+		return bank_transaction_echec($id_transaction,
+			array(
+				'mode'=>"paypalexpress",
+				"date_paiement" => $date_paiement,
+				'code_erreur' => '',
+				'erreur' => "Erreur lors de la transaction avec Paypal",
+				'log' => var_export($resArray, true),
+				'where' => 'DoExpressCheckoutPayment',
+			)
+		);
 	}
 
 	$authorisation_id = $resArray['TRANSACTIONID'];

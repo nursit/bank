@@ -234,28 +234,24 @@ function sips_traite_reponse_transaction($response,$mode = 'sips') {
 	$transaction_hash = $response['transaction_id'];
 	$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
 	if (!$row){
-		spip_log($t = "call_response : id_transaction $id_transaction inconnu:".sips_shell_args($response),$mode);
-		// on log ca dans un journal dedie
-		spip_log($t,$mode . "_douteux");
-		// on mail le webmestre
-		$envoyer_mail = charger_fonction('envoyer_mail','inc');
-		$envoyer_mail($GLOBALS['meta']['email_webmaster'],"[$mode]Transaction Frauduleuse",$t,"$mode@".$_SERVER['HTTP_HOST']);
-		$message = "Une erreur est survenue, les donn&eacute;es re&ccedil;ues de la banque ne sont pas conformes. ";
-		$message .= "Votre r&egrave;glement n'a pas &eacute;t&eacute; pris en compte (Ref : $id_transaction)";
-		#sql_updateq("spip_transactions",array("message"=>$message),"id_transaction=".intval($id_transaction));
-		return array($id_transaction,false);
+		include_spip('inc/bank');
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "transaction inconnue",
+				'log' => sips_shell_args($response)
+			)
+		);
 	}
 	if ($transaction_hash!=($row['transaction_hash']%999999)){
-		spip_log($t = "call_response : id_transaction $id_transaction, hash $transaction_hash invalide:".sips_shell_args($response),$mode);
-		// on log ca dans un journal dedie
-		spip_log($t,$mode . '_douteux');
-		// on mail le webmestre
-		$envoyer_mail = charger_fonction('envoyer_mail','inc');
-		$envoyer_mail($GLOBALS['meta']['email_webmaster'],"[$mode]Transaction Frauduleuse",$t,"$mode@".$_SERVER['HTTP_HOST']);
-		$message = "Une erreur est survenue, les donn&eacute;es re&ccedil;ues de la banque ne sont pas conformes. ";
-		$message .= "Votre r&egrave;glement n'a pas &eacute;t&eacute; pris en compte (Ref : $id_transaction)";
-		#sql_updateq("spip_transactions",array("message"=>$message),"id_transaction=".intval($id_transaction));
-		return array($id_transaction,false);
+		include_spip('inc/bank');
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode'=>$mode,
+				'erreur' => "hash $transaction_hash invalide",
+				'log' => sips_shell_args($response)
+			)
+		);
 	}
 	// ok, on traite le reglement
 	$date='payment';

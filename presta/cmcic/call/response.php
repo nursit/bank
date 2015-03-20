@@ -85,20 +85,32 @@ function cmcic_terminer_transaction() {
 
 	// pas vide ?
 	if (!$id_transaction OR !$transaction_hash) {
-		spip_log("call_response : Incohérence avec $id reçu de l'url", "cmcic");
-		return array(0, false);
+		include_spip('inc/bank');
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode'=>"cmcic",
+				'erreur' => "Id=$id mal forme dans l'URL",
+				'send_mail' => false,
+			)
+		);
 	}
 
 	// transaction existante ?
 	$row = sql_fetsel("id_transaction, reglee","spip_transactions",
 		"id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash));
 	if (!$row) {
-		spip_log("call_response : Erreur avec $id reçu de l'url : transaction introuvable", "cmcic");
-		return array(0, false);
+		include_spip('inc/bank');
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode'=>"cmcic",
+				'erreur' => "Erreur avec $id reçu de l'url : transaction introuvable",
+				'send_mail' => false,
+			)
+		);
 	}
 
 	// la transaction est là.
-	spip_log("call_response : $id reçu de l'url OK. Payée : $row[reglee].", "cmcic");
+	spip_log("call_response : $id reçu de l'url OK. Payée : ".$row['reglee'], "cmcic");
 	return array($id_transaction, $row['reglee'] == 'oui');
 
 }
@@ -142,18 +154,16 @@ function cmcic_traite_reponse_transaction($response, $mode = "cmcic") {
 		"id_transaction=".intval($id_transaction),
 		'transaction_hash='.sql_quote($contenu['hash']))))
 	{
-		spip_log($t = "call_response : id_transaction $id_transaction / $transaction_hash inconnu:", $mode);
-		// on log ca dans un journal dedie
-		spip_log($t, $mode . "_douteux");
-		// on mail le webmestre
-		$envoyer_mail = charger_fonction('envoyer_mail','inc');
-		$envoyer_mail($GLOBALS['meta']['email_webmaster'],"[$mode]Transaction Frauduleuse",$t,"$mode@".$_SERVER['HTTP_HOST']);
-		#$message = "Une erreur est survenue, les donn&eacute;es re&ccedil;ues de la banque ne sont pas conformes. ";
-		#$message .= "Votre r&egrave;glement n'a pas &eacute;t&eacute; pris en compte (Ref : $id_transaction)";
-		#sql_updateq("spip_transactions",array("message"=>$message,'statut'=>'echec'),"id_transaction=".intval($id_transaction));
-		#return array($id_transaction,false);
+		include_spip('inc/bank');
+		$res = bank_transaction_invalide($id_transaction,
+			array(
+				'mode'=>$mode,
+				'erreur' => "$id_transaction / $transaction_hash inconnu",
+				'log' => var_export($response,true)
+			)
+		);
 		cmcic_notifier_banque_erreur();
-		return array(0, false);
+		return $res;
 	}
 
 	// ici on a tout bon !
