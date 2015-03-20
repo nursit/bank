@@ -43,8 +43,13 @@ function presta_simu_call_response_dist(){
 	if (_request('status')=='fail'){
 	 	// sinon enregistrer l'absence de paiement et l'erreur
 		include_spip('inc/bank');
-		bank_echec_transaction($id_transaction,"simu",date('Y-m-d H:i:s'),'simu','Simulation du paiement echou&eacute;');
-		return array($id_transaction,false);
+		return bank_echec_transaction($id_transaction,
+			array(
+				'mode'=>"simu",
+				'code_erreur' => "simu",
+				'erreur' => 'Simulation echec paiement',
+			)
+		);
 	}
 
 	// Ouf, le reglement a ete accepte

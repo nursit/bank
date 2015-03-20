@@ -115,8 +115,14 @@ function bank_paypalexpress_checkoutpayment($payerid){
 		$trace = "Payerid:$payerid\n".var_export($_SESSION,true);
 	 	// sinon enregistrer l'absence de paiement et l'erreur
 		include_spip('inc/bank');
-		bank_echec_transaction($id_transaction,"paypalexpress",date('Y-m-d H:i:s'),"","Annulee",$trace);
-		return array($id_transaction,false);
+		return bank_echec_transaction($id_transaction,
+			array(
+				'mode'=>"paypalexpress",
+				'code_erreur' => '',
+				'erreur' => "Annulation",
+				'log' => $trace,
+			)
+		);
 	}
 
 

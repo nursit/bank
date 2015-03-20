@@ -317,8 +317,15 @@ function cmcic_gerer_transaction_annulee($id_transaction, $response, $row, $erre
 	if ($row['reglee']!='oui') {
 		$date_paiement = date('Y-m-d H:i:s');
 		include_spip('inc/bank');
-		bank_echec_transaction($id_transaction,$mode,$date_paiement,$response['motifrefus'],$erreur===true?"":$erreur,bank_shell_args($response));
-		return array($id_transaction, false);
+		return bank_echec_transaction($id_transaction,
+			array(
+				'mode'=>$mode,
+				'date_paiement' => $date_paiement,
+				'code_erreur' => $response['motifrefus'],
+				'erreur' => $erreur===true?"":$erreur,
+				'log' => bank_shell_args($response)
+			)
+		);
 	}
 
 	return array($id_transaction, true);

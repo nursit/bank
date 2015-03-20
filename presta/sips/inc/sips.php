@@ -282,9 +282,16 @@ function sips_traite_reponse_transaction($response,$mode = 'sips') {
 
 	 	// sinon enregistrer l'absence de paiement et l'erreur
 		include_spip('inc/bank');
-		bank_echec_transaction($id_transaction,$mode,$date_paiement,$response['response_code'].":".$response['bank_response_code'],trim($response_code." ".$bank_response_code),sips_shell_args($response),$response['response_code']=='03');
-
-		return array($id_transaction,false);
+		return bank_echec_transaction($id_transaction,
+			array(
+				'mode'=>$mode,
+				'date_paiement' => $date_paiement,
+				'code_erreur' => $response['response_code'].":".$response['bank_response_code'],
+				'erreur' => trim($response_code." ".$bank_response_code),
+				'log' => sips_shell_args($response),
+				'send_mail' => $response['response_code']=='03',
+			)
+		);
 	}
 
 	// Ouf, le reglement a ete accepte
@@ -297,7 +304,7 @@ function sips_traite_reponse_transaction($response,$mode = 'sips') {
 		spip_log($t,$mode . '_reglements_partiels');
 	}
 
-	// mais sinon on not regle quand meme,
+	// mais sinon on note regle quand meme,
 	// pour ne pas creer des problemes hasardeux
 	// (il y a des fois une erreur d'un centime)
 	$authorisation_id = $response['authorisation_id'];

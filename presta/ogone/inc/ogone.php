@@ -197,8 +197,15 @@ function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
 	 	if ($row['reglee']=='oui') return array($id_transaction,true);
 
 		include_spip('inc/bank');
-		bank_echec_transaction($id_transaction,$mode,$date_paiement,$response['STATUS'].':'.$response['NCERROR'],$erreur,var_export($response,true));
-		return array($id_transaction,false);
+		return bank_echec_transaction($id_transaction,
+			array(
+				'mode'=>$mode,
+				'date_paiement' => $date_paiement,
+				'code_erreur' => $response['STATUS'].':'.$response['NCERROR'],
+				'erreur' => $erreur,
+				'log' => var_export($response,true),
+			)
+		);
 	}
 
 	// Ouf, le reglement a ete accepte

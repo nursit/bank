@@ -158,8 +158,16 @@ function cyberplus_traite_reponse_transaction($response, $mode="cyberplus"){
 	 	if ($row['reglee']=='oui') return array($id_transaction,true);
 	 	// sinon enregistrer l'absence de paiement et l'erreur
 		include_spip('inc/bank');
-		bank_echec_transaction($id_transaction,$mode,$date_paiement,$response['vads_result'],$erreur,bank_shell_args($response),intval($response['vads_result'])==2);
-		return array($id_transaction,false);
+		return bank_echec_transaction($id_transaction,
+			array(
+				'mode'=>$mode,
+				'date_paiement' => $date_paiement,
+				'code_erreur' => $response['vads_result'],
+				'erreur' => $erreur,
+				'log' => bank_shell_args($response),
+				'send_mail' => intval($response['vads_result'])==2,
+			)
+		);
 	}
 
 	// Ouf, le reglement a ete accepte
