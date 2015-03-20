@@ -55,11 +55,16 @@ function bank_transaction_invalide($id_transaction="",$args=array()){
 			"mode" => $args['mode'],
 			"statut" => 'echec[invalide]',
 			"date_paiement" => date('Y-m-d H:i:s'),
-			// TODO : stocker l'erreur en base pour l'admin
-			//"erreur" => $erreur,
+			"erreur" => $args['erreur'],
 			"message" => $message,
 		);
+		// verifier que le champ erreur existe pour ne pas risquer de planter l'enregistrement si l'up de base n'a pas encore ete fait
+		if($row=sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))
+		  AND !isset($row['erreur'])){
+			unset($set['erreur']);
+		}
 		sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
+
 		return array(intval($id_transaction),false);
 	}
 
@@ -100,10 +105,14 @@ function bank_transaction_echec($id_transaction,$args=array()){
 		"mode" => $args['mode'],
 		"statut" => 'echec'.($args['code_erreur']?'['.$args['code_erreur'].']':''),
 		"date_paiement" => $args['date_paiement'],
-		// TODO : stocker l'erreur en base pour l'admin
-		//"erreur" => $erreur,
+		"erreur" => $args['erreur'],
 		"message" => "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute;. (Transaction Ref. #$id_transaction)",
 	);
+	// verifier que le champ erreur existe pour ne pas risquer de planter l'enregistrement si l'up de base n'a pas encore ete fait
+	if($row=sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))
+	  AND !isset($row['erreur'])){
+		unset($set['erreur']);
+	}
 
 	sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
 

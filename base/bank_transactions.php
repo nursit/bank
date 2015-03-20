@@ -45,6 +45,7 @@ function bank_declarer_tables_principales($tables_principales){
 		"reglee" => "varchar(3) NOT NULL DEFAULT 'non'", // oui/non (non si reglement incomplet/partiel)
 		"finie" => "tinyint(1) NOT NULL DEFAULT 0",
 
+		"erreur" => "tinytext NOT NULL DEFAULT ''", // erreur en clair, pour l'admin
 		"message" => "TEXT NOT NULL DEFAULT ''", // message de retour a afficher
 
 		"parrain" => "varchar(255) NOT NULL DEFAULT ''", // sponsor de la transaction (apporteur affilie, url site source..)
