@@ -14,10 +14,8 @@
 
 	<auteur lien="http://nursit.com">Nursit.com</auteur>
 
-	<pipeline nom="declarer_tables_interfaces" inclure="base/bank_transactions.php" />
-	<pipeline nom="declarer_tables_principales" inclure="base/bank_transactions.php" />
-	<pipeline nom="declarer_tables_objets_sql" inclure="base/bank_transactions.php" />
-	<pipeline nom="rechercher_liste_des_champs" inclure="base/bank_transactions.php" />
+	<pipeline nom="declarer_tables_interfaces" inclure="base/bank.php" />
+	<pipeline nom="declarer_tables_objets_sql" inclure="base/bank.php" />
 	<pipeline nom="affiche_auteurs_interventions" inclure="bank_fonctions.php" />
 	<pipeline nom="taches_generales_cron" inclure="bank_fonctions.php" />
 
