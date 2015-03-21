@@ -55,14 +55,18 @@ function bank_regler_transaction_dist($id_transaction,$options = array()){
 
 	// ne pas jouer 2 fois le traitement du reglement !
 	if (!$row_prec OR
-		(($row_prec['reglee']=='oui') AND $row_prec['finie']))
+		(($row_prec['reglee']=='oui') AND intval($row_prec['finie'])!=0))
 		return;
 
 	// verification du flag 'finie' pour ne pas jouer 2 fois
-	if (sql_getfetsel('finie','spip_transactions',"id_transaction=".intval($id_transaction)))
+	if (sql_getfetsel('finie','spip_transactions',"id_transaction=".intval($id_transaction))!=0)
 		return;
-	// et on le pose aussitot
-	sql_updateq('spip_transactions',array('finie'=>1),"id_transaction=".intval($id_transaction));
+
+	// et on le pose aussitot ainsi qu'une 1ere version du message
+	// ne pas avoir un message vide ou d'erreur en cas de concurrence cf https://github.com/nursit/bank/issues/14
+	// TODO : passer le flag a -1 ici (indique traitement en cours), puis a 1 quand on a vraiment fini
+	// et un while(finie==-1) sleep(1); pour faire patienter en cas de concurrence
+	sql_updateq('spip_transactions',array('finie'=>1,'message'=>$message),"id_transaction=".intval($id_transaction));
 
 
 	$notifier = ($notifier AND $row_prec['reglee']!='oui');
@@ -94,6 +98,9 @@ function bank_regler_transaction_dist($id_transaction,$options = array()){
 	);
 
 	sql_updateq("spip_transactions",array('message'=>$message,'finie'=>1),"id_transaction=".intval($id_transaction));
+	// on vide aussi l'erreur (cas d'un double hit IPN echec puis succes cf https://github.com/nursit/bank/issues/14)
+	// dans une requete separee au cas ou la maj de base n'a pas encore ete faite
+	sql_updateq("spip_transactions",array('erreur'=>''),"id_transaction=".intval($id_transaction));
 
 	// notifier aux admins avec un ticket caisse
 	if ($notifier) {
