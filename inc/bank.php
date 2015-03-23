@@ -123,3 +123,27 @@ function bank_transaction_echec($id_transaction,$args=array()){
 	}
 	return array($id_transaction,false);
 }
+
+function bank_response_simple($mode){
+	$vars = array('id_transaction','transaction_hash','autorisation_id');
+	$response = array();
+	foreach($vars as $k) {
+		if (!is_null($v = _request($k)))
+		$response[$k] = $v;
+	}
+
+	if (!$s = _request('sign')
+		OR $s !== bank_sign_response_simple($mode,$response)){
+		spip_log("bank_response_simple : signature invalide","bank"._LOG_ERREUR);
+		return false;
+	}
+	return $response;
+}
+
+function bank_sign_response_simple($mode,$response = array()){
+	ksort($response);
+	$s = serialize($response);
+	include_spip("inc/securiser_action");
+	$sign = calculer_cle_action("bank-$mode-$s");
+	return $sign;
+}
