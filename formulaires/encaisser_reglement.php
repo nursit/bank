@@ -54,16 +54,26 @@ function formulaires_encaisser_reglement_verifier_dist($id_transaction, $mode){
 function formulaires_encaisser_reglement_traiter_dist($id_transaction, $mode){
 
 	$hash = sql_getfetsel("transaction_hash","spip_transactions","id_transaction=".intval($id_transaction));
-	set_request("bankp",$mode);
-	set_request("id_transaction",$id_transaction);
-	set_request("hash",$hash);
 	$autorisation_id = autorisation_suffixe();
 	if (strlen($autorisation_id)<55){
 		$autorisation_id = _request('autorisation_id')."|".$autorisation_id;
 	}
-	set_request('autorisation_id',$autorisation_id);
-	$bank_response = charger_fonction("bank_response","action");
 
+	include_spip('inc/bank');
+	$response = array(
+		'id_transaction' => $id_transaction,
+		'transaction_hash' => $hash,
+		'autorisation_id' => $autorisation_id,
+	);
+	$sign = bank_sign_response_simple($mode,$response);
+	foreach($response as $k=>$v){
+		set_request($k,$v);
+	}
+	set_request("sign",$sign);
+	set_request("bankp",$mode);
+
+	// on charge l'action et on l'appelle pour passer par tout le processus de paiement standard
+	$bank_response = charger_fonction("bank_response","action");
 	return array('message_ok'=>$bank_response());
 }
 
