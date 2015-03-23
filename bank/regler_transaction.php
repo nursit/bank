@@ -53,20 +53,29 @@ function bank_regler_transaction_dist($id_transaction,$options = array()){
 	if (!test_espace_prive())
 		$_SESSION['id_transaction_achevee'] = $id_transaction;
 
-	// ne pas jouer 2 fois le traitement du reglement !
+	// si le reglement est fini, ressortir tout de suite
 	if (!$row_prec OR
-		(($row_prec['reglee']=='oui') AND intval($row_prec['finie'])!=0))
+		(($row_prec['reglee']=='oui') AND intval($row_prec['finie'])==1))
 		return;
 
-	// verification du flag 'finie' pour ne pas jouer 2 fois
-	if (sql_getfetsel('finie','spip_transactions',"id_transaction=".intval($id_transaction))!=0)
+
+	// verification du flag 'finie' en base et pour ne pas jouer 2 fois
+	// faire une pause si on est en cours de processing dans un processus concurrent, maximum 10s (c'est deja bien long)
+	// https://github.com/nursit/bank/issues/14
+	$maxiter = 10;
+	while(!in_array($finie = intval(sql_getfetsel('finie','spip_transactions',"id_transaction=".intval($id_transaction))),array(0,1))
+	  AND $maxiter-->0){
+		sleep(1);
+	}
+	// si $finie n'est pas nulle on ressort
+	// et tant pis si on est encore en processing ($finie=-1)
+	if ($finie!=0)
 		return;
 
 	// et on le pose aussitot ainsi qu'une 1ere version du message
 	// ne pas avoir un message vide ou d'erreur en cas de concurrence cf https://github.com/nursit/bank/issues/14
-	// TODO : passer le flag a -1 ici (indique traitement en cours), puis a 1 quand on a vraiment fini
-	// et un while(finie==-1) sleep(1); pour faire patienter en cas de concurrence
-	sql_updateq('spip_transactions',array('finie'=>1,'message'=>$message),"id_transaction=".intval($id_transaction));
+	// passer le flag a -1 ici (indique traitement en cours), puis a 1 quand on a vraiment fini
+	sql_updateq('spip_transactions',array('finie'=>-1,'message'=>$message),"id_transaction=".intval($id_transaction));
 
 
 	$notifier = ($notifier AND $row_prec['reglee']!='oui');
