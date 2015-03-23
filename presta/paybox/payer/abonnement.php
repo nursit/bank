@@ -13,13 +13,13 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function presta_paybox_payer_abonnement_dist($id_transaction, $transaction_hash, $titre=''){
 
+	$config = paybox_pbx_ids("abo");
 	$call_request = charger_fonction('request','presta/paybox/call');
-	$contexte = $call_request($id_transaction,$transaction_hash,'abo');
+	$contexte = $call_request($id_transaction,$transaction_hash,$config);
 	$contexte['title'] = $titre;
 
-	$contexte['sandbox'] = (_PAYBOX_SANDBOX?' ':'');
+	$contexte['sandbox'] = (strpos(paybox_url_host($config),"preprod")!==false?' ':'');
 
 	return recuperer_fond('presta/paybox/payer/abonnement',$contexte);
 }
 
-?>

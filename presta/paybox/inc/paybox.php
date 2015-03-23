@@ -17,15 +17,70 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @return array
  */
 function paybox_pbx_ids($boutique=''){
-	$boutique = $boutique ? "_".$boutique:"";
-	$config = 'config'.$boutique.'_paybox';
+	$config = (($boutique AND $boutique!=="acte") ? $boutique."_":"").'paybox';
 
 	include_spip('inc/config');
-	$v = lire_config("bank_paiement/$config");
+	$v = lire_config("bank_paiement/config_$config");
 	if (isset($v['pubkey']))
 		unset($v['pubkey']);
+	$v['config'] = $config;
+	$v['type'] = ($boutique=='abo'?'abo':'acte');
+
 	return $v;
 }
+
+/**
+ * Determiner le host pour les appels Paybox : sandbox, host principal ou host fallback
+ * @param $config
+ * @return string
+ */
+function paybox_url_host($config){
+	// mode sandbox ? possibilite de le forcer par define
+	if ( (defined('_PAYBOX_SANDBOX') AND _PAYBOX_SANDBOX)
+	  OR (isset($config['mode_test']) AND $config['mode_test'])) {
+
+		return "https://preprod-tpeweb.paybox.com/";
+	}
+
+	$host = "https://tpeweb.paybox.com/";
+
+	// TODO : tester la dispo de https://tpeweb.paybox.com/load.html avec timeout faible
+	// cf https://github.com/nursit/bank/issues/7
+	// else $host = "https://tpeweb1.paybox.com/";
+
+	return $host;
+
+}
+
+
+/**
+ * URL d'appel pour le paiement en fonction de la config
+ * @param $config
+ * @return string
+ */
+function paybox_url_paiment($config){
+	return paybox_url_host($config)."cgi/MYchoix_pagepaiement.cgi";
+}
+
+/**
+ * URL d'appel pour la resiliation en fonction de la config
+ * @param $config
+ * @return string
+ */
+function paybox_url_resil($config){
+	return paybox_url_host($config)."cgi-bin/ResAbon.cgi";
+}
+
+/**
+ * URL d'appel pour le paiement directplus
+ * @param $config
+ * @return string
+ */
+function paybox_url_directplus($config){
+	// pas de sandbox ni de host de repli ?
+	return "https://ppps.paybox.com/PPPS.php";
+}
+
 
 function paybox_shell_args($params){
 	return bank_shell_args($params);

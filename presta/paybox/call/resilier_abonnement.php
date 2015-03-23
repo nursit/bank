@@ -22,17 +22,17 @@ include_spip('presta/paybox/inc/paybox');
  */
 function presta_paybox_call_resilier_abonnement_dist($uid){
 
-	$parm = paybox_pbx_ids('abo');
+	$config = paybox_pbx_ids('abo');
 	
 	$args = 
 	  "VERSION=001"
 	. "&TYPE=001"
-	. "&SITE=" . str_pad($parm['PBX_SITE'],7,"0",STR_PAD_LEFT)
-	. "&MACH=" . str_pad($parm['PBX_RANG'],3,"0",STR_PAD_LEFT)
-	. "&IDENTIFIANT=" . $parm['PBX_IDENTIFIANT']
+	. "&SITE=" . str_pad($config['PBX_SITE'],7,"0",STR_PAD_LEFT)
+	. "&MACH=" . str_pad($config['PBX_RANG'],3,"0",STR_PAD_LEFT)
+	. "&IDENTIFIANT=" . $config['PBX_IDENTIFIANT']
 	. "&ABONNEMENT=" . $uid;
 	
-	$url = _PAYBOX_URL_RESIL . "?" . $args;
+	$url = paybox_url_resil($config) . "?" . $args;
 	
 	include_spip('inc/distant');
 	$reponse = recuperer_page($url);

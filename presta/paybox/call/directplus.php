@@ -53,10 +53,10 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 		$montant = str_pad($montant,10,'0',STR_PAD_LEFT);
 
 	//		Affectation des parametres obligatoires
-	$p = paybox_pbx_ids('abo');
-	$parm = array('VERSION'=>'00104','SITE'=>$p['PBX_SITE'],'RANG'=>$p['PBX_RANG'],'IDENTIFIANT'=>'');
+	$config = paybox_pbx_ids('abo');
+	$parm = array('VERSION'=>'00104','SITE'=>$config['PBX_SITE'],'RANG'=>$config['PBX_RANG'],'IDENTIFIANT'=>'');
 
-	$parm['CLE'] = $p['DIRECT_PLUS_CLE'];
+	$parm['CLE'] = $config['DIRECT_PLUS_CLE'];
 	$parm['DATEQ'] = date('dmYHis');
 	$parm['TYPE'] = _PAYBOX_DIRECTPLUS_AUTHDEBIT_ABONNE;
 	$parm['DEVISE'] = "978";
@@ -91,8 +91,9 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 		#var_dump($parm);
 
 		// requete en POST sur PAYBOX DIRECT PLUS
-		#spip_log("Appel de "._PAYBOX_DIRECT_URL." avec ".var_export($parm,true),'dbdp');
-		$res = recuperer_page(_PAYBOX_DIRECT_URL,false,false,1048576,$parm);
+		$url = paybox_url_directplus($config);
+		#spip_log("Appel de $url avec ".var_export($parm,true),'dbdp');
+		$res = recuperer_page($url,false,false,1048576,$parm);
 		parse_str($res,$r);
 
 		if ($r['CODEREPONSE']=='00005'){
