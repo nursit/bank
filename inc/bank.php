@@ -48,7 +48,7 @@ function bank_config($mode,$abo=false){
 		}
 	}
 
-	if (!$config){
+	if (!$config AND $mode!=="gratuit"){
 		spip_log("Configuration $mode introuvable","bank"._LOG_ERREUR);
 		$config = array('erreur'=>'inconnu');
 	}
@@ -196,9 +196,6 @@ function bank_sign_response_simple($mode,$response = array()){
 	$s = serialize($response);
 	include_spip("inc/securiser_action");
 	$sign = calculer_cle_action("bank-$mode-$s");
-
-	var_dump($response);
-	var_dump($sign);
 
 	return $sign;
 }
