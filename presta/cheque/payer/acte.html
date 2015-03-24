@@ -14,7 +14,7 @@
 <div class="payer_mode payer_cheque payer_acte">
 	<p class="titre h4"><:bank:payer_par_cheque:></p>
 	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive}|non)
-		#SET{ordre,#CONFIG{bank_paiement/config_cheque/ordre,#NOM_SITE_SPIP}|wrap{'<b>'}}
+		#SET{ordre,#ENV{config/ordre,#NOM_SITE_SPIP}|wrap{'<b>'}}
 		#SET{montant,#MONTANT|affiche_monnaie|wrap{'<b>'}}
 		#SET{transaction,#ID_TRANSACTION|wrap{'<b>'}}
 		<:bank:info_cheque_imprimer{montant=#GET{montant},transaction=#GET{transaction},ordre=#GET{ordre}}|propre:>
@@ -22,18 +22,15 @@
 		[(#ENV{attente_mode,''}|=={cheque}|oui)
 			<div class="success">
 				<p><:bank:info_mode_reglement_enregistre:></p>
-                <p>
-                    <:bank:info_cheque_envoyer{montant=#GET{montant},transaction=#GET{transaction},ordre=#GET{ordre}}|propre:>
-                </p>
-                <p>
-                    <:bank:info_cheque_envoyer_adresse:></p>
+				<p><:bank:info_cheque_envoyer{montant=#GET{montant},transaction=#GET{transaction},ordre=#GET{ordre}}|propre:></p>
+				<p><:bank:info_cheque_envoyer_adresse:></p>
 				<p>
-					[<strong>(#CONFIG{bank_paiement/config_cheque/adresse}|propre|PtoBR|sinon{
+					[<strong>(#ENV{config/adresse}|propre|PtoBR|sinon{
 					#NOM_SITE_SPIP<br />
 					????<br />
 					????})</strong>]
 				</p>
-				[<p class="small">(#CONFIG{bank_paiement/config_cheque/notice,''}|propre|PtoBR)</p>]
+				[<p class="small">(#ENV{config/notice,''}|propre|PtoBR)</p>]
 			</div>
 		]
 		[(#ENV{attente_mode,''}|=={cheque}|non)
