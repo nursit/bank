@@ -25,8 +25,13 @@ function wha_check_offer_dist($id_abonnement){
 		spip_log("wha_check_offer :Erreur : abonnement $id_abonnement n'a pas d'url node enregistree",'wha_abo_check');
 		return false;
 	}
-	
-	$url_check = wha_url_check_abo($uoid,'love',$confirm['partner'],$confirm['key'],$confirm['node']);
+
+	$config = array(
+		'MERCHANT_ID' => $confirm['partner'],
+		'KEY_ID' => $confirm['key'],
+		'node' => $confirm['node'],
+	);
+	$url_check = wha_url_check_abo($uoid,'love',$config);
 	
 	include_spip('inc/distant');
 	$ack = @recuperer_page($url_check);

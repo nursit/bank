@@ -64,7 +64,12 @@ function presta_internetplus_inc_traiter_reponse_wha_dist($m,$args,$partnerId,$k
 	
 		// declencher l'url de confirmation de reglement
 		$node_response = $v['rt'];
-		$url = wha_url_confirm($authorisation_id,$row['montant'],$partnerId,$keyId,$node_response);
+		$config = array(
+			'MERCHANT_ID' => $partnerId,
+			'KEY_ID' => $keyId,
+			'node' => $node_response,
+		);
+		$url = wha_url_confirm($authorisation_id,$row['montant'],$config);
 		include_spip('inc/distant');
 		$ack = @recuperer_page($url);
 		if (!$ack

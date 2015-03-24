@@ -15,22 +15,24 @@ include_spip('presta/internetplus/inc/wha_services');
 
 function presta_internetplus_payer_acte_dist($id_transaction,$transaction_hash){
 
-	// veriffier que le montant est < 30EUR
+	include_spip('inc/bank');
+	$config = bank_config("internetplus");
+
+	// verifier que le montant est < 30EUR
 	$montant = sql_getfetsel("montant","spip_transactions","id_transaction=".intval($id_transaction));
 	if ($montant>=30){
 		spip_log("Payer acte transaction #$id_transaction : montant non pris en charge " . $montant,"internetplus"._LOG_INFO_IMPORTANTE);
 		return "";
 	}
 
-
-	$url_payer = wha_url_transaction($id_transaction,$transaction_hash,_WHA_MERCHANT_ID,_WHA_KEY_ID);
+	$url_payer = wha_url_transaction($id_transaction,$transaction_hash,$config);
 	return recuperer_fond('presta/internetplus/payer/acte',
 		array(
 			'id_transaction' => $id_transaction,
 			'transaction_hash' => $transaction_hash,
 			'url_payer' => $url_payer,
 			'logo' => wha_logo_detecte_fai_visiteur(),
-			'sandbox' => defined('_INTERNETPLUS_SANDBOX')?' ':'',
+			'sandbox' => wha_is_sandbox($config),
 		)
 	);
 }

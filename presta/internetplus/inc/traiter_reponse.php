@@ -29,6 +29,7 @@ function presta_internetplus_inc_traiter_reponse_dist($mode='wha'){
 		);
 		return array($id_transaction,false,false);
 	}
+
 	list($unsign,$partnerId,$keyId) = $decode;
 	#var_dump($unsign);
 	$args = wha_extract_args($unsign);

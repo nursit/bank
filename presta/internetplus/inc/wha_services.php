@@ -11,6 +11,53 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+
+/**
+ * Determiner le mode test en fonction d'un define ou de la config
+ * @param array $config
+ * @return bool
+ */
+function wha_is_sandbox($config){
+	$test = false;
+	// _INTERNETPLUS_SANDBOX force a TRUE pour utiliser le mode sandbox
+	if ( (defined('_INTERNETPLUS_SANDBOX') AND _INTERNETPLUS_SANDBOX)
+	  OR (isset($config['mode_test']) AND $config['mode_test']) ){
+		$test = true;
+	}
+	return $test;
+}
+
+/**
+ * Determiner l'URL d'appel serveur en fonction de la config
+ *
+ * @param array $config
+ * @return string
+ */
+function wha_node_url($config){
+
+	// si cette config dispose d'un node specifique, on l'utilise
+	if (isset($config['node']) AND $config['node']) {
+		return $config['node'];
+	}
+
+	$url = "";
+	if (wha_is_sandbox($config)){
+		$url = "https://qualif-marchand.w-ha.com";
+	}
+	else {
+		$url = "https://route.w-ha.com";
+	}
+
+	if ($config['type']=='abo'){
+		$url .= "/app-bundlepurchase";
+	}
+	else {
+		$url .= "/app-authorization";
+	}
+	return $url."/node";
+}
+
+
 function wha_secret_key($partnerId,$keyId){
 	if (defined($s = '_WHA_SECRET_'.intval($partnerId)) AND constant($s))
 		return constant($s);
@@ -181,9 +228,9 @@ function wha_abo_desc($aboId,$infos_marchant=array()){
 }
 
 // $action = AuthorizeReq ou Confirm
-function wha_action_url($action,$achat_desc,$partnerId,$keyId,$node=false,$versionId=2) {
-	$url = $node?$node:_WHA_NODE_URL;
-	$signed = wha_message($action,$achat_desc,$partnerId,$keyId,$versionId);
+function wha_action_url($action,$achat_desc,$config,$versionId=2) {
+	$url = wha_node_url($config);
+	$signed = wha_message($action,$achat_desc,$config['MERCHANT_ID'],$config['KEY_ID'],$versionId);
 	return $url.((strpos($url,'?')===FALSE)?'?':'&').'m='.urlencode($signed);
 }
 
@@ -196,23 +243,22 @@ function wha_message($action,$desc,$partnerId,$keyId,$versionId=2){
 	return $signed;
 }
 
-function wha_url_transaction($id_transaction,$transaction_hash,$partnerId,$keyId,$args = array(),$node=false){
+function wha_url_transaction($id_transaction,$transaction_hash,$config,$args = array()){
 	$res = sql_select("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash));
 	if (!$row = spip_fetch_array($res))
 		return "";
 	if ($row['reglee']=='oui')
 		return "";
 	$achat_desc = wha_achat_desc($id_transaction,"Votre commande No $id_transaction",$row['montant'],$args);
-	return parametre_url(wha_action_url("AuthorizeReq",$achat_desc,$partnerId,$keyId,$node),'lg','fr','&');
+	return parametre_url(wha_action_url("AuthorizeReq",$achat_desc,$config),'lg','fr','&');
 }
 
-function wha_url_abonnement($aboId,$id_transaction,$partnerId,$keyId,$args = array(),$node=false){
+function wha_url_abonnement($aboId,$id_transaction,$config,$args = array()){
 	$abo_desc = wha_abo_desc($aboId,array_merge($args,array('_ap_id_transaction'=>$id_transaction)));
-	$node = $node ? $node : _WHA_NODE_ABO_URL; // le node pour l'abo est different du node pour l'acte
-	return parametre_url(wha_action_url("OfferAuthorizeReq",$abo_desc,$partnerId,$keyId,$node,3),'lg','fr','&');
+	return parametre_url(wha_action_url("OfferAuthorizeReq",$abo_desc,$config,3),'lg','fr','&');
 }
 
-function wha_url_confirm($trxId,$montant,$partnerId,$keyId,$node=false){
+function wha_url_confirm($trxId,$montant,$config){
 	# $montant=0.01; // debug
 	$url = wha_action_url("Confirm",array(
 	's_rate'=>0,
@@ -223,25 +269,25 @@ function wha_url_confirm($trxId,$montant,$partnerId,$keyId,$node=false){
 	'v_rate'=>0,
 	's_amt'=>0,
 	'cur'=>'EUR'
-	),$partnerId,$keyId,$node);
+	),$config);
 	return $url;
 }
 
-function wha_url_confirm_abo($uoid,$partnerId,$keyId,$node=false){
+function wha_url_confirm_abo($uoid,$config){
 	$url = wha_action_url("m_offerConfirm",array(
 	'uoid'=>$uoid
-	),$partnerId,$keyId,$node,3);
+	),$config,3);
 	return $url;
 }
 
 
-function wha_url_check_abo($uoid,$pid,$partnerId,$keyId,$node=false){
+function wha_url_check_abo($uoid,$pid,$config){
 	$url = wha_action_url("m_consume",array(
 	'pc'=>'pca',
 	'uoid'=>$uoid,
 	'pi'=>$pid,
 	'desc'=>'desc',
-	),$partnerId,$keyId,$node,3);
+	),$config,3);
 	return $url;
 }
 

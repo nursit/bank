@@ -15,6 +15,9 @@ include_spip('presta/internetplus/inc/wha_services');
 
 function presta_internetplus_payer_abonnement_dist($id_transaction,$transaction_hash){
 
+	include_spip('inc/bank');
+	$config = bank_config("internetplus",true);
+
 	// on decrit l'echeance
 	if ($decrire_echeance = charger_fonction("decrire_echeance","abos",true)
 	  AND $echeance = $decrire_echeance($id_transaction)){
@@ -36,7 +39,7 @@ function presta_internetplus_payer_abonnement_dist($id_transaction,$transaction_
 		return false;
 	}
 
-	$url_payer = wha_url_abonnement($echeance['wha_oid'],$id_transaction,_WHA_ABO_MERCHANT_ID,_WHA_ABO_KEY_ID);
+	$url_payer = wha_url_abonnement($echeance['wha_oid'],$id_transaction,$config);
 
 	return recuperer_fond('presta/internetplus/payer/abonnement',
 		array(
@@ -44,7 +47,7 @@ function presta_internetplus_payer_abonnement_dist($id_transaction,$transaction_
 			'transaction_hash' => $transaction_hash,
 			'url_payer' => $url_payer,
 			'logo' => wha_logo_detecte_fai_visiteur(),
-			'sandbox' => defined('_INTERNETPLUS_SANDBOX')?' ':'',
+			'sandbox' => wha_is_sandbox($config),
 		)
 	);
 }

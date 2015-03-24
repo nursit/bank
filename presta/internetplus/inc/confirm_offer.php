@@ -15,7 +15,12 @@ include_spip('presta/internetplus/inc/wha_services');
 function presta_internetplus_inc_confirm_offer_dist($id_transaction,$uoid, $confirm){
 
 
-	$url_confirm = wha_url_confirm_abo($uoid,$confirm['partner'],$confirm['key'],$confirm['node']);
+	$config = array(
+		'MERCHANT_ID' => $confirm['partner'],
+		'KEY_ID' => $confirm['key'],
+		'node' => $confirm['node'],
+	);
+	$url_confirm = wha_url_confirm_abo($uoid,$config);
 	
 	include_spip('inc/distant');
 	$ack = @recuperer_page($url_confirm);
