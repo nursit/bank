@@ -20,7 +20,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  */
 function paypal_is_sandbox($config){
 	$test = false;
-	// _CMCIC_TEST force a TRUE pour utiliser l'adresse de test de CMCIC
+	// _PAYPAL_SANDBOX force a TRUE pour utiliser l'adresse de test de CMCIC
 	if ( (defined('_PAYPAL_SANDBOX') AND _PAYPAL_SANDBOX)
 	  OR (isset($config['mode_test']) AND $config['mode_test']) ){
 		$test = true;
