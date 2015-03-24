@@ -50,7 +50,6 @@ function ogone_url_serveur($config){
  */
 function ogone_sha_in($contexte, $config){
 	$key = (isset($config['CLE_SHA_IN'])?$config['CLE_SHA_IN']:'sha-in');
-	var_dump($key);
 	return ogone_signe_contexte(
 		$contexte,
 		$key,

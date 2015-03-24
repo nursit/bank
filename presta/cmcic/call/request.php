@@ -156,4 +156,4 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 
 	return $contexte;
 }
-?>
+
