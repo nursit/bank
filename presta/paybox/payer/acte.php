@@ -13,6 +13,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function presta_paybox_payer_acte_dist($id_transaction, $transaction_hash, $titre=''){
 
+	include_spip('presta/paybox/inc/paybox');
 	$config = paybox_pbx_ids();
 	$call_request = charger_fonction('request','presta/paybox/call');
 	$contexte = $call_request($id_transaction,$transaction_hash,$config);
