@@ -11,6 +11,11 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+/**
+ * Determiner le mode test en fonction d'un define ou de la config
+ * @param array $config
+ * @return bool
+ */
 function cmcic_is_sandbox($config){
 	$test = false;
 	// _CMCIC_TEST force a TRUE pour utiliser l'adresse de test de CMCIC
@@ -24,7 +29,7 @@ function cmcic_is_sandbox($config){
 /**
  * Determiner l'URL d'appel serveur en fonction de la config
  *
- * @param $config
+ * @param array $config
  * @return string
  */
 function cmcic_url_serveur($config){
