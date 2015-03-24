@@ -73,11 +73,10 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	if (defined('_PBX_DISPLAY'))
 		$parm['PBX_DISPLAY'] = _PBX_DISPLAY;
 
-	$parm['PBX_EFFECTUE']=generer_url_action('bank_response',"bankp=paybox",true,true);
-	$parm['PBX_REFUSE']=generer_url_action('bank_cancel',"bankp=paybox",true,true);
-	$parm['PBX_ANNULE']=generer_url_action('bank_cancel',"bankp=paybox",true,true);
- 	$parm['PBX_REPONDRE_A']=generer_url_action('bank_autoresponse',"bankp=paybox",true,true);
-	
+	$parm['PBX_EFFECTUE'] = bank_url_api_retour($config,"response");
+	$parm['PBX_REFUSE'] = bank_url_api_retour($config,"cancel");
+	$parm['PBX_ANNULE'] = bank_url_api_retour($config,"cancel");
+ 	$parm['PBX_REPONDRE_A'] = bank_url_api_retour($config,"autoresponse");
 
 	$parm['PBX_RETOUR'] = 'montant:M;id_transaction:R;auth:A;trans:S;abo:B;erreur:E;valid:D;';
 
