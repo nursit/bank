@@ -15,8 +15,9 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * Recuperer une url en https avec curl ou recuperer_page sinon
  *
  * @param string $url
- * @param array/string $datas
+ * @param array|string $datas
  *   $datas peut etre un tableau de paire=>valeur, ou une chaine de get paire=valeur&...
+ * @return array
  */
 function inc_bank_recuperer_post_https_dist($url,$datas='') {
 
