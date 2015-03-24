@@ -135,11 +135,11 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	// le paiement positif et en attend une réponse (texte).
 	// Puis, elle présente sur la banque au choix ces urls pour revenir sur le site
 	// - retour OK si le paiement s'est bien déroulé
-	$contexte['url_retour_ok']  = generer_url_action('bank_response',"bankp=cmcic&id=$id_transaction;$transaction_hash",true,true);
+	$contexte['url_retour_ok']  = bank_url_api_retour($config,"response","id=$id_transaction;$transaction_hash");
 	// - retour err si le paiement a été refusé
-	$contexte['url_retour_err'] = generer_url_action('bank_cancel',"bankp=cmcic&id=$id_transaction;$transaction_hash",true,true);
+	$contexte['url_retour_err'] = bank_url_api_retour($config,"cancel","id=$id_transaction;$transaction_hash");
 	// - retour (bouton Annuler) si le bonhomme décide d'abandonner le paiement
-	$contexte['url_retour'] = generer_url_action('bank_response',"bankp=cmcic&id=$id_transaction;$transaction_hash",true,true);
+	$contexte['url_retour'] = $contexte['url_retour_ok'];
 
 	$hidden = "";
 	foreach($contexte as $k=>$v){

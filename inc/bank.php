@@ -13,6 +13,22 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
 /**
+ * Generer les urls de retour bank
+ * @param array $config
+ * @param string $action
+ *   response|cancel|autoresponse
+ * @param string $args
+ *   query string
+ * @return mixed|string
+ */
+function bank_url_api_retour($config,$action,$args=""){
+	$args = (strlen($args)?"&":"").$args;
+	$args = "bankp=".$config['presta'].$args;
+	return generer_url_action('bank_'.$action,$args,true,true);
+}
+
+
+/**
  * @param string $mode
  * @param bool $abo
  * @return array
@@ -20,11 +36,16 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 function bank_config($mode,$abo=false){
 
 	include_spip('inc/config');
+	$config = array();
 	if ($abo) {
-		$config = lire_config("bank_paiement/presta_abo/".$mode,'');
+		if (lire_config("bank_paiement/presta_abo/".$mode,'')){
+			$config = lire_config("bank_paiement/config_abo_".$mode,'');
+		}
 	}
 	else {
-		$config = lire_config("bank_paiement/presta/".$mode,'');
+		if (lire_config("bank_paiement/presta/".$mode,'')){
+			$config = lire_config("bank_paiement/config_".$mode,'');
+		}
 	}
 
 	if (!$config){
