@@ -14,7 +14,7 @@
 <div class='payer_mode payer_gratuit payer_acte'>
 	<p class="titre h4">Vous n'avez rien à payer</p>
 	<div class='boutons'>
-	#BOUTON_ACTION{'Valider la commande',#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}}
+	#BOUTON_ACTION{'Valider la commande',#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}|parametre_url{sign,#SIGN}}
 	</div>
 </div>
 </BOUCLE_trans>

@@ -13,7 +13,17 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function presta_gratuit_payer_acte_dist($id_transaction,$transaction_hash){
 
-	return recuperer_fond('presta/gratuit/payer/acte',array('action'=>  generer_url_action('bank_response', 'bankp=gratuit',true,true),'id_transaction'=>$id_transaction,'transaction_hash'=>$transaction_hash));
+	include_spip('inc/bank');
+	$config = bank_config("gratuit");
+
+	$contexte = array(
+		'id_transaction' => $id_transaction,
+		'transaction_hash' => $transaction_hash,
+	);
+	$contexte['sign'] = bank_sign_response_simple("gratuit",$contexte);
+	$contexte['action'] = bank_url_api_retour($config,"response");
+
+	return recuperer_fond('presta/gratuit/payer/acte',$contexte);
 }
 
 ?>
