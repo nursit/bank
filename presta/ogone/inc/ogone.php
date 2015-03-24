@@ -11,20 +11,49 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+
+
 /**
- * Recuperer l'identifiant de la boutique
- *
- * @return string
+ * Determiner le mode test en fonction d'un define ou de la config
+ * @param array $config
+ * @return bool
  */
-function ogone_pspid(){
-	return _OGONE_PSPID;
+function ogone_is_sandbox($config){
+	$test = false;
+	// _CMCIC_TEST force a TRUE pour utiliser l'adresse de test de CMCIC
+	if ( (defined('_OGONE_TEST') AND _OGONE_TEST)
+	  OR (isset($config['mode_test']) AND $config['mode_test']) ){
+		$test = true;
+	}
+	return $test;
 }
 
+/**
+ * Determiner l'URL d'appel serveur en fonction de la config
+ *
+ * @param array $config
+ * @return string
+ */
+function ogone_url_serveur($config){
 
-function ogone_sha_in($contexte){
+	if (ogone_is_sandbox($config))
+		return "https://secure.ogone.com/ncol/test/orderstandard.asp";
+
+	return "https://secure.ogone.com/ncol/prod/orderstandard.asp";
+}
+
+/**
+ * Signer les donnes envoyees a Ogone
+ * @param array $contexte
+ * @param array $config
+ * @return string
+ */
+function ogone_sha_in($contexte, $config){
+	$key = (isset($config['CLE_SHA_IN'])?$config['CLE_SHA_IN']:'sha-in');
+	var_dump($key);
 	return ogone_signe_contexte(
 		$contexte,
-		_OGONE_CLE_SHA_IN,
+		$key,
 		array(
 			'ACCEPTURL','ADDMATCH','ADDRMATCH','ALIAS','ALIASOPERATION','ALIASUSAGE','ALLOWCORRECTION',
 			'AMOUNT','AMOUNTHTVA','AMOUNTTVA','BACKURL','BGCOLOR','BRAND','BRANDVISUAL','BUTTONBGCOLOR',
@@ -62,11 +91,17 @@ function ogone_sha_in($contexte){
 	);
 }
 
-
-function ogone_sha_out($contexte){
+/**
+ * Signer les donnees recues de Ogone
+ * @param array $contexte
+ * @param array $config
+ * @return string
+ */
+function ogone_sha_out($contexte, $config){
+	$key = (isset($config['CLE_SHA_OUT'])?$config['CLE_SHA_OUT']:'sha-out');
 	return ogone_signe_contexte(
 		$contexte,
-		_OGONE_CLE_SHA_OUT,
+		$key,
 		array(
 			'AAVADDRESS','AAVCHECK','AAVZIP','ACCEPTANCE','ALIAS','AMOUNT','BRAND','CARDNO','CCCTY',
 			'CN','COMPLUS','CURRENCY','CVCCHECK','DCC_COMMPERCENTAGE','DCC_CONVAMOUNT','DCC_CONVCCY',
@@ -107,7 +142,7 @@ function ogone_signe_contexte($contexte,$secret,$parametres) {
 	return $s;
 }
 
-function ogone_get_response(){
+function ogone_get_response($config){
 	$response = $_REQUEST;
 	foreach ($_COOKIE as $key => $value)
 		unset($response[$key]);
@@ -126,11 +161,11 @@ function ogone_get_response(){
 	}
 
 	if (
-		$response['SHASIGN']!==ogone_sha_out($response)
+		$response['SHASIGN']!==ogone_sha_out($response,$config)
 		// lorsque le nom est accentue, il faut le rencode utf8 pour que la signature concorde
 		// il est double encode, donc on garde la reponse initiale qui est moins moche...
 		// mais on accepte la reponse ainsi signee
-	  AND $response['SHASIGN']!==ogone_sha_out(array_map('utf8_encode',$response))
+	  AND $response['SHASIGN']!==ogone_sha_out(array_map('utf8_encode',$response),$config)
 	){
 		include_spip('inc/bank');
 		bank_transaction_invalide(0,

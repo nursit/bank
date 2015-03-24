@@ -20,20 +20,24 @@ include_spip('presta/ogone/inc/ogone');
  *
  * @param int $id_transaction
  * @param string $transaction_hash
+ * @param string $mode
  * @return array
  */
-function presta_ogone_call_response_dist($response=null){
+function presta_ogone_call_response_dist($response=null, $mode="ogone"){
+
+	include_spip('inc/bank');
+	$config = bank_config($mode);
 
 	if (!$response)
 		// recuperer la reponse en post et la decoder
-		$response = ogone_get_response();
+		$response = ogone_get_response($config);
 	#var_dump($response);
 	if (!$response) {
 		return array(0,false);
 	}
 
 	// depouillement de la transaction
-	list($id_transaction,$success) =  ogone_traite_reponse_transaction($response);
+	list($id_transaction,$success) =  ogone_traite_reponse_transaction($response, $mode);
 
 	return array($id_transaction,$success);	
 }

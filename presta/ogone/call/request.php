@@ -57,9 +57,11 @@ include_spip('presta/ogone/inc/ogone');
  *
  * @param int $id_transaction
  * @param string $transaction_hash
+ * @param $config
+ *   configuration du module
  * @return array
  */
-function presta_ogone_call_request_dist($id_transaction, $transaction_hash){
+function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $config){
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash)))
 		return array();
 
@@ -72,7 +74,7 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash){
 	include_spip('inc/filtres');
 	$contexte = array();
 
-	$contexte['PSPID'] = ogone_pspid();
+	$contexte['PSPID'] = $config['PSPID'];
 	$contexte['orderID'] = $id_transaction."/".modulo($row['transaction_hash'],999999);
 	$contexte['operation'] = "SAL"; // c'est un paiement a l'acte immediat
 
@@ -96,10 +98,11 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash){
 	$contexte['ownertelno'] = "";
 
 	// Urls de retour
-	$contexte['accepturl'] = generer_url_action('bank_response',"bankp=ogone&id=$id_transaction;$transaction_hash",true,true);
-	$contexte['declineurl'] = generer_url_action('bank_cancel',"bankp=ogone&id=$id_transaction;$transaction_hash",true,true);
-	$contexte['cancelurl'] = generer_url_action('bank_cancel',"bankp=ogone&id=$id_transaction;$transaction_hash",true,true);
-	$contexte['exceptionurl'] = generer_url_action('bank_response',"bankp=ogone&id=$id_transaction;$transaction_hash",true,true);
+	include_spip("inc/bank");
+	$contexte['accepturl'] = bank_url_api_retour($config,'response',"id=$id_transaction;$transaction_hash");
+	$contexte['declineurl'] = bank_url_api_retour($config,'cancel',"id=$id_transaction;$transaction_hash");
+	$contexte['cancelurl'] = bank_url_api_retour($config,'cancel',"id=$id_transaction;$transaction_hash");
+	$contexte['exceptionurl'] = bank_url_api_retour($config,'response',"id=$id_transaction;$transaction_hash");
 
 	$hidden = "";
 	foreach($contexte as $k=>$v){
@@ -109,7 +112,7 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash){
 	include_spip('inc/filtres_mini');
 	$contexte = array(
 		'hidden'=>$hidden,
-		'action'=>_OGONE_URL,
+		'action'=>ogone_url_serveur($config),
 		'backurl'=>url_absolue(self()),
 		'id_transaction'=>$id_transaction,
 		'transaction_hash' => $transaction_hash
@@ -117,4 +120,4 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash){
 
 	return $contexte;
 }
-?>
+
