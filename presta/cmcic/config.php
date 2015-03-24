@@ -20,10 +20,10 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * Vous pouvez définir ces constantes dans votre fichier mes_options.php
  *
  * Il vous faudra obtenir 3 informations de CMCIC et les définir dans
- * les constantes correspondantes :
- * - le n° de TPE (constante _CMCIC_TPE),
- * - le code de société (constante _CMCIC_CODESOCIETE),
- * - la clé HMAC-SHA1 (constante _CMCIC_CLE)
+ * la configuration du plugin :
+ * - le n° de TPE,
+ * - le code de société,
+ * - la clé HMAC-SHA1
  *
  * Il vous faudra leur indiquer l'adresse suivante comme «URL CGI2»
  * (il faut nécéssairement leur téléphoner pour ça. Il n'y a pas d'interface web le faire) :
@@ -51,64 +51,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  */
 
 
-// CLE : il s'agit d'une cle de sécurité unique de marchand fournit par CMCIC
-// C'est une clé qui est à demander à CMCIC. Ils transmettront un mail permettant
-// de télécharger cette clé sur un site (par exemple https://paiement.creditmutuel.fr/config/download.cgi)
-// Une fois le fichier de clé HMAC-SHA1 téléchargé, la clé se trouve sur la première ligne
-// de ce fichier après le texte "Version 1 ", en majuscule.
-if (!defined('_CMCIC_CLE'))
-	define('_CMCIC_CLE',  $GLOBALS['config_bank_paiement']['config_cmcic']['CLE']); // indiquer sa clé hexa 40 caractères
-
-// TPE : il s'agit du numéro de TPE, fournit par CMCIC pour le marchand
-if (!defined('_CMCIC_TPE'))
-	define('_CMCIC_TPE', $GLOBALS['config_bank_paiement']['config_cmcic']['TPE']); // indiquer son numéro de TPE (7 chiffres ?)
-
-// code de société du marchant, fournit par CMCIC
-if (!defined('_CMCIC_CODESOCIETE'))
-	define ('_CMCIC_CODESOCIETE', $GLOBALS['config_bank_paiement']['config_cmcic']['CODESOCIETE']); // indiquer code de société (10 caractères ?)
-
-
-if (!defined('_CMCIC_TEST'))
-	define('_CMCIC_TEST',
-		(isset($GLOBALS['config_bank_paiement']['config_cmcic']['mode_test'])
-			AND $GLOBALS['config_bank_paiement']['config_cmcic']['mode_test'])?true:false);
-
-// URL d'accès à la banque.
-// Par défaut, l'adresse CIC de paiement normal.
-// vous pouvez indiquer, soit la constante _CMCIC_SERVEUR directement,
-// soit définir _CMCIC_TEST à TRUE pour utiliser l'adresse de test de CMCIC
-if (!defined('_CMCIC_SERVEUR')) {
-	switch($GLOBALS['config_bank_paiement']['config_cmcic']['service']){
-		case "CMUT":
-			define ("_CMCIC_SERVEUR",
-				_CMCIC_TEST?
-					"https://paiement.creditmutuel.fr/test/paiement.cgi"
-					:
-					"https://paiement.creditmutuel.fr/paiement.cgi"
-			);
-			break;
-		case "OBC":
-			define ("_CMCIC_SERVEUR",
-				_CMCIC_TEST?
-					"https://ssl.paiement.banque-obc.fr/test/paiement.cgi"
-					:
-					"https://ssl.paiement.banque-obc.fr/paiement.cgi"
-			);
-			break;
-		case "CIC":
-		default:
-			define ("_CMCIC_SERVEUR",
-				_CMCIC_TEST?
-					"https://ssl.paiement.cic-banques.fr/test/paiement.cgi"
-					:
-					"https://ssl.paiement.cic-banques.fr/paiement.cgi"
-			);
-			break;
-	}
-}
-
 # Version du logiciel
 if (!defined('_CMCIC_VERSION'))
 	define("_CMCIC_VERSION", "3.0");
 
-?>

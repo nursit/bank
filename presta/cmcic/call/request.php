@@ -51,17 +51,19 @@ include_spip('presta/cmcic/inc/cmcic');
  *
  * @param int $id_transaction
  * @param string $transaction_hash
+ * @param $config
+ *   configuration du module
  * @return array
  */
-function presta_cmcic_call_request_dist($id_transaction, $transaction_hash) {
+function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $config) {
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash)))
 		return array();
 
 	include_spip('inc/filtres');
 	$contexte = array();
 
-	$oTpe  = new CMCIC_Tpe( strtoupper($GLOBALS['spip_lang']) );
-	$oHmac = new CMCIC_Hmac($oTpe);   
+	$oTpe  = new CMCIC_Tpe($config, strtoupper($GLOBALS['spip_lang']));
+	$oHmac = new CMCIC_Hmac($oTpe);
 
 	// Control String for support
 	$CtlHmac = sprintf(_CMCIC_CTLHMAC,
@@ -147,7 +149,7 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash) {
 	include_spip('inc/filtres_mini');
 	$contexte = array(
 		'hidden' => $hidden,
-		'action' => _CMCIC_SERVEUR,
+		'action' => cmcic_url_serveur($config),
 		'backurl' => url_absolue(self()),
 		'id_transaction' => $id_transaction,
 		'transaction_hash' => $transaction_hash);

@@ -11,7 +11,44 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+function cmcic_is_sandbox($config){
+	$test = false;
+	// _CMCIC_TEST force a TRUE pour utiliser l'adresse de test de CMCIC
+	if ( (defined('_CMCIC_TEST') AND _CMCIC_TEST)
+	  OR (isset($config['mode_test']) AND $config['mode_test']) ){
+		$test = true;
+	}
+	return $test;
+}
 
+/**
+ * Determiner l'URL d'appel serveur en fonction de la config
+ *
+ * @param $config
+ * @return string
+ */
+function cmcic_url_serveur($config){
+
+	// URL d'accès à la banque.
+	// Par défaut, l'adresse CIC de paiement normal.
+	switch($config['service']){
+		case "CMUT":
+			$host = "https://paiement.creditmutuel.fr";
+			break;
+		case "OBC":
+			$host = "https://ssl.paiement.banque-obc.fr";
+			break;
+		case "CIC":
+		default:
+			$host = "https://ssl.paiement.cic-banques.fr";
+			break;
+	}
+
+	if (cmcic_is_sandbox($config))
+		$host .= "/test";
+	return $host . "/" . _CMCIC_URLPAIEMENT;
+
+}
 
 /*****************************************************************************
  *
@@ -64,18 +101,18 @@ class CMCIC_Tpe {
 	//
 	// ----------------------------------------------------------------------------
 	
-	function __construct($sLangue = "FR") {
+	function __construct($config, $sLangue = "FR") {
 
 		// contrôle de l'existence des constantes de paramétrages.
-		$aRequiredConstants = array('_CMCIC_CLE', '_CMCIC_VERSION', '_CMCIC_TPE', '_CMCIC_CODESOCIETE');
+		$aRequiredConstants = array('_CMCIC_VERSION');
 		$this->_checkTpeParams($aRequiredConstants);
 
 		$this->sVersion = _CMCIC_VERSION;
-		$this->_sCle = _CMCIC_CLE;
-		$this->sNumero = _CMCIC_TPE;
-		$this->sUrlPaiement = _CMCIC_SERVEUR . _CMCIC_URLPAIEMENT;
+		$this->_sCle = $config['CLE'];
+		$this->sNumero = $config['TPE'];
+		$this->sUrlPaiement = cmcic_url_serveur($config);
 
-		$this->sCodeSociete = _CMCIC_CODESOCIETE;
+		$this->sCodeSociete = $config['CODESOCIETE'];
 		$this->sLangue = $sLangue;
 
 		$this->sUrlOK = (defined('_CMCIC_URLOK')?_CMCIC_URLOK:"");

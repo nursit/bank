@@ -42,10 +42,13 @@ include_spip('inc/date');
  * 
  * @param array|null $response
  *     Réponse déjà obtenue de la banque si transmis. Sinon sera calculé.
+ * @param string $mode
  * @return array(int $id_transaction, bool $paiement_ok)
 **/
-function presta_cmcic_call_response_dist($response=null){
-	$mode = 'cmcic';
+function presta_cmcic_call_response_dist($response=null, $mode='cmcic'){
+
+	include_spip('inc/bank');
+	$config = bank_config($mode);
 
 	// Cas B : retour depuis la banque (annulation avant paiement ou fin de la procédure)
 	if ($res = cmcic_terminer_transaction()) {
@@ -54,7 +57,7 @@ function presta_cmcic_call_response_dist($response=null){
 
 	// Cas A : appel de la banque attendant traitements et notification
 	if (!$response) {
-		$response = cmcic_response();
+		$response = cmcic_response($config);
 	}
 
 	if (!$response) {
@@ -247,12 +250,13 @@ function cmcic_notifier_banque_erreur() {
 /**
  * Retrouve la réponse de la banque CIC et vérifie sa sécurité
  * 
+ * @param array $config
  * @return bool|array
  *     False si erreur ou clé de sécurité erronnée
  *     array : tableau des données de la banque sinon
-**/ 
-function cmcic_response() {
-	$mode = "cmcic";
+**/
+function cmcic_response($config) {
+	$mode = $config['presta'];
 
 	// Begin Main : Retrieve Variables posted by CMCIC Payment Server 
 	$CMCIC_bruteVars = getMethode();
@@ -266,7 +270,7 @@ function cmcic_response() {
 	}
 
 	// TPE init variables
-	$oTpe  = new CMCIC_Tpe();
+	$oTpe  = new CMCIC_Tpe($config);
 	$oHmac = new CMCIC_Hmac($oTpe);
 
 	// Message Authentication
