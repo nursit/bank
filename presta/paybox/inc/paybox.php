@@ -17,14 +17,11 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @return array
  */
 function paybox_pbx_ids($boutique=''){
-	$config = (($boutique AND $boutique!=="acte") ? $boutique."_":"").'paybox';
 
-	include_spip('inc/config');
-	$v = lire_config("bank_paiement/config_$config");
+	include_spip('inc/bank');
+	$v = bank_config("paybox",$boutique=='abo');
 	if (isset($v['pubkey']))
 		unset($v['pubkey']);
-	$v['config'] = $config;
-	$v['type'] = ($boutique=='abo'?'abo':'acte');
 
 	return $v;
 }

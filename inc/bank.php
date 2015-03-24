@@ -12,7 +12,32 @@
 
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+/**
+ * @param string $mode
+ * @param bool $abo
+ * @return array
+ */
+function bank_config($mode,$abo=false){
 
+	include_spip('inc/config');
+	if ($abo) {
+		$config = lire_config("bank_paiement/presta_abo/".$mode,'');
+	}
+	else {
+		$config = lire_config("bank_paiement/presta/".$mode,'');
+	}
+
+	if (!$config){
+		spip_log("Configuration $mode introuvable","bank"._LOG_ERREUR);
+		$config = array('erreur'=>'inconnu');
+	}
+
+	$config['presta'] = $mode; // servira pour l'aiguillage dans le futur
+	$config['config'] = ($abo?'abo_':'').$mode;
+	$config['type'] = ($abo?'abo':'acte');
+
+	return $config;
+}
 
 /**
  * Generer le message d'erreur d'une transaction invalide/incoherente
