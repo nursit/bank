@@ -11,17 +11,36 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-function cyberplus_site_id(){
-	return _CYBERPLUS_SITE_ID;
+
+/**
+ * Determiner l'URL d'appel serveur en fonction de la config
+ *
+ * @param array $config
+ * @return string
+ */
+function cyberplus_url_serveur($config){
+	return "https://paiement.systempay.fr/vads-payment/";
+}
+
+/**
+ * Determiner la cle de signature en fonction de la config
+ * @param array $config
+ * @return string
+ */
+function cyberplus_key($config){
+	return $config['CLE'];
 }
 
 /**
  * Generer les hidden du form en signant les parametres au prealable
+ * @param array $config
+ *   configuration du prestataire paiement
  * @param array $parms
+ *   parametres du form
  * @return string
  */
-function cyberplus_form_hidden($parms){
-	$parms['signature'] = cyberplus_signe_contexte($parms,_CYBERPLUS_CLE);
+function cyberplus_form_hidden($config,$parms){
+	$parms['signature'] = cyberplus_signe_contexte($parms,cyberplus_key($config));
 	$hidden = "";
 	foreach($parms as $k=>$v){
 		$hidden .= "<input type='hidden' name='$k' value='".str_replace("'", "&#39;", $v)."' />";
@@ -78,10 +97,10 @@ function cyberplus_verifie_signature($values,$key) {
  * Recuperer le POST/GET de la reponse dans un tableau
  * en verifiant la signature
  *
- * @param $key
+ * @param array $config
  * @return array|bool
  */
-function cyberplus_recupere_reponse($key){
+function cyberplus_recupere_reponse($config){
 	$reponse = array();
 	foreach($_REQUEST as $k=>$v){
 		if (strncmp($k,'vads_',5)==0){
@@ -90,8 +109,10 @@ function cyberplus_recupere_reponse($key){
 	}
 	$reponse['signature'] = (isset($_REQUEST['signature'])?$_REQUEST['signature']:'');
 
-	if (!cyberplus_verifie_signature($reponse,$key))
+	if (!cyberplus_verifie_signature($reponse,cyberplus_key($config))){
+		spip_log("recupere_reponse : signature invalide ".var_export($reponse,true),$config['presta']._LOG_ERREUR);
 		return false;
+	}
 
 	return $reponse;
 }

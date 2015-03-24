@@ -40,26 +40,6 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *
  */
 
-
-// CLE : il s'agit d'une cle de sécurité unique de marchand fournit par Cyberplus (appelee certificat)
-if (!defined('_CYBERPLUS_CLE'))
-	define('_CYBERPLUS_CLE',  $GLOBALS['config_bank_paiement']['config_cyberplus']['CLE']);
-
-// SITE_ID : il s'agit du numéro de SITE_ID, fournit par Cyberplus
-if (!defined('_CYBERPLUS_SITE_ID'))
-	define('_CYBERPLUS_SITE_ID', $GLOBALS['config_bank_paiement']['config_cyberplus']['SITE_ID']);
-
-
-// URL d'accès à la banque.
-if (!defined('_CYBERPLUS_SERVEUR'))
-	define ("_CYBERPLUS_SERVEUR", "https://paiement.systempay.fr/vads-payment/");
-
-// TEST ou PRODUCTION
-if (!defined('_CYBERPLUS_MODE'))
-	define("_CYBERPLUS_MODE", $GLOBALS['config_bank_paiement']['config_cyberplus']['mode_test']?"TEST":"PRODUCTION");
-
 # Version du logiciel
 if (!defined('_CYBERPLUS_VERSION'))
 	define("_CYBERPLUS_VERSION", "V2");
-
-?>

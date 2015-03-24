@@ -379,16 +379,16 @@ vads_redirect_error_message = Redirection vers la boutique dans quelques instant
  *
  * @param int $id_transaction
  * @param string $transaction_hash
- * @param array $options
+ * @param array $config
  *   array cartes
  * @return array
  */
-function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, $options = array()){
+function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, $config = array()){
 
 
 	$cartes = array('CB','VISA','MASTERCARD','E-CARTEBLEUE');
-	if (isset($options['cartes']) AND $options['cartes'])
-		$cartes = $options['cartes'];
+	if (isset($config['cartes']) AND $config['cartes'])
+		$cartes = $config['cartes'];
 
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash)))
 		return array();
@@ -403,8 +403,8 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, 
 
 	$parm = array();
 
-	$parm['vads_site_id'] = cyberplus_site_id();
-	$parm['vads_ctx_mode'] = _CYBERPLUS_MODE;
+	$parm['vads_site_id'] = $config['SITE_ID'];
+	$parm['vads_ctx_mode'] = ($config['mode_test']?"TEST":"PRODUCTION");
 	$parm['vads_version'] = _CYBERPLUS_VERSION;
 
 	// pour vads_trans_id on utilise
@@ -437,8 +437,8 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, 
 	// Urls de retour
 	$parm['vads_shop_url'] = $GLOBALS['meta']['adresse_site'];
 	$parm['vads_return_mode'] = "GET";//"POST";
-	$parm['vads_url_return'] = generer_url_action('bank_response',"bankp=cyberplus",true,true);
-	$parm['vads_url_cancel'] = generer_url_action('bank_cancel',"bankp=cyberplus",true,true);
+	$parm['vads_url_return'] = bank_url_api_retour($config,"response");
+	$parm['vads_url_cancel'] = bank_url_api_retour($config,"cancel");
 
 	// this is SPIP + bank
 	include_spip('inc/filtres');
@@ -465,7 +465,7 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, 
 
 	$contexte = array(
 		'hidden'=>array(),
-		'action'=>_CYBERPLUS_SERVEUR,
+		'action'=>cyberplus_url_serveur($config),
 		'backurl'=>url_absolue(self()),
 		'id_transaction'=>$id_transaction,
 		'transaction_hash' => $transaction_hash
@@ -473,7 +473,7 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, 
 	foreach($cartes as $carte){
 		if (isset($cartes_possibles[$carte])){
 			$parm['vads_payment_cards'] = $carte;
-			$contexte['hidden'][$carte] = cyberplus_form_hidden($parm);
+			$contexte['hidden'][$carte] = cyberplus_form_hidden($config,$parm);
 			$contexte['logo'][$carte] = $cartes_possibles[$carte];
 		}
 	}

@@ -13,11 +13,14 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function presta_cyberplus_payer_acte_dist($id_transaction,$transaction_hash, $titre=''){
 
+	include_spip('inc/bank');
+	$config = bank_config("cyberplus");
+
 	$call_request = charger_fonction('request','presta/cyberplus/call');
-	$contexte = $call_request($id_transaction,$transaction_hash);
+	$contexte = $call_request($id_transaction,$transaction_hash,$config);
 	$contexte['title'] = $titre;
 
-	$contexte['sandbox'] = (_CYBERPLUS_MODE=="TEST"?' ':'');
+	$contexte['sandbox'] = ($config['mode_test']?' ':'');
 
 	return recuperer_fond('presta/cyberplus/payer/acte',$contexte);
 }
