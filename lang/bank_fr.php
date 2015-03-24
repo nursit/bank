@@ -39,7 +39,7 @@ Transaction&nbsp;: #@transaction@
 _ Montant&nbsp;: @montant@',
 	'info_cheque_envoyer_adresse' => 'Merci d\'envoyer votre ch&egrave;que à l\'adresse&nbsp;:',
 	'info_mode_reglement_enregistre' => 'Nous avons bien enregistré votre choix de mode de r&egrave;glement.',
-	'info_mode_test' => 'Mode TEST (paiement fictif)',
+	'info_mode_test' => '[@presta@] Mode TEST (paiement fictif)',
     'info_virement' => 'Vous pouvez payer par virement bancaire.
 Les instructions concernant l’établissement du virement seront fournies après avoir cliqué sur ’Régler par virement bancaire’.
 
