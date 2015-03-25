@@ -21,8 +21,72 @@
  * DoDirectPaymentReceipt.php and DoExpressCheckoutPayment.php.
  ****************************************************/
 
+/**
+ * Determiner le mode test en fonction d'un define ou de la config
+ * @param array $config
+ * @return bool
+ */
+function paypalexpress_is_sandbox($config){
+	$test = false;
+	// _PAYPAL_API_SANDBOX force a TRUE pour utiliser l'adresse de test de CMCIC
+	if ( (defined('_PAYPAL_API_SANDBOX') AND _PAYPAL_API_SANDBOX)
+	  OR (isset($config['mode_test']) AND $config['mode_test']) ){
+		$test = true;
+	}
+	return $test;
+}
 
-function bank_paypalexpress_order_init($id_transaction, $url_confirm=null){
+
+/**
+ * Determiner l'URL d'appel serveur en fonction de la config
+ * Define the PayPal URL. This is the URL that the buyer is
+ * first sent to to authorize payment with their paypal account
+ * change the URL depending if you are testing on the sandbox
+ * or going to the live PayPal site
+ * For the sandbox, the URL is
+ * https://www.sandbox.paypal.com/webscr&cmd=_express-checkout&token=
+ * For the live site, the URL is
+ * https://www.paypal.com/webscr&cmd=_express-checkout&token=
+ *
+ * @param array $config
+ * @return string
+ */
+function paypal_api_url($config){
+
+	if (paypal_is_sandbox($config)){
+		return 'https://www.sandbox.paypal.com/webscr&cmd=_express-checkout';
+	}
+	else {
+		return 'https://www.paypal.com/webscr&cmd=_express-checkout';
+	}
+}
+
+
+/**
+ * Endpoint: this is the server URL which you have to connect for submitting your API request.
+ *
+ * @param array $config
+ * @return string
+ */
+function paypal_api_endpoint($config){
+
+	if (paypal_is_sandbox($config)){
+		return 'https://api-3t.sandbox.paypal.com:443/nvp';
+	}
+	else {
+		return 'https://api-3t.paypal.com:443/nvp';
+	}
+}
+
+
+/**
+ * Initier la demande de paiement Paypal Express Checkout
+ * @param $config
+ * @param $id_transaction
+ * @param null $url_confirm
+ * @return bool
+ */
+function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=null){
 
 	if (!$row = sql_fetsel('*', 'spip_transactions', 'id_transaction=' . intval($id_transaction))){
 		include_spip('inc/bank');
@@ -68,8 +132,8 @@ function bank_paypalexpress_order_init($id_transaction, $url_confirm=null){
 	cancel button during authorization of payment during the PayPal flow
 	*/
 
-	$returnURL = generer_url_action('bank_response', "bankp=paypalexpress", true, true);
-	$cancelURL = generer_url_action('bank_cancel', "bankp=paypalexpress", true, true);
+	$returnURL = bank_url_api_retour($config,'response');
+	$cancelURL = bank_url_api_retour($config,'cancel');
 
 	/* Construct the parameter string that describes the PayPal payment
 	the varialbes were set in the web form, and the resulting string
@@ -83,7 +147,7 @@ function bank_paypalexpress_order_init($id_transaction, $url_confirm=null){
 	to begin to authorize payment.  If an error occured, show the
 	resulting errors
 	*/
-	$resArray = bank_paypalexpress_hash_call("SetExpressCheckout", $nvpstr);
+	$resArray = bank_paypalexpress_hash_call($config, "SetExpressCheckout", $nvpstr);
 	$_SESSION['reshash'] = $resArray;
 
 	$ack = strtoupper($resArray["ACK"]);
@@ -91,7 +155,7 @@ function bank_paypalexpress_order_init($id_transaction, $url_confirm=null){
 	if ($ack=="SUCCESS"){
 		// Redirect to paypal.com here
 		$token = urldecode($resArray["TOKEN"]);
-		$payPalURL = parametre_url(_PAYPAL_API_PAYPAL_URL, 'token', $token, '&');
+		$payPalURL = parametre_url(paypal_api_url($config), 'token', $token, '&');
 
 		return $payPalURL;
 	}
@@ -110,7 +174,10 @@ function bank_paypalexpress_order_init($id_transaction, $url_confirm=null){
 }
 
 
-function bank_paypalexpress_checkoutpayment($payerid){
+function bank_paypalexpress_checkoutpayment($payerid,$mode="paypalexpress"){
+
+	include_spip('inc/bank');
+	$config = bank_config($mode);
 
 	include_spip('inc/date');
 
@@ -174,7 +241,7 @@ function bank_paypalexpress_checkoutpayment($payerid){
 	/* Make the call to PayPal to finalize payment
 	If an error occured, show the resulting errors
 	*/
-	$resArray = bank_paypalexpress_hash_call("DoExpressCheckoutPayment", $nvpstr);
+	$resArray = bank_paypalexpress_hash_call($config, "DoExpressCheckoutPayment", $nvpstr);
 
 	$date_paiement = date('Y-m-d H:i:s');
 
@@ -201,17 +268,20 @@ function bank_paypalexpress_checkoutpayment($payerid){
 
 	$authorisation_id = $resArray['TRANSACTIONID'];
 	$montant_regle = $resArray['AMT'];
-	sql_updateq("spip_transactions",array(
-			"autorisation_id"=>$authorisation_id,
-			"mode"=>'paypalexpress',
-			"montant_regle"=>$montant_regle,
-			"date_paiement"=>$date_paiement,
-			"statut"=>'ok',
-			"reglee"=>'oui'
-		),
+
+	$set = array(
+		"autorisation_id"=>$authorisation_id,
+		"mode"=>$mode,
+		"montant_regle"=>$montant_regle,
+		"date_paiement"=>$date_paiement,
+		"statut"=>'ok',
+		"reglee"=>'oui'
+	);
+
+	sql_updateq("spip_transactions",$set,
 		"id_transaction=" . intval($id_transaction)
 	);
-	spip_log("DoExpressCheckoutPayment : id_transaction $id_transaction, reglee", 'paypalexpress' . _LOG_INFO_IMPORTANTE);
+	spip_log("DoExpressCheckoutPayment : id_transaction $id_transaction, reglee", $mode . _LOG_INFO_IMPORTANTE);
 
 	// a faire avant le reglement qui va poser d'autres variables de session
 	session_unset();
@@ -228,12 +298,18 @@ function bank_paypalexpress_checkoutpayment($payerid){
  * @methodName is name of API  method.
  * @nvpStr is nvp string.
  * returns an associative array containing the response from the server.
+ *
+ * @param $config
+ *   configuration du module
+ * @param $methodName
+ * @param $nvpStr
+ * @return array|bool
  */
-function bank_paypalexpress_hash_call($methodName, $nvpStr){
-	$API_UserName = _PAYPAL_API_USERNAME;
-	$API_Password = _PAYPAL_API_PASSWORD;
-	$API_Signature = _PAYPAL_API_SIGNATURE;
-	$API_Endpoint = _PAYPAL_API_ENDPOINT;
+function bank_paypalexpress_hash_call($config, $methodName, $nvpStr){
+	$API_UserName = $config['API_USERNAME'];
+	$API_Password = $config['API_PASSWORD'];
+	$API_Signature = $config['API_SIGNATURE'];
+	$API_Endpoint = paypal_api_endpoint($config);
 	$api_version = _PAYPAL_API_VERSION;
 
 	//NVPRequest for submitting to server
