@@ -201,7 +201,7 @@ function bank_sign_response_simple($mode,$response = array()){
 }
 
 /**
- * Call response simple (cheque, virement)
+ * Call response simple (cheque, virement, simu)
  * il faut avoir un id_transaction et un transaction_hash coherents
  * pour se premunir d'une tentative d'appel exterieur
  *
@@ -216,20 +216,35 @@ function bank_simple_call_response($response=null, $mode="simple"){
 		$response = bank_response_simple($mode);
 
 	if (!isset($response['id_transaction']) OR !isset($response['transaction_hash'])){
-		spip_log("id_transaction ou transaction_hash absent ".var_export($response,true),$mode._LOG_ERREUR);
-		return array(0,false);
+		return bank_transaction_invalide(0,
+			array(
+				'mode' => $mode,
+				'erreur' => "transaction inconnue",
+				'log' => var_export($response,true),
+			)
+		);
 	}
 
 	$id_transaction = $response['id_transaction'];
 	$transaction_hash = $response['transaction_hash'];
 
 	if (!$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction))){
-		spip_log("id_transaction $id_transaction non trouve",$mode._LOG_ERREUR);
-		return array($id_transaction,false);
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "transaction non trouvee",
+				'log' => var_export($response,true),
+			)
+		);
 	}
 	if ($transaction_hash!=$row['transaction_hash']){
-		spip_log("id_transaction $id_transaction, hash $transaction_hash non conforme",$mode._LOG_ERREUR);
-		return array($id_transaction,false);
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "hash $transaction_hash non conforme",
+				'log' => var_export($response,true),
+			)
+		);
 	}
 
 	$autorisation = (isset($response['autorisation_id'])?$response['autorisation_id']:'');
@@ -238,10 +253,37 @@ function bank_simple_call_response($response=null, $mode="simple"){
 		$autorisation = $GLOBALS['visiteur_session']['id_auteur']."/".$GLOBALS['visiteur_session']['nom'];
 
 	include_spip("inc/autoriser");
-	if (!autoriser('encaisser'.$mode,'transaction',$id_transaction)){
-		spip_log("id_transaction $id_transaction, tentative d'encaisser un $mode par auteur #$autorisation pas autorise",$mode._LOG_CRITIQUE);
-		return array($id_transaction,false);
+	if (!autoriser('utilisermodepaiement',$mode)) {
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "$mode pas autorisee",
+			)
+		);
 	}
+
+	if (!autoriser('encaisser'.$mode,'transaction',$id_transaction)){
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "tentative d'encaisser un $mode par auteur #$autorisation pas autorise",
+			)
+		);
+	}
+
+	// est-ce une demande d'echec ? (cas de la simulation)
+	if (isset($response['fail']) AND $response['fail']){
+	 	// sinon enregistrer l'absence de paiement et l'erreur
+		include_spip('inc/bank');
+		return bank_transaction_echec($id_transaction,
+			array(
+				'mode'=>$mode,
+				'code_erreur' => 'fail',
+				'erreur' => $response['fail'],
+			)
+		);
+	}
+
 
 	// OK, on peut accepter le reglement
 	$set = array(
@@ -252,11 +294,25 @@ function bank_simple_call_response($response=null, $mode="simple"){
 		"statut"=>'ok',
 		"reglee"=>'oui'
 	);
+
+	// est-ce un abonnement ?
+	if (isset($response['abo_uid']) AND $response['abo_uid']){
+		$set['abo_uid'] = $response['abo_uid'];
+	}
+
 	sql_updateq("spip_transactions", $set,	"id_transaction=".intval($id_transaction));
 	spip_log("call_resonse : id_transaction $id_transaction, reglee",$mode);
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
 	$regler_transaction($id_transaction,array('row_prec'=>$row));
+
+	if (isset($response['abo_uid'])
+	  AND $response['abo_uid']
+	  AND $activer_abonnement = charger_fonction('activer_abonnement','abos',true)){
+		// numero d'abonne = numero de transaction
+		$activer_abonnement($id_transaction,$response['abo_uid'],$mode);
+	}
+
 
 	return array($id_transaction,true);
 }
