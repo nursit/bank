@@ -434,8 +434,11 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, 
 	// recuperer l'email
 	$parm['vads_cust_email'] = bank_email_porteur($row);
 
-	// Urls de retour
+	// nom et url de la boutique
 	$parm['vads_shop_url'] = $GLOBALS['meta']['adresse_site'];
+	$parm['vads_shop_name'] = $GLOBALS['meta']['nom_site'];
+
+	// Urls de retour
 	$parm['vads_return_mode'] = "GET";//"POST";
 	$parm['vads_url_return'] = bank_url_api_retour($config,"response");
 	$parm['vads_url_cancel'] = bank_url_api_retour($config,"cancel");
