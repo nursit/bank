@@ -113,6 +113,14 @@ function paybox_form_hidden($params){
 	if (isset($params['PBX_HMAC_KEY']) AND !trim($params['PBX_HMAC_KEY']))
 		unset($params['PBX_HMAC_KEY']);
 
+	if (paybox_is_sandbox($params) AND isset($params['PBX_HMAC_KEY_test'])){
+		$params['PBX_HMAC_KEY'] = $params['PBX_HMAC_KEY_test'];
+	}
+	// cle de test, on la vire de toute facon
+	if (isset($parm['PBX_HMAC_KEY_test'])){
+		unset($parm['PBX_HMAC_KEY_test']);
+	}
+
 	// methode hash avec cle secrete partagee fournie
 	if (isset($params['PBX_HMAC_KEY'])){
 		$key = trim($params['PBX_HMAC_KEY']);
