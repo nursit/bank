@@ -63,72 +63,85 @@ function bank_presta_install(){
  * @param string $version_cible
  */
 function bank_upgrade($nom_meta_base_version,$version_cible){
-	$current_version = 0.0;
-	if (   (!isset($GLOBALS['meta'][$nom_meta_base_version]) )
-			|| (($current_version = $GLOBALS['meta'][$nom_meta_base_version])!=$version_cible)){
-		include_spip('base/abstract_sql');
-		if (spip_version_compare($current_version,"0.0.0","<=")){
-			include_spip('base/create');
-			include_spip('base/serial');
-			creer_base();
-			echo "Paiement Install<br/>";
-			ecrire_meta($nom_meta_base_version,$current_version=$version_cible,'non');
-		}
-		if (spip_version_compare($current_version,"0.1.3","<=")){
-			include_spip('base/create');
-			include_spip('base/serial');
-			maj_tables(array('spip_transactions'));
-			ecrire_meta($nom_meta_base_version,$current_version="0.1.3",'non');
-		}
-		if (spip_version_compare($current_version,"0.1.5","<=")){
-			include_spip('base/create');
-			include_spip('base/serial');
-			sql_alter("table spip_transactions change url_retour url_retour text DEFAULT '' NOT NULL");
-			ecrire_meta($nom_meta_base_version,$current_version="0.1.5",'non');
-		}
-		if (spip_version_compare($current_version,"1.0.0","<=")){
-			include_spip('base/create');
-			include_spip('base/serial');
-			sql_alter("table spip_transactions change transaction_hash transaction_hash bigint(21) NOT NULL DEFAULT 0");
-			ecrire_meta($nom_meta_base_version,$current_version="1.0.0",'non');
-		}
-		if (spip_version_compare($current_version,"1.0.1","<=")){
-			include_spip('base/create');
-			include_spip('base/serial');
-			sql_alter("table spip_transactions change finie finie tinyint(1) NOT NULL DEFAULT 0");
-			sql_alter("table spip_transactions change tracking_id tracking_id bigint(21) NOT NULL DEFAULT 0");
-			sql_alter("table spip_transactions change id_panier id_panier bigint(21) NOT NULL DEFAULT 0");
-			sql_alter("table spip_transactions change id_facture id_facture bigint(21) NOT NULL DEFAULT 0");
-			ecrire_meta($nom_meta_base_version,$current_version="1.0.1",'non');
-		}
-		if (spip_version_compare($current_version,"1.1.0","<=")){
-			include_spip('base/create');
-			include_spip('base/serial');
-			sql_alter("table spip_transactions ADD contenu TEXT NOT NULL DEFAULT ''");
-			ecrire_meta($nom_meta_base_version,$current_version="1.1.0",'non');
-		}
-		if (spip_version_compare($current_version,"1.2.0","<=")){
-			ecrire_meta($nom_meta_base_version,$current_version="1.2.0",'non');
-		}
-		if (spip_version_compare($current_version,"1.3.0","<=")){
-			sql_alter("table spip_transactions ADD refcb varchar(100) NOT NULL DEFAULT ''");
-			ecrire_meta($nom_meta_base_version,$current_version="1.3.0",'non');
-		}
-		if (spip_version_compare($current_version,"1.4.0","<=")){
-			sql_alter("table spip_transactions ADD abo_uid varchar(55) NOT NULL DEFAULT ''");
-			sql_alter("table spip_transactions ADD validite varchar(10) NOT NULL DEFAULT ''");
-			ecrire_meta($nom_meta_base_version,$current_version="1.4.0",'non');
-		}
-		if (spip_version_compare($current_version,"1.4.1","<=")){
-			sql_alter("table spip_transactions ADD id_commande bigint(21) NOT NULL DEFAULT 0");
-			ecrire_meta($nom_meta_base_version,$current_version="1.4.1",'non');
-		}
-		if (spip_version_compare($current_version,"1.5.0","<=")){
-			sql_alter("table spip_transactions ADD erreur tinytext NOT NULL DEFAULT ''");
-			ecrire_meta($nom_meta_base_version,$current_version="1.5.0",'non');
-		}
 
-		bank_presta_install();
+	$maj = array();
+	$maj['create'] = array(
+		array('maj_tables',array('spip_transactions')),
+		array("echo","Paiement Install<br/>"),
+	);
+
+	$maj['0.1.3'] = array(
+		array('maj_tables',array('spip_transactions')),
+	);
+	$maj['0.1.5'] = array(
+		array("sql_alter","table spip_transactions change url_retour url_retour text DEFAULT '' NOT NULL"),
+	);
+
+	$maj['1.0.0'] = array(
+		array("sql_alter","table spip_transactions change transaction_hash transaction_hash bigint(21) NOT NULL DEFAULT 0"),
+	);
+	$maj['1.0.1'] = array(
+		array("sql_alter","table spip_transactions change finie finie tinyint(1) NOT NULL DEFAULT 0"),
+		array("sql_alter","table spip_transactions change tracking_id tracking_id bigint(21) NOT NULL DEFAULT 0"),
+		array("sql_alter","table spip_transactions change id_panier id_panier bigint(21) NOT NULL DEFAULT 0"),
+		array("sql_alter","table spip_transactions change id_facture id_facture bigint(21) NOT NULL DEFAULT 0"),
+	);
+
+	$maj['1.1.0'] = array(
+		array("sql_alter","table spip_transactions ADD contenu TEXT NOT NULL DEFAULT ''"),
+	);
+
+	$maj['1.2.0'] = array(
+	);
+
+	$maj['1.3.0'] = array(
+		array("sql_alter","table spip_transactions ADD refcb varchar(100) NOT NULL DEFAULT ''"),
+	);
+
+	$maj['1.4.0'] = array(
+		array("sql_alter","table spip_transactions ADD abo_uid varchar(55) NOT NULL DEFAULT ''"),
+		array("sql_alter","table spip_transactions ADD validite varchar(10) NOT NULL DEFAULT ''"),
+	);
+	$maj['1.4.1'] = array(
+		array("sql_alter","table spip_transactions ADD id_commande bigint(21) NOT NULL DEFAULT 0"),
+	);
+
+	$maj['1.5.0'] = array(
+		array("sql_alter","table spip_transactions ADD erreur tinytext NOT NULL DEFAULT ''"),
+	);
+
+	$maj['1.6.0'] = array(
+		array("bank_upgrade_config"),
+	);
+
+	include_spip('base/upgrade');
+	maj_plugin($nom_meta_base_version, $version_cible, $maj);
+
+	bank_presta_install();
+}
+
+function bank_upgrade_config(){
+	// suppression d'une vieille config Paybox
+	if (lire_config("bank_paiement/config_paybox/pubkey",'')){
+		ecrire_config("bank_paiement/config_paybox/pubkey",null);
+	}
+	if (lire_config("bank_paiement/config_abo_paybox/pubkey",'')){
+		ecrire_config("bank_paiement/config_abo_paybox/pubkey",null);
+	}
+
+	// renommage CybperPlus en SystemPay
+	$prestas = lire_config("bank_paiement/presta");
+	var_dump($prestas);
+	if (isset($prestas['cyberplus'])){
+		$prestas['systempay'] = $prestas['cyberplus'];
+		unset($prestas['cyberplus']);
+		ecrire_config("bank_paiement/presta",$prestas);
+	}
+	if (!is_null($c = lire_config("bank_paiement/config_cyberplus"))){
+		ecrire_config("bank_paiement/config_cyberplus",null);
+		if (!lire_config("bank_paiement/config_systempay",'')){
+			ecrire_config("bank_paiement/config_systempay",$c);
+		}
 	}
 }
 
