@@ -18,7 +18,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @param array $config
  * @return string
  */
-function cyberplus_url_serveur($config){
+function systempay_url_serveur($config){
 	return "https://paiement.systempay.fr/vads-payment/";
 }
 
@@ -27,7 +27,7 @@ function cyberplus_url_serveur($config){
  * @param array $config
  * @return string
  */
-function cyberplus_key($config){
+function systempay_key($config){
 	return $config['CLE'];
 }
 
@@ -39,8 +39,8 @@ function cyberplus_key($config){
  *   parametres du form
  * @return string
  */
-function cyberplus_form_hidden($config,$parms){
-	$parms['signature'] = cyberplus_signe_contexte($parms,cyberplus_key($config));
+function systempay_form_hidden($config,$parms){
+	$parms['signature'] = systempay_signe_contexte($parms,systempay_key($config));
 	$hidden = "";
 	foreach($parms as $k=>$v){
 		$hidden .= "<input type='hidden' name='$k' value='".str_replace("'", "&#39;", $v)."' />";
@@ -56,7 +56,7 @@ function cyberplus_form_hidden($config,$parms){
  * @param string $key
  * @return string
  */
-function cyberplus_signe_contexte($contexte,$key) {
+function systempay_signe_contexte($contexte,$key) {
 
 	// on ne prend que les infos vads_*
 	// a signer
@@ -76,13 +76,13 @@ function cyberplus_signe_contexte($contexte,$key) {
 
 
 /**
- * Verifier la signature de la reponse Cyberplus
+ * Verifier la signature de la reponse systempay
  * @param $values
  * @param $key
  * @return bool
  */
-function cyberplus_verifie_signature($values,$key) {
-	$signature = cyberplus_signe_contexte($values,$key);
+function systempay_verifie_signature($values,$key) {
+	$signature = systempay_signe_contexte($values,$key);
 
 	if(isset($values['signature'])
 		AND ($values['signature'] == $signature))	{
@@ -100,7 +100,7 @@ function cyberplus_verifie_signature($values,$key) {
  * @param array $config
  * @return array|bool
  */
-function cyberplus_recupere_reponse($config){
+function systempay_recupere_reponse($config){
 	$reponse = array();
 	foreach($_REQUEST as $k=>$v){
 		if (strncmp($k,'vads_',5)==0){
@@ -109,7 +109,7 @@ function cyberplus_recupere_reponse($config){
 	}
 	$reponse['signature'] = (isset($_REQUEST['signature'])?$_REQUEST['signature']:'');
 
-	if (!cyberplus_verifie_signature($reponse,cyberplus_key($config))){
+	if (!systempay_verifie_signature($reponse,systempay_key($config))){
 		spip_log("recupere_reponse : signature invalide ".var_export($reponse,true),$config['presta']._LOG_ERREUR);
 		return false;
 	}
@@ -118,7 +118,7 @@ function cyberplus_recupere_reponse($config){
 }
 
 
-function cyberplus_traite_reponse_transaction($response, $mode="cyberplus"){
+function systempay_traite_reponse_transaction($response, $mode="systempay"){
 	#var_dump($response);
 
 	$id_transaction = $response['vads_order_id'];
@@ -159,8 +159,8 @@ function cyberplus_traite_reponse_transaction($response, $mode="cyberplus"){
 	);
 
 	$erreur = array(
-		cyberplus_response_code($response['vads_result']),
-		cyberplus_auth_response_code($response['vads_auth_result'])
+		systempay_response_code($response['vads_result']),
+		systempay_auth_response_code($response['vads_auth_result'])
 	);
 	$erreur = array_filter($erreur);
 	$erreur = trim(implode(' ',$erreur));
@@ -225,7 +225,7 @@ function cyberplus_traite_reponse_transaction($response, $mode="cyberplus"){
 }
 
 
-function cyberplus_response_code($code){
+function systempay_response_code($code){
 	if ($code==0) return '';
 	$pre = 'Erreur : ';
 	$codes = array(
@@ -241,7 +241,7 @@ function cyberplus_response_code($code){
 	return $pre ? $pre : 'Erreur inconnue';
 }
 
-function cyberplus_auth_response_code($code){
+function systempay_auth_response_code($code){
 	if ($code==0) return '';
 	$pre = 'Autorisation refusee : ';
 	$codes = array(

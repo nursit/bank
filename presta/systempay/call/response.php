@@ -11,18 +11,18 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-include_spip('presta/cyberplus/inc/cyberplus');
+include_spip('presta/systempay/inc/systempay');
 
 // il faut avoir un id_transaction et un transaction_hash coherents
 // pour se premunir d'une tentative d'appel exterieur
-function presta_cyberplus_call_response_dist($response=null, $mode='cyberplus'){
+function presta_systempay_call_response_dist($response=null, $mode='systempay'){
 
 	include_spip('inc/bank');
 	$config = bank_config($mode);
 
 	if (!$response){
 		// recuperer la reponse en post et la decoder
-		$response = cyberplus_recupere_reponse($config);
+		$response = systempay_recupere_reponse($config);
 	}
 
 	if (!$response) {
@@ -30,7 +30,7 @@ function presta_cyberplus_call_response_dist($response=null, $mode='cyberplus'){
 	}
 
 	// depouillement de la transaction
-	list($id_transaction,$success) =  cyberplus_traite_reponse_transaction($response,$mode);
+	list($id_transaction,$success) =  systempay_traite_reponse_transaction($response,$mode);
 
 	return array($id_transaction,$success);
 }

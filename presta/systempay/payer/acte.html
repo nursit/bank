@@ -11,13 +11,13 @@
  */
 ]#CACHE{0}
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
-<div class='payer_mode payer_cyberplus payer_acte'>
+<div class='payer_mode payer_systempay payer_acte'>
 	<p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
 	<div class='boutons'>
 	<BOUCLE_cb(POUR){tableau #ENV{hidden}}>
-		[(#INCLURE{fond=presta/cyberplus/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#CHEMIN{#ENV{logo}|table_valeur{#CLE}}|balise_img{[Payer par carte (#CLE)]}|inserer_attribut{title,[Payer par carte (#CLE)]})]})]
+		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#CHEMIN{#ENV{logo}|table_valeur{#CLE}}|balise_img{[Payer par carte (#CLE)]}|inserer_attribut{title,[Payer par carte (#CLE)]})]})]
 	</BOUCLE_cb>
 	</div>
-	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=CyberPlus}:></div>]
+	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=SystemPay}:></div>]
 </div>
 </BOUCLE_trans>

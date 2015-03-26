@@ -11,18 +11,18 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-function presta_cyberplus_payer_acte_dist($id_transaction,$transaction_hash, $titre=''){
+function presta_systempay_payer_acte_dist($id_transaction,$transaction_hash, $titre=''){
 
 	include_spip('inc/bank');
-	$config = bank_config("cyberplus");
+	$config = bank_config("systempay");
 
-	$call_request = charger_fonction('request','presta/cyberplus/call');
+	$call_request = charger_fonction('request','presta/systempay/call');
 	$contexte = $call_request($id_transaction,$transaction_hash,$config);
 	$contexte['title'] = $titre;
 
 	$contexte['sandbox'] = ($config['mode_test']?' ':'');
 
-	return recuperer_fond('presta/cyberplus/payer/acte',$contexte);
+	return recuperer_fond('presta/systempay/payer/acte',$contexte);
 }
 
 ?>

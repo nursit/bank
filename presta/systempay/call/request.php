@@ -11,7 +11,7 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-include_spip('presta/cyberplus/inc/cyberplus');
+include_spip('presta/systempay/inc/systempay');
 
 /*
 
@@ -383,7 +383,7 @@ vads_redirect_error_message = Redirection vers la boutique dans quelques instant
  *   array cartes
  * @return array
  */
-function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, $config = array()){
+function presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config = array()){
 
 
 	$cartes = array('CB','VISA','MASTERCARD','E-CARTEBLEUE');
@@ -405,7 +405,7 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, 
 
 	$parm['vads_site_id'] = $config['SITE_ID'];
 	$parm['vads_ctx_mode'] = ($config['mode_test']?"TEST":"PRODUCTION");
-	$parm['vads_version'] = _CYBERPLUS_VERSION;
+	$parm['vads_version'] = _SYSTEMPAY_VERSION;
 
 	// pour vads_trans_id on utilise
 	// le nombre de secondes depuis le debut de la journee x 10 + id_transaction%10
@@ -457,18 +457,18 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, 
 
 
 	$cartes_possibles = array(
-		'CB'=>'presta/cyberplus/logo/CB.gif',
-		'VISA'=>'presta/cyberplus/logo/VISA.gif',
-		'MASTERCARD'=>'presta/cyberplus/logo/MASTERCARD.gif',
+		'CB'=>'presta/systempay/logo/CB.gif',
+		'VISA'=>'presta/systempay/logo/VISA.gif',
+		'MASTERCARD'=>'presta/systempay/logo/MASTERCARD.gif',
 	);
 
 	// cartes pour paiement a l'acte uniquement
-	$cartes_possibles['E-CARTEBLEUE']='presta/cyberplus/logo/E-CB.gif';
-	$cartes_possibles['AMEX']='presta/cyberplus/logo/AMEX.gif';
+	$cartes_possibles['E-CARTEBLEUE']='presta/systempay/logo/E-CB.gif';
+	$cartes_possibles['AMEX']='presta/systempay/logo/AMEX.gif';
 
 	$contexte = array(
 		'hidden'=>array(),
-		'action'=>cyberplus_url_serveur($config),
+		'action'=>systempay_url_serveur($config),
 		'backurl'=>url_absolue(self()),
 		'id_transaction'=>$id_transaction,
 		'transaction_hash' => $transaction_hash
@@ -476,7 +476,7 @@ function presta_cyberplus_call_request_dist($id_transaction, $transaction_hash, 
 	foreach($cartes as $carte){
 		if (isset($cartes_possibles[$carte])){
 			$parm['vads_payment_cards'] = $carte;
-			$contexte['hidden'][$carte] = cyberplus_form_hidden($config,$parm);
+			$contexte['hidden'][$carte] = systempay_form_hidden($config,$parm);
 			$contexte['logo'][$carte] = $cartes_possibles[$carte];
 		}
 	}

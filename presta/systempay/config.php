@@ -11,21 +11,21 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-/* CyberPlus  ----------------------------------------------------------- */
+/* Systempay  ----------------------------------------------------------- */
 
 
 /**
- * Constantes pour CyberPlus
+ * Constantes pour Systempay
  * 
  * Vous pouvez définir ces constantes dans votre fichier mes_options.php
  *
- * Il vous faudra obtenir 3 informations de CyberPlus et les définir dans
+ * Il vous faudra obtenir 3 informations de Systempay et les définir dans
  * les constantes correspondantes :
- * - Identifiant Boutique à récupérer dans le Back office de la solution de paiement (constante _CYBERPLUS_ID),
- * - Certificat à récupérer dans le Back office de la solution de paiement (constante _CYBERPLUS_CLE)
+ * - Identifiant Boutique à récupérer dans le Back office de la solution de paiement (constante _SYSTEMPAY_ID),
+ * - Certificat à récupérer dans le Back office de la solution de paiement (constante _SYSTEMPAY_CLE)
  *
  * Le fonctionnement est le suivant :
- * - le visiteur de votre site clique le bouton de paiement CyberPlus, il est redirigé sur la banque
+ * - le visiteur de votre site clique le bouton de paiement Systempay, il est redirigé sur la banque
  * - là, il peut effectuer 3 actions :
  *   1) annuler : il retourne sur votre site (ce qui annule sa transaction)
  *   2) payer correctement : il reste sur le site de la banque,
@@ -41,5 +41,5 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  */
 
 # Version du logiciel
-if (!defined('_CYBERPLUS_VERSION'))
-	define("_CYBERPLUS_VERSION", "V2");
+if (!defined('_SYSTEMPAY_VERSION'))
+	define("_SYSTEMPAY_VERSION", "V2");
