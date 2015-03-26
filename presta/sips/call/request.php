@@ -11,23 +11,45 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-// il faut avoir un id_transaction et un transacrion_hash coherents
-// pour se premunir d'une tentative d'appel exterieur
-function presta_sips_call_request_dist($id_transaction,$transaction_hash){
-	$res = sql_select("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash));
-	if (!$row = sql_fetch($res))
-		return "";
+/**
+ * Preparation de la requete par cartes
+ * il faut avoir un id_transaction et un transaction_hash coherents
+ * pour se premunir d'une tentative d'appel exterieur
+ *
+ * @param int $id_transaction
+ * @param string $transaction_hash
+ * @param $config
+ *   configuration du module
+ * @return array
+ */
+function presta_sips_call_request_dist($id_transaction, $transaction_hash, $config){
 
-	if (!$row['id_auteur'] AND !$row['auteur_id'] AND $GLOBALS['visiteur_session']['id_auteur'])
-		sql_updateq("spip_transactions",array("id_auteur"=>$GLOBALS['visiteur_session']['id_auteur']),"id_transaction=".intval($id_transaction));
+	$mode = 'sips';
+	if (!is_array($config) OR !isset($config['type']) OR !isset($config['config'])){
+		spip_log("call_request : config invalide ".var_export($config,true),$mode._LOG_ERREUR);
+		$mode = $config['config'];
+	}
+
+	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash))){
+		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable",$mode._LOG_ERREUR);
+		return "";
+	}
+
+	if (!$row['id_auteur'] AND $GLOBALS['visiteur_session']['id_auteur']){
+		sql_updateq("spip_transactions",
+			array("id_auteur" => intval($row['id_auteur'] = $GLOBALS['visiteur_session']['id_auteur'])),
+			"id_transaction=" . intval($id_transaction)
+		);
+	}
+
+	$mail = bank_email_porteur($row);
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
 	$montant = intval(round(100*$row['montant'],0));
 
-	include_spip('inc/config');
-	$merchant_id = lire_config('bank_paiement/config_sips/merchant_id','');
-	$service = lire_config('bank_paiement/config_sips/service','');
-	$certif = lire_config('bank_paiement/config_sips/certificat','');
+	$merchant_id = $config['merchant_id'];
+	$service = $config['service'];
+	$certif = $config['certificat'];
 
 	//		Affectation des parametres obligatoires
 	$parm = array();
@@ -38,19 +60,19 @@ function presta_sips_call_request_dist($id_transaction,$transaction_hash){
 	$parm['customer_id']=intval($row['id_auteur'])?$row['id_auteur']:$row['auteur_id'];
 	$parm['order_id']=intval($id_transaction);
 	$parm['transaction_id']=modulo($row['transaction_hash'],999999);
-	$parm['customer_email']=substr(bank_email_porteur($row),0,128);
+	$parm['customer_email']=substr($mail,0,128);
 
-	$parm['normal_return_url']=generer_url_action('bank_response',"bankp=sips",true,true);
-	$parm['cancel_return_url']=generer_url_action('bank_cancel',"bankp=sips",true,true);
-	$parm['automatic_response_url']=generer_url_action('bank_response',"bankp=sips",true,true);
+	$parm['normal_return_url']=bank_url_api_retour($config,'response');
+	$parm['cancel_return_url']=bank_url_api_retour($config,'cancel');
+	$parm['automatic_response_url']=bank_url_api_retour($config,'autoresponse');
 
 	// ajouter les logos de paiement si configures
 	foreach(array('logo_id','logo_id2','advert') as $logo_key){
-		if ($file = lire_config('bank_paiement/config_sips/'.$logo_key,'')){
+		if (isset($config[$logo_key])
+		  AND $file = $config[$logo_key]){
 			$parm[$logo_key]=$file;
 		}
 	}
-
 
 	//		Les valeurs suivantes ne sont utilisables qu'en pre-production
 	//		Elles necessitent l'installation de vos fichiers sur le serveur de paiement

@@ -230,6 +230,7 @@ function sips_response($service, $merchant_id, $certificat, $response = 'respons
  * @return array
  */
 function sips_traite_reponse_transaction($response,$mode = 'sips') {
+
 	$id_transaction = $response['order_id'];
 	$transaction_hash = $response['transaction_id'];
 	$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
@@ -243,7 +244,9 @@ function sips_traite_reponse_transaction($response,$mode = 'sips') {
 			)
 		);
 	}
-	if ($transaction_hash!=($row['transaction_hash']%999999)){
+
+	include_spip('inc/filtres');
+	if ($transaction_hash!=modulo($row['transaction_hash'],999999)){
 		include_spip('inc/bank');
 		return bank_transaction_invalide($id_transaction,
 			array(
@@ -253,18 +256,19 @@ function sips_traite_reponse_transaction($response,$mode = 'sips') {
 			)
 		);
 	}
+
 	// ok, on traite le reglement
 	$date='payment';
 	if ($mode == 'sipsabo')
 		$date='sub';
 	//"Y-m-d H:i:s"
 	$date_paiement =
-	substr($response[$date.'_date'],0,4)."-". //annee
-	substr($response[$date.'_date'],4,2)."-". //mois
-	substr($response[$date.'_date'],6,2)." ". //jour
-	substr($response[$date.'_time'],0,2).":". //Heures
-	substr($response[$date.'_time'],2,2).":". //min
-	substr($response[$date.'_time'],4,2) //sec
+	    substr($response[$date.'_date'],0,4)."-" //annee
+	  . substr($response[$date.'_date'],4,2)."-" //mois
+	  . substr($response[$date.'_date'],6,2)." " //jour
+	  . substr($response[$date.'_time'],0,2).":" //Heures
+	  . substr($response[$date.'_time'],2,2).":" //min
+	  . substr($response[$date.'_time'],4,2) //sec
 	;
 
 	$response_code = sips_response_code($response['response_code']);

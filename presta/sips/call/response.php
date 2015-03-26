@@ -12,23 +12,37 @@
 include_spip('presta/sips/inc/sips');
 include_spip('inc/date');
 
-// il faut avoir un id_transaction et un transaction_hash coherents
-// pour se premunir d'une tentative d'appel exterieur
-function presta_sips_call_response_dist(){
+/**
+ * Verifier le statut d'une transaction lors du retour de l'internaute
+ *
+ * @param array $response
+ * @param string $mode
+ * @return array
+ */
+function presta_sips_call_response_dist($response=null, $mode='sips'){
+
+	include_spip('inc/bank');
+	$config = bank_config($mode);
 
 	include_spip('inc/config');
-	$merchant_id = lire_config('bank_paiement/config_sips/merchant_id','');
-	$service = lire_config('bank_paiement/config_sips/service','');
-	$certif = lire_config('bank_paiement/config_sips/certificat','');
+	$merchant_id = $config['merchant_id'];
+	$service = $config['service'];
+	$certif = $config['certificat'];
 
 	// recuperer la reponse en post et la decoder
-	$response = sips_response($service, $merchant_id, $certif);
+	if (is_null($response)){
+		$response = sips_response($service, $merchant_id, $certif);
+	}
 
 	if ($response['merchant_id']!==$merchant_id) {
-		spip_log('call_response : merchant_id invalide:'.sips_shell_args($response),'sips.'._LOG_ERREUR);
-		return array(0,false);
+		return bank_transaction_invalide(0,
+			array(
+				'mode' => $mode,
+				'erreur' => "merchant_id invalide",
+				'log' => sips_shell_args($response)
+			)
+		);
 	}
 
 	return sips_traite_reponse_transaction($response);
 }
-?>

@@ -13,8 +13,12 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function presta_sips_payer_acte_dist($id_transaction, $transaction_hash, $titre=''){
 
+	include_spip('inc/bank');
+	$config = bank_config("sips");
+
 	$call_request = charger_fonction('request','presta/sips/call');
-	$contexte = $call_request($id_transaction,$transaction_hash);
+	$contexte = $call_request($id_transaction,$transaction_hash,$config);
+
 	$contexte['title'] = $titre;
 
 	return recuperer_fond('presta/sips/payer/acte',$contexte);

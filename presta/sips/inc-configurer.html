@@ -24,7 +24,7 @@
 	<li class="editer haut editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 		<label for="#GET{name}">Certificat</label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
-		]<textarea name="#ENV{casier,''}[certificat]" class="textarea" rows="10">
+		]<textarea name="#ENV{casier,''}[certificat]" class="textarea" style='font-family:monospace;font-size:11px' rows="10">
 #ENV*{#ENV{casier,''}/certificat,#GET{defaut}}</textarea>
 	</li>
 	<li class="fieldset"><fieldset><legend><:bank:legend_sips_logo_page_paiement:></legend><ul>
