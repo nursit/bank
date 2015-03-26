@@ -13,13 +13,14 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function presta_paybox_payer_acte_dist($id_transaction, $transaction_hash, $titre=''){
 
-	include_spip('presta/paybox/inc/paybox');
-	$config = paybox_pbx_ids();
+	include_spip('inc/bank');
+	$config = bank_config("paybox");
+
 	$call_request = charger_fonction('request','presta/paybox/call');
 	$contexte = $call_request($id_transaction,$transaction_hash,$config);
 	$contexte['title'] = $titre;
 
-	$contexte['sandbox'] = (strpos(paybox_url_host($config),"preprod")!==false?' ':'');
+	$contexte['sandbox'] = (paybox_is_sandbox($config)?' ':'');
 
 	return recuperer_fond('presta/paybox/payer/acte',$contexte);
 }

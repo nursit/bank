@@ -29,7 +29,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 
 	$mode = 'paybox';
 	if (!is_array($config) OR !isset($config['type']) OR !isset($config['config'])){
-		spip_log("call_request : config invalide ".var_export($config,true),'paybox'._LOG_ERREUR);
+		spip_log("call_request : config invalide ".var_export($config,true),$mode._LOG_ERREUR);
 		$mode = $config['config'];
 	}
 
@@ -42,11 +42,12 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	if (isset($config['cartes']) AND is_array($config['cartes']) AND $config['cartes'])
 		$cartes = $config['cartes'];
 
-	if (!$row['id_auteur'] AND $GLOBALS['visiteur_session']['id_auteur'])
+	if (!$row['id_auteur'] AND $GLOBALS['visiteur_session']['id_auteur']){
 		sql_updateq("spip_transactions",
-		  array("id_auteur"=>intval($row['id_auteur'] = $GLOBALS['visiteur_session']['id_auteur'])),
-			"id_transaction=".intval($id_transaction)
+			array("id_auteur" => intval($row['id_auteur'] = $GLOBALS['visiteur_session']['id_auteur'])),
+			"id_transaction=" . intval($id_transaction)
 		);
+	}
 
 	$mail = bank_email_porteur($row);
 

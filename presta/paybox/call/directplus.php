@@ -53,7 +53,8 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 		$montant = str_pad($montant,10,'0',STR_PAD_LEFT);
 
 	//		Affectation des parametres obligatoires
-	$config = paybox_pbx_ids('abo');
+	include_spip('inc/bank');
+	$config = bank_config("paybox",true);
 	$parm = array('VERSION'=>'00104','SITE'=>$config['PBX_SITE'],'RANG'=>$config['PBX_RANG'],'IDENTIFIANT'=>'');
 
 	$parm['CLE'] = $config['DIRECT_PLUS_CLE'];

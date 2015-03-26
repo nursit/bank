@@ -12,18 +12,18 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
 /**
- * @param string $boutique
- *   string : abo ou ''
- * @return array
+ * Determiner le mode test en fonction d'un define ou de la config
+ * @param array $config
+ * @return bool
  */
-function paybox_pbx_ids($boutique=''){
-
-	include_spip('inc/bank');
-	$v = bank_config("paybox",$boutique=='abo');
-	if (isset($v['pubkey']))
-		unset($v['pubkey']);
-
-	return $v;
+function paybox_is_sandbox($config){
+	$test = false;
+	// _PAYBOX_SANDBOX force a TRUE pour utiliser l'adresse de test de CMCIC
+	if ( (defined('_PAYBOX_SANDBOX') AND _PAYBOX_SANDBOX)
+	  OR (isset($config['mode_test']) AND $config['mode_test']) ){
+		$test = true;
+	}
+	return $test;
 }
 
 /**
@@ -33,9 +33,7 @@ function paybox_pbx_ids($boutique=''){
  */
 function paybox_url_host($config){
 	// mode sandbox ? possibilite de le forcer par define
-	if ( (defined('_PAYBOX_SANDBOX') AND _PAYBOX_SANDBOX)
-	  OR (isset($config['mode_test']) AND $config['mode_test'])) {
-
+	if (paybox_is_sandbox($config)) {
 		return "https://preprod-tpeweb.paybox.com/";
 	}
 
