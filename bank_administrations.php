@@ -131,7 +131,6 @@ function bank_upgrade_config(){
 
 	// renommage CybperPlus en SystemPay
 	$prestas = lire_config("bank_paiement/presta");
-	var_dump($prestas);
 	if (isset($prestas['cyberplus'])){
 		$prestas['systempay'] = $prestas['cyberplus'];
 		unset($prestas['cyberplus']);
