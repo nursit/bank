@@ -47,6 +47,26 @@ function paybox_url_host($config){
 
 }
 
+/**
+ * Liste des cartes CB possibles selon la config
+ * @param $config
+ * @return array
+ */
+function paybox_available_cards($config){
+
+	$cartes_possibles = array(
+		'CB'=>'presta/paybox/logo/CB.gif',
+		'VISA'=>'presta/paybox/logo/VISA.gif',
+		'EUROCARD_MASTERCARD'=>'presta/paybox/logo/MASTERCARD.gif',
+	);
+	if ($config['type']!=='abo'){
+		$cartes_possibles['E_CARD']='presta/paybox/logo/E-CB.gif';
+		$cartes_possibles['AMEX']='presta/paybox/logo/AMEX.gif';
+		$cartes_possibles['AURORE']='presta/paybox/logo/AURORE.gif';
+	}
+
+	return $cartes_possibles;
+}
 
 /**
  * URL d'appel pour le paiement en fonction de la config

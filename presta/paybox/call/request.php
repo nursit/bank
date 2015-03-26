@@ -106,23 +106,10 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 
 	// fermer le retour avec la signature
 	$parm['PBX_RETOUR'] .= 'sign:K';
-
-
-
 	//var_dump($parm);
-	$cartes_possibles = array(
-		'CB'=>'presta/paybox/logo/CB.gif',
-		'VISA'=>'presta/paybox/logo/VISA.gif',
-		'EUROCARD_MASTERCARD'=>'presta/paybox/logo/MASTERCARD.gif',
-	);
-	if ($config['type']!=='abo'){
-		$cartes_possibles['E_CARD']='presta/paybox/logo/E-CB.gif';
-		$cartes_possibles['AMEX']='presta/paybox/logo/AMEX.gif';
-		$cartes_possibles['AURORE']='presta/paybox/logo/AURORE.gif';
-	}
 
-	include_spip('inc/filtres_mini');
 
+	include_spip('inc/filtres_mini'); // url_absolue
 	$contexte = array(
 		'hidden'=>array(),
 		'action'=>paybox_url_paiment($config),
@@ -130,6 +117,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 		'id_transaction'=>$id_transaction
 	);
 
+	$cartes_possibles = paybox_available_cards($config);
 	foreach($cartes as $carte){
 		if (isset($cartes_possibles[$carte])){
 			$parm['PBX_TYPEPAIEMENT'] = 'CARTE';

@@ -53,6 +53,7 @@ _ Bank account:
 	'label_configuration_virement_ordre' => 'Beneficiary Account Name',
 	'label_configuration_virement_adresse_banque' => 'Bank Address',
 	'label_configuration_virement_notice' => 'Additional displayed information',
+	'label_configuration_cartes' => 'Use Payment Cards:',
 	'label_email_ticket_admin' => 'Target email for transaction tickets',
 	'label_emailfrom__ticket_admin' => '<i>From</i> email for transaction tickets',
 	'label_inactif' => 'Disable',

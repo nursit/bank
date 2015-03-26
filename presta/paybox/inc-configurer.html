@@ -23,6 +23,18 @@
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[PBX_HMAC_KEY]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{PBX_HMAC_KEY,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
+	#SET{name,#ENV{casier,''}_cartes}#SET{obli,''}#SET{defaut,#LISTE{}}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label><:bank:label_configuration_cartes:></label>
+		<BOUCLE_cards(POUR){tableau #REM|paybox_lister_cartes_config}>
+		#SET{val,#CLE}
+		<div class="choix">
+			<input type="checkbox" name="#ENV{casier,''}[cartes][]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#GET{val}|in_any{#ENV*{#ENV{casier,''}}|table_valeur{cartes,#GET{defaut}}}|oui)checked="checked"] />
+			<label for="#GET{name}_#GET{val}" title="[(#CLE|attribut_html)]">[(#CHEMIN{#VALEUR}|balise_img{#CLE})]</label>
+		</div>
+		</BOUCLE_cards>
+		<style>.editer_[(#GET{name})] .choix{display: inline-block;line-height: 30px}.editer_[(#GET{name})] .choix label{margin-left: 0}.editer_[(#GET{name})] .choix label img {max-height:24px;width:auto;vertical-align:middle;}</style>
+	</li>
 	#SET{name,#ENV{casier,''}_mode_test}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
 		<span class='erreur_message'>(#GET{erreurs})</span>
