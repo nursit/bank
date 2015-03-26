@@ -14,13 +14,13 @@
   <div class="payer_mode payer_virement payer_acte">
     <p class="titre h4"><:bank:payer_par_virement:></p>
     [(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive}|non)
-	    #SET{ordre,#CONFIG{bank_paiement/config_virement/ordre,#NOM_SITE_SPIP}|wrap{'<b>'}}
+	    #SET{ordre,#ENV{config/ordre,#NOM_SITE_SPIP}|wrap{'<b>'}}
 			#SET{montant,#MONTANT|affiche_monnaie|wrap{'<b>'}}
 			#SET{transaction,#ID_TRANSACTION|wrap{'<b>'}}
-	    #SET{iban,#CONFIG{bank_paiement/config_virement/iban}|wrap{'<b>'}}
-	    #SET{bic,#CONFIG{bank_paiement/config_virement/bic}|wrap{'<b>'}}
-	    #SET{banque,#CONFIG{bank_paiement/config_virement/banque}|wrap{'<b>'}}
-	    #SET{adressebanque,#CONFIG{bank_paiement/config_virement/adresse_banque}|nl2br}
+	    #SET{iban,#ENV{config/iban}|wrap{'<b>'}}
+	    #SET{bic,#ENV{config/bic}|wrap{'<b>'}}
+	    #SET{banque,#ENV{config/banque}|wrap{'<b>'}}
+	    #SET{adressebanque,#ENV{config/adresse_banque}|nl2br}
 
 	    [(#VAL{bank:info_virement}|_T{#ARRAY{
 		    ordre, #GET{ordre},
@@ -46,7 +46,7 @@
                         adressebanque, #GET{adressebanque}}
                         }|propre)]
                     </p>
-					[<p class="small">(#CONFIG{bank_paiement/config_virement/notice,''}|propre|PtoBR)</p>]
+					[<p class="small">(#ENV{config/notice,''}|propre|PtoBR)</p>]
 				</div>
 			]
 			[(#ENV{attente_mode,''}|=={virement}|non)

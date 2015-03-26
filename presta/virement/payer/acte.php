@@ -13,16 +13,17 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function presta_virement_payer_acte_dist($id_transaction,$transaction_hash) {
-	return recuperer_fond(
-		'presta/virement/payer/acte',
-		array(
-			'action' => generer_url_action('bank_response', 'bankp=virement', true, true),
-			'id_transaction' => $id_transaction,
-			'transaction_hash' => $transaction_hash,
-			'attente_mode' => _request('attente_mode'),
-		),
-		array(
-			'ajax'=>true
-		)
+
+	include_spip('inc/bank');
+	$config = bank_config("virement");
+
+	$contexte = array(
+		'action' => bank_url_api_retour($config,'response'),
+		'id_transaction' => $id_transaction,
+		'transaction_hash' => $transaction_hash,
+		'attente_mode' => _request('attente_mode'),
+		'config' => $config,
 	);
+
+	return recuperer_fond('presta/virement/payer/acte', $contexte, array('ajax'=>true));
 }
