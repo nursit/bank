@@ -66,7 +66,7 @@ _ Bank account:
 	'label_presta_cheque' => 'Checks (manual check remittance)',
 	'label_presta_cmcic' => 'CMCIC <a href="https://www.cmcicpaiement.fr/fr/">cmcicpaiement.fr</a>',
 	'label_presta_cmcic_banque' => 'Bank',
-	'label_presta_cyberplus' => 'CyberPlus',
+	'label_presta_systempay' => 'Systempay',
 	'label_presta_internetplus' => 'Internet +',
 	'label_presta_ogone' => 'Ogone <a href="http://www.ogone.fr/">http://www.ogone.fr/</a>',
 	'label_presta_paybox' => 'Paybox <a href="http://www.paybox.com/">http://www.paybox.com/</a>',
