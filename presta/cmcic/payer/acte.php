@@ -21,7 +21,7 @@ function presta_cmcic_payer_acte_dist($id_transaction,$transaction_hash, $titre=
 	$contexte['title'] = $titre;
 
 	include_spip('inc/cmcic');
-	$contexte['sandbox'] = cmcic_is_sandbox($config);
+	$contexte['sandbox'] = (cmcic_is_sandbox($config)?' ':'');
 
 	return recuperer_fond('presta/cmcic/payer/acte',$contexte);
 }
