@@ -455,17 +455,6 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	#$parm['vads_redirect_error_timeout'] = 1;
 	#$parm['vads_redirect_error_message'] = "Echec";
 
-
-	$cartes_possibles = array(
-		'CB'=>'presta/systempay/logo/CB.gif',
-		'VISA'=>'presta/systempay/logo/VISA.gif',
-		'MASTERCARD'=>'presta/systempay/logo/MASTERCARD.gif',
-	);
-
-	// cartes pour paiement a l'acte uniquement
-	$cartes_possibles['E-CARTEBLEUE']='presta/systempay/logo/E-CB.gif';
-	$cartes_possibles['AMEX']='presta/systempay/logo/AMEX.gif';
-
 	$contexte = array(
 		'hidden'=>array(),
 		'action'=>systempay_url_serveur($config),
@@ -473,6 +462,8 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 		'id_transaction'=>$id_transaction,
 		'transaction_hash' => $transaction_hash
 	);
+
+	$cartes_possibles = systempay_available_cards($config);
 	foreach($cartes as $carte){
 		if (isset($cartes_possibles[$carte])){
 			$parm['vads_payment_cards'] = $carte;

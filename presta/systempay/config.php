@@ -43,3 +43,10 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 # Version du logiciel
 if (!defined('_SYSTEMPAY_VERSION'))
 	define("_SYSTEMPAY_VERSION", "V2");
+
+function systempay_lister_cartes_config($abo=false){
+	include_spip('inc/bank');
+	$config = bank_config('systempay',$abo);
+	include_spip("presta/systempay/inc/systempay");
+	return systempay_available_cards($config);
+}

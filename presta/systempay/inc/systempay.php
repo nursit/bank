@@ -19,7 +19,24 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @return string
  */
 function systempay_url_serveur($config){
-	return "https://paiement.systempay.fr/vads-payment/";
+
+	$host = "";
+	switch($config['service']){
+		case "osb":
+			$host = "https://secure.osb.pf";
+			break;
+		case "payzen":
+			$host = "https://secure.payzen.eu";
+			break;
+		case "systempay":
+		case "cyberplus":
+		case "spplus":
+		default:
+			$host = "https://paiement.systempay.fr";
+			break;
+	}
+
+	return "$host/vads-payment/";
 }
 
 /**
@@ -28,8 +45,61 @@ function systempay_url_serveur($config){
  * @return string
  */
 function systempay_key($config){
+	if ($config['mode_test']) {
+		return $config['CLE_test'];
+	}
+
 	return $config['CLE'];
 }
+
+
+/**
+ * Liste des cartes CB possibles selon la config
+ * @param $config
+ * @return array
+ */
+function systempay_available_cards($config){
+
+	$mode = $config['presta'];
+	$cartes_possibles = array(
+		'CB'=>"presta/$mode/logo/CB.gif",
+		'VISA'=>"presta/$mode/logo/VISA.gif",
+		'MASTERCARD'=>"presta/$mode/logo/MASTERCARD.gif",
+		'E-CARTEBLEUE' => "presta/$mode/logo/E-CB.gif",
+		'AMEX' => "presta/$mode/logo/AMEX.gif",
+	);
+
+	if ($config['service']=="osb"){
+		// pas de CB et e-CB avec OSB
+		unset($cartes_possibles['CB']);
+		unset($cartes_possibles['E-CARTEBLEUE']);
+	}
+	else {
+		if ($config['type']!=='abo'){
+			$cartes_possibles['MAESTRO'] = "presta/$mode/logo/MAESTRO.gif";
+			$cartes_possibles['VISA_ELECTRON'] = "presta/$mode/logo/VISAELECTRON.gif";
+			//$cartes_possibles['PAYPAL']="presta/$mode/logo/PAYPAL.gif";
+			//$cartes_possibles['V_ME']="presta/$mode/logo/VME.gif";
+		}
+	}
+	if ($config['service']=='payzen'){
+		if ($config['type']!=='abo'){
+			$cartes_possibles['PAYLIB'] = "presta/$mode/logo/PAYLIB.gif";
+			$cartes_possibles['ONEY'] = "presta/$mode/logo/ONEY.gif";
+			$cartes_possibles['JCB'] = "presta/$mode/logo/JCB.gif";
+			$cartes_possibles['DINERS'] = "presta/$mode/logo/DINERS.gif";
+			$cartes_possibles['SOFORT_BANKING'] = "presta/$mode/logo/SOFORT.gif";
+			$cartes_possibles['IDEAL'] = "presta/$mode/logo/IDEAL.gif";
+		}
+	}
+
+	if ($config['type']=='abo'){
+		unset($cartes_possibles['E-CARTEBLEUE']);
+	}
+
+	return $cartes_possibles;
+}
+
 
 /**
  * Generer les hidden du form en signant les parametres au prealable
