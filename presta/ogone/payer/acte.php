@@ -20,7 +20,7 @@ function presta_ogone_payer_acte_dist($id_transaction,$transaction_hash, $titre=
 	$contexte = $call_request($id_transaction,$transaction_hash,$config);
 	$contexte['title'] = $titre;
 
-	$contexte['sandbox'] = ogone_is_sandbox($config);
+	$contexte['sandbox'] = (ogone_is_sandbox($config)?' ':'');
 
 	$forms = recuperer_fond('presta/ogone/payer/acte',$contexte);
 	$forms = ogone_form_sha_in($forms,$config);

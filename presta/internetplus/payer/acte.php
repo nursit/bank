@@ -26,13 +26,13 @@ function presta_internetplus_payer_acte_dist($id_transaction,$transaction_hash){
 	}
 
 	$url_payer = wha_url_transaction($id_transaction,$transaction_hash,$config);
-	return recuperer_fond('presta/internetplus/payer/acte',
-		array(
-			'id_transaction' => $id_transaction,
-			'transaction_hash' => $transaction_hash,
-			'url_payer' => $url_payer,
-			'logo' => wha_logo_detecte_fai_visiteur(),
-			'sandbox' => wha_is_sandbox($config),
-		)
+	$contexte = array(
+		'id_transaction' => $id_transaction,
+		'transaction_hash' => $transaction_hash,
+		'url_payer' => $url_payer,
+		'logo' => wha_logo_detecte_fai_visiteur(),
+		'sandbox' => (wha_is_sandbox($config)?' ':''),
 	);
+
+	return recuperer_fond('presta/internetplus/payer/acte', $contexte);
 }
