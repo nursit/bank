@@ -25,23 +25,24 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 
 		$auto = ($auto ? "auto":"");
 		$result = false;
-		// intercepter les retours depuis un presta actif
-		if ($p = ($presta?$presta:_request('bankp'))
-			AND
-			 ((isset($prestas[$p]) AND $prestas[$p]) OR $p=='gratuit')
-		){
 
-			if (!$auto OR !$call_response = charger_fonction('autoresponse',"presta/$p/call",true))
-				$call_response = charger_fonction('response',"presta/$p/call");
+		// intercepter les retours depuis un presta actif
+		if (!$presta) $presta = _request('bankp');
+		if ($presta=="cyberplus") $presta = "systempay"; // renommage d'un prestataire : assurer la continuite de fonctionnement
+
+		if ($presta AND ((isset($prestas[$presta]) AND $prestas[$presta]) OR $presta=='gratuit') ){
+
+			if (!$auto OR !$call_response = charger_fonction('autoresponse',"presta/$presta/call",true))
+				$call_response = charger_fonction('response',"presta/$presta/call");
 
 			if ($cancel)
 				define('_BANK_CANCEL_TRANSACTION',true);
-			spip_log('call_'.$auto.'response : '.$_SERVER['REQUEST_URI'],"$p$auto");
+			spip_log('call_'.$auto.'response : '.$_SERVER['REQUEST_URI'],"$presta$auto");
 			list($id_transaction,$result)=$call_response();
-			spip_log('call_'.$auto.'response : '."$id_transaction/$result","$p$auto");
+			spip_log('call_'.$auto.'response : '."$id_transaction/$result","$presta$auto");
 		}
 		else {
-			spip_log("Prestataire $p inconnu ou inactif",'bank_response');
+			spip_log("Prestataire $presta inconnu ou inactif",'bank_response');
 		}
 
 		// fall back si le presta n'a rien renvoye de lisible
@@ -56,7 +57,7 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 			$id_transaction = sql_getfetsel ("id_transaction","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($hash));
 			if ($id_transaction){
 				$set = array(
-					'mode'=>$p,
+					'mode'=>$presta,
 					'statut'=>'echec',
 					'message'=>'Transaction annul&eacute;e',
 				);
@@ -83,7 +84,7 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 
 		if (!$auto){
 			$abo = sql_getfetsel("abo_uid","spip_transactions","id_transaction=".intval($id_transaction));
-			return redirige_apres_retour_transaction($p,!$abo?'acte':'abo',$cancel?false:$result,$id_transaction);
+			return redirige_apres_retour_transaction($presta,!$abo?'acte':'abo',$cancel?false:$result,$id_transaction);
 		}
 		die(); // mourir silencieusement
 	}
