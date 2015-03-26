@@ -14,8 +14,13 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 include_spip('presta/paybox/inc/paybox');
 include_spip('inc/date');
 
-// il faut avoir un id_transaction et un transaction_hash coherents
-// pour se premunir d'une tentative d'appel exterieur
+/**
+ * Verifier le statut d'une transaction lors du retour de l'internaute
+ *
+ * @param array $response
+ * @param string $mode
+ * @return array
+ */
 function presta_paybox_call_response_dist($response=null, $mode='paybox'){
 
 	if (!$response)
