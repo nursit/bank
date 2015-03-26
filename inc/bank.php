@@ -13,6 +13,47 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
 /**
+ * Retourner la liste des prestataires connus
+ * @param bool $abo
+ */
+function bank_lister_prestas($abo=false){
+	static $prestas = array();
+	if (isset($prestas[$abo]))
+		return $prestas[$abo];
+
+	$prestas[$abo] = array();
+	$regexp = ($abo?"abonnement\.php$":"acte\.php$");
+	foreach (creer_chemin() as $d){
+		$f = $d . "presta/";
+		if (@is_dir($f)){
+			$all = preg_files($f, $regexp);
+			foreach($all as $a){
+				$a = explode("/presta/",$a);
+				$a = end($a);
+				$a = explode("/",$a);
+				if (count($a)==3 AND $a[1]="payer"){
+					$prestas[$abo][reset($a)] = true;
+				}
+			}
+		}
+	}
+	ksort($prestas[$abo]);
+	// a la fin
+	foreach(array("cheque","virement","simu") as $m){
+		if (isset($prestas[$abo][$m])){
+			unset($prestas[$abo][$m]);
+			$prestas[$abo][$m] = true;
+		}
+	}
+	if (isset($prestas[$abo]['gratuit'])){
+		unset($prestas[$abo]['gratuit']);
+	}
+
+	$prestas[$abo] = array_keys($prestas[$abo]);
+	return $prestas[$abo];
+}
+
+/**
  * Generer les urls de retour bank
  * @param array $config
  * @param string $action

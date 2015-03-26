@@ -11,6 +11,8 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+include_spip('inc/bank');
+
 function formulaires_configurer_bank_paiement_verifier_dist(){
 	$erreurs = array();
 	if ($e = _request('email_ticket_admin') AND !email_valide($e))

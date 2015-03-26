@@ -23,18 +23,7 @@
 		<fieldset>
 			<legend><:bank:label_mode_paiement:></legend>
 			<ul>
-				<BOUCLE_prestas(POUR){tableau #LISTE{
-				cmcic,
-				internetplus,
-				ogone,
-				paybox,
-				paypal,
-				paypalexpress,
-				sips,
-				systempay,
-				cheque,
-				virement,
-				simu}}>
+				<BOUCLE_prestas(POUR){tableau #REM|bank_lister_prestas}>
 					#SET{name,presta_#VALEUR}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 					#SET{disabled,''}
 					[(#AUTORISER{utilisermodepaiement,_#VALEUR}|non)#SET{disabled,true}]
@@ -64,10 +53,7 @@
 		<fieldset>
 			<legend><:bank:label_mode_paiement_abo:></legend>
 			<ul>
-				<BOUCLE_prestasabo(POUR){tableau #LISTE{
-				internetplus,
-				paybox,
-				simu}}>
+				<BOUCLE_prestasabo(POUR){tableau #VAL{abo}|bank_lister_prestas}>
 					#SET{name,presta_abo_#VALEUR}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 					#SET{disabled,''}
 					[(#AUTORISER{utilisermodepaiementabo,_#VALEUR}|non)#SET{disabled,true}]
