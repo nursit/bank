@@ -14,7 +14,8 @@
 <div class='payer_mode payer_simu payer_abonnement'>
 	<p class="titre h4">S'abonner [SIMULATION] :</p>
 	<div class='boutons'>
-	#BOUTON_ACTION{'Simuler l&#39;abonnement',#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{hash,#TRANSACTION_HASH}}
+		#BOUTON_ACTION{'Simuler l&#39;abonnement',#ENV{action}}
+		#BOUTON_ACTION{'Simuler un echec de l&#39;abonnement',#ENV{action}|parametre_url{status,fail}}
 	</div>
 </div>
 </BOUCLE_trans>

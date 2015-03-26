@@ -13,14 +13,22 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function presta_simu_payer_abonnement_dist($id_transaction,$transaction_hash){
 
-	return recuperer_fond(
-		'presta/simu/payer/abonnement',
-		array(
-			'action'=>  generer_url_action('bank_response', 'bankp=simu&abo=oui',true,true),
-			'id_transaction'=>$id_transaction,
-			'transaction_hash'=>$transaction_hash
-		)
-	);
-}
+	include_spip('inc/bank');
+	$config = bank_config("simu",true);
 
-?>
+	$contexte = array(
+		'id_transaction' => $id_transaction,
+		'transaction_hash' => $transaction_hash,
+	);
+	$contexte['sign'] = bank_sign_response_simple('simu', $contexte);
+
+	// url action
+	$action = bank_url_api_retour($config,'response');
+	foreach($contexte as $k=>$v){
+		$action = parametre_url($action,$k,$v);
+	}
+	$action = parametre_url($action,"abo","oui");
+	$contexte['action'] = $action;
+
+	return recuperer_fond('presta/simu/payer/abonnement',$contexte);
+}

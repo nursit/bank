@@ -17,82 +17,28 @@ include_spip('inc/date');
  * il faut avoir un id_transaction et un transaction_hash coherents
  * pour se premunir d'une tentative d'appel exterieur
  * 
+ * @param null $response
+ * @param string $mode
+ * @return array
  */
-function presta_simu_call_response_dist(){
+function presta_simu_call_response_dist($response=null, $mode="simu"){
 
-	// recuperer la reponse en post et la decoder
-	
-	$id_transaction = _request('id_transaction');
-	$transaction_hash = _request('hash');
-	include_spip('inc/autoriser');
-	if (!autoriser('utilisermodepaiement','simu')) {
-		include_spip('inc/bank');
-		return bank_transaction_invalide($id_transaction,
-			array(
-				'mode' => "simu",
-				'erreur' => "simu pas autorisee",
-			)
-		);
-	}
-	
-	if (!$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction))){
-		include_spip('inc/bank');
-		return bank_transaction_invalide($id_transaction,
-			array(
-				'mode' => "simu",
-				'erreur' => "transaction inconnue",
-			)
-		);
-	}
-	if ($transaction_hash!=$row['transaction_hash']){
-		include_spip('inc/bank');
-		return bank_transaction_invalide($id_transaction,
-			array(
-				'mode' => "simu",
-				'erreur' => "hash $transaction_hash non conforme",
-			)
-		);
-	}
+	include_spip('inc/bank');
+	$config = bank_config($mode);
 
-	// est-ce une simulation d'echec ?
+	// recuperer la reponse en post et la decoder, en verifiant la signature
+	if (!$response)
+		$response = bank_response_simple($mode);
+
+		// est-ce une simulation d'echec ?
 	if (_request('status')=='fail'){
-	 	// sinon enregistrer l'absence de paiement et l'erreur
-		include_spip('inc/bank');
-		return bank_transaction_echec($id_transaction,
-			array(
-				'mode'=>"simu",
-				'code_erreur' => "simu",
-				'erreur' => 'Simulation echec paiement',
-			)
-		);
+		$response['fail'] = "Simulation echec paiement";
 	}
 
-	// Ouf, le reglement a ete accepte
-	$set = array(
-		"mode"=>'simu',
-		"montant_regle"=>$row['montant'],
-		"date_paiement"=>date('Y-m-d H:i:s'),
-		"statut"=>'ok',
-		"reglee"=>'oui',
-	);
-	// generer un numero d'abonne simule
+	// generer un numero d'abonne simule si besoin
 	if (_request('abo')){
-		$abo_uid = substr(md5("$id_transaction-".time()),0,10);
-		$set['abo_uid'] = $abo_uid;
+		$response['abo_uid'] = substr(md5($response['id_transaction']."-".time()),0,10);
 	}
 
-	sql_updateq("spip_transactions", $set,	"id_transaction=".intval($id_transaction));
-	spip_log("simu_response : id_transaction $id_transaction, reglee",'simu');
-
-	$regler_transaction = charger_fonction('regler_transaction','bank');
-	$regler_transaction($id_transaction,array('row_prec'=>$row));
-
-	if (_request('abo')
-		AND $abo_uid
-	  AND $activer_abonnement = charger_fonction('activer_abonnement','abos',true)){
-		// numero d'abonne = numero de transaction
-		$activer_abonnement($id_transaction,$abo_uid,'simu');
-	}
-
-	return array($id_transaction,true);
+	return bank_simple_call_response($response, $mode);
 }
