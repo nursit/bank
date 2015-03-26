@@ -30,6 +30,9 @@ function presta_paybox_install_dist(){
 	}
 	// effacer cette vieille config
 	if (lire_config("bank_paiement/config_paybox/pubkey",'')){
-		ecrire_config("bank_paiement/config_paybox/pubkey");
+		ecrire_config("bank_paiement/config_paybox/pubkey",null);
+	}
+	if (lire_config("bank_paiement/config_abo_paybox/pubkey",'')){
+		ecrire_config("bank_paiement/config_abo_paybox/pubkey",null);
 	}
 }
