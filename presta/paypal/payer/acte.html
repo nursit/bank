@@ -15,6 +15,7 @@
 	<p class="titre h4"><:bank:payer_avec{nom=Paypal}:></p>
 	<div class='boutons'>
 		<form action="#ENV{action}" method="post" class="noajax">
+			<button type="submit" title="<:bank:payer_avec{nom=Paypal}|attribut_html:>">[(#CHEMIN{presta/paypal/logo/PayPal_mark_60x38.gif}|balise_img)]</button>
 			<div>
 				<input TYPE="hidden" name="charset" value="#CHARSET" />
 				<input type="hidden" name="cmd" value="_cart" />
@@ -39,7 +40,6 @@
 				<input type="hidden" name="return" value="#ENV*{url_return}" />
 				<input type="hidden" name="rm" value="2" />[(#REM) 1=GET 2=POST]
 			</div>
-			<input type="image" src ='#CHEMIN{presta/paypal/logo/PayPal_mark_60x38.gif}' />
 		</form>
 	</div>
 	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=Paypal}:></div>]
