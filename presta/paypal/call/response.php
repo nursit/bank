@@ -59,6 +59,6 @@ function presta_paypal_call_response($mode='paypal', $response=null){
 	}
 
 	include_spip('presta/paypal/inc/paypal');
-	return paypal_traite_response($response,$config);
+	return paypal_traite_response($config, $response);
 }
 

@@ -49,11 +49,11 @@ function paypal_url_serveur($config){
  * Recevoir la notification paypal
  * du paiement
  *
+ * @param array $config
  * @param array $response
- * @param string $mode
  * @return array
  */
-function paypal_traite_response($response, $config){
+function paypal_traite_response($config, $response){
 
 	$mode = $config['presta'];
 	spip_log('Paypal IPN'.var_export($response,true),$mode);
