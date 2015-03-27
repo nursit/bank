@@ -47,7 +47,7 @@ function affiche_monnaie($valeur,$decimales=2,$unite=true){
 			$unite = "&nbsp;%";
 	}
 	if (!$unite)
-		$unite=="";
+		$unite="";
 	return sprintf("%.{$decimales}f",$valeur).$unite;
 }
 }
