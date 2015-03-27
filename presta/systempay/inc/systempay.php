@@ -91,6 +91,11 @@ function systempay_available_cards($config){
 			$cartes_possibles['DINERS'] = "presta/$mode/logo/DINERS.gif";
 			$cartes_possibles['SOFORT_BANKING'] = "presta/$mode/logo/SOFORT.gif";
 			$cartes_possibles['IDEAL'] = "presta/$mode/logo/IDEAL.gif";
+
+			// et les SEPA
+			$cartes_possibles['SDD'] = "presta/$mode/logo/SEPA_SDD.gif";
+			// et les e-cheques vacances
+			$cartes_possibles['E_CV'] = "presta/$mode/logo/E_CV.gif";
 		}
 	}
 

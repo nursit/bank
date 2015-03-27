@@ -1,0 +1,23 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012-2015 - Distribue sous licence GNU/GPL
+ *
+ */
+]#CACHE{0}
+<BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
+<div class='payer_mode payer_payzen payer_acte'>
+	<p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
+	<div class='boutons'>
+	<BOUCLE_cb(POUR){tableau #ENV{hidden}}>
+		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#CHEMIN{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
+	</BOUCLE_cb>
+	</div>
+	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=PayZen}:></div>]
+</div>
+</BOUCLE_trans>
