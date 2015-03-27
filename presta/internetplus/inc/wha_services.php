@@ -11,6 +11,7 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+include_spip('inc/bank');
 
 /**
  * Determiner le mode test en fonction d'un define ou de la config
@@ -59,10 +60,19 @@ function wha_node_url($config){
 
 
 function wha_secret_key($partnerId,$keyId){
-	if (defined($s = '_WHA_SECRET_'.intval($partnerId)) AND constant($s))
-		return constant($s);
+
+	$config = bank_config("internetplus",false);
+	if (  isset($config['MERCHANT_ID']) AND $config['MERCHANT_ID']==$partnerId
+	  AND isset($config['SECRET']) AND $config['SECRET'])
+		return $config['SECRET'];
+
+	$config = bank_config("internetplus",true);
+	if (  isset($config['MERCHANT_ID']) AND $config['MERCHANT_ID']==$partnerId
+	  AND isset($config['SECRET']) AND $config['SECRET'])
+		return $config['SECRET'];
+
 	// sinon on log l'absence de cle
-	spip_log("wha_secret_key : $s non definie","internetplus"._LOG_ERREUR);
+	spip_log("wha_secret_key : pas de config internetplus avec MERCHANT_ID=$partnerId et SECRET defini","internetplus"._LOG_ERREUR);
 	return "nokey";
 }
 
