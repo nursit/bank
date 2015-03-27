@@ -59,20 +59,34 @@ function paypal_traite_response($config, $response){
 	spip_log('Paypal IPN'.var_export($response,true),$mode);
 		
 	if (!isset($response['receiver_email']) OR ($response['receiver_email']!=$config['BUSINESS_USERNAME'])){
-		spip_log($s="receiver_email errone : POST :".var_export($response,true),$mode._LOG_ERREUR);
-		return array(0,false);
+		return bank_transaction_invalide(0,
+			array(
+				'mode' => $mode,
+				'erreur' => "receiver_email errone",
+				'log' => var_export($response, true),
+			)
+		);
 	}
 
 	if (!isset($response['invoice'])){
-		spip_log($s="pas de invoice specifie : POST :".var_export($response,true),$mode._LOG_ERREUR);
-		spip_log($s,$mode._LOG_ERREUR);
-		return array(0,false);
+		return bank_transaction_invalide(0,
+			array(
+				'mode' => $mode,
+				'erreur' => "pas de invoice specifie",
+				'log' => var_export($response, true),
+			)
+		);
 	}
 	
 	list($id_transaction,$transaction_hash) = explode('|',$response['invoice']);
 	if (!$row = sql_fetsel("*","spip_transactions", "id_transaction=".intval($id_transaction) ." AND transaction_hash=".sql_quote($transaction_hash))){
-		spip_log("id_transaction invalide : $id_transaction/hash$transaction_hash : POST :".var_export($response,true),$mode._LOG_ERREUR);
-		return array(0,false);
+		return bank_transaction_invalide(0,
+			array(
+				'mode' => $mode,
+				'erreur' => "transaction inconnue",
+				'log' => var_export($response, true),
+			)
+		);
 	}
 
 	if ($row['reglee']=='oui')
@@ -80,51 +94,78 @@ function paypal_traite_response($config, $response){
 
 	// verifier que le status est bien ok
 	if (!isset($response['payment_status']) OR ($response['payment_status']!='Completed')){
-		spip_log("Transaction $id_transaction:payment_status!=completed : POST :".var_export($response,true),$mode._LOG_ERREUR);
-		$message="Votre r&egrave;glement n'a pu &ecirc;tre r&eacute;alis&eacute; par Paypal";
-		return paypal_echec_transaction($id_transaction,$message); // erreur sur la transaction
+		return bank_transaction_echec($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "payment_status!=completed",
+				'log' => var_export($response, true),
+			)
+		);
 	}
 	
 	// verifier que le numero de transaction au sens paypal
 	// (=numero d'autorisation ici) est bien fourni
 	if (!isset($response['txn_id']) OR (!$response['txn_id'])){
-		spip_log("Transaction $id_transaction:pas de txn_id : POST :".var_export($response,true),$mode._LOG_ERREUR);
-		$message="Nous n'avons re&ccedil;u aucune autorisation de Paypal concernant votre r&egrave;glement";
-		return paypal_echec_transaction($id_transaction,$message); // erreur sur la transaction
+		return bank_transaction_echec($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "pas de txn_id (autorisation manquante)",
+				'log' => var_export($response, true),
+			)
+		);
 	}
 	
 	// verifier que le numero de transaction au sens paypal
 	// (=numero d'autorisation ici) n'a pas deja ete utilise
 	$autorisation_id = $response['txn_id'];
 	if ($id = sql_getfetsel("id_transaction","spip_transactions","autorisation_id=".sql_quote($autorisation_id)." AND mode='paypal'")){
-		// une transaction existe deja avec ce numero d'autorisation
-		spip_log("Transaction $id_transaction:txn_id $autorisation_id deja utilise par $id : POST :".var_export($response,true),$mode._LOG_ERREUR);
-		$message="Les informations concernant votre transaction $id_transaction sont erron&eacute;es";
-		return paypal_echec_transaction($id_transaction,$message); // erreur sur la transaction
+		return bank_transaction_echec($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "txn_id deja en base (doublon autorisation)",
+				'log' => var_export($response, true),
+			)
+		);
 	}
 
 	// enregistrer immediatement le present numero d'autorisation pour ne pas risquer des requetes simultanees sur le meme id
-	sql_updateq("spip_transactions",array("autorisation_id"=>$autorisation_id,"mode"=>'paypal'),"id_transaction=".intval($id_transaction));
+	$set = array(
+		"autorisation_id"=>$autorisation_id,
+		"mode"=>$mode
+	);
+	sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
 
 	// une monnaie est-elle bien indique (et en EUR) ?
 	if (!isset($response['mc_currency']) OR ($response['mc_currency']!='EUR')){
-		spip_log("Transaction $id_transaction:devise incorrecte : POST :".var_export($response,true),$mode._LOG_ERREUR);
-		$message="Les informations concernant votre transaction $id_transaction sont erron&eacute;es";
-		return paypal_echec_transaction($id_transaction,$message); // erreur sur la transaction
+		return bank_transaction_echec($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "devise mc_currency incorrecte",
+				'log' => var_export($response, true),
+			)
+		);
 	}
 
-	// un montant est il bien renvoye ?
+	// un montant est il bien renvoye et correct ?
 	if (!isset($response['mc_gross']) OR (($montant_regle=$response['mc_gross'])!=$row['montant'])){
-		spip_log("Transaction $id_transaction:montant incorrect : POST :".var_export($response,true),$mode._LOG_ERREUR);
-		$message="Les informations concernant votre transaction $id_transaction sont erron&eacute;es";
-		return paypal_echec_transaction($id_transaction,$message); // erreur sur la transaction
+		return bank_transaction_echec($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "montant mc_gross incorrect",
+				'log' => var_export($response, true),
+			)
+		);
 	}
 
 	// verifier que la notification vien bien de paypal !
-	if (!bank_paypal_verifie_notification($response, $config)){
-		spip_log("Transaction $id_transaction:reponse IPN!=VERIFIE : POST :".var_export($response,true),$mode._LOG_ERREUR);
-		$message="Paypal n'a pu confirmer la validit&eacute; de votre r&egrave;glement concernant la transaction $id_transaction";
-		return paypal_echec_transaction($id_transaction,$message); // erreur sur la transaction
+	if (!bank_paypal_verifie_notification($config, $response)){
+		return bank_transaction_echec($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "verification invalide (IPN!=VERIFIE)",
+				'log' => var_export($response, true),
+			)
+		);
 	}
 
 	$set = array(
@@ -161,10 +202,11 @@ function paypal_echec_transaction($id_transaction,$message){
 
 /**
  * Verifier que la notification de paiement vient bien de paypal !
- * @param array $args
+ * @param array $config
+ * @param array $response
  * @return bool
  */
-function bank_paypal_verifie_notification($response, $config){
+function bank_paypal_verifie_notification($config, $response){
 	// lire la publication du systeme PayPal et ajouter 'cmd'
 	$response['cmd'] ='_notify-validate';
 
@@ -179,5 +221,3 @@ function bank_paypal_verifie_notification($response, $config){
 	spip_log("Retour IPN :$resultat:Erreur$erreur:$erreur_msg: POST :".var_export($response,true),$config['presta']._LOG_ERREUR);
 	return false;
 }
-
-?>
