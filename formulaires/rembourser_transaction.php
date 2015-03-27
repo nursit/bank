@@ -15,16 +15,6 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function formulaires_rembourser_transaction_charger_dist($id_transaction){
 
-	$prestas = array();
-	if (isset($GLOBALS['meta']['bank_paiement'])
-		AND $config = unserialize($GLOBALS['meta']['bank_paiement'])){
-
-		$prestas = (is_array($config['presta'])?$config['presta']:array());
-		$prestas = array_filter($prestas);
-		if (is_array($config['presta_abo']))
-			$prestas = array_merge($prestas,array_filter($config['presta_abo']));
-	}
-
 	$transaction = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
 	if ($transaction['statut']!=='ok')
 		return false;
