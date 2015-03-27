@@ -31,7 +31,6 @@ if (isset($GLOBALS['meta']['bank_paiement'])
 		foreach($prestas as $p=>$actif){
 			// TODO ajouter une secu !preg_match(',[\W],',$p) ?
 			if ($actif) {
-				#_chemin(_DIR_PLUGIN_BANK."presta/$p"); // pour les pages de retour
 				include_spip("presta/$p/config"); // pour la config par defaut
 			}
 		}
