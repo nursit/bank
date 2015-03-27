@@ -11,10 +11,15 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-function presta_simu_payer_acte_dist($id_transaction,$transaction_hash){
 
-	include_spip('inc/bank');
-	$config = bank_config("simu");
+/**
+ * @param array $config
+ * @param int $id_transaction
+ * @param string $transaction_hash
+ * @param array $options
+ * @return array|string
+ */
+function presta_simu_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
 
 	$contexte = array(
 		'id_transaction' => $id_transaction,
@@ -28,6 +33,8 @@ function presta_simu_payer_acte_dist($id_transaction,$transaction_hash){
 		$action = parametre_url($action,$k,$v);
 	}
 	$contexte['action'] = $action;
+
+	$contexte = array_merge($options, $contexte);
 
 	return recuperer_fond('presta/simu/payer/acte',$contexte);
 

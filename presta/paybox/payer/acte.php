@@ -11,16 +11,21 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-function presta_paybox_payer_acte_dist($id_transaction, $transaction_hash, $titre=''){
-
-	include_spip('inc/bank');
-	$config = bank_config("paybox");
+/**
+ * @param array $config
+ * @param int $id_transaction
+ * @param string $transaction_hash
+ * @param array $options
+ * @return array|string
+ */
+function presta_paybox_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
 
 	$call_request = charger_fonction('request','presta/paybox/call');
 	$contexte = $call_request($id_transaction,$transaction_hash,$config);
-	$contexte['title'] = $titre;
 
 	$contexte['sandbox'] = (paybox_is_sandbox($config)?' ':'');
+
+	$contexte = array_merge($options,$contexte);
 
 	return recuperer_fond('presta/paybox/payer/acte',$contexte);
 }

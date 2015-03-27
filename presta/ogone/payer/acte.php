@@ -11,16 +11,22 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-function presta_ogone_payer_acte_dist($id_transaction,$transaction_hash, $titre=''){
+/**
+ * @param array $config
+ * @param int $id_transaction
+ * @param string $transaction_hash
+ * @param array $options
+ * @return array|string
+ */
+function presta_ogone_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
 
-	include_spip('inc/bank');
-	$config = bank_config("ogone");
 
 	$call_request = charger_fonction('request','presta/ogone/call');
 	$contexte = $call_request($id_transaction,$transaction_hash,$config);
-	$contexte['title'] = $titre;
 
 	$contexte['sandbox'] = (ogone_is_sandbox($config)?' ':'');
+
+	$contexte = array_merge($options,$contexte);
 
 	$forms = recuperer_fond('presta/ogone/payer/acte',$contexte);
 	$forms = ogone_form_sha_in($forms,$config);

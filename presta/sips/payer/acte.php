@@ -11,15 +11,20 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-function presta_sips_payer_acte_dist($id_transaction, $transaction_hash, $titre=''){
 
-	include_spip('inc/bank');
-	$config = bank_config("sips");
+/**
+ * @param array $config
+ * @param int $id_transaction
+ * @param string $transaction_hash
+ * @param array $options
+ * @return array|string
+ */
+function presta_sips_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
 
 	$call_request = charger_fonction('request','presta/sips/call');
 	$contexte = $call_request($id_transaction,$transaction_hash,$config);
 
-	$contexte['title'] = $titre;
+	$contexte = array_merge($options, $contexte);
 
 	return recuperer_fond('presta/sips/payer/acte',$contexte);
 }

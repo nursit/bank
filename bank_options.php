@@ -52,3 +52,38 @@ function affiche_monnaie($valeur,$decimales=2,$unite=true){
 }
 }
 
+/**
+ * Fonction appelee par la balise #PAYER_ACTE et #PAYER_ABONNEMENT
+ * @param string $mode
+ * @param string $type
+ *   abo ou acte
+ * @param int $id_transaction
+ * @param string $transaction_hash
+ * @param array|string|null $options
+ * @return string
+ */
+function bank_affiche_payer($mode,$type,$id_transaction,$transaction_hash,$options=null){
+
+	// compatibilite ancienne syntaxe, titre en 4e argument de #PAYER_XXX
+	if (is_string($options)){
+		$options = array(
+			'title' => $options,
+		);
+	}
+	// invalide ou null ?
+	if (!is_array($options)) {
+		$options = array();
+	}
+
+	include_spip('inc/bank');
+	$config = bank_config($mode,$type=='abo');
+
+	$quoi = ($type=='abo'?'abonnement':'acte');
+	if ($payer = charger_fonction($quoi,'presta/'.$config['presta'].'/payer',true)){
+		return $payer($config, $id_transaction, $transaction_hash, $options);
+	}
+
+	spip_log("Pas de payer/$quoi pour mode=$mode/presta=".$config['presta'],"bank"._LOG_ERREUR);
+	return "";
+
+}

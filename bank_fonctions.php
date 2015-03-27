@@ -14,20 +14,21 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 /**
  * #PAYER_ACTE{sips,#ID_TRANSACTION,#HASH}
+ * 4e argument optionnel : tableau d'options #ARRAY{title,'Payez!'}
  *
- * @param <type> $p
- * @return <type>
+ * @param Object $p
+ * @return Object
  */
 function balise_PAYER_ACTE_dist($p){
 	$_mode = interprete_argument_balise(1,$p);
 	$_id = interprete_argument_balise(2,$p);
 	$_hash = interprete_argument_balise(3,$p);
-	$_titre = interprete_argument_balise(4,$p);
+	$_opts = interprete_argument_balise(4,$p);
 
 	$p->code = "";
 
 	if ($_mode AND $_id AND $_hash)
-		$p->code = "( (\$f=charger_fonction('acte','presta/'.$_mode.'/payer',true))?\$f($_id,$_hash,$_titre):vide(spip_log('Pas de payer/acte pour '.$_mode,'bank')))";
+		$p->code = "bank_affiche_payer($_mode,'acte',$_id,$_hash,$_opts)";
 
 	$p->interdire_scripts = false;
 	return $p;
@@ -36,19 +37,21 @@ function balise_PAYER_ACTE_dist($p){
 
 /**
  * #PAYER_ABONNEMENT{sips,#ID_TRANSACTION,#HASH}
+ * 4e argument optionnel : tableau d'options #ARRAY{title,'Payez!'}
  *
- * @param <type> $p
- * @return <type>
+ * @param Object $p
+ * @return Object
  */
 function balise_PAYER_ABONNEMENT_dist($p){
 	$_mode = interprete_argument_balise(1,$p);
 	$_id = interprete_argument_balise(2,$p);
 	$_hash = interprete_argument_balise(3,$p);
+	$_opts = interprete_argument_balise(4,$p);
 
 	$p->code = "";
 
 	if ($_mode AND $_id AND $_hash)
-		$p->code = "( (\$f=charger_fonction('abonnement','presta/'.$_mode.'/payer',true))?\$f($_id,$_hash):vide(spip_log('Pas de payer/abonnement pour '.$_mode,'bank')))";
+		$p->code = "bank_affiche_payer($_mode,'abo',$_id,$_hash,$_opts)";
 
 	$p->interdire_scripts = false;
 	return $p;

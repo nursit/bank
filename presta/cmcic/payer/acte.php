@@ -11,17 +11,22 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-function presta_cmcic_payer_acte_dist($id_transaction,$transaction_hash, $titre=''){
-
-	include_spip('inc/bank');
-	$config = bank_config("cmcic");
+/**
+ * @param array $config
+ * @param int $id_transaction
+ * @param string $transaction_hash
+ * @param array $options
+ * @return array|string
+ */
+function presta_cmcic_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
 
 	$call_request = charger_fonction('request','presta/cmcic/call');
 	$contexte = $call_request($id_transaction,$transaction_hash,$config);
-	$contexte['title'] = $titre;
 
 	include_spip('inc/cmcic');
 	$contexte['sandbox'] = (cmcic_is_sandbox($config)?' ':'');
+
+	$contexte = array_merge($options,$contexte);
 
 	return recuperer_fond('presta/cmcic/payer/acte',$contexte);
 }
