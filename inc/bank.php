@@ -246,11 +246,11 @@ function bank_sign_response_simple($mode,$response = array()){
  * il faut avoir un id_transaction et un transaction_hash coherents
  * pour se premunir d'une tentative d'appel exterieur
  *
- * @param null|array $response
  * @param string $mode
+ * @param null|array $response
  * @return array
  */
-function bank_simple_call_response($response=null, $mode="simple"){
+function bank_simple_call_response($mode="simple", $response=null){
 
 	// recuperer la reponse en post et la decoder, en verifiant la signature
 	if (!$response)

@@ -17,11 +17,11 @@ include_spip('inc/date');
 /**
  * Verifier le statut d'une transaction lors du retour de l'internaute
  *
- * @param array $response
  * @param string $mode
+ * @param null|array $response
  * @return array
  */
-function presta_paybox_call_response_dist($response=null, $mode='paybox'){
+function presta_paybox_call_response_dist($mode='paybox', $response=null){
 
 	if (!$response)
 		// recuperer la reponse en post et la decoder
@@ -42,7 +42,7 @@ function presta_paybox_call_response_dist($response=null, $mode='paybox'){
 	}
 	
 	// depouillement de la transaction
-	list($id_transaction,$success) =  paybox_traite_reponse_transaction($response, $mode);
+	list($id_transaction,$success) =  paybox_traite_reponse_transaction($mode, $response);
 
 	if ($response['abo'] AND $id_transaction) {
 

@@ -15,11 +15,11 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * il faut avoir un id_transaction et un transaction_hash coherents
  * pour se premunir d'une tentative d'appel exterieur
  *
- * @param null|array $response
  * @param string $mode
+ * @param null|array $response
  * @return array
  */
-function presta_gratuit_call_response_dist($response=null, $mode='gratuit'){
+function presta_gratuit_call_response_dist($mode='gratuit', $response=null){
 
 	// recuperer la reponse en post et la decoder, en verifiant la signature
 	if (!$response)

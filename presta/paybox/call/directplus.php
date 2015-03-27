@@ -146,5 +146,5 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	);
 
 	$call_response = charger_fonction('response','presta/paybox/call');
-	return $call_response($response, 'pboxdirpl');
+	return $call_response('pboxdirpl', $response);
 }

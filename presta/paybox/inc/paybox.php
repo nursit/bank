@@ -263,7 +263,12 @@ function paybox_response($response = 'response'){
 	return $response;
 }
 
-function paybox_traite_reponse_transaction($response,$mode = 'paybox') {
+/**
+ * @param string $mode
+ * @param array $response
+ * @return array
+ */
+function paybox_traite_reponse_transaction($mode, $response) {
 	// $response['id_transaction'] Peut contenir /email ou IBSxx... en cas d'abo
 	$id_transaction = intval($response['id_transaction']);
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){

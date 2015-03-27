@@ -15,11 +15,11 @@ include_spip('inc/date');
 /**
  * Verifier le statut d'une transaction lors du retour de l'internaute
  *
- * @param array $response
  * @param string $mode
+ * @param null|array $response
  * @return array
  */
-function presta_sips_call_response_dist($response=null, $mode='sips'){
+function presta_sips_call_response_dist($mode='sips', $response=null){
 
 	include_spip('inc/bank');
 	$config = bank_config($mode);
@@ -44,5 +44,5 @@ function presta_sips_call_response_dist($response=null, $mode='sips'){
 		);
 	}
 
-	return sips_traite_reponse_transaction($response);
+	return sips_traite_reponse_transaction($mode, $response);
 }

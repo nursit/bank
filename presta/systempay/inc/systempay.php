@@ -187,8 +187,13 @@ function systempay_recupere_reponse($config){
 	return $reponse;
 }
 
-
-function systempay_traite_reponse_transaction($response, $mode="systempay"){
+/**
+ * Traiter la reponse
+ * @param string $mode
+ * @param array $response
+ * @return array
+ */
+function systempay_traite_reponse_transaction($mode, $response){
 	#var_dump($response);
 
 	$id_transaction = $response['vads_order_id'];

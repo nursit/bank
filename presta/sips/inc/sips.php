@@ -225,11 +225,11 @@ function sips_response($service, $merchant_id, $certificat, $response = 'respons
 /**
  * Traiter la reponse apres son decodage
  *
- * @param $response
  * @param string $mode
+ * @param array $response
  * @return array
  */
-function sips_traite_reponse_transaction($response,$mode = 'sips') {
+function sips_traite_reponse_transaction($mode, $response) {
 
 	$id_transaction = $response['order_id'];
 	$transaction_hash = $response['transaction_id'];

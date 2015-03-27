@@ -17,11 +17,11 @@ include_spip('inc/date');
  * il faut avoir un id_transaction et un transaction_hash coherents
  * pour se premunir d'une tentative d'appel exterieur
  * 
- * @param null $response
  * @param string $mode
+ * @param null|array $response
  * @return array
  */
-function presta_simu_call_response_dist($response=null, $mode="simu"){
+function presta_simu_call_response_dist($mode="simu", $response=null){
 
 	include_spip('inc/bank');
 	$config = bank_config($mode);
@@ -40,5 +40,5 @@ function presta_simu_call_response_dist($response=null, $mode="simu"){
 		$response['abo_uid'] = substr(md5($response['id_transaction']."-".time()),0,10);
 	}
 
-	return bank_simple_call_response($response, $mode);
+	return bank_simple_call_response($mode, $response);
 }

@@ -18,12 +18,11 @@ include_spip('presta/ogone/inc/ogone');
  * il faut avoir un id_transaction et un transaction_hash coherents
  * pour se premunir d'une tentative d'appel exterieur
  *
- * @param int $id_transaction
- * @param string $transaction_hash
  * @param string $mode
+ * @param null|array $response
  * @return array
  */
-function presta_ogone_call_response_dist($response=null, $mode="ogone"){
+function presta_ogone_call_response_dist($mode="ogone", $response=null){
 
 	include_spip('inc/bank');
 	$config = bank_config($mode);
@@ -41,4 +40,3 @@ function presta_ogone_call_response_dist($response=null, $mode="ogone"){
 
 	return array($id_transaction,$success);	
 }
-?>

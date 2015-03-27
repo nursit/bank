@@ -12,7 +12,12 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 include_spip('presta/internetplus/inc/wha_services');
 
-function presta_internetplus_inc_traiter_reponse_dist($mode='wha'){
+function presta_internetplus_inc_traiter_reponse_dist($config){
+
+	$mode = 'wha'; // historique...
+	if ($config['type']=='abo')
+		$mode = 'wha_abo';
+
 	$id_transaction = 0;
 	if (!$m = _request('m')) return array($id_transaction,false,false);
 	$m = urldecode($m);

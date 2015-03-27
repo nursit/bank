@@ -17,12 +17,12 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * il faut avoir un id_transaction et un transaction_hash coherents
  * pour se premunir d'une tentative d'appel exterieur
  *
- * @param null|array $response
  * @param string $mode
+ * @param null|array $response
  * @return array
  */
-function presta_cheque_call_response_dist($response=null, $mode="cheque"){
+function presta_cheque_call_response_dist($mode="cheque", $response=null){
 
 	include_spip('inc/bank');
-	return bank_simple_call_response($response,$mode);
+	return bank_simple_call_response($mode, $response);
 }

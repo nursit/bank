@@ -40,12 +40,12 @@ include_spip('inc/date');
  * Dans le cas B, la fonction doit juste rediriger sans effectuer de
  * traitements supplémentaires (sauf en cas d'annulation avant le paiement)
  * 
+ * @param string $mode
  * @param array|null $response
  *     Réponse déjà obtenue de la banque si transmis. Sinon sera calculé.
- * @param string $mode
  * @return array(int $id_transaction, bool $paiement_ok)
 **/
-function presta_cmcic_call_response_dist($response=null, $mode='cmcic'){
+function presta_cmcic_call_response_dist($mode='cmcic', $response=null){
 
 	include_spip('inc/bank');
 	$config = bank_config($mode);
@@ -65,7 +65,7 @@ function presta_cmcic_call_response_dist($response=null, $mode='cmcic'){
 		return array(0, false);
 	}
 
-	return cmcic_traite_reponse_transaction($response);
+	return cmcic_traite_reponse_transaction($mode, $response);
 }
 
 
@@ -121,13 +121,13 @@ function cmcic_terminer_transaction() {
 /**
  * Traite la réponse de la banque
  *
- * @param array $response
- *     Données envoyées par la banque
  * @param string $mode
  *     Type de banque
+ * @param array $response
+ *     Données envoyées par la banque
  * @return array(int $id_transaction, bool $paiement_ok)
 **/
-function cmcic_traite_reponse_transaction($response, $mode = "cmcic") {
+function cmcic_traite_reponse_transaction($mode, $response) {
 
 	spip_log("call_response : traitement d'une réponse de la banque $mode !", $mode);
 	

@@ -13,9 +13,15 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 include_spip('presta/systempay/inc/systempay');
 
-// il faut avoir un id_transaction et un transaction_hash coherents
-// pour se premunir d'une tentative d'appel exterieur
-function presta_systempay_call_response_dist($response=null, $mode='systempay'){
+/**
+ * il faut avoir un id_transaction et un transaction_hash coherents
+ * pour se premunir d'une tentative d'appel exterieur
+ *
+ * @param string $mode
+ * @param null|array $response
+ * @return array
+ */
+function presta_systempay_call_response_dist($mode='systempay', $response=null){
 
 	include_spip('inc/bank');
 	$config = bank_config($mode);
@@ -30,8 +36,7 @@ function presta_systempay_call_response_dist($response=null, $mode='systempay'){
 	}
 
 	// depouillement de la transaction
-	list($id_transaction,$success) =  systempay_traite_reponse_transaction($response,$mode);
+	list($id_transaction,$success) =  systempay_traite_reponse_transaction($mode, $response);
 
 	return array($id_transaction,$success);
 }
-?>

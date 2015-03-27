@@ -14,11 +14,11 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 /**
  * Retour de la demande de paiement chez PaypalExpress
  *
- * @param null|array $response
  * @param string $mode
+ * @param null|array $response
  * @return array
  */
-function presta_paypalexpress_call_response($response = null, $mode="paypalexpress"){
+function presta_paypalexpress_call_response($mode="paypalexpress", $response = null){
 
 	include_spip('inc/bank');
 	$config = bank_config($mode);

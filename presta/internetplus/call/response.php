@@ -12,10 +12,17 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
 
-function presta_internetplus_call_response_dist(){
+/**
+ * @param string $mode
+ * @return array
+ */
+function presta_internetplus_call_response_dist($mode = "internetplus"){
 
-	$wha_traiter_reponse = charger_fonction('traiter_reponse','presta/internetplus/inc');
-	list($id_transaction,$result,$mp)=$wha_traiter_reponse(_request('abo')?'wha_abo':'wha');
+	include_spip('inc/bank');
+	$config = bank_config($mode,_request('abo'));
+
+	$traiter_reponse = charger_fonction('traiter_reponse','presta/internetplus/inc');
+	list($id_transaction,$result,$mp)=$traiter_reponse($config);
 
 	// pour gerer les redirections dans le pipeline si besoin
 	$_SESSION['wha_mp'] = $mp;
