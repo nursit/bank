@@ -63,9 +63,26 @@ function bank_lister_prestas($abo=false){
  * @return mixed|string
  */
 function bank_url_api_retour($config,$action,$args=""){
-	$args = (strlen($args)?"&":"").$args;
-	$args = "bankp=".$config['presta'].$args;
-	return generer_url_action('bank_'.$action,$args,true,true);
+	static $is_api = null;
+	if (is_null($is_api)){
+		$is_api = false;
+		if (file_exists($f=_DIR_RACINE.".htaccess")){
+			lire_fichier($f,$contenu);
+			if (strpos($contenu,'spip.php?action=api_$1')!==false){
+				$is_api = true;
+			}
+		}
+	}
+
+	if ($is_api){
+		$args = (strlen($args)?"?":"").$args;
+		return generer_url_public('',$args,false,false,"bank.api/".$config['presta']."/$action/");
+	}
+	else {
+		$args = (strlen($args)?"&":"").$args;
+		$args = "bankp=".$config['presta'].$args;
+		return generer_url_action('bank_'.$action,$args,true,true);
+	}
 }
 
 
