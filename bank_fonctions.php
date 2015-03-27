@@ -87,6 +87,17 @@ function bank_label_payer_par_carte($code_carte){
 
 
 /**
+ * Urls d'auto response pour afficher dans la config de certains prestas
+ * @param $mode
+ * @return string
+ */
+function bank_url_autoresponse($mode){
+	include_spip('inc/bank');
+	$config = bank_config($mode);
+	return bank_url_api_retour($config,"autoresponse");
+}
+
+/**
  * Afficher la liste des transactions d'un auteur sur la page auteur de l'espace prive
  *
  * @pipeline affiche_auteurs_interventions

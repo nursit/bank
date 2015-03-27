@@ -43,4 +43,4 @@
 		</div>
 	</li>
 </ul>
-<p class="explication">URL CGI2&nbsp;: <br /><input type="text" class="text" readonly="readonly" value="[(#EVAL{_DIR_RACINE}|concat{bank.api/cmcic/autoresponse/}|url_absolue)]" /></p>
+<p class="explication">URL CGI2&nbsp;: <br /><input type="text" class="text" readonly="readonly" value="[(#ENV{mode}|bank_url_autoresponse)]" /></p>
