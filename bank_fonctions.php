@@ -71,6 +71,20 @@ function bank_titre_type_paiement($presta){
 	return $titre;
 }
 
+/**
+ * "Payer par Carte Bleue" ou autre nom de carte en clair en fonction du $code_carte interne a la banque
+ * @param string $code_carte
+ * @return string
+ */
+function bank_label_payer_par_carte($code_carte){
+	$carte = _T('bank:label_carte_'.$code_carte,array(),array('force'=>false));
+	if (!$carte){
+		#var_dump($code_carte);
+		$carte = $code_carte;
+	}
+	return _T('bank:payer_par_carte',array('carte'=>$carte));
+}
+
 
 /**
  * Afficher la liste des transactions d'un auteur sur la page auteur de l'espace prive
