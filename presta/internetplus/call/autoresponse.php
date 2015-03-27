@@ -12,10 +12,13 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
 
-function presta_internetplus_call_autoresponse_dist(){
+function presta_internetplus_call_autoresponse_dist($mode = "internetplus"){
 
-	$wha_responder = charger_fonction('responder','presta/internetplus/inc');
-	list($uoid,$resil)=$wha_responder();
+	include_spip('inc/bank');
+	$config = bank_config($mode,true);
+
+	$responder = charger_fonction('responder','presta/internetplus/inc');
+	list($uoid,$resil)=$responder();
 
 	if ($uoid
 		AND $resil

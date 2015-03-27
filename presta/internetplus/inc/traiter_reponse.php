@@ -12,6 +12,10 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 include_spip('presta/internetplus/inc/wha_services');
 
+/**
+ * @param array $config
+ * @return array
+ */
 function presta_internetplus_inc_traiter_reponse_dist($config){
 
 	$mode = 'wha'; // historique...

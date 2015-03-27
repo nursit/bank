@@ -10,7 +10,16 @@
  */
 include_spip('wha/wha_services');
 
-function wha_responder_dist($mode='wha_responder'){
+/**
+ * @param array $config
+ * @return array
+ */
+function wha_responder_dist($config){
+
+	$mode = 'wha'; // historique...
+	if ($config['type']=='abo')
+		$mode = 'wha_abo';
+
 	$uoid = 0;
 	if (!$m = _request('m')) return array($uoid,false);
 	$m = urldecode($m);
