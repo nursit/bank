@@ -11,6 +11,8 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+include_spip('inc/bank');
+
 /**
  * Determiner le mode test en fonction d'un define ou de la config
  * @param array $config

@@ -10,6 +10,11 @@
  *
  */
 
+if (!defined('_ECRIRE_INC_VERSION')) return;
+
+include_spip('inc/bank');
+
+
 /****************************************************
  * CallerService.php
  *
@@ -89,7 +94,6 @@ function paypal_api_endpoint($config){
 function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=null){
 
 	if (!$row = sql_fetsel('*', 'spip_transactions', 'id_transaction=' . intval($id_transaction))){
-		include_spip('inc/bank');
 		bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => 'paypalexpress',
@@ -100,7 +104,6 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=nu
 	}
 
 	if ($row['reglee']=='oui'){
-		include_spip('inc/bank');
 		bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => 'paypalexpress',
@@ -160,7 +163,6 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=nu
 		return $payPalURL;
 	}
 	else {
-		include_spip('inc/bank');
 		bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => 'paypalexpress',
@@ -176,13 +178,11 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=nu
 
 function bank_paypalexpress_checkoutpayment($payerid,$mode="paypalexpress"){
 
-	include_spip('inc/bank');
 	$config = bank_config($mode);
 
 	include_spip('inc/date');
 
 	if (!$id_transaction = $_SESSION['id_transaction']){
-		include_spip('inc/bank');
 		return bank_transaction_invalide(0,
 			array(
 				'mode' => "paypalexpress",
@@ -193,7 +193,6 @@ function bank_paypalexpress_checkoutpayment($payerid,$mode="paypalexpress"){
 	}
 
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=" . intval($id_transaction))){
-		include_spip('inc/bank');
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => "paypalexpress",
@@ -213,7 +212,6 @@ function bank_paypalexpress_checkoutpayment($payerid,$mode="paypalexpress"){
 	if ($payerid!==$_SESSION['payer_id']){
 		$trace = "Payerid:$payerid\n".var_export($_SESSION,true);
 	 	// sinon enregistrer l'absence de paiement et l'erreur
-		include_spip('inc/bank');
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>"paypalexpress",
@@ -253,7 +251,6 @@ function bank_paypalexpress_checkoutpayment($payerid,$mode="paypalexpress"){
 
 	if ($ack!="SUCCESS"){
 		$_SESSION['reshash'] = $resArray;
-		include_spip('inc/bank');
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>"paypalexpress",

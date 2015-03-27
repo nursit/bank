@@ -14,6 +14,7 @@
 
 	<auteur lien="http://nursit.com">Nursit.com</auteur>
 
+	<pipeline nom="autoriser" inclure="bank_autorisations.php" />
 	<pipeline nom="declarer_tables_interfaces" inclure="base/bank.php" />
 	<pipeline nom="declarer_tables_objets_sql" inclure="base/bank.php" />
 	<pipeline nom="affiche_auteurs_interventions" inclure="bank_fonctions.php" />

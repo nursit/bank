@@ -11,6 +11,8 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+include_spip('inc/bank');
+
 /**
  * Ecrire les fichiers de config/parametres a la volee avant l'appel a un binaire SIPS
  * @param string $service
@@ -235,7 +237,6 @@ function sips_traite_reponse_transaction($mode, $response) {
 	$transaction_hash = $response['transaction_id'];
 	$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
 	if (!$row){
-		include_spip('inc/bank');
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => $mode,
@@ -247,7 +248,6 @@ function sips_traite_reponse_transaction($mode, $response) {
 
 	include_spip('inc/filtres');
 	if ($transaction_hash!=modulo($row['transaction_hash'],999999)){
-		include_spip('inc/bank');
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode'=>$mode,
@@ -281,7 +281,6 @@ function sips_traite_reponse_transaction($mode, $response) {
 			return array($id_transaction,true);
 
 	 	// sinon enregistrer l'absence de paiement et l'erreur
-		include_spip('inc/bank');
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,

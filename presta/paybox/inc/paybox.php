@@ -11,6 +11,8 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+include_spip('inc/bank');
+
 /**
  * Determiner le mode test en fonction d'un define ou de la config
  * @param array $config
@@ -221,7 +223,6 @@ function paybox_response($response = 'response'){
 		  OR !$cle = openssl_pkey_get_public($pubkey)
 			OR !(openssl_verify( $vars, $sign, $cle ) OR openssl_verify($vars1, $sign, $cle))
 		){
-			include_spip('inc/bank');
 			bank_transaction_invalide(0,
 				array(
 					'mode'=>"paybox",
@@ -234,7 +235,6 @@ function paybox_response($response = 'response'){
 	}
 	else {
 		if (!_request('sign')){
-			include_spip('inc/bank');
 			bank_transaction_invalide(0,
 				array(
 					'mode'=>"paybox",
@@ -245,7 +245,6 @@ function paybox_response($response = 'response'){
 			return false;
 		}
 		// on ne sait pas verifier la signature, on laisse passer mais on mail le webmestre
-		include_spip('inc/bank');
 		bank_transaction_invalide(0,
 			array(
 				'mode'=>"paybox",
@@ -272,7 +271,6 @@ function paybox_traite_reponse_transaction($mode, $response) {
 	// $response['id_transaction'] Peut contenir /email ou IBSxx... en cas d'abo
 	$id_transaction = intval($response['id_transaction']);
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
-		include_spip('inc/bank');
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode'=>$mode,
@@ -304,7 +302,6 @@ function paybox_traite_reponse_transaction($mode, $response) {
 	 	// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
 	 	if ($row['reglee']=='oui') return array($id_transaction,true);
 	 	// sinon enregistrer l'absence de paiement et l'erreur
-		include_spip('inc/bank');
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,

@@ -11,6 +11,7 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+include_spip('inc/bank');
 
 
 /**
@@ -148,7 +149,6 @@ function ogone_get_response($config){
 
 	// si pas de signature dans la reponse, la refuser
 	if (!isset($response['SHASIGN'])){
-		include_spip('inc/bank');
 		bank_transaction_invalide(0,
 			array(
 				'mode'=>"ogone",
@@ -166,7 +166,6 @@ function ogone_get_response($config){
 		// mais on accepte la reponse ainsi signee
 	  AND $response['SHASIGN']!==ogone_sha_out(array_map('utf8_encode',$response),$config)
 	){
-		include_spip('inc/bank');
 		bank_transaction_invalide(0,
 			array(
 				'mode'=>"ogone",
@@ -214,7 +213,6 @@ function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
 
 	$id_transaction = intval($response['orderID']);
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
-		include_spip('inc/bank');
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode'=>$mode,
@@ -239,7 +237,6 @@ function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
 	 	// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
 	 	if ($row['reglee']=='oui') return array($id_transaction,true);
 
-		include_spip('inc/bank');
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,

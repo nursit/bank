@@ -11,6 +11,7 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+include_spip('inc/bank');
 
 /**
  * Determiner l'URL d'appel serveur en fonction de la config
@@ -198,7 +199,6 @@ function systempay_traite_reponse_transaction($mode, $response){
 
 	$id_transaction = $response['vads_order_id'];
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
-		include_spip('inc/bank');
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => $mode,
@@ -210,7 +210,6 @@ function systempay_traite_reponse_transaction($mode, $response){
 
 	// est-ce bien un debit
 	if ($response['vads_operation_type']!=="DEBIT"){
-		include_spip('inc/bank');
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => $mode,
@@ -249,7 +248,6 @@ function systempay_traite_reponse_transaction($mode, $response){
 	 	// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
 	 	if ($row['reglee']=='oui') return array($id_transaction,true);
 	 	// sinon enregistrer l'absence de paiement et l'erreur
-		include_spip('inc/bank');
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,
