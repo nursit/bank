@@ -74,7 +74,7 @@ _ Compte bancaire&nbsp;:
 	'label_carte_SOFORT_BANKING' => 'Carte Sofort Banking',
 	'label_carte_IDEAL' => 'Carte Ideal',
 	'label_carte_SDD' => 'Prélèvement SEPA',
-	'label_carte_E_CV' => 'e-Chèques Vacances',
+	'label_carte_E_CV' => 'e-Chèque-Vacances',
 
 	'label_configuration_cheque_notice' => 'Information compl&eacute;mentaire affich&eacute;e',
 	'label_configuration_cheque_ordre' => 'Ordre',
@@ -131,7 +131,7 @@ _ Compte bancaire&nbsp;:
 	'payer_par_carte_bancaire' => 'Payer par carte bancaire :',
 	'payer_par_virement' => 'Payer par virement bancaire :',
 	'payer_par_prelevement_sepa' => 'Payer par prélèvement automatique :',
-	'payer_par_e_cheques_vacances' => 'Payer par e-Chèques Vacances :',
+	'payer_par_e_cheque_vacances' => 'Payer par e-Chèque-Vacances :',
 
 
 	'titre_reglement_ok' => 'R&egrave;glement r&eacute;ussi',
