@@ -37,3 +37,10 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 /* ------------------------------------------------------------------------- */
 
+
+function ogone_lister_cartes_config(){
+	include_spip('inc/bank');
+	include_spip("presta/ogone/inc/ogone");
+	$config = bank_config("ogone");
+	return ogone_available_cards($config);
+}

@@ -65,11 +65,16 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $con
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash)))
 		return array();
 
-	if (!$row['id_auteur'] AND $GLOBALS['visiteur_session']['id_auteur'])
+	if (!$row['id_auteur'] AND $GLOBALS['visiteur_session']['id_auteur']){
 		sql_updateq("spip_transactions",
-		  array("id_auteur"=>intval($row['id_auteur'] = $GLOBALS['visiteur_session']['id_auteur'])),
-			"id_transaction=".intval($id_transaction)
+			array("id_auteur" => intval($row['id_auteur'] = $GLOBALS['visiteur_session']['id_auteur'])),
+			"id_transaction=" . intval($id_transaction)
 		);
+	}
+
+	$cartes = array('VISA','MasterCard','American Express');
+	if (isset($config['cartes']) AND is_array($config['cartes']) AND $config['cartes'])
+		$cartes = $config['cartes'];
 
 	include_spip('inc/filtres');
 	$contexte = array();
@@ -118,7 +123,14 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $con
 		'transaction_hash' => $transaction_hash
 	);
 
-	$contexte['cards'] = ogone_available_cards($config);
+	$cartes_possibles = ogone_available_cards($config);
+	$contexte['cards'] = array();
+	foreach($cartes as $carte){
+		if (isset($cartes_possibles[$carte])){
+			$contexte['cards'][$carte] = $cartes_possibles[$carte];
+		}
+	}
+
 	return $contexte;
 }
 
