@@ -63,11 +63,11 @@ function systempay_available_cards($config){
 
 	$mode = $config['presta'];
 	$cartes_possibles = array(
-		'CB'=>"presta/$mode/logo/CB.gif",
-		'VISA'=>"presta/$mode/logo/VISA.gif",
-		'MASTERCARD'=>"presta/$mode/logo/MASTERCARD.gif",
-		'E-CARTEBLEUE' => "presta/$mode/logo/E-CB.gif",
-		'AMEX' => "presta/$mode/logo/AMEX.gif",
+		'CB'=>"CB.gif",
+		'VISA'=>"VISA.gif",
+		'MASTERCARD'=>"MASTERCARD.gif",
+		'E-CARTEBLEUE' => "E-CB.gif",
+		'AMEX' => "AMEX.gif",
 	);
 
 	if ($config['service']=="osb"){
@@ -77,25 +77,25 @@ function systempay_available_cards($config){
 	}
 	else {
 		if ($config['type']!=='abo'){
-			$cartes_possibles['MAESTRO'] = "presta/$mode/logo/MAESTRO.gif";
-			$cartes_possibles['VISA_ELECTRON'] = "presta/$mode/logo/VISAELECTRON.gif";
-			//$cartes_possibles['PAYPAL']="presta/$mode/logo/PAYPAL.gif";
-			//$cartes_possibles['V_ME']="presta/$mode/logo/VME.gif";
+			$cartes_possibles['MAESTRO'] = "MAESTRO.gif";
+			$cartes_possibles['VISA_ELECTRON'] = "VISAELECTRON.gif";
+			//$cartes_possibles['PAYPAL']="PAYPAL.gif";
+			//$cartes_possibles['V_ME']="VME.gif";
 		}
 	}
 	if ($config['service']=='payzen'){
 		if ($config['type']!=='abo'){
-			$cartes_possibles['PAYLIB'] = "presta/$mode/logo/PAYLIB.gif";
-			$cartes_possibles['ONEY'] = "presta/$mode/logo/ONEY.gif";
-			$cartes_possibles['JCB'] = "presta/$mode/logo/JCB.gif";
-			$cartes_possibles['DINERS'] = "presta/$mode/logo/DINERS.gif";
-			$cartes_possibles['SOFORT_BANKING'] = "presta/$mode/logo/SOFORT.gif";
-			$cartes_possibles['IDEAL'] = "presta/$mode/logo/IDEAL.gif";
+			$cartes_possibles['PAYLIB'] = "PAYLIB.gif";
+			$cartes_possibles['ONEY'] = "ONEY.gif";
+			$cartes_possibles['JCB'] = "JCB.gif";
+			$cartes_possibles['DINERS'] = "DINERS.gif";
+			$cartes_possibles['SOFORT_BANKING'] = "SOFORT.gif";
+			$cartes_possibles['IDEAL'] = "IDEAL.gif";
 
 			// et les SEPA
-			$cartes_possibles['SDD'] = "presta/$mode/logo/SEPA_SDD.gif";
+			$cartes_possibles['SDD'] = "SEPA_SDD.gif";
 			// et les e-cheques vacances
-			$cartes_possibles['E_CV'] = "presta/$mode/logo/E_CV.gif";
+			$cartes_possibles['E_CV'] = "E_CV.gif";
 		}
 	}
 

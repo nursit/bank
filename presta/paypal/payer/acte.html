@@ -15,7 +15,7 @@
 	<p class="titre h4"><:bank:payer_avec{nom=Paypal}:></p>
 	<div class='boutons'>
 		<form action="#ENV{action}" method="post" class="noajax">
-			<button type="submit" title="<:bank:payer_avec{nom=Paypal}|attribut_html:>">[(#CHEMIN{presta/paypal/logo/PayPal_mark_60x38.gif}|balise_img)]</button>
+			<button type="submit" title="<:bank:payer_avec{nom=Paypal}|attribut_html:>">[(#ENV{logo}|balise_img{<:bank:payer_avec{nom=Paypal}:>})]</button>
 			<div>
 				<input TYPE="hidden" name="charset" value="#CHARSET" />
 				<input type="hidden" name="cmd" value="_cart" />

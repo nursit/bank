@@ -18,7 +18,7 @@
 		[(#ENV**{hidden})]
 		[(#SET{texte,<:bank:payer_avec{nom=CMCIC}:>})]
 		<button class="submit" type="submit" title="[(#GET{texte}|attribut_html)]">
-			[(#CHEMIN{presta/cmcic/logo/cmcic.png}
+			[(#ENV{logo}
 				|balise_img{#GET{texte}}
 				|inserer_attribut{title,#GET{texte}}
 				|image_reduire{100}

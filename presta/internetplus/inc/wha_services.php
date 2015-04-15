@@ -316,9 +316,9 @@ function wha_logo_detecte_fai_visiteur(){
 		$fai = "orange";
 	$fai_supporte = array("proxad", "orange", "bouygues");
 	if (in_array($fai, $fai_supporte))
-		return find_in_path("presta/internetplus/logo/$fai.png");
+		return bank_trouver_logo('internetplus',"$fai.png");
 	else {
 		#spip_log($fai."non supporte par internet+".$gethostbyaddr);
-		return find_in_path("presta/internetplus/logo/logo_wha_abo_sans_sfr.png");
+		return bank_trouver_logo('internetplus',"logo_wha_abo_sans_sfr.png");
 	}
 }

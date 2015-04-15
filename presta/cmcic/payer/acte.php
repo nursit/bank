@@ -25,6 +25,7 @@ function presta_cmcic_payer_acte_dist($config, $id_transaction, $transaction_has
 
 	include_spip('inc/cmcic');
 	$contexte['sandbox'] = (cmcic_is_sandbox($config)?' ':'');
+	$contexte['logo'] = bank_trouver_logo("cmcic","cmcic.png");
 
 	$contexte = array_merge($options,$contexte);
 

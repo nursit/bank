@@ -28,6 +28,7 @@ function presta_paypalexpress_payer_acte_dist($config, $id_transaction, $transac
 		'transaction_hash' => $transaction_hash,
 		'url_confirm' => parametre_url(self(),'confirm','oui'),
 		'sandbox' => paypalexpress_is_sandbox($config)?' ':'',
+		'logo' => bank_trouver_logo('paypal','PAYPAL.gif'),
 		'config' => $config,
 	);
 

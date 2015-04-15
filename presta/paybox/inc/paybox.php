@@ -57,14 +57,14 @@ function paybox_url_host($config){
 function paybox_available_cards($config){
 
 	$cartes_possibles = array(
-		'CB'=>'presta/paybox/logo/CB.gif',
-		'VISA'=>'presta/paybox/logo/VISA.gif',
-		'EUROCARD_MASTERCARD'=>'presta/paybox/logo/MASTERCARD.gif',
+		'CB'=>'CB.gif',
+		'VISA'=>'VISA.gif',
+		'EUROCARD_MASTERCARD'=>'MASTERCARD.gif',
 	);
 	if ($config['type']!=='abo'){
-		$cartes_possibles['E_CARD']='presta/paybox/logo/E-CB.gif';
-		$cartes_possibles['AMEX']='presta/paybox/logo/AMEX.gif';
-		$cartes_possibles['AURORE']='presta/paybox/logo/AURORE.gif';
+		$cartes_possibles['E_CARD']='E-CB.gif';
+		$cartes_possibles['AMEX']='AMEX.gif';
+		$cartes_possibles['AURORE']='AURORE.gif';
 	}
 
 	return $cartes_possibles;

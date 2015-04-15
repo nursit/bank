@@ -86,3 +86,13 @@ function bank_affiche_payer($mode,$type,$id_transaction,$transaction_hash,$optio
 	return "";
 
 }
+
+function bank_trouver_logo($mode,$logo){
+	// d'abord dans un dossier presta/
+	if ($f=find_in_path("presta/$mode/logo/$logo"))
+		return $f;
+	// sinon le dossier generique
+	elseif ($f=find_in_path("bank/logo/$logo"))
+		return $f;
+	return "";
+}

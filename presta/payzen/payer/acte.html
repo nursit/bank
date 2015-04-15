@@ -16,7 +16,7 @@
 	<p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
 	<div class='boutons'>
 	<BOUCLE_cb(POUR){tableau #ENV{hidden}}{cle !IN SDD,E_CV}>
-		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#CHEMIN{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
+		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{payzen}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
 	</BOUCLE_cb>
 	</div>
 	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=PayZen}:></div>]
@@ -27,7 +27,7 @@
 	<p class="titre h4"><:bank:payer_par_prelevement_sepa:></p>
 	<div class='boutons'>
 	<BOUCLE_sepa(POUR){tableau #ENV{hidden}}{cle=SDD}>
-		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#CHEMIN{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
+		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{payzen}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
 	</BOUCLE_sepa>
 	</div>
 	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=PayZen}:></div>]
@@ -38,7 +38,7 @@
 	<p class="titre h4"><:bank:payer_par_e_cheque_vacances:></p>
 	<div class='boutons'>
 	<BOUCLE_ecv(POUR){tableau #ENV{hidden}}{cle=E_CV}>
-		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#CHEMIN{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
+		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{payzen}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
 	</BOUCLE_ecv>
 	</div>
 	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=PayZen}:></div>]

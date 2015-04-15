@@ -21,6 +21,8 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  */
 function presta_paypal_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
 
+	include_spip('presta/paypal/inc/paypal');
+
 	$contexte = array(
 		'action' => paypal_url_serveur($config),
 		'url_return' => bank_url_api_retour($config,"response"),
@@ -29,12 +31,12 @@ function presta_paypal_payer_acte_dist($config, $id_transaction, $transaction_ha
 		'id_transaction'=>$id_transaction,
 		'transaction_hash'=>$transaction_hash,
 		'sandbox' => paypal_is_sandbox($config),
+		'logo' => bank_trouver_logo('paypal','PAYPAL.gif'),
 		'config' => $config,
 	);
 
 	$contexte = array_merge($options, $contexte);
 
-	include_spip('presta/paypal/inc/paypal');
 	return recuperer_fond('presta/paypal/payer/acte', $contexte);
 }
 
