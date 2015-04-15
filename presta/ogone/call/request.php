@@ -118,6 +118,7 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $con
 		'transaction_hash' => $transaction_hash
 	);
 
+	$contexte['cards'] = ogone_available_cards($config);
 	return $contexte;
 }
 

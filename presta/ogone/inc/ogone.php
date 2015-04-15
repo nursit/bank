@@ -43,6 +43,24 @@ function ogone_url_serveur($config){
 	return "https://secure.ogone.com/ncol/prod/orderstandard.asp";
 }
 
+
+/**
+ * Liste des cartes CB possibles selon la config
+ * @param $config
+ * @return array
+ */
+function ogone_available_cards($config){
+
+	$cartes_possibles = array(
+		'VISA'=>'VISA.gif',
+		'MasterCard'=>'MASTERCARD.gif',
+		'American Express'=>'AMEX.gif',
+	);
+
+	return $cartes_possibles;
+}
+
+
 /**
  * Signer les donnes envoyees a Ogone
  * @param array $contexte

@@ -13,10 +13,9 @@
 <div class='payer_mode payer_ogone payer_acte'>
 	<p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
 	<div class='boutons'>
-		[(#INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand=VISA,pm=CreditCard,logobrand=#CHEMIN{presta/ogone/logo/VISA.gif}|balise_img{Payer par carte VISA}})]
-		[(#INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand=MasterCard,pm=CreditCard,logobrand=#CHEMIN{presta/ogone/logo/MASTERCARD.gif}|balise_img{Payer par carte MasterCard}})]
-		[(#INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand='American Express',pm=CreditCard,logobrand=#CHEMIN{presta/ogone/logo/AMEX.gif}|balise_img{Payer par carte American Express}})]
-		[(#REM)(# INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand=PAYPAL,pm=PAYPAL,logobrand=#CHEMIN{presta/ogone/logo/PayPal.gif}|balise_img{Payer par PayPal}})]
+		<BOUCLE_cb(POUR){tableau #ENV{cards}}>
+		[(#INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand=#CLE,pm=CreditCard,logobrand=[(#VAL{ogone}|bank_trouver_logo{#VALEUR}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
+		</BOUCLE_cb>
 	</div>
 	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=Ogone}:></div>]
 </div>
