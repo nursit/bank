@@ -25,6 +25,6 @@
 	<input type="hidden" name="LOGO" value="#ENV{LOGO,''}" />
 	<input type="hidden" name="FONTTYPE" value="#ENV{fonttype,'Verdana'}" />
 	<input type="hidden" name="backurl" value="#ENV*{backurl}" />
-	<button class="submit" type="submit">#ENV*{logobrand,'Payer'}</button>
+	<button class="submit" type="submit" title="[(#ENV*{brand,''}|bank_label_payer_par_carte|attribut_html)]">#ENV*{logobrand,'Payer'}</button>
 	</div>
 </form>
