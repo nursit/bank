@@ -273,6 +273,11 @@ function bank_transaction_echec($id_transaction,$args=array()){
  */
 
 
+/**
+ * Recuperer la reponse postee et verifier sa signature
+ * @param string $mode
+ * @return array|bool
+ */
 function bank_response_simple($mode){
 	$vars = array('id_transaction','transaction_hash','autorisation_id');
 	$response = array();
@@ -283,18 +288,28 @@ function bank_response_simple($mode){
 
 	if (!$s = _request('sign')
 		OR $s !== bank_sign_response_simple($mode,$response)){
+
 		spip_log("bank_response_simple : signature invalide","bank"._LOG_ERREUR);
 		return false;
 	}
 	return $response;
 }
 
+/**
+ * Calculer une signature de la reponse (securite)
+ * @param string $mode
+ * @param array $response
+ * @return string
+ */
 function bank_sign_response_simple($mode,$response = array()){
 	ksort($response);
+	foreach($response as $k=>$v){
+		if (is_numeric($v))
+			$response[$k] = (string)$v;
+	}
 	$s = serialize($response);
 	include_spip("inc/securiser_action");
 	$sign = calculer_cle_action("bank-$mode-$s");
-
 	return $sign;
 }
 
