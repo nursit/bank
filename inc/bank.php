@@ -75,7 +75,6 @@ function bank_url_api_retour($config,$action,$args=""){
 	}
 
 	if ($is_api){
-		$args = (strlen($args)?"?":"").$args;
 		return generer_url_public('',$args,false,false,"bank.api/".$config['presta']."/$action/");
 	}
 	else {
