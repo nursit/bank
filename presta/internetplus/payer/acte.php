@@ -13,10 +13,9 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 include_spip('presta/internetplus/inc/wha_services');
 
-function presta_internetplus_payer_acte_dist($id_transaction,$transaction_hash){
+function presta_internetplus_payer_acte_dist($config,$id_transaction,$transaction_hash){
 
 	include_spip('inc/bank');
-	$config = bank_config("internetplus");
 
 	// verifier que le montant est < 30EUR
 	$montant = sql_getfetsel("montant","spip_transactions","id_transaction=".intval($id_transaction));
