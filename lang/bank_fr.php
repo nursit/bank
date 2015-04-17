@@ -85,7 +85,7 @@ _ Compte bancaire&nbsp;:
 	'label_configuration_virement_ordre' => 'Compte b&eacute;n&eacute;ficiaire&nbsp;:',
 	'label_configuration_virement_adresse_banque' => 'Adresse de la banque',
 	'label_configuration_virement_notice' => 'Remarques compl&eacute;mentaires&nbsp;:',
-	'label_configuration_cartes' => 'Utiliser les cartes de paiement :',
+	'label_configuration_cartes' => 'Proposer les cartes de paiement :',
 	'label_configuration_autres_moyens' => 'Proposer aussi :',
 	'label_email_ticket_admin' => 'Email destinataire des tickets d\'achat',
 	'label_email_from_ticket_admin' => 'Email <i>from</i> des tickets d\'achat',
