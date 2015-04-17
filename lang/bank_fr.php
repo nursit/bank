@@ -15,7 +15,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 	'carte_bleu' => 'Carte Bleue',
 	'choisissez_cb' => 'Choisissez votre carte bancaire&nbsp;:',
-	'confirme_reglement_annule' => 'L\'op&eacute;ration a &eacute;t&eacute; annul&eacute;e. Aucun r&egrave;glement n\'a &eacute;t&eacute; r&eacute;alis&eacute;',
+	'confirme_reglement_annule' => 'L\'op&eacute;ration a &eacute;t&eacute; annul&eacute;e. Aucun r&egrave;glement n\'a &eacute;t&eacute; r&eacute;alis&eacute;.',
 	'confirme_reglement_pris_en_compte' => 'Votre r&egrave;glement a bien &eacute;t&eacute; pris en compte, et nous vous en remercions.',
 
 	'explication_page_configurer_paiement' => 'Configurez les syst&egrave;mes de paiement actifs',
