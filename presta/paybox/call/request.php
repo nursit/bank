@@ -30,8 +30,9 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	$mode = 'paybox';
 	if (!is_array($config) OR !isset($config['type']) OR !isset($config['config'])){
 		spip_log("call_request : config invalide ".var_export($config,true),$mode._LOG_ERREUR);
-		$mode = $config['config'];
+		return "";
 	}
+	$mode = $config['config'];
 
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash))){
 		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable",$mode._LOG_ERREUR);
