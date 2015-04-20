@@ -18,98 +18,65 @@
 
 <form method="post" action="#ENV{action}"><div>
 	#ACTION_FORMULAIRE{#ENV{action}}
-	<ul>
-		<li class="fieldset">
-		<fieldset>
-			<legend><:bank:label_mode_paiement:></legend>
-			<ul>
-				<BOUCLE_prestas(POUR){tableau #REM|bank_lister_prestas}>
-					#SET{casier,config_#VALEUR}
-					#SET{name,#GET{casier}_actif}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
-					#SET{disabled,''}
-					[(#AUTORISER{utilisermodepaiement,_#VALEUR}|non)#SET{disabled,true}]
-					<li class="editer pleine_largeur editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
-						<span class='erreur_message'>(#GET{erreurs})</span>
-						]
-						#SET{val,0}
-						<input type="hidden" name="#GET{casier}[actif]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
-						#SET{val,1}
-						<div class="choix[(#GET{disabled}|oui)muted]">
-							<input type="checkbox" name="#GET{casier}[actif]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#GET{casier}}|table_valeur{actif, #GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
-							<label for="#GET{name}_#GET{val}">[(#VAL{bank:label_presta_}|concat{#VALEUR}|_T)]</label>
-						</div>
-					</li>
-					[(#CHEMIN{presta/#VALEUR/inc-configurer.html}|oui)
-					<li class="fieldset suite">
-						<input type="hidden" name="#GET{casier}\[presta\]" value="#VALEUR" />
-						<input type="hidden" name="#GET{casier}\[type\]" value="acte" />
-						<fieldset>
-							<INCLURE{fond=presta/#VALEUR/inc-configurer,casier=#GET{casier},mode=#VALEUR,env} />
-						</fieldset>
-					</li>
-					]
-				</BOUCLE_prestas>
-			</ul>
-		</fieldset>
-		</li>
-		<li class="fieldset">
-		<fieldset>
-			<legend><:bank:label_mode_paiement_abo:></legend>
-			<ul>
-				<BOUCLE_prestasabo(POUR){tableau #VAL{abo}|bank_lister_prestas}>
-					#SET{casier,config_abo_#VALEUR}
-					#SET{name,#GET{casier}_actif}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
-					#SET{disabled,''}
-					[(#AUTORISER{utilisermodepaiementabo,_#VALEUR}|non)#SET{disabled,true}]
-					<li class="editer pleine_largeur editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
-						<span class='erreur_message'>(#GET{erreurs})</span>
-						]
-						#SET{val,0}
-						<input type="hidden" name="#GET{casier}[actif]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
-						#SET{val,1}
-						<div class="choix[(#GET{disabled}|oui)muted]">
-							<input type="checkbox" name="#GET{casier}[actif]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#GET{casier}}|table_valeur{actif, #GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
-							<label for="#GET{name}_#GET{val}">[(#VAL{bank:label_presta_abo_}|concat{#VALEUR}|_T)]</label>
-						</div>
-					</li>
-					[(#CHEMIN{presta/#VALEUR/inc-configurer-abo.html}|oui)
-					<li class="fieldset suite">
-						<input type="hidden" name="#GET{casier}\[presta\]" value="#VALEUR" />
-						<input type="hidden" name="#GET{casier}\[type\]" value="abo" />
-						<fieldset>
-							<INCLURE{fond=presta/#VALEUR/inc-configurer-abo,casier=#GET{casier},mode=#VALEUR,env} />
-						</fieldset>
-					</li>
-					]
-				</BOUCLE_prestasabo>
-			</ul>
-		</fieldset>
-		</li>
-		<li class="fieldset">
-		<fieldset>
-			<legend><:bank:label_notifications:></legend>
-			<ul>
-				<li class="editer long_label editer_email_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
-					<label><:bank:label_email_ticket_admin:></label>[
-					<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_ticket_admin})</span>]
-					<input type="text" class="text" name="email_ticket_admin" value="#ENV*{email_ticket_admin}" />
-				</li>
-				<li class="editer long_label editer_email_from_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
-					<label><:bank:label_email_from_ticket_admin:></label>[
-					<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_ticket_admin})</span>]
-					#SET{default,#CONFIG{adresse_site}|parse_url|table_valeur{host}|ltrim{w.}}
-					<input type="text" class="text" name="email_from_ticket_admin" value="#ENV*{email_from_ticket_admin}" placeholder="reglements@#GET{default}"/>
-				</li>
-				<li class="editer long_label editer_email_reporting[ (#ENV**{erreurs}|table_valeur{email_reporting}|oui)erreur]">
-					<label><:bank:label_email_reporting:></label>[
-					<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_reporting})</span>]
-					<input type="text" class="text" name="email_reporting" value="#ENV*{email_reporting}" />
-				</li>
-			</ul>
-		</fieldset>
-		</li>
-	</ul>
+	<fieldset>
+		<legend><:bank:label_notifications:></legend>
+		<ul>
+			<li class="editer long_label editer_email_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
+				<label><:bank:label_email_ticket_admin:></label>[
+				<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_ticket_admin})</span>]
+				<input type="text" class="text" name="email_ticket_admin" value="#ENV*{email_ticket_admin}" />
+			</li>
+			<li class="editer long_label editer_email_from_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
+				<label><:bank:label_email_from_ticket_admin:></label>[
+				<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_ticket_admin})</span>]
+				#SET{default,#CONFIG{adresse_site}|parse_url|table_valeur{host}|ltrim{w.}}
+				<input type="text" class="text" name="email_from_ticket_admin" value="#ENV*{email_from_ticket_admin}" placeholder="reglements@#GET{default}"/>
+			</li>
+			<li class="editer long_label editer_email_reporting[ (#ENV**{erreurs}|table_valeur{email_reporting}|oui)erreur]">
+				<label><:bank:label_email_reporting:></label>[
+				<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_reporting})</span>]
+				<input type="text" class="text" name="email_reporting" value="#ENV*{email_reporting}" />
+			</li>
+		</ul>
+	</fieldset>
 
+	<h3 class="titrem"><:bank:label_prestataires:></h3>
+	<BOUCLE_configs(POUR){tableau #REM|bank_lister_configs}>
+		<fieldset>
+			<legend>[(#VAL{bank:label_presta_}|concat{#CLE}|_T)]</legend>
+			<ul>
+				#SET{casier,config_#CLE}
+				#SET{name,#GET{casier}_actif}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+				#SET{disabled,''}
+				[(#AUTORISER{utilisermodepaiement,_#CLE}|non)#SET{disabled,true}]
+				<li class="editer pleine_largeur editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
+					<span class='erreur_message'>(#GET{erreurs})</span>
+					]
+					<div class="action" style="float:right">
+						<button name="action_up[#GET{casier}]" title="Monter" value="X">^</button>
+						<button name="action_down[#GET{casier}]" title="Descendre" value="X">v</button>
+						<button name="action_del[#GET{casier}]" title="Supprimer" value="X">X</button>
+					</div>
+					#SET{val,0}
+					<input type="hidden" name="#GET{casier}[actif]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
+					#SET{val,1}
+					<div class="choix[(#GET{disabled}|oui)muted]">
+						<input type="checkbox" name="#GET{casier}[actif]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#GET{casier}}|table_valeur{actif, #GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
+						<label for="#GET{name}_#GET{val}">Activer</label>
+					</div>
+				</li>
+				[(#CHEMIN{presta/#VALEUR{presta}/inc-configurer.html}|oui)
+				<li class="fieldset suite">
+					<input type="hidden" name="#GET{casier}\[presta\]" value="#CLE" />
+					<input type="hidden" name="#GET{casier}\[type\]" value="acte" />
+					<fieldset>
+						<INCLURE{fond=presta/#VALEUR{presta}/inc-configurer,casier=#GET{casier},mode=#CLE,env} />
+					</fieldset>
+				</li>
+				]
+			</ul>
+		</fieldset>
+	</BOUCLE_configs>
 	<p class="boutons">
 		<input type="submit" name="enregistrer" class="submit" value="<:bouton_enregistrer|attribut_html:>" />
 	</p>

@@ -95,16 +95,14 @@ function bank_config($mode,$abo=false){
 	if ($mode=="cyberplus") $mode = "systempay";
 
 	include_spip('inc/config');
-	$config = array();
 	if ($abo) {
-		if (lire_config("bank_paiement/presta_abo/".$mode,'')){
-			$config = lire_config("bank_paiement/config_abo_".$mode,'');
-		}
+		$config = lire_config("bank_paiement/config_abo_".$mode,'');
 	}
 	else {
-		if (lire_config("bank_paiement/presta/".$mode,'')){
-			$config = lire_config("bank_paiement/config_".$mode,'');
-		}
+		$config = lire_config("bank_paiement/config_".$mode,'');
+	}
+	if (!isset($config['actif']) OR !$config['actif']){
+		$config = array();
 	}
 
 	if (!$config AND $mode!=="gratuit"){
@@ -123,6 +121,24 @@ function bank_config($mode,$abo=false){
 	}
 
 	return $config;
+}
+
+function bank_lister_configs($type=null){
+	if ($type AND !in_array($type,array('abo','acte'))){
+		$type=null;
+	}
+
+	include_spip('inc/config');
+	$config = lire_config("bank_paiement/");
+	$configs = array();
+	foreach($config as $k=>$v){
+		if (strncmp($k,"config_",7)==0){
+			if (!$type OR ($v['type']==$type) OR $v['type']=='tout'){
+				$configs[substr($k,7)] = $v;
+			}
+		}
+	}
+	return $configs;
 }
 
 /**
