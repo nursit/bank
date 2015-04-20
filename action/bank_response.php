@@ -13,24 +13,18 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 	
-	if (isset($GLOBALS['meta']['bank_paiement'])
-		AND $config = unserialize($GLOBALS['meta']['bank_paiement'])){
-
 		$id_transaction = 0;
-
-		$prestas = (is_array($config['presta'])?$config['presta']:array());
-		$prestas = array_filter($prestas);
-		if (is_array($config['presta_abo']))
-			$prestas = array_merge($prestas,array_filter($config['presta_abo']));
-
 		$auto = ($auto ? "auto":"");
 		$result = false;
 
 		// intercepter les retours depuis un presta actif
 		if (!$presta) $presta = _request('bankp');
-		if ($presta=="cyberplus") $presta = "systempay"; // renommage d'un prestataire : assurer la continuite de fonctionnement
+		include_spip('inc/bank');
+		if (
+				($presta AND $config = bank_config($presta) AND !isset($config['erreur']) AND $config['actif'])
+		OR  ($presta AND $config = bank_config($presta,true) AND !isset($config['erreur']) AND $config['actif'])){
 
-		if ($presta AND ((isset($prestas[$presta]) AND $prestas[$presta]) OR $presta=='gratuit') ){
+			$presta = $config['presta']; // en cas de renommage
 
 			if (!$auto OR !$call_response = charger_fonction('autoresponse',"presta/$presta/call",true))
 				$call_response = charger_fonction('response',"presta/$presta/call");
@@ -42,7 +36,7 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 			spip_log('call_'.$auto.'response : '."$id_transaction/$result","$presta$auto");
 		}
 		else {
-			spip_log("Prestataire $presta inconnu ou inactif",'bank_response');
+			spip_log("Prestataire $presta inconnu ou inactif",'bank_response'._LOG_ERREUR);
 		}
 
 		// fall back si le presta n'a rien renvoye de lisible
@@ -87,11 +81,7 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 			return redirige_apres_retour_transaction($presta,!$abo?'acte':'abo',$cancel?false:$result,$id_transaction);
 		}
 		die(); // mourir silencieusement
-	}
-	else {
-		spip_log('Aucun prestataire de paiement configure','bank_response');
-	}
-	die();
+
 }
 
 

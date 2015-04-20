@@ -24,24 +24,27 @@
 			<legend><:bank:label_mode_paiement:></legend>
 			<ul>
 				<BOUCLE_prestas(POUR){tableau #REM|bank_lister_prestas}>
-					#SET{name,presta_#VALEUR}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+					#SET{casier,config_#VALEUR}
+					#SET{name,#GET{casier}_actif}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 					#SET{disabled,''}
 					[(#AUTORISER{utilisermodepaiement,_#VALEUR}|non)#SET{disabled,true}]
 					<li class="editer pleine_largeur editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
 						<span class='erreur_message'>(#GET{erreurs})</span>
 						]
 						#SET{val,0}
-						<input type="hidden" name="presta[#VALEUR]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
+						<input type="hidden" name="#GET{casier}[actif]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
 						#SET{val,1}
 						<div class="choix[(#GET{disabled}|oui)muted]">
-							<input type="checkbox" name="presta[#VALEUR]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{presta}|table_valeur{#VALEUR, #GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
+							<input type="checkbox" name="#GET{casier}[actif]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#GET{casier}}|table_valeur{actif, #GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
 							<label for="#GET{name}_#GET{val}">[(#VAL{bank:label_presta_}|concat{#VALEUR}|_T)]</label>
 						</div>
 					</li>
 					[(#CHEMIN{presta/#VALEUR/inc-configurer.html}|oui)
 					<li class="fieldset suite">
+						<input type="hidden" name="#GET{casier}\[presta\]" value="#VALEUR" />
+						<input type="hidden" name="#GET{casier}\[type\]" value="acte" />
 						<fieldset>
-							<INCLURE{fond=presta/#VALEUR/inc-configurer,casier=config_#VALEUR,mode=#VALEUR,env} />
+							<INCLURE{fond=presta/#VALEUR/inc-configurer,casier=#GET{casier},mode=#VALEUR,env} />
 						</fieldset>
 					</li>
 					]
@@ -54,24 +57,27 @@
 			<legend><:bank:label_mode_paiement_abo:></legend>
 			<ul>
 				<BOUCLE_prestasabo(POUR){tableau #VAL{abo}|bank_lister_prestas}>
-					#SET{name,presta_abo_#VALEUR}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+					#SET{casier,config_abo_#VALEUR}
+					#SET{name,#GET{casier}_actif}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 					#SET{disabled,''}
 					[(#AUTORISER{utilisermodepaiementabo,_#VALEUR}|non)#SET{disabled,true}]
 					<li class="editer pleine_largeur editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
 						<span class='erreur_message'>(#GET{erreurs})</span>
 						]
 						#SET{val,0}
-						<input type="hidden" name="presta_abo[#VALEUR]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
+						<input type="hidden" name="#GET{casier}[actif]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
 						#SET{val,1}
 						<div class="choix[(#GET{disabled}|oui)muted]">
-							<input type="checkbox" name="presta_abo[#VALEUR]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{presta_abo}|table_valeur{#VALEUR, #GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
+							<input type="checkbox" name="#GET{casier}[actif]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#GET{casier}}|table_valeur{actif, #GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
 							<label for="#GET{name}_#GET{val}">[(#VAL{bank:label_presta_abo_}|concat{#VALEUR}|_T)]</label>
 						</div>
 					</li>
 					[(#CHEMIN{presta/#VALEUR/inc-configurer-abo.html}|oui)
 					<li class="fieldset suite">
+						<input type="hidden" name="#GET{casier}\[presta\]" value="#VALEUR" />
+						<input type="hidden" name="#GET{casier}\[type\]" value="abo" />
 						<fieldset>
-							<INCLURE{fond=presta/#VALEUR/inc-configurer-abo,casier=config_abo_#VALEUR,mode=#VALEUR,env} />
+							<INCLURE{fond=presta/#VALEUR/inc-configurer-abo,casier=#GET{casier},mode=#VALEUR,env} />
 						</fieldset>
 					</li>
 					]

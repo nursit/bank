@@ -91,6 +91,8 @@ function bank_url_api_retour($config,$action,$args=""){
  * @return array
  */
 function bank_config($mode,$abo=false){
+	// renommage d'un prestataire : assurer la continuite de fonctionnement
+	if ($mode=="cyberplus") $mode = "systempay";
 
 	include_spip('inc/config');
 	$config = array();
@@ -110,9 +112,15 @@ function bank_config($mode,$abo=false){
 		$config = array('erreur'=>'inconnu');
 	}
 
-	$config['presta'] = $mode; // servira pour l'aiguillage dans le futur
-	$config['config'] = ($abo?'abo_':'').$mode;
-	$config['type'] = ($abo?'abo':'acte');
+	if (!isset($config['presta'])){
+		$config['presta'] = $mode; // servira pour l'aiguillage dans le futur
+	}
+	if (!isset($config['config'])){
+		$config['config'] = ($abo ? 'abo_' : '') . $mode;
+	}
+	if (!isset($config['type'])){
+		$config['type'] = ($abo?'abo':'acte');
+	}
 
 	return $config;
 }

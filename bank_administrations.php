@@ -110,7 +110,7 @@ function bank_upgrade($nom_meta_base_version,$version_cible){
 		array("sql_alter","table spip_transactions ADD erreur tinytext NOT NULL DEFAULT ''"),
 	);
 
-	$maj['1.6.0'] = array(
+	$maj['1.6.1'] = array(
 		array("bank_upgrade_config"),
 	);
 
@@ -141,6 +141,23 @@ function bank_upgrade_config(){
 		if (!lire_config("bank_paiement/config_systempay",'')){
 			ecrire_config("bank_paiement/config_systempay",$c);
 		}
+	}
+	if ($actifs = lire_config("bank_paiement/presta")){
+		foreach($actifs as $mode=>$actif){
+			ecrire_config("bank_paiement/config_$mode/actif",$actif);
+			ecrire_config("bank_paiement/config_$mode/presta",$mode);
+			ecrire_config("bank_paiement/config_$mode/type","acte");
+		}
+		effacer_config("bank_paiement/presta");
+	}
+
+	if ($actifs_abo = lire_config("bank_paiement/presta_abo")){
+		foreach($actifs_abo as $mode=>$actif){
+			ecrire_config("bank_paiement/config_abo_$mode/actif",$actif);
+			ecrire_config("bank_paiement/config_abo_$mode/presta",$mode);
+			ecrire_config("bank_paiement/config_abo_$mode/type","abo");
+		}
+		effacer_config("bank_paiement/presta_abo");
 	}
 }
 
