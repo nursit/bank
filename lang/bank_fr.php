@@ -56,6 +56,7 @@ _ Compte bancaire&nbsp;:
 -* IBAN&nbsp;: @iban@
 -* BIC&nbsp;: @bic@',
 	'label_actif' => 'Activer',
+	'label_action_append_presta' => 'Ajouter un prestataire',
 
 	'label_carte_CB' => 'Carte Bleue',
 	'label_carte_VISA' => 'carte Visa',
@@ -96,6 +97,7 @@ _ Compte bancaire&nbsp;:
 	'label_mode_paiement_abo' => 'Modes de paiements des abonnements',
 	'label_mode_test' => 'Utiliser en mode TEST (aucun paiement r&eacute;el)',
 	'label_notifications' => 'Notifications',
+	'label_prestataires' => 'Prestataires',
 	'label_presta_abo_paybox' => 'Paybox <a href="http://www.paybox.com/">http://www.paybox.com/</a>',
 	'label_presta_abo_simu' => 'Simulation (necessite une autorisation par define)',
 	'label_presta_abo_internetplus' => 'Internet +',

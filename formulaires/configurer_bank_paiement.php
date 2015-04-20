@@ -39,10 +39,43 @@ function formulaires_configurer_bank_paiement_verifier_dist(){
 				bank_deplacer_config($down,"down");
 			}
 		}
+		if (_request('action_append')
+		  AND $presta = _request('action_append_presta')
+		  AND in_array($presta,bank_lister_prestas())){
+			bank_ajouter_config($presta);
+		}
 	}
 	return $erreurs;
 }
 
+/**
+ * Ajouter une config pour un presta
+ * @param $presta
+ */
+function bank_ajouter_config($presta){
+	include_spip('inc/config');
+	$config = lire_config("bank_paiement/");
+	$c = array('presta'=>$presta,'actif'=>0,'type'=>'acte');
+
+	$id = $presta;
+	$suff = "";
+	$n = "";
+	while(isset($config["config_$id$suff"])){
+		$n++;
+		$suff = "-$n";
+	}
+	$id  = "$id$suff";
+	$c['config'] = $id;
+	set_request("config_$id",$c);
+	ecrire_config("bank_paiement/config_$id",$c);
+}
+
+
+/**
+ * Deplacer une config (remonter/descendre) pour configurer l'ordre de presentation
+ * @param $nom
+ * @param string $sens
+ */
 function bank_deplacer_config($nom,$sens="up"){
 	include_spip('inc/config');
 	$config = lire_config("bank_paiement/");

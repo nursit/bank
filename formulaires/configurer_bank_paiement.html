@@ -41,9 +41,25 @@
 	</fieldset>
 
 	<h3 class="titrem"><:bank:label_prestataires:></h3>
+	<ul>
+		#SET{name,action_append_presta}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+		<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+			<label for="#GET{name}"><:bank:label_action_append_presta:></label>[
+			<span class='erreur_message'>(#GET{erreurs})</span>
+			]
+			<select name="#GET{name}" class="select" id="#GET{name}" style="width: 70%">
+				<option value=""></option>
+				<BOUCLE_prestas(POUR){tableau #REM|bank_lister_prestas}>
+					#SET{val,#VALEUR}
+					<option value="#GET{val}">[(#VAL{bank:label_presta_}|concat{#VALEUR}|_T|textebrut)]</option>
+				</BOUCLE_prestas>
+			</select>
+			<button name="action_append" value="ajouter" style="float:right;">Ajouter</button>
+		</li>
+	</ul>
 	<BOUCLE_configs(POUR){tableau #REM|bank_lister_configs}>
 		<fieldset>
-			<legend>[(#VAL{bank:label_presta_}|concat{#CLE}|_T)]</legend>
+			<legend>[(#VAL{bank:label_presta_}|concat{#VALEUR{presta}}|_T)]</legend>
 			<ul>
 				#SET{casier,config_#CLE}
 				#SET{name,#GET{casier}_actif}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
