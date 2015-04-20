@@ -64,11 +64,11 @@
 						<input type="checkbox" name="#GET{casier}[actif]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#GET{casier}}|table_valeur{actif, #GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
 						<label for="#GET{name}_#GET{val}">Activer</label>
 					</div>
+					<input type="hidden" name="#GET{casier}\[presta\]" value="[(#VALEUR{presta})]" />
+					<input type="hidden" name="#GET{casier}\[type\]" value="acte" />
 				</li>
 				[(#CHEMIN{presta/#VALEUR{presta}/inc-configurer.html}|oui)
 				<li class="fieldset suite">
-					<input type="hidden" name="#GET{casier}\[presta\]" value="#CLE" />
-					<input type="hidden" name="#GET{casier}\[type\]" value="acte" />
 					<fieldset>
 						<INCLURE{fond=presta/#VALEUR{presta}/inc-configurer,casier=#GET{casier},mode=#CLE,env} />
 					</fieldset>
