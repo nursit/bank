@@ -122,6 +122,53 @@ function bank_config($mode,$abo=false){
 	return $config;
 }
 
+/**
+ * Calculer un ID de config unique (qui change si un ID significatif change)
+ * pour differencier 2 config du meme prestataire
+ * @param array $config
+ * @return string
+ */
+function bank_config_id($config){
+
+	$t = $config;
+	// enlever les cles non significatives
+	foreach(array(
+		'actif',
+		'config',
+		'type',
+		'cartes',
+		'mode_test',
+	        ) as $k){
+		if (isset($t[$k])){
+			unset($t[$k]);
+		}
+	}
+	foreach($t as $k=>$v){
+		if (
+		  // enlever les key/secret/signature/certificat
+			stripos($k,"key")!==false
+			OR stripos($k,"cle")!==false
+			OR stripos($k,"secret")!==false
+			OR stripos($k,"signature")!==false
+			OR stripos($k,"certificat")!==false
+		  // enlever les logo/advert/notice/adresse
+			OR stripos($k,"logo")!==false
+			OR stripos($k,"advert")!==false
+			OR stripos($k,"notice")!==false
+			OR stripos($k,"adresse")!==false
+		){
+			unset($t[$k]);
+		}
+
+	}
+	ksort($t);
+	include_spip('inc/json');
+	$t = json_encode($t);
+	#var_dump($t);
+	return strtoupper(substr(md5($t),0,4));
+}
+
+
 function bank_lister_configs($type=null){
 	if ($type AND !in_array($type,array('abo','acte'))){
 		$type=null;

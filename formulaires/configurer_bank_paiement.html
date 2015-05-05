@@ -59,7 +59,7 @@
 	</ul>
 	<BOUCLE_configs(POUR){tableau #REM|bank_lister_configs}>
 		<fieldset>
-			<legend>[(#VAL{bank:label_presta_}|concat{#VALEUR{presta}}|_T)]</legend>
+			<legend>[(#VAL{bank:label_presta_}|concat{#VALEUR{presta}}|_T)][ \(<tt>(#VALEUR|bank_config_id)</tt>\)]</legend>
 			<ul>
 				#SET{casier,config_#CLE}
 				#SET{name,#GET{casier}_actif}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
