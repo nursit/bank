@@ -179,7 +179,7 @@ function bank_lister_configs($type=null){
 	$configs = array();
 	foreach($config as $k=>$v){
 		if (strncmp($k,"config_",7)==0){
-			if (!$type OR ($v['type']==$type) OR $v['type']=='tout'){
+			if (!$type OR ($v['type']==$type) OR $v['type']=='abo_acte'){
 				$configs[substr($k,7)] = $v;
 			}
 		}
