@@ -85,29 +85,58 @@ function bank_url_api_retour($config,$action,$args=""){
 
 
 /**
- * @param string $mode
+ * @param string $presta
  * @param bool $abo
  * @return array
  */
-function bank_config($mode,$abo=false){
+function bank_config($presta,$abo=false){
+
+	$id = "";
+	$mode = $presta;
+	if (preg_match(",-[A-F0-9]{4},Uims",$presta)){
+		$mode = substr($presta,0,-5);
+		$id = substr($presta,-4);
+	}
+
 	// renommage d'un prestataire : assurer la continuite de fonctionnement
 	if ($mode=="cyberplus") $mode = "systempay";
+	$type = null;
+	if ($abo) $type = 'abo';
 
-	include_spip('inc/config');
-	if ($abo) {
-		$config = lire_config("bank_paiement/config_abo_".$mode,'');
-	}
-	else {
-		$config = lire_config("bank_paiement/config_".$mode,'');
-	}
-	if (!isset($config['actif']) OR !$config['actif']){
-		$config = array();
+	$config = false;
+	if ($mode!=="gratuit"){
+		$configs = bank_lister_configs($type);
+		$ids = array($id);
+		if ($id) $ids[] = "";
+		foreach($ids as $i) {
+			foreach($configs as $k=>$c){
+				if ($c['presta']==$mode
+					AND (!$i OR $i == bank_config_id($c)) ){
+					// si actif c'est le bon, on sort
+					if (isset($c['actif']) AND $c['actif']){
+						$config = $c;
+						break;
+					}
+					// si inactif on le memorise mais on continue a chercher
+					if (!$config){
+						$config = $c;
+					}
+				}
+			}
+			if ($config){
+				break;
+			}
+		}
+
+		if (!$config){
+			spip_log("Configuration $mode introuvable","bank"._LOG_ERREUR);
+			$config = array('erreur'=>'inconnu');
+		}
 	}
 
-	if (!$config AND $mode!=="gratuit"){
-		spip_log("Configuration $mode introuvable","bank"._LOG_ERREUR);
-		$config = array('erreur'=>'inconnu');
-	}
+	#if (!isset($config['actif']) OR !$config['actif']){
+	#	$config = array();
+	#}
 
 	if (!isset($config['presta'])){
 		$config['presta'] = $mode; // servira pour l'aiguillage dans le futur
