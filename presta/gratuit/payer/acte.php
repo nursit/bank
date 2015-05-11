@@ -11,7 +11,7 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-function presta_gratuit_payer_acte_dist($id_transaction,$transaction_hash){
+function presta_gratuit_payer_acte_dist($config, $id_transaction,$transaction_hash, $options=array()){
 
 	include_spip('inc/bank');
 	$config = bank_config("gratuit");
@@ -22,6 +22,8 @@ function presta_gratuit_payer_acte_dist($id_transaction,$transaction_hash){
 	);
 	$contexte['sign'] = bank_sign_response_simple("gratuit",$contexte);
 	$contexte['action'] = bank_url_api_retour($config,"response");
+
+	$contexte = array_merge($options,$contexte);
 
 	return recuperer_fond('presta/gratuit/payer/acte',$contexte);
 }
