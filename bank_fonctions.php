@@ -97,6 +97,12 @@ function bank_url_autoresponse($mode){
 	return bank_url_api_retour($config,"autoresponse");
 }
 
+function filtre_bank_lister_configs_dist($type){
+	include_spip('inc/bank');
+	return bank_lister_configs($type);
+}
+
+
 /**
  * Afficher la liste des transactions d'un auteur sur la page auteur de l'espace prive
  *
