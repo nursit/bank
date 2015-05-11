@@ -73,12 +73,13 @@ function bank_url_api_retour($config,$action,$args=""){
 		}
 	}
 
+	$presta = $config['presta']."-".bank_config_id($config);
 	if ($is_api){
-		return generer_url_public('',$args,false,false,"bank.api/".$config['presta']."/$action/");
+		return generer_url_public('',$args,false,false,"bank.api/$presta/$action/");
 	}
 	else {
 		$args = (strlen($args)?"&":"").$args;
-		$args = "bankp=".$config['presta'].$args;
+		$args = "bankp=".$presta.$args;
 		return generer_url_action('bank_'.$action,$args,true,true);
 	}
 }
@@ -167,6 +168,10 @@ function bank_config($presta,$abo=false){
  * @return string
  */
 function bank_config_id($config){
+	static $ids;
+	$hash = serialize($config);
+	if (isset($ids[$hash]))
+		return $ids[$hash];
 
 	$t = $config;
 	// enlever les cles non significatives
@@ -203,7 +208,7 @@ function bank_config_id($config){
 	include_spip('inc/json');
 	$t = json_encode($t);
 	#var_dump($t);
-	return strtoupper(substr(md5($t),0,4));
+	return $ids[$hash] = strtoupper(substr(md5($t),0,4));
 }
 
 
