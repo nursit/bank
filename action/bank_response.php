@@ -20,9 +20,10 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 		// intercepter les retours depuis un presta actif
 		if (!$presta) $presta = _request('bankp');
 		include_spip('inc/bank');
-		if (
-				($presta AND $config = bank_config($presta) AND !isset($config['erreur']) AND $config['actif'])
-		OR  ($presta AND $config = bank_config($presta,true) AND !isset($config['erreur']) AND $config['actif'])){
+		if ($presta
+			AND $config = bank_config($presta)
+			AND !isset($config['erreur'])
+			AND $config['actif']){
 
 			$presta = $config['presta']; // en cas de renommage
 
