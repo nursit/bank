@@ -21,7 +21,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 function presta_paybox_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
 
 	$call_request = charger_fonction('request','presta/paybox/call');
-	$contexte = $call_request($id_transaction,$transaction_hash,$config);
+	$contexte = $call_request($id_transaction,$transaction_hash,$config,"acte");
 
 	$contexte['sandbox'] = (paybox_is_sandbox($config)?' ':'');
 

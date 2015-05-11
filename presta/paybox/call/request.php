@@ -23,16 +23,18 @@ include_spip('presta/paybox/inc/paybox');
  * @param string $transaction_hash
  * @param $config
  *   configuration du module
+ * @param string $type
+ *   type de paiement : acte ou abo
  * @return array
  */
-function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $config){
+function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $config, $type="acte"){
 
 	$mode = 'paybox';
-	if (!is_array($config) OR !isset($config['type']) OR !isset($config['config'])){
+	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
 		spip_log("call_request : config invalide ".var_export($config,true),$mode._LOG_ERREUR);
 		return "";
 	}
-	$mode = $config['config'];
+	$mode = $config['presta'];
 
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash))){
 		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable",$mode._LOG_ERREUR);
@@ -82,7 +84,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 
 	$parm['PBX_RETOUR'] = 'montant:M;id_transaction:R;auth:A;trans:S;abo:B;erreur:E;valid:D;';
 
-	if ($config['type']=='abo'){
+	if ($type=='abo' AND $config['type']!=='acte'){
 		// on decrit l'echeance, en indiquant qu'on peut la gerer manuellement grace a PayBoxDirectPlus
 		if (
 			$decrire_echeance = charger_fonction("decrire_echeance","abos",true)
