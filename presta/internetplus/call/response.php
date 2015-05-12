@@ -13,13 +13,13 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 
 /**
- * @param string $mode
+ * @param array $config
  * @return array
  */
-function presta_internetplus_call_response_dist($mode = "internetplus"){
+function presta_internetplus_call_response_dist($config){
 
 	include_spip('inc/bank');
-	$config = bank_config($mode,_request('abo'));
+	$mode = $config['presta'];
 
 	$traiter_reponse = charger_fonction('traiter_reponse','presta/internetplus/inc');
 	list($id_transaction,$result,$mp)=$traiter_reponse($config);

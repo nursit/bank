@@ -15,12 +15,13 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * il faut avoir un id_transaction et un transaction_hash coherents
  * pour se premunir d'une tentative d'appel exterieur
  *
- * @param string $mode
+ * @param array $config
  * @param null|array $response
  * @return array
  */
-function presta_gratuit_call_response_dist($mode='gratuit', $response=null){
+function presta_gratuit_call_response_dist($config, $response=null){
 
+	$mode = $config['presta'];
 	// recuperer la reponse en post et la decoder, en verifiant la signature
 	if (!$response)
 		$response = bank_response_simple($mode);

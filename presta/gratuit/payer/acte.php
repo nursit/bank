@@ -14,7 +14,6 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 function presta_gratuit_payer_acte_dist($config, $id_transaction,$transaction_hash, $options=array()){
 
 	include_spip('inc/bank');
-	$config = bank_config("gratuit");
 
 	$contexte = array(
 		'id_transaction' => $id_transaction,

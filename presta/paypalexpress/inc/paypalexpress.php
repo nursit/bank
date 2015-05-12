@@ -176,16 +176,16 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=nu
 }
 
 
-function bank_paypalexpress_checkoutpayment($payerid,$mode="paypalexpress"){
+function bank_paypalexpress_checkoutpayment($payerid,$config){
 
-	$config = bank_config($mode);
+	$mode = $config['presta'];
 
 	include_spip('inc/date');
 
 	if (!$id_transaction = $_SESSION['id_transaction']){
 		return bank_transaction_invalide(0,
 			array(
-				'mode' => "paypalexpress",
+				'mode' => $mode,
 				'erreur' => "id_transaction absent de la session",
 				'log' => var_export($_SESSION,true)
 			)
@@ -195,7 +195,7 @@ function bank_paypalexpress_checkoutpayment($payerid,$mode="paypalexpress"){
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=" . intval($id_transaction))){
 		return bank_transaction_invalide($id_transaction,
 			array(
-				'mode' => "paypalexpress",
+				'mode' => $mode,
 				'erreur' => "transaction inconnue",
 				'log' => var_export($_SESSION,true)
 			)
@@ -204,7 +204,7 @@ function bank_paypalexpress_checkoutpayment($payerid,$mode="paypalexpress"){
 
 	// hmm bizare, double hit ? On fait comme si c'etait OK
 	if ($row['reglee']=='oui'){
-		spip_log("Erreur transaction $id_transaction deja reglee", 'paypalexpress' . _LOG_INFO_IMPORTANTE);
+		spip_log("Erreur transaction $id_transaction deja reglee", $mode . _LOG_INFO_IMPORTANTE);
 		return array($id_transaction,true);
 	}
 
@@ -214,7 +214,7 @@ function bank_paypalexpress_checkoutpayment($payerid,$mode="paypalexpress"){
 	 	// sinon enregistrer l'absence de paiement et l'erreur
 		return bank_transaction_echec($id_transaction,
 			array(
-				'mode'=>"paypalexpress",
+				'mode'=>$mode,
 				'code_erreur' => '',
 				'erreur' => "Annulation",
 				'log' => $trace,
@@ -253,7 +253,7 @@ function bank_paypalexpress_checkoutpayment($payerid,$mode="paypalexpress"){
 		$_SESSION['reshash'] = $resArray;
 		return bank_transaction_echec($id_transaction,
 			array(
-				'mode'=>"paypalexpress",
+				'mode'=>$mode,
 				"date_paiement" => $date_paiement,
 				'code_erreur' => '',
 				'erreur' => "Erreur lors de la transaction avec Paypal",

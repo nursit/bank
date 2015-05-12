@@ -44,9 +44,12 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 if (!defined('_SYSTEMPAY_VERSION'))
 	define("_SYSTEMPAY_VERSION", "V2");
 
-function systempay_lister_cartes_config($abo=false){
-	include_spip('inc/bank');
-	$config = bank_config('systempay',$abo);
+function systempay_lister_cartes_config($c){
+	$config = array(
+		'presta'=>'systempay',
+		'type'=>isset($c['type'])?$c['type']:'acte',
+		'service'=>isset($c['service'])?$c['service']:'cyberplus'
+	);
 	include_spip("presta/systempay/inc/systempay");
 	return systempay_available_cards($config);
 }

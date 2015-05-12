@@ -25,13 +25,9 @@ if (!defined('_SYSTEMPAY_VERSION'))
 	define("_SYSTEMPAY_VERSION", "V2");
 
 
-function payzen_lister_cartes_config($abo=false){
+function payzen_lister_cartes_config($c){
 	include_spip('inc/bank');
-	$config = bank_config('payzen',$abo);
-	// au premier coup, quand la config a pas encore ete enregistree service est vide
-	if (!isset($config['service'])){
-		$config['service'] = 'payzen';
-	}
+	$config = array('presta'=>'payzen','type'=>isset($c['type'])?$c['type']:'acte','service'=>'payzen');
 
 	include_spip("presta/systempay/inc/systempay");
 	return systempay_available_cards($config);

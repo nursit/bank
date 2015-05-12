@@ -14,14 +14,14 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 /**
  * Verifier le statut d'une transaction lors du retour de l'internaute
  *
- * @param string $mode
+ * @param array $config
  * @param null|array $response
  * @return array
  */
-function presta_paypal_call_response($mode='paypal', $response=null){
+function presta_paypal_call_response($config, $response=null){
 
 	include_spip('inc/bank');
-	$config = bank_config($mode);
+	$mode = $config['presta'];
 
 	if (!$response){
 		$response = array();

@@ -15,14 +15,14 @@ include_spip('inc/date');
 /**
  * Verifier le statut d'une transaction lors du retour de l'internaute
  *
- * @param string $mode
+ * @param array $config
  * @param null|array $response
  * @return array
  */
-function presta_sips_call_response_dist($mode='sips', $response=null){
+function presta_sips_call_response_dist($config, $response=null){
 
 	include_spip('inc/bank');
-	$config = bank_config($mode);
+	$mode = $config['presta'];
 
 	include_spip('inc/config');
 	$merchant_id = $config['merchant_id'];

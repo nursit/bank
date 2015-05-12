@@ -17,14 +17,14 @@ include_spip('inc/date');
  * il faut avoir un id_transaction et un transaction_hash coherents
  * pour se premunir d'une tentative d'appel exterieur
  * 
- * @param string $mode
+ * @param array $config
  * @param null|array $response
  * @return array
  */
-function presta_simu_call_response_dist($mode="simu", $response=null){
+function presta_simu_call_response_dist($config, $response=null){
 
 	include_spip('inc/bank');
-	$config = bank_config($mode);
+	$mode = $config['presta'];
 
 	// recuperer la reponse en post et la decoder, en verifiant la signature
 	if (!$response)

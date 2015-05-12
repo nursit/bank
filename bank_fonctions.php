@@ -91,9 +91,9 @@ function bank_label_payer_par_carte($code_carte){
  * @param $mode
  * @return string
  */
-function bank_url_autoresponse($mode){
+function bank_url_autoresponse($config){
 	include_spip('inc/bank');
-	$config = bank_config($mode);
+	if (!isset($config['presta'])) return "";
 	return bank_url_api_retour($config,"autoresponse");
 }
 

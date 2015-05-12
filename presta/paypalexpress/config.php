@@ -76,7 +76,10 @@ function action_paypalexpress_order_dist($arg=null){
 		$arg = $securiser_action();
 	}
 
-	list($id_transaction,$mode) = explode("-",$arg);
+	// id_transaction-mode (qui peut etre sous la forme paypal-XXXX avec son id de presta)
+	$arg = explode("-",$arg);
+	$id_transaction = array_shift($arg);
+	$mode = implode("-",$arg);
 	include_spip('inc/bank');
 	$config = bank_config($mode);
 
@@ -107,10 +110,15 @@ function action_paypalexpress_checkoutpayment_dist($arg=null){
 		$arg = $securiser_action();
 	}
 
-	list($payerid,$mode) = explode("-",$arg);
+	$arg = explode("-",$arg);
+	$payerid = array_shift($arg);
+	$mode = implode("-",$arg);
+
+	include_spip("inc/bank");
+	$config = bank_config($mode);
 
 	include_spip("presta/paypalexpress/inc/paypalexpress");
-	$res = bank_paypalexpress_checkoutpayment($payerid,$mode);
+	$res = bank_paypalexpress_checkoutpayment($payerid,$config);
 
 	list($id_transaction, $success) = $res;
 

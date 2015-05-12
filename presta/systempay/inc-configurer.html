@@ -29,7 +29,7 @@
 	#SET{name,#ENV{casier,''}_cartes}#SET{obli,''}#SET{defaut,#LISTE{}}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 		<label><:bank:label_configuration_cartes:></label>
-		<BOUCLE_cards(POUR){tableau #REM|systempay_lister_cartes_config}>
+		<BOUCLE_cards(POUR){tableau #ENV{#ENV{casier,''}}|systempay_lister_cartes_config}>
 		#SET{val,#CLE}
 		<div class="choix">
 			<input type="checkbox" name="#ENV{casier,''}[cartes][]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#GET{val}|in_any{#ENV*{#ENV{casier,''}}|table_valeur{cartes,#GET{defaut}}}|oui)checked="checked"] />
@@ -57,4 +57,4 @@
 		]<input type="text" name="#ENV{casier,''}[CLE_test]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{CLE_test,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
 </ul>
-<p class="explication">URL Serveur&nbsp;: <br /><input type="text" class="text" readonly="readonly" value="[(#ENV{mode}|bank_url_autoresponse)]" /></p>
+<p class="explication">URL Serveur&nbsp;: <br /><input type="text" class="text" readonly="readonly" value="[(#ENV{#ENV{casier,''}}|bank_url_autoresponse)]" /></p>

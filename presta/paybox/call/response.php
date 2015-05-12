@@ -17,11 +17,14 @@ include_spip('inc/date');
 /**
  * Verifier le statut d'une transaction lors du retour de l'internaute
  *
- * @param string $mode
+ * @param array $config
  * @param null|array $response
  * @return array
  */
-function presta_paybox_call_response_dist($mode='paybox', $response=null){
+function presta_paybox_call_response_dist($config, $response=null){
+
+	include_spip('inc/bank');
+	$mode = $config['presta'];
 
 	if (!$response)
 		// recuperer la reponse en post et la decoder

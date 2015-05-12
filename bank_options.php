@@ -46,7 +46,8 @@ function affiche_monnaie($valeur,$decimales=2,$unite=true){
 
 /**
  * Fonction appelee par la balise #PAYER_ACTE et #PAYER_ABONNEMENT
- * @param array $config
+ * @param array|string $config
+ *   string dans le cas "gratuit" => on va chercher la config via bank_config()
  * @param string $type
  * @param int $id_transaction
  * @param string $transaction_hash
@@ -66,9 +67,9 @@ function bank_affiche_payer($config,$type,$id_transaction,$transaction_hash,$opt
 		$options = array();
 	}
 
+	// $config de type string ?
 	include_spip('inc/bank');
 	if (is_string($config)){
-		include_spip('inc/bank');
 		$config = bank_config($config,$type=='abo');
 	}
 

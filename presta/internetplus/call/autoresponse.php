@@ -11,11 +11,14 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-
-function presta_internetplus_call_autoresponse_dist($mode = "internetplus"){
+/**
+ * @param array $config
+ * @return array
+ */
+function presta_internetplus_call_autoresponse_dist($config){
 
 	include_spip('inc/bank');
-	$config = bank_config($mode,true);
+	$mode = $config['presta'];
 
 	$responder = charger_fonction('responder','presta/internetplus/inc');
 	list($uoid,$resil)=$responder();

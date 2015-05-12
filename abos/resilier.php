@@ -75,6 +75,9 @@ function abos_resilier_dist($id,$options=array()){
  *   renvoie false si le presta bancaire indique un echec, true dans tous les autres cas
  */
 function abos_resilier_notify_bank($abonne_uid,$mode_paiement){
+
+	// TODO : recuperer le presta et la config depuis la transaction
+
 	$ok = true;
 	// notifier au presta bancaire si besoin
 	if ($mode_paiement

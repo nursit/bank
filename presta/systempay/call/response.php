@@ -17,14 +17,14 @@ include_spip('presta/systempay/inc/systempay');
  * il faut avoir un id_transaction et un transaction_hash coherents
  * pour se premunir d'une tentative d'appel exterieur
  *
- * @param string $mode
+ * @param array $config
  * @param null|array $response
  * @return array
  */
-function presta_systempay_call_response_dist($mode='systempay', $response=null){
+function presta_systempay_call_response_dist($config, $response=null){
 
 	include_spip('inc/bank');
-	$config = bank_config($mode);
+	$mode = $config['presta'];
 
 	if (!$response){
 		// recuperer la reponse en post et la decoder

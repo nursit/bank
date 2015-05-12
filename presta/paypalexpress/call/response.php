@@ -14,14 +14,14 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 /**
  * Retour de la demande de paiement chez PaypalExpress
  *
- * @param string $mode
+ * @param array $config
  * @param null|array $response
  * @return array
  */
-function presta_paypalexpress_call_response($mode="paypalexpress", $response = null){
+function presta_paypalexpress_call_response($config, $response = null){
 
 	include_spip('inc/bank');
-	$config = bank_config($mode);
+	$mode = $config['presta'];
 
 	$ack = false;
 	include_spip('presta/paypalexpress/inc/paypalexpress');
@@ -75,7 +75,7 @@ function presta_paypalexpress_call_response($mode="paypalexpress", $response = n
 	  AND $resArray["PAYERID"]==_request('PayerID')){
 
 		$url = $_SESSION['paypalexpress_url_confirm'];
-		$url_checkout = generer_action_auteur('paypalexpress_checkoutpayment', $resArray["PAYERID"]."-".$mode);
+		$url_checkout = generer_action_auteur('paypalexpress_checkoutpayment', $resArray["PAYERID"]."-".$mode."-".bank_config_id($config));
 		$url = parametre_url($url, 'checkout', $url_checkout, '&');
 
 		$resume = "Paiement par compte Paypal : <br/>" . $resArray['FIRSTNAME'] . ' ' . $resArray['LASTNAME'] . "," . $resArray['EMAIL'];

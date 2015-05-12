@@ -26,18 +26,27 @@ include_spip('presta/paybox/inc/paybox');
  * @param string $refabonne
  * @param string $ppps
  *   fournit par Paybox lors de l'appel initial avec un ppps:U;
+ * @param array $config
+ *   configuration paybox qui contient les infos de connexion directplus
  * @return string
  */
-function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, $refabonne, $ppps){
+function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, $refabonne, $ppps, $config=null){
+
+	include_spip('inc/bank');
+	if (!$config){
+		$config = bank_config("paybox",true);
+	}
+	$config['mode'] .= "_dplus"; // pour les logs
+	$mode = $config['mode'];
 
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash))){
-		spip_log("Transaction inconnue $id_transaction/$transaction_hash","payboxdplus");
+		spip_log("Transaction inconnue $id_transaction/$transaction_hash",$mode._LOG_ERREUR);
 		return "";
 	}
 
 	// securite : eviter de faire payer plusieurs fois une meme transaction si bug en amont
 	if ($row['statut']=='ok'){
-		spip_log("Transaction $id_transaction/$transaction_hash deja reglee","payboxdplus");
+		spip_log("Transaction $id_transaction/$transaction_hash deja reglee",$mode._LOG_INFO_IMPORTANTE);
 		return "";
 	}
 
@@ -53,8 +62,6 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 		$montant = str_pad($montant,10,'0',STR_PAD_LEFT);
 
 	//		Affectation des parametres obligatoires
-	include_spip('inc/bank');
-	$config = bank_config("paybox",true);
 	$parm = array('VERSION'=>'00104','SITE'=>$config['PBX_SITE'],'RANG'=>$config['PBX_RANG'],'IDENTIFIANT'=>'');
 
 	$parm['CLE'] = $config['DIRECT_PLUS_CLE'];
@@ -93,17 +100,18 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 
 		// requete en POST sur PAYBOX DIRECT PLUS
 		$url = paybox_url_directplus($config);
-		#spip_log("Appel de $url avec ".var_export($parm,true),'dbdp');
+		#spip_log("Appel de $url avec ".var_export($parm,true),$mode);
 		$res = recuperer_page($url,false,false,1048576,$parm);
 		parse_str($res,$r);
 
 		if ($r['CODEREPONSE']=='00005'){
-			spip_log("Collision Reponse : $res",'payboxdplus');
+			spip_log("Collision Reponse : $res",$mode);
 			// hum
 			sleep(1);
 		}
-		else
-			spip_log("Reponse : $res",'payboxdplus');
+		else {
+			spip_log("Reponse : $res",$mode);
+		}
 
 	}
 	while ($r['CODEREPONSE']=='00005' AND $maxtry-->0);
@@ -146,5 +154,5 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	);
 
 	$call_response = charger_fonction('response','presta/paybox/call');
-	return $call_response('pboxdirpl', $response);
+	return $call_response($config, $response);
 }

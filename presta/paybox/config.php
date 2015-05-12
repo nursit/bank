@@ -41,9 +41,12 @@ Ka1g88CjFwRw/PB9kwIDAQAB
 
 */
 
-function paybox_lister_cartes_config($abo=false){
+function paybox_lister_cartes_config($c){
 	include_spip('inc/bank');
 	include_spip("presta/paybox/inc/paybox");
-	$config = bank_config("paybox",$abo);
+	$config = array(
+		'presta'=>'paybox',
+		'type'=>isset($c['type'])?$c['type']:'acte',
+	);
 	return paybox_available_cards($config);
 }

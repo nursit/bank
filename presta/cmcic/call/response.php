@@ -40,15 +40,15 @@ include_spip('inc/date');
  * Dans le cas B, la fonction doit juste rediriger sans effectuer de
  * traitements supplémentaires (sauf en cas d'annulation avant le paiement)
  * 
- * @param string $mode
+ * @param array $config
  * @param array|null $response
  *     Réponse déjà obtenue de la banque si transmis. Sinon sera calculé.
  * @return array(int $id_transaction, bool $paiement_ok)
 **/
-function presta_cmcic_call_response_dist($mode='cmcic', $response=null){
+function presta_cmcic_call_response_dist($config, $response=null){
 
 	include_spip('inc/bank');
-	$config = bank_config($mode);
+	$mode = $config['presta'];
 
 	// Cas B : retour depuis la banque (annulation avant paiement ou fin de la procédure)
 	if ($res = cmcic_terminer_transaction()) {

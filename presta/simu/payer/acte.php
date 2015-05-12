@@ -25,7 +25,7 @@ function presta_simu_payer_acte_dist($config, $id_transaction, $transaction_hash
 		'id_transaction' => $id_transaction,
 		'transaction_hash' => $transaction_hash,
 	);
-	$contexte['sign'] = bank_sign_response_simple('simu', $contexte);
+	$contexte['sign'] = bank_sign_response_simple($config['presta'], $contexte);
 
 	// url action
 	$action = bank_url_api_retour($config,'response');

@@ -60,20 +60,23 @@ function wha_node_url($config){
 
 
 function wha_secret_key($partnerId,$keyId){
+	static $secrets = array();
+	if (isset($secrets[$partnerId])){
+		return $secrets[$partnerId];
+	}
 
-	$config = bank_config("internetplus",false);
-	if (  isset($config['MERCHANT_ID']) AND $config['MERCHANT_ID']==$partnerId
-	  AND isset($config['SECRET']) AND $config['SECRET'])
-		return $config['SECRET'];
-
-	$config = bank_config("internetplus",true);
-	if (  isset($config['MERCHANT_ID']) AND $config['MERCHANT_ID']==$partnerId
-	  AND isset($config['SECRET']) AND $config['SECRET'])
-		return $config['SECRET'];
+	$configs = bank_lister_configs();
+	foreach($configs as $config){
+		if ($config['presta']=='internetplus' AND $config['actif']){
+			if (  isset($config['MERCHANT_ID']) AND $config['MERCHANT_ID']==$partnerId
+			  AND isset($config['SECRET']) AND $config['SECRET'])
+				return $secrets[$partnerId] = $config['SECRET'];
+		}
+	}
 
 	// sinon on log l'absence de cle
 	spip_log("wha_secret_key : pas de config internetplus avec MERCHANT_ID=$partnerId et SECRET defini","internetplus"._LOG_ERREUR);
-	return "nokey";
+	return $secrets[$partnerId] = "nokey";
 }
 
 // Calculate HMAC according to RFC2104
