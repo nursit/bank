@@ -13,10 +13,9 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 include_spip('presta/internetplus/inc/wha_services');
 
-function presta_internetplus_payer_abonnement_dist($id_transaction,$transaction_hash){
+function presta_internetplus_payer_abonnement_dist($config, $id_transaction, $transaction_hash){
 
 	include_spip('inc/bank');
-	$config = bank_config("internetplus",true);
 
 	// on decrit l'echeance
 	if ($decrire_echeance = charger_fonction("decrire_echeance","abos",true)
@@ -32,6 +31,9 @@ function presta_internetplus_payer_abonnement_dist($id_transaction,$transaction_
 			spip_log("Payer abo transaction #$id_transaction : pas de wha_oid dans l'echeance " . var_export($echeance,true),"internetplus_abo"._LOG_INFO_IMPORTANTE);
 			return false;
 		}
+
+		// on ne gere pas les subtilites d'abonnements (frequence, count, count_init)
+		// c'est l'offre wha_oid qui les porte eventuellement (dans la mesure de ce qui est possible ches InternetPlus)
 
 	}
 	else {

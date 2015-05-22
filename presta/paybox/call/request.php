@@ -92,12 +92,26 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 			if ($echeance['montant']>0){
 				$montant_echeance = str_pad(intval(round(100*$echeance['montant'])), 10, "0", STR_PAD_LEFT);
 
+				// si plus d'une echeance initiale prevue on ne sait pas faire avec Paybox
+				if (isset($echeance['count_init']) AND $echeance['count_init']>1){
+					spip_log("Transaction #$id_transaction : nombre d'echeances init ".$echeance['count_init'].">1 non supporte",$mode._LOG_ERREUR);
+					return "";
+				}
+
 				// infos de l'abonnement :
-				// montant identique recurrent, frequence mensuelle, a date anniversaire, sans delai
+				// montant identique recurrent, frequence mensuelle ou annuelle, a date anniversaire, sans delai
+				$freq = "01";
+				if (isset($echeance['freq']) AND $echeance['freq']=='yearly'){
+					$freq = "12";
+				}
+				$nbpaie = "00";
+				if (isset($echeance['count']) AND intval($echeance['count']) AND intval($echeance['count'])<100){
+					$nbpaie = str_pad(intval($echeance['count']), 2, "0", STR_PAD_LEFT);
+				}
 				$parm['PBX_CMD'] .=
 				"IBS_2MONT$montant_echeance"
-				. "IBS_NBPAIE00"
-				. "IBS_FREQ01"
+				. "IBS_NBPAIE$nbpaie"
+				. "IBS_FREQ$freq"
 				. "IBS_QUAND00"
 				//. "IBS_DELAIS000"
 				;
