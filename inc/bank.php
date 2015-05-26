@@ -87,7 +87,8 @@ function bank_url_api_retour($config,$action,$args=""){
 
 /**
  * Trouver une config d'apres le nom du presta
- * si un ID de config est fourni, on l'utilise pour verifier qu'on a bien la bonne config
+ * si un ID de config est fourni en suffixe du nom du presta,
+ * on l'utilise pour verifier qu'on a bien la bonne config
  * (cas de configs multiples avec le meme presta)
  * sinon on prend la premiere config qui a le bon presta
  * Si possible on choisit une config "active"
