@@ -185,6 +185,8 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=nu
 function bank_paypalexpress_checkoutpayment($payerid,$config){
 
 	$mode = $config['presta'];
+	$config_id = bank_config_id($config);
+
 
 	include_spip('inc/date');
 
@@ -221,6 +223,7 @@ function bank_paypalexpress_checkoutpayment($payerid,$config){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,
+				'config_id' => $config_id,
 				'code_erreur' => '',
 				'erreur' => "Annulation",
 				'log' => $trace,
@@ -260,6 +263,7 @@ function bank_paypalexpress_checkoutpayment($payerid,$config){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,
+				'config_id' => $config_id,
 				"date_paiement" => $date_paiement,
 				'code_erreur' => '',
 				'erreur' => "Erreur lors de la transaction avec Paypal",
@@ -274,7 +278,7 @@ function bank_paypalexpress_checkoutpayment($payerid,$config){
 
 	$set = array(
 		"autorisation_id"=>$authorisation_id,
-		"mode"=>$mode,
+		"mode"=>"$mode/$config_id",
 		"montant_regle"=>$montant_regle,
 		"date_paiement"=>$date_paiement,
 		"statut"=>'ok',

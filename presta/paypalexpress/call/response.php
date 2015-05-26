@@ -96,6 +96,7 @@ function presta_paypalexpress_call_response($config, $response = null){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
+				'config_id' => bank_config_id($config),
 				'log' => var_export($_REQUEST,true).var_export($_SESSION['reshash'],true),
 				'erreur' => $ack,
 				'where' => 'GetExpressCheckoutDetails'
