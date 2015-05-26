@@ -24,7 +24,6 @@ include_spip('presta/systempay/inc/systempay');
 function presta_systempay_call_response_dist($config, $response=null){
 
 	include_spip('inc/bank');
-	$mode = $config['presta'];
 
 	if (!$response){
 		// recuperer la reponse en post et la decoder
@@ -36,7 +35,7 @@ function presta_systempay_call_response_dist($config, $response=null){
 	}
 
 	// depouillement de la transaction
-	list($id_transaction,$success) =  systempay_traite_reponse_transaction($mode, $response);
+	list($id_transaction,$success) =  systempay_traite_reponse_transaction($config, $response);
 
 	return array($id_transaction,$success);
 }

@@ -195,12 +195,14 @@ function systempay_recupere_reponse($config){
 
 /**
  * Traiter la reponse
- * @param string $mode
+ * @param array $config
  * @param array $response
  * @return array
  */
-function systempay_traite_reponse_transaction($mode, $response){
+function systempay_traite_reponse_transaction($config, $response){
 	#var_dump($response);
+	$mode = $config['presta'];
+	$config_id = bank_config_id($config);
 
 	$id_transaction = $response['vads_order_id'];
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
@@ -257,6 +259,7 @@ function systempay_traite_reponse_transaction($mode, $response){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,
+				'config_id' => $config_id,
 				'date_paiement' => $date_paiement,
 				'code_erreur' => $response['vads_result'],
 				'erreur' => $erreur,
@@ -278,7 +281,7 @@ function systempay_traite_reponse_transaction($mode, $response){
 
 	$set = array(
 		"autorisation_id" => "$transaction/$authorisation_id",
-		"mode" => $mode,
+		"mode" => "$mode/$config_id",
 		"montant_regle" => $montant_regle,
 		"date_paiement" => $date_paiement,
 		"statut"=>'ok',
