@@ -413,7 +413,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	// ce qui autorise 10 paiements/secondes. Au pire si collision il suffit de recommencer
 	// deux presentations de la meme transaction donnent 2 vads_trans_id differents
 	$now = time();
-	$id = 10*(date('s',$now)+60*(date('i',$now))+60*date('H',$now));
+	$id = 10*(date('s',$now)+60*(date('i',$now)+60*date('H',$now)));
 	$id += modulo($row['id_transaction'],10);
 	$parm['vads_trans_id'] = str_pad($id,6,"0",STR_PAD_LEFT);
 	$parm['vads_order_id'] = $row['id_transaction'];
