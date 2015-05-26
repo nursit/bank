@@ -23,11 +23,13 @@ function inc_bank_recuperer_post_https_dist($url,$datas='') {
 
 	if (!function_exists('curl_init')){
 		include_spip('inc/distant');
-		if (is_string($datas) AND strlen($datas)){
-			parse_str($datas, $args); // passer en tableau
-			$datas = $args;
+		$nvpreq=$datas;
+		if (is_array($datas) AND count($datas)){
+			$nvpreq = http_build_query($datas);
 		}
-		$response = recuperer_page($url,false,false,1048576,$datas);
+		spip_log("bank_recuperer_post_https sur $url via recuperer_page : $nvpreq",'bank');
+
+		$response = recuperer_page($url,false,false,1048576,$datas,null);
 		$erreur = $response===false;
 		$erreur_msg = "recuperer_page impossible";
 	}
@@ -35,14 +37,24 @@ function inc_bank_recuperer_post_https_dist($url,$datas='') {
 		//setting the curl parameters.
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL,$url);
-		curl_setopt($ch, CURLOPT_VERBOSE, 1);
+		//curl_setopt($ch, CURLOPT_VERBOSE, 1);
+		curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 
 		//turning off the server and peer verification(TrustManager Concept).
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER,1);
-		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+		curl_setopt($ch, CURLOPT_CAINFO, dirname(__FILE__)."/cert/api_cert_chain.crt");
+
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
+		curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+		curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
+		curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
 
 		//if USE_PROXY constant set to TRUE in Constants.php, then only proxy will be enabled.
 		//Set proxy name to PROXY_HOST and port number to PROXY_PORT in constants.php
@@ -54,9 +66,11 @@ function inc_bank_recuperer_post_https_dist($url,$datas='') {
 		if (is_array($datas) AND count($datas)){
 			$nvpreq = http_build_query($datas);
 		}
+		spip_log("bank_recuperer_post_https sur $url via curl : $nvpreq",'bank');
 
 		//setting the nvpreq as POST FIELD to curl
-		curl_setopt($ch,CURLOPT_POSTFIELDS,$nvpreq);
+		curl_setopt($ch, CURLOPT_POSTFIELDS,$nvpreq);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: Close', 'User-Agent: SPIP/Bank'));
 
 		//getting response from server
 		$response = curl_exec($ch);
