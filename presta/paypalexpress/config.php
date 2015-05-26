@@ -83,7 +83,7 @@ function action_paypalexpress_order_dist($arg=null){
 	include_spip('inc/bank');
 	$config = bank_config($mode);
 
-/* An express checkout transaction starts with a token, that
+	/* An express checkout transaction starts with a token, that
    identifies to PayPal your transaction
    In this example, when the script sees a token, the script
    knows that the buyer has already authorized payment through
@@ -91,16 +91,11 @@ function action_paypalexpress_order_dist($arg=null){
    to PayPal to first authorize payment
    */
 
-	if(!$token = _request('token')) {
-
-		include_spip("presta/paypalexpress/inc/paypalexpress");
-		$redirect = bank_paypalexpress_order_init($config, $id_transaction,_request('url_confirm'));
-
-		if (!$redirect)
-			$redirect = url_de_base();
+	include_spip("presta/paypalexpress/inc/paypalexpress");
+	if ($redirect = bank_paypalexpress_order_init($config, $id_transaction,_request('url_confirm'))) {
+		$GLOBALS['redirect'] = $redirect;
 	}
 
-	$GLOBALS['redirect'] = $redirect;
 }
 
 

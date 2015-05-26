@@ -58,7 +58,7 @@ function paypalexpress_is_sandbox($config){
  */
 function paypal_api_url($config){
 
-	if (paypal_is_sandbox($config)){
+	if (paypalexpress_is_sandbox($config)){
 		return 'https://www.sandbox.paypal.com/webscr&cmd=_express-checkout';
 	}
 	else {
@@ -75,7 +75,7 @@ function paypal_api_url($config){
  */
 function paypal_api_endpoint($config){
 
-	if (paypal_is_sandbox($config)){
+	if (paypalexpress_is_sandbox($config)){
 		return 'https://api-3t.sandbox.paypal.com:443/nvp';
 	}
 	else {
@@ -92,11 +92,12 @@ function paypal_api_endpoint($config){
  * @return bool
  */
 function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=null){
+	$mode = $config['presta'];
 
 	if (!$row = sql_fetsel('*', 'spip_transactions', 'id_transaction=' . intval($id_transaction))){
 		bank_transaction_invalide($id_transaction,
 			array(
-				'mode' => 'paypalexpress',
+				'mode' => $mode,
 				'erreur' => "transaction inconnue",
 			)
 		);
@@ -106,7 +107,7 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=nu
 	if ($row['reglee']=='oui'){
 		bank_transaction_invalide($id_transaction,
 			array(
-				'mode' => 'paypalexpress',
+				'mode' => $mode,
 				'erreur' => "transaction $id_transaction deja reglee",
 			)
 		);
@@ -163,10 +164,15 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=nu
 		return $payPalURL;
 	}
 	else {
+		$erreur = "erreur lors de la demande du jeton";
+		if (isset($resArray['L_ERRORCODE0']) AND $resArray['L_ERRORCODE0']=='10002'){
+			$erreur .= " - Verifiez les parametres de signature de l'API";
+		}
+
 		bank_transaction_invalide($id_transaction,
 			array(
-				'mode' => 'paypalexpress',
-				'erreur' => "erreur lors de la demande du jeton",
+				'mode' => $mode,
+				'erreur' => $erreur,
 				'log' => var_export($resArray, true),
 				'where' => 'SetExpressCheckout'
 			)
@@ -323,14 +329,18 @@ function bank_paypalexpress_hash_call($config, $methodName, $nvpStr){
 		//setting the curl parameters.
 		$ch = curl_init();
 		curl_setopt($ch, CURLOPT_URL, $API_Endpoint);
-		curl_setopt($ch, CURLOPT_VERBOSE, 1);
+		#curl_setopt($ch, CURLOPT_VERBOSE, 1);
+		curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
 
 		//turning off the server and peer verification(TrustManager Concept).
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, FALSE);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_HEADER, false);
+		curl_setopt($ch, CURLOPT_POST, true);
+		curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
+		curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
 		//if USE_PROXY constant set to TRUE in Constants.php, then only proxy will be enabled.
 		//Set proxy name to PROXY_HOST and port number to PROXY_PORT in constants.php
 		if (_PAYPAL_API_USE_PROXY)
@@ -338,6 +348,7 @@ function bank_paypalexpress_hash_call($config, $methodName, $nvpStr){
 
 		//setting the nvpreq as POST FIELD to curl
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $nvpreq);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: Close', 'User-Agent: SPIP/Bank'));
 
 		//getting response from server
 		$response = curl_exec($ch);
@@ -358,7 +369,7 @@ function bank_paypalexpress_hash_call($config, $methodName, $nvpStr){
 		// moving to display page to display curl errors
 		$_SESSION['curl_error_no'] = $erreur;
 		$_SESSION['curl_error_msg'] = $erreur_msg;
-		spip_log('Erreur curl : ' . $erreur . ';' . $erreur_msg, 'paypalexpress' . _LOG_ERREUR);
+		spip_log('Erreur curl : ' . $erreur . ';' . $erreur_msg, $config['presta'] . _LOG_ERREUR);
 		return false;
 	}
 
