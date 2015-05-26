@@ -16,18 +16,17 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 if (isset($GLOBALS['meta']['bank_paiement'])
   AND $GLOBALS['config_bank_paiement'] = unserialize($GLOBALS['meta']['bank_paiement'])){
 
-	$prestas = (is_array($GLOBALS['config_bank_paiement']['presta'])?$GLOBALS['config_bank_paiement']['presta']:array());
-	$prestas = array_filter($prestas);
-	if (is_array($GLOBALS['config_bank_paiement']['presta_abo']))
-		$prestas = array_merge($prestas,array_filter($GLOBALS['config_bank_paiement']['presta_abo']));
-	// initialiser la config de chaque presta actif
-	if (count($prestas))
-		foreach($prestas as $p=>$actif){
-			// TODO ajouter une secu !preg_match(',[\W],',$p) ?
-			if ($actif) {
-				include_spip("presta/$p/config"); // pour la config par defaut
-			}
+	foreach($GLOBALS['config_bank_paiement'] as $nom=>$config){
+		if (strncmp($nom,"config_",7)==0
+			AND isset($config['actif'])
+		  AND $config['actif']
+			AND isset($config['presta'])
+		  AND $presta = $config['presta']){
+			// inclure le fichier config du presta correspondant
+			include_spip("presta/$presta/config");
 		}
+	}
+
 	// securite : on ne conserve pas la globale en memoire car elle contient des donnees sensibles
 	unset($GLOBALS['config_bank_paiement']);
 }
