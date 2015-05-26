@@ -359,7 +359,7 @@ function bank_transaction_echec($id_transaction,$args=array()){
 
 	spip_log($t=$args['where']." : transaction $id_transaction refusee ou annulee pour : ".$args['code_erreur']." (".$args['erreur'].") ".$args['log'], $args['mode']._LOG_ERREUR);
 	$set = array(
-		"mode" => $args['mode'],
+		"mode" => $args['mode'].(isset($args['config_id'])?'/'.$args['config_id']:''),
 		"statut" => 'echec'.($args['code_erreur']?'['.$args['code_erreur'].']':''),
 		"date_paiement" => $args['date_paiement'],
 		"erreur" => $args['erreur'],
