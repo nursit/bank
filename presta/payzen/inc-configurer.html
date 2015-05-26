@@ -12,6 +12,7 @@
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[CLE]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{CLE,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
+	<INCLURE{fond=formulaires/inc-bank-config-type,env} />
 	<INCLURE{fond=formulaires/inc-bank-config-cartes,env,cartes=#ENV{#ENV{casier,''}}|payzen_lister_cartes_config} />
 	<INCLURE{fond=formulaires/inc-bank-config-cartes,env,cartes=#ENV{#ENV{casier,''}}|payzen_lister_cartes_config{0},label=<:bank:label_configuration_autres_moyens:>} />
 	<INCLURE{fond=formulaires/inc-bank-config-mode_test,env} />
