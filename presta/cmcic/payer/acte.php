@@ -22,6 +22,7 @@ function presta_cmcic_payer_acte_dist($config, $id_transaction, $transaction_has
 
 	$call_request = charger_fonction('request','presta/cmcic/call');
 	$contexte = $call_request($id_transaction,$transaction_hash,$config);
+	if (!$contexte) return "";
 
 	include_spip('inc/cmcic');
 	$contexte['sandbox'] = (cmcic_is_sandbox($config)?' ':'');

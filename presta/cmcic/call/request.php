@@ -63,6 +63,8 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	$contexte = array();
 
 	$oTpe  = new CMCIC_Tpe($config, strtoupper($GLOBALS['spip_lang']));
+	if (!$oTpe->isOK) return false;
+
 	$oHmac = new CMCIC_Hmac($oTpe);
 
 	// Control String for support

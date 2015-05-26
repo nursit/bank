@@ -100,7 +100,9 @@ class CMCIC_Tpe {
 	public $sUrlPaiement;	// Url du serveur de paiement - Payment Server URL (Ex : https://paiement.creditmutuel.fr/paiement.cgi)
 
 	private $_sCle;		// La clé - The Key
-	
+
+	public $isOK; // flag pour signaler que le TPE est OK ou bon
+
 
 	// ----------------------------------------------------------------------------
 	//
@@ -112,7 +114,7 @@ class CMCIC_Tpe {
 
 		// contrôle de l'existence des constantes de paramétrages.
 		$aRequiredConstants = array('_CMCIC_VERSION');
-		$this->_checkTpeParams($aRequiredConstants);
+		$this->_checkTpeParams($config, $aRequiredConstants);
 
 		$this->sVersion = _CMCIC_VERSION;
 		$this->_sCle = $config['CLE'];
@@ -149,11 +151,16 @@ class CMCIC_Tpe {
 	//
 	// ----------------------------------------------------------------------------
 
-	private function _checkTpeParams($aConstants) {
+	private function _checkTpeParams($config, $aConstants) {
 
-		for ($i = 0; $i < count($aConstants); $i++)
-			if (!defined($aConstants[$i]))
-				die ("Erreur paramètre " . $aConstants[$i] . " indéfini");
+		$this->isOK = true;
+
+		for ($i = 0; $i < count($aConstants); $i++){
+			if (!defined($aConstants[$i])){
+				spip_log("Erreur paramètre " . $aConstants[$i] . " indéfini", $config['presta']._LOG_ERREUR);
+				$this->isOK = false;
+			}
+		}
 	}
 
 }
