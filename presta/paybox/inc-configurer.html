@@ -29,53 +29,9 @@
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[DIRECT_PLUS_CLE]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{DIRECT_PLUS_CLE,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
-	#SET{name,#ENV{casier,''}_type}#SET{obli,''}#SET{defaut,'acte'}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
-	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-		<label><:bank:label_configuration_type:></label>[
-		<span class='erreur_message'>(#GET{erreurs})</span>
-		]
-		#SET{val,acte}
-		<div class="choix">
-			<input type="radio" name="#ENV{casier,''}\[type\]" class="radio" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#ENV{casier,''}}|table_valeur{type,#GET{defaut}}|=={#GET{val}}|oui)checked="checked"] />
-			<label for="#GET{name}_#GET{val}"><:bank:label_configuration_type_acte:></label>
-		</div>
-		#SET{val,abo}
-		<div class="choix">
-			<input type="radio" name="#ENV{casier,''}\[type\]" class="radio" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#ENV{casier,''}}|table_valeur{type,#GET{defaut}}|=={#GET{val}}|oui)checked="checked"] />
-			<label for="#GET{name}_#GET{val}"><:bank:label_configuration_type_abo:></label>
-		</div>
-		#SET{val,abo_acte}
-		<div class="choix">
-			<input type="radio" name="#ENV{casier,''}\[type\]" class="radio" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#ENV{casier,''}}|table_valeur{type,#GET{defaut}}|=={#GET{val}}|oui)checked="checked"] />
-			<label for="#GET{name}_#GET{val}"><:bank:label_configuration_type_abo_acte:></label>
-		</div>
-		<style>.editer_[(#GET{name})] .choix{display: inline-block;}.editer_[(#GET{name})] .choix label{margin-left: 0}</style>
-	</li>
-
-	#SET{name,#ENV{casier,''}_cartes}#SET{obli,''}#SET{defaut,#LISTE{}}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
-	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-		<label><:bank:label_configuration_cartes:></label>
-		<BOUCLE_cards(POUR){tableau #ENV{#ENV{casier,''}}|paybox_lister_cartes_config}>
-		#SET{val,#CLE}
-		<div class="choix">
-			<input type="checkbox" name="#ENV{casier,''}[cartes][]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#GET{val}|in_any{#ENV*{#ENV{casier,''}}|table_valeur{cartes,#GET{defaut}}}|oui)checked="checked"] />
-			<label for="#GET{name}_#GET{val}" title="[(#CLE|bank_label_payer_par_carte|attribut_html)]">[(#VAL{paybox}|bank_trouver_logo{#VALEUR}|balise_img{#CLE|bank_label_payer_par_carte})]</label>
-		</div>
-		</BOUCLE_cards>
-		<style>.editer_[(#GET{name})] .choix{display: inline-block;line-height: 30px}.editer_[(#GET{name})] .choix label{margin-left: 0}.editer_[(#GET{name})] .choix label img {max-height:24px;width:auto;vertical-align:middle;}</style>
-	</li>
-	#SET{name,#ENV{casier,''}_mode_test}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
-	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
-		<span class='erreur_message'>(#GET{erreurs})</span>
-		]
-		#SET{val,0}
-		<input type="hidden" name="#ENV{casier,''}[mode_test]" value="#GET{val}" />
-		#SET{val,1}
-		<div class="choix">
-			<input type="checkbox" name="#ENV{casier,''}[mode_test]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV*{#ENV{casier,''}}|table_valeur{mode_test,#GET{defaut}}|=={#GET{val}}|oui)checked="checked"] />
-			<label for="#GET{name}_#GET{val}"><:bank:label_mode_test:></label>
-		</div>
-	</li>
+	<INCLURE{fond=formulaires/inc-bank-config-type,env} />
+	<INCLURE{fond=formulaires/inc-bank-config-cartes,env,cartes=#ENV{#ENV{casier,''}}|paybox_lister_cartes_config} />
+	<INCLURE{fond=formulaires/inc-bank-config-mode_test,env} />
 	#SET{name,#ENV{casier,''}_PBX_HMAC_KEY_test}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 		<label for="#GET{name}">PBX_HMAC_KEY (Test)</label>[

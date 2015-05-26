@@ -1,24 +1,3 @@
 <ul>
-	#SET{name,#ENV{casier,''}_type}#SET{obli,''}#SET{defaut,'acte'}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
-	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-		<label><:bank:label_configuration_type:></label>[
-		<span class='erreur_message'>(#GET{erreurs})</span>
-		]
-		#SET{val,acte}
-		<div class="choix">
-			<input type="radio" name="#ENV{casier,''}\[type\]" class="radio" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#ENV{casier,''}}|table_valeur{type,#GET{defaut}}|=={#GET{val}}|oui)checked="checked"] />
-			<label for="#GET{name}_#GET{val}"><:bank:label_configuration_type_acte:></label>
-		</div>
-		#SET{val,abo}
-		<div class="choix">
-			<input type="radio" name="#ENV{casier,''}\[type\]" class="radio" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#ENV{casier,''}}|table_valeur{type,#GET{defaut}}|=={#GET{val}}|oui)checked="checked"] />
-			<label for="#GET{name}_#GET{val}"><:bank:label_configuration_type_abo:></label>
-		</div>
-		#SET{val,abo_acte}
-		<div class="choix">
-			<input type="radio" name="#ENV{casier,''}\[type\]" class="radio" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#ENV{casier,''}}|table_valeur{type,#GET{defaut}}|=={#GET{val}}|oui)checked="checked"] />
-			<label for="#GET{name}_#GET{val}"><:bank:label_configuration_type_abo_acte:></label>
-		</div>
-		<style>.editer_[(#GET{name})] .choix{display: inline-block;}.editer_[(#GET{name})] .choix label{margin-left: 0}</style>
-	</li>
+	<INCLURE{fond=formulaires/inc-bank-config-type,env} />
 </ul>

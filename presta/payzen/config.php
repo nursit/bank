@@ -25,10 +25,21 @@ if (!defined('_SYSTEMPAY_VERSION'))
 	define("_SYSTEMPAY_VERSION", "V2");
 
 
-function payzen_lister_cartes_config($c){
+function payzen_lister_cartes_config($c,$cartes = true){
 	include_spip('inc/bank');
 	$config = array('presta'=>'payzen','type'=>isset($c['type'])?$c['type']:'acte','service'=>'payzen');
 
 	include_spip("presta/systempay/inc/systempay");
-	return systempay_available_cards($config);
+	$liste = systempay_available_cards($config);
+
+	$others = array('SDD','E_CV');
+	foreach($liste as $k=>$v){
+		if ($cartes AND in_array($k,$others)){
+			unset($liste[$k]);
+		}
+		if (!$cartes AND !in_array($k,$others)){
+			unset($liste[$k]);
+		}
+	}
+	return $liste;
 }

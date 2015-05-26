@@ -30,17 +30,6 @@
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[CODESOCIETE]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{CODESOCIETE,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
-	#SET{name,#ENV{casier,''}_mode_test}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
-	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
-		<span class='erreur_message'>(#GET{erreurs})</span>
-		]
-		#SET{val,0}
-		<input type="hidden" name="#ENV{casier,''}[mode_test]" value="#GET{val}" />
-		#SET{val,1}
-		<div class="choix">
-			<input type="checkbox" name="#ENV{casier,''}[mode_test]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV*{#ENV{casier,''}}|table_valeur{mode_test,#GET{defaut}}|=={#GET{val}}|oui)checked="checked"] />
-			<label for="#GET{name}_#GET{val}"><:bank:label_mode_test:></label>
-		</div>
-	</li>
+	<INCLURE{fond=formulaires/inc-bank-config-mode_test,env} />
 </ul>
 <p class="explication">URL CGI2&nbsp;: <br /><input type="text" class="text" readonly="readonly" value="[(#ENV{#ENV{casier,''}}|bank_url_autoresponse)]" /></p>
