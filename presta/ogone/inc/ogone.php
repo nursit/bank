@@ -213,6 +213,7 @@ function ogone_get_response($config){
 function ogone_traite_reponse_transaction($config, $response) {
 
 	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
 	$config_id = bank_config_id($config);
 
 /*

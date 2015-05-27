@@ -56,6 +56,7 @@ function paypal_url_serveur($config){
 function paypal_traite_response($config, $response){
 
 	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
 	$config_id = bank_config_id($config);
 	spip_log('Paypal IPN '.var_export($response,true),$mode);
 		

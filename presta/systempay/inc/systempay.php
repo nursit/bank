@@ -202,6 +202,7 @@ function systempay_recupere_reponse($config){
 function systempay_traite_reponse_transaction($config, $response){
 	#var_dump($response);
 	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
 	$config_id = bank_config_id($config);
 
 	$id_transaction = $response['vads_order_id'];

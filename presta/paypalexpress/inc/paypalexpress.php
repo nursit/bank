@@ -185,6 +185,7 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=nu
 function bank_paypalexpress_checkoutpayment($payerid,$config){
 
 	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
 	$config_id = bank_config_id($config);
 
 

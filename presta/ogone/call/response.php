@@ -36,7 +36,7 @@ function presta_ogone_call_response_dist($config, $response=null){
 	}
 
 	// depouillement de la transaction
-	list($id_transaction,$success) =  ogone_traite_reponse_transaction($response, $mode);
+	list($id_transaction,$success) =  ogone_traite_reponse_transaction($config, $response);
 
 	return array($id_transaction,$success);	
 }
