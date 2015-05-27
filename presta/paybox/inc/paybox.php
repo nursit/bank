@@ -263,11 +263,15 @@ function paybox_response($response = 'response'){
 }
 
 /**
- * @param string $mode
+ * @param array $config
  * @param array $response
  * @return array
  */
-function paybox_traite_reponse_transaction($mode, $response) {
+function paybox_traite_reponse_transaction($config, $response) {
+	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
+	$config_id = bank_config_id($config);
+
 	// $response['id_transaction'] Peut contenir /email ou IBSxx... en cas d'abo
 	$id_transaction = intval($response['id_transaction']);
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
@@ -304,7 +308,8 @@ function paybox_traite_reponse_transaction($mode, $response) {
 	 	// sinon enregistrer l'absence de paiement et l'erreur
 		return bank_transaction_echec($id_transaction,
 			array(
-				'mode'=>$mode,
+				'mode' => $mode,
+				'config_id' => $config_id,
 				'date_paiement' => $date_paiement,
 				'code_erreur' => $response['erreur'],
 				'erreur' => $erreur,
@@ -326,7 +331,7 @@ function paybox_traite_reponse_transaction($mode, $response) {
 
 	$set = array(
 			"autorisation_id"=>"$transaction/$authorisation_id",
-			"mode"=>$mode,
+			"mode"=>"$mode/$config_id",
 			"montant_regle"=>$montant_regle,
 			"date_paiement"=>$date_paiement,
 			"statut"=>'ok',

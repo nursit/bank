@@ -45,7 +45,7 @@ function presta_paybox_call_response_dist($config, $response=null){
 	}
 	
 	// depouillement de la transaction
-	list($id_transaction,$success) =  paybox_traite_reponse_transaction($mode, $response);
+	list($id_transaction,$success) =  paybox_traite_reponse_transaction($config, $response);
 
 	if ($response['abo'] AND $id_transaction) {
 
