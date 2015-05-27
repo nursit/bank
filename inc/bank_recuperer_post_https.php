@@ -17,9 +17,10 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @param string $url
  * @param array|string $datas
  *   $datas peut etre un tableau de paire=>valeur, ou une chaine de get paire=valeur&...
+ * @param string $user_agent
  * @return array
  */
-function inc_bank_recuperer_post_https_dist($url,$datas='') {
+function inc_bank_recuperer_post_https_dist($url,$datas='',$user_agent='') {
 
 	if (!function_exists('curl_init')){
 		include_spip('inc/distant');
@@ -44,8 +45,8 @@ function inc_bank_recuperer_post_https_dist($url,$datas='') {
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
 
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+		//curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+		//curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
 		//curl_setopt($ch, CURLOPT_CAINFO, dirname(__FILE__)."/cert/api_cert_chain.crt");
 
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER,true);
@@ -68,9 +69,12 @@ function inc_bank_recuperer_post_https_dist($url,$datas='') {
 		}
 		spip_log("bank_recuperer_post_https sur $url via curl : $nvpreq",'bank');
 
+		if (!$user_agent)
+			$user_agent = "SPIP/Bank";
+
 		//setting the nvpreq as POST FIELD to curl
 		curl_setopt($ch, CURLOPT_POSTFIELDS,$nvpreq);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: Close', 'User-Agent: SPIP/Bank'));
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: Close', "User-Agent: $user_agent"));
 
 		//getting response from server
 		$response = curl_exec($ch);
