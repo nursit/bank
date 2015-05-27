@@ -44,5 +44,5 @@ function presta_sips_call_response_dist($config, $response=null){
 		);
 	}
 
-	return sips_traite_reponse_transaction($mode, $response);
+	return sips_traite_reponse_transaction($config, $response);
 }

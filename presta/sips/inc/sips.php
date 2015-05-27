@@ -227,11 +227,14 @@ function sips_response($service, $merchant_id, $certificat, $response = 'respons
 /**
  * Traiter la reponse apres son decodage
  *
- * @param string $mode
+ * @param array $config
  * @param array $response
  * @return array
  */
-function sips_traite_reponse_transaction($mode, $response) {
+function sips_traite_reponse_transaction($config, $response) {
+
+	$mode = $config['presta'];
+	$config_id = bank_config_id($config);
 
 	$id_transaction = $response['order_id'];
 	$transaction_hash = $response['transaction_id'];
@@ -284,6 +287,7 @@ function sips_traite_reponse_transaction($mode, $response) {
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,
+				'config_id' => $config_id,
 				'date_paiement' => $date_paiement,
 				'code_erreur' => $response['response_code'].":".$response['bank_response_code'],
 				'erreur' => trim($response_code." ".$bank_response_code),
@@ -309,7 +313,7 @@ function sips_traite_reponse_transaction($mode, $response) {
 	$authorisation_id = $response['authorisation_id'];
 	$set = array(
 		"autorisation_id"=>$authorisation_id,
-		"mode"=>$mode,
+		"mode"=>"$mode/$config_id",
 		"montant_regle"=>$montant_regle,
 		"date_paiement"=>$date_paiement,
 		"statut"=>'ok',
