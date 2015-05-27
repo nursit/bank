@@ -40,5 +40,5 @@ function presta_simu_call_response_dist($config, $response=null){
 		$response['abo_uid'] = substr(md5($response['id_transaction']."-".time()),0,10);
 	}
 
-	return bank_simple_call_response($mode, $response);
+	return bank_simple_call_response($config, $response);
 }

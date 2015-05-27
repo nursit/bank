@@ -431,11 +431,14 @@ function bank_sign_response_simple($mode,$response = array()){
  * il faut avoir un id_transaction et un transaction_hash coherents
  * pour se premunir d'une tentative d'appel exterieur
  *
- * @param string $mode
+ * @param array $config
  * @param null|array $response
  * @return array
  */
-function bank_simple_call_response($mode="simple", $response=null){
+function bank_simple_call_response($config, $response=null){
+
+	$mode = $config['presta'];
+	$config_id = bank_config_id($config);
 
 	// recuperer la reponse en post et la decoder, en verifiant la signature
 	if (!$response)
@@ -504,6 +507,7 @@ function bank_simple_call_response($mode="simple", $response=null){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,
+				'config_id' => $config_id,
 				'code_erreur' => 'fail',
 				'erreur' => $response['fail'],
 			)
@@ -513,7 +517,7 @@ function bank_simple_call_response($mode="simple", $response=null){
 
 	// OK, on peut accepter le reglement
 	$set = array(
-		"mode"=>$mode,
+		"mode"=>"$mode/$config_id",
 		"autorisation_id"=>$autorisation,
 		"montant_regle"=>$row['montant'],
 		"date_paiement"=>date('Y-m-d H:i:s'),

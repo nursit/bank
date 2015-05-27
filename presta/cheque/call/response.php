@@ -23,7 +23,6 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  */
 function presta_cheque_call_response_dist($config, $response=null){
 
-	$mode = $config['presta'];
 	include_spip('inc/bank');
-	return bank_simple_call_response($mode, $response);
+	return bank_simple_call_response($config, $response);
 }
