@@ -65,14 +65,14 @@
 				#SET{name,#GET{casier}_actif}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 				#SET{disabled,''}
 				[(#AUTORISER{utilisermodepaiement,_#CLE}|non)#SET{disabled,true}]
-				<li class="editer pleine_largeur editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
+				<li class="editer pleine_largeur editer_presta editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
 					<span class='erreur_message'>(#GET{erreurs})</span>
 					]
-					<div class="action" style="float:right">
+					<span class="action">
 						<button type="submit" name="action_up[#GET{casier}]" title="Monter" value="X">^</button>
 						<button type="submit" name="action_down[#GET{casier}]" title="Descendre" value="X">v</button>
 						<button type="submit" name="action_del[#GET{casier}]" title="Supprimer" value="X">X</button>
-					</div>
+					</span>
 					#SET{val,0}
 					<input type="hidden" name="#GET{casier}[actif]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
 					#SET{val,1}
@@ -102,6 +102,8 @@
 	.formulaire_spip .choix input:checked + label {font-weight: bold}
 	.muted {opacity: 0.6;}
 	.suite {margin-left: 40px;font-size: 0.9em;}
+	.formulaire_spip .editer_presta {position: relative;}
+	.formulaire_spip .editer_presta .action {position:absolute;right:10px;top:10px;z-index: 2;}
 </style>
 <script type="text/javascript">
 jQuery(function(){
