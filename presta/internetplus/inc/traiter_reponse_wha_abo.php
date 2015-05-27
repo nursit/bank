@@ -12,28 +12,37 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 include_spip('presta/internetplus/inc/wha_services');
 
-function presta_internetplus_inc_traiter_reponse_wha_abo_dist($m,$args,$partnerId,$keyId){
+function presta_internetplus_inc_traiter_reponse_wha_abo_dist($config,$m,$args,$partnerId,$keyId){
+	$mode = 'wha_abo'; // historique...
+	$config_id = bank_config_id($config);
+
 	$v=$args['v'];
 	$mp = $v['mp'];
 	
 	if (!isset($mp['id_transaction'])
 	 OR !$id_transaction=$mp['id_transaction']) {
-		spip_log($t = "wha_traiter_reponse : pas d'id_transaction, traitement impossible : $m",'internetplus_abo'._LOG_ERREUR);
-		return array($id_transaction,false,$mp);
+		bank_transaction_invalide(0,
+			array(
+				'where' => 'wha_traiter_reponse_abo',
+				'mode' => $mode,
+				'erreur' => "pas de id_transaction en retour",
+				'log' => $m
+			)
+		);
+		return array(0,false,$mp);
 	}
 
 	// verifier que la transaction est connue
 	$res = sql_select("*","spip_transactions","id_transaction=".intval($id_transaction));
 	if (!$row = sql_fetch($res)){
-		spip_log($t = "wha_traiter_reponse : id_transaction $id_transaction inconnu: $m",'internetplus_abo'._LOG_ERREUR);
-		// on log ca dans un journal dedie
-		spip_log($t,'wha_abo_douteux');
-		// on mail le webmestre
-		$envoyer_mail = charger_fonction('envoyer_mail','inc');
-		$envoyer_mail($GLOBALS['meta']['email_webmaster'],'[WHA]Transaction Frauduleuse',$t,"sips@".$_SERVER['HTTP_HOST']);
-		$message = "Une erreur est survenue, les donn&eacute;es re&ccedil;ues de la banque ne sont pas conformes. ";
-		$message .= "Votre r&egrave;glement n'a pas &eacute;t&eacute; pris en compte (Ref : $id_transaction)";
-		sql_updateq("spip_transactions",array("mode"=>'wha_abo',"message"=>$message),"id_transaction=".intval($id_transaction));
+		bank_transaction_invalide($id_transaction,
+			array(
+				'where' => 'wha_traiter_reponse_abo',
+				'mode' => $mode,
+				'erreur' => "transaction inconnue",
+				'log' => $m
+			)
+		);
 		return array($id_transaction,false,$mp);
 	}
 
@@ -47,8 +56,15 @@ function presta_internetplus_inc_traiter_reponse_wha_abo_dist($m,$args,$partnerI
 
 		$confirm_offer = charger_fonction("confirm_offer","presta/internetplus/inc");
 		if (!$confirm_offer($id_transaction,$uoid, $confirm)){
-			$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute; (pas de confirmation de debit de la part d'Internet+)";
-			sql_updateq("spip_transactions",array("statut"=>'echec',"message"=>$message),"id_transaction=".intval($id_transaction));
+			bank_transaction_invalide($id_transaction,
+				array(
+					'where' => 'wha_traiter_reponse_abo',
+					'mode' => $mode,
+					'erreur' => "pas de confirmation du debit par Internet+",
+					'update' => true,
+					'log' => $m
+				)
+			);
 			// invalider abo ?
 			return array($id_transaction,false,$mp);
 		}
@@ -57,7 +73,7 @@ function presta_internetplus_inc_traiter_reponse_wha_abo_dist($m,$args,$partnerI
 		$authorisation_id = $uoid; // url de confirmation
 		sql_updateq("spip_transactions",array(
 				"autorisation_id"=>$authorisation_id,
-				"mode"=>'wha_abo',
+				"mode"=>"$mode/$config_id",
 				"date_paiement"=>date('Y-m-d H:i:s'),
 				"statut"=>'ok',
 				"reglee"=>'oui',

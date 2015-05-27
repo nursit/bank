@@ -12,28 +12,37 @@
 if (!defined('_ECRIRE_INC_VERSION')) return;
 include_spip('presta/internetplus/inc/wha_services');
 
-function presta_internetplus_inc_traiter_reponse_wha_dist($m,$args,$partnerId,$keyId){
+function presta_internetplus_inc_traiter_reponse_wha_dist($config,$m,$args,$partnerId,$keyId){
+	$mode = 'wha'; // historique...
+	$config_id = bank_config_id($config);
+
 	$v=$args['v'];
 	$mp = $v['mp'];
 	
 	if (!isset($mp['id_transaction'])
 	 OR !$id_transaction=$mp['id_transaction']) {
-		spip_log($t = "wha_traiter_reponse : pas d'id_transaction, traitement impossible : $m",'internetplus'._LOG_ERREUR);
-		return array($id_transaction,false,$mp);
+		bank_transaction_invalide(0,
+			array(
+				'where' => 'wha_traiter_reponse',
+				'mode' => $mode,
+				'erreur' => "pas de id_transaction en retour",
+				'log' => $m
+			)
+		);
+		return array(0,false,$mp);
 	}
 
 	// verifier que la transaction est connue
 	$res = sql_select("*","spip_transactions","id_transaction=".intval($id_transaction));
 	if (!$row = sql_fetch($res)){
-		spip_log($t = "wha_traiter_reponse : id_transaction $id_transaction inconnu: $m",'internetplus'._LOG_ERREUR);
-		// on log ca dans un journal dedie
-		spip_log($t,'internetplus_douteux'._LOG_INFO_IMPORTANTE);
-		// on mail le webmestre
-		$envoyer_mail = charger_fonction('envoyer_mail','inc');
-		$envoyer_mail($GLOBALS['meta']['email_webmaster'],'[WHA]Transaction Frauduleuse',$t,"sips@".$_SERVER['HTTP_HOST']);
-		$message = "Une erreur est survenue, les donn&eacute;es re&ccedil;ues de la banque ne sont pas conformes. ";
-		$message .= "Votre r&egrave;glement n'a pas &eacute;t&eacute; pris en compte (Ref : $id_transaction)";
-		sql_updateq("spip_transactions",array("message"=>$message),"id_transaction=".intval($id_transaction));
+		bank_transaction_invalide($id_transaction,
+			array(
+				'where' => 'wha_traiter_reponse',
+				'mode' => $mode,
+				'erreur' => "transaction inconnue",
+				'log' => $m
+			)
+		);
 		return array($id_transaction,false,$mp);
 	}
 	
@@ -77,16 +86,22 @@ function presta_internetplus_inc_traiter_reponse_wha_dist($m,$args,$partnerId,$k
 		  OR (!$args=wha_extract_args(reset($unsign)))
 		  OR (!isset($args['c']))
 		  OR (!$args['c']=='ack')) {
-			spip_log($t = "wha_traiter_reponse : id_transaction $id_transaction, pas de confirmation de debit $m / $url : $ack",'internetplus'._LOG_ERREUR);
-			spip_log($t,'internetplus_confirm_hs'._LOG_ERREUR);
-			$message = "Aucun r&egrave;glement n'a &eacute;t&eacute; r&eacute;alis&eacute; (pas de confirmation de debit de la part d'Internet+)";
-			sql_updateq("spip_transactions",array("statut"=>'echec',"message"=>$message),"id_transaction=".intval($id_transaction));
+
+			bank_transaction_invalide($id_transaction,
+				array(
+					'where' => 'wha_traiter_reponse',
+					'mode' => $mode,
+					'erreur' => "pas de confirmation de debit / $url : $ack",
+					'update' => true,
+					'log' => $m
+				)
+			);
 			return array($id_transaction,false,$mp);
 		}
 
 		sql_updateq("spip_transactions",array(
 			"autorisation_id"=>$authorisation_id,
-			"mode"=>'wha',
+			"mode"=>"wha/$config_id",
 			"montant_regle"=>$montant_regle,
 			"date_paiement"=>date('Y-m-d H:i:s'),
 			"statut"=>'ok',
@@ -94,8 +109,8 @@ function presta_internetplus_inc_traiter_reponse_wha_dist($m,$args,$partnerId,$k
 			),
 			"id_transaction=".intval($id_transaction)
 		);
-		spip_log("wha_traiter_reponse : id_transaction $id_transaction, reglee",'internetplus'._LOG_INFO_IMPORTANTE);
-		spip_log("$m",'internetplus_autorisations'._LOG_INFO_IMPORTANTE);
+		spip_log("wha_traiter_reponse : id_transaction $id_transaction, reglee",$mode._LOG_INFO_IMPORTANTE);
+		spip_log("$m",$mode.'_autorisations'._LOG_INFO_IMPORTANTE);
 	}
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');

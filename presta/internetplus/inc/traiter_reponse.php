@@ -21,6 +21,7 @@ function presta_internetplus_inc_traiter_reponse_dist($config){
 	$mode = 'wha'; // historique...
 	if ($config['type']=='abo')
 		$mode = 'wha_abo';
+	$config_id = bank_config_id($config);
 
 	$id_transaction = 0;
 	if (!$m = _request('m')) return array($id_transaction,false,false);
@@ -62,6 +63,7 @@ function presta_internetplus_inc_traiter_reponse_dist($config){
 			bank_transaction_echec($id_transaction,
 				array(
 					'mode'=>$mode,
+					'config_id' => $config_id,
 					'date_paiement' => $date_paiement,
 					'code_erreur' => "",
 					'erreur' => "Annulation",
@@ -113,7 +115,7 @@ function presta_internetplus_inc_traiter_reponse_dist($config){
 
 	// OK
 	$traiter_reponse = charger_fonction("traiter_reponse_$mode",'presta/internetplus/inc');
-	return $traiter_reponse($m,$args,$partnerId,$keyId);
+	return $traiter_reponse($config,$m,$args,$partnerId,$keyId);
 }
 
 ?>
