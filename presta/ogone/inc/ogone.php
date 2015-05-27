@@ -133,8 +133,10 @@ function ogone_sha_out($contexte, $config){
 }
 
 /**
- * Signer le contexte en SHA, avec une cle secrete _OGONE_CLE_SHA_IN
+ * Signer le $contexte en SHA, avec une cle secrete $secret
  * @param array $contexte
+ * @param string $secret
+ * @param array $parametres
  * @return string
  */
 function ogone_signe_contexte($contexte,$secret,$parametres) {
@@ -204,11 +206,14 @@ function ogone_get_response($config){
 /**
  * Decoder la reponse renvoyee par Ogone
  *
+ * @param array $config
  * @param array $response
- * @param string $mode
  * @return array
  */
-function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
+function ogone_traite_reponse_transaction($config, $response) {
+
+	$mode = $config['presta'];
+	$config_id = bank_config_id($config);
 
 /*
 	'orderID' => string '15' (length=2)
@@ -258,6 +263,7 @@ function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,
+				'config_id' => $config_id,
 				'date_paiement' => $date_paiement,
 				'code_erreur' => $response['STATUS'].':'.$response['NCERROR'],
 				'erreur' => $erreur,
@@ -281,7 +287,7 @@ function ogone_traite_reponse_transaction($response,$mode = 'ogone') {
 
 	sql_updateq("spip_transactions",array(
 		"autorisation_id"=>"$transaction/$authorisation_id",
-		"mode"=>$mode,
+		"mode"=>"$mode/$config_id",
 		"montant_regle"=>$montant_regle,
 		"date_paiement"=>$date_paiement,
 		"statut"=>'ok',
