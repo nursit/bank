@@ -17,12 +17,13 @@
 		<form action="#ENV{action}" method="post" class="noajax">
 			<button type="submit" title="<:bank:payer_avec{nom=Paypal}|attribut_html:>">[(#ENV{logo}|balise_img{<:bank:payer_avec{nom=Paypal}:>})]</button>
 			<div>
-				<input TYPE="hidden" name="charset" value="#CHARSET" />
-				<input type="hidden" name="cmd" value="_cart" />
-				<input type="hidden" name="upload" value="1" />
+				<input type="hidden" name="charset" value="#CHARSET" />
+				<input type="hidden" name="cmd" value="_xclick" />
+				<input type="hidden" name="bn" value="PP-BuyNow" />
+				<input type="hidden" name="item_name" value="Bon de commande #ID_TRANSACTION" />
+				<input type="hidden" name="amount" value="#MONTANT" />
+				<input type="hidden" name="no_note" value="1" />
 				<input type="hidden" name="business" value="#ENV{config/BUSINESS_USERNAME}" />
-				<input type="hidden" name="item_name_1" value="Bon de commande #ID_TRANSACTION" />
-				<input type="hidden" name="amount_1" value="#MONTANT" />
 				<input type="hidden" name="currency_code" value="EUR" />
 				<input type="hidden" name="lc" value="FR" />
 				<input type="hidden" name="invoice" value="#ID_TRANSACTION|#TRANSACTION_HASH" />
