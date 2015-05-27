@@ -109,7 +109,7 @@ function redirige_apres_retour_transaction($mode,$acte_ou_abo,$succes,$id_transa
 	$id_auteur = sql_getfetsel("id_auteur","spip_transactions","id_transaction=".intval($id_transaction));
 	if ($id_transaction
 		AND isset($GLOBALS['visiteur_session']['id_auteur'])
-	  AND (test_espace_prive() OR $GLOBALS['visiteur_session']['id_auteur']!=$id_auteur)
+	  AND (test_espace_prive() OR ($id_auteur AND $GLOBALS['visiteur_session']['id_auteur']!=$id_auteur))
 		AND include_spip("inc/autoriser")
 	  AND autoriser("regler","transaction",$id_transaction)){
 
