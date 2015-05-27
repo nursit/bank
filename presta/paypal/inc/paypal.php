@@ -56,7 +56,7 @@ function paypal_url_serveur($config){
 function paypal_traite_response($config, $response){
 
 	$mode = $config['presta'];
-	spip_log('Paypal IPN'.var_export($response,true),$mode);
+	spip_log('Paypal IPN '.var_export($response,true),$mode);
 		
 	if (!isset($response['receiver_email']) OR ($response['receiver_email']!=$config['BUSINESS_USERNAME'])){
 		return bank_transaction_invalide(0,
@@ -97,7 +97,7 @@ function paypal_traite_response($config, $response){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
-				'erreur' => "payment_status!=completed",
+				'erreur' => "payment_status=".$response['payment_status'],
 				'log' => var_export($response, true),
 			)
 		);
@@ -118,7 +118,7 @@ function paypal_traite_response($config, $response){
 	// verifier que le numero de transaction au sens paypal
 	// (=numero d'autorisation ici) n'a pas deja ete utilise
 	$autorisation_id = $response['txn_id'];
-	if ($id = sql_getfetsel("id_transaction","spip_transactions","autorisation_id=".sql_quote($autorisation_id)." AND mode='paypal'")){
+	if ($id = sql_getfetsel("id_transaction","spip_transactions","autorisation_id=".sql_quote($autorisation_id)." AND mode='paypal' AND id_transaction<>".intval($id_transaction))){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
@@ -207,17 +207,83 @@ function paypal_echec_transaction($id_transaction,$message){
  * @return bool
  */
 function bank_paypal_verifie_notification($config, $response){
-	// lire la publication du systeme PayPal et ajouter 'cmd'
-	$response['cmd'] ='_notify-validate';
+
+	// marche bien avec la notif de test ci-dessous
+	/*
+	$response = json_decode
+    (
+        '{
+            "residence_country": "US",
+            "invoice": "abc1234",
+            "address_city": "San Jose",
+            "first_name": "John",
+            "payer_id": "TESTBUYERID01",
+            "shipping": "3.04",
+            "mc_fee": "0.44",
+            "txn_id": "611422392",
+            "receiver_email": "seller@paypalsandbox.com",
+            "quantity": "1",
+            "custom": "xyz123",
+            "payment_date": "22:29:21 28 Oct 2013 PDT",
+            "address_country_code": "US",
+            "address_zip": "95131",
+            "tax": "2.02",
+            "item_name": "something",
+            "address_name": "John Smith",
+            "last_name": "Smith",
+            "receiver_id": "seller@paypalsandbox.com",
+            "item_number": "AK-1234",
+            "verify_sign": "AiPC9BjkCyDFQXbSkoZcgqH3hpacAaChsjNZq2jHG82F97aoFSMa6SED",
+            "address_country": "United States",
+            "payment_status": "Completed",
+            "address_status": "confirmed",
+            "business": "seller@paypalsandbox.com",
+            "payer_email": "buyer@paypalsandbox.com",
+            "notify_version": "2.1",
+            "txn_type": "web_accept",
+            "test_ipn": "1",
+            "payer_status": "verified",
+            "mc_currency": "USD",
+            "mc_gross": "12.34",
+            "address_state": "CA",
+            "mc_gross1": "12.34",
+            "payment_type": "echeck",
+            "address_street": "123, any street"
+        }',
+        true
+    );
+	*/
+
+	// lire la publication du systeme PayPal et ajouter 'cmd' en tete
+	$post_check = array('cmd' => '_notify-validate');
+	foreach($response as $k=>$v){
+		$post_check[$k] = $v;
+	}
 
 	// envoyer la demande de verif en post
 	// attention, c'est une demande en ssl, il faut avoir un php qui le supporte
+	$c = $config;
+	if (isset($response['test_ipn']) AND $response['test_ipn']){
+		$c['mode_test'] = true;
+	}
+	else {
+		$c['mode_test'] = false;
+	}
+	$url = paypal_url_serveur($c);
 	$bank_recuperer_post_https = charger_fonction("bank_recuperer_post_https","inc");
-	list($resultat,$erreur,$erreur_msg) = $bank_recuperer_post_https(paypal_url_serveur($config),$response);
+	list($resultat,$erreur,$erreur_msg) = $bank_recuperer_post_https($url,$post_check,isset($post_check['payer_id'])?$post_check['payer_id']:'');
 
-	if (strncmp($resultat,'VERIFIE',7)==0)
+
+	if (strncmp(trim($resultat),'VERIFIE',7)==0)
 		return true;
 
-	spip_log("Retour IPN :$resultat:Erreur$erreur:$erreur_msg: POST :".var_export($response,true),$config['presta']._LOG_ERREUR);
+
+	spip_log("Retour IPN :$resultat:Erreur $erreur:$erreur_msg: POST: ".http_build_query($post_check),$config['presta']._LOG_ERREUR);
+
+	#var_dump($resultat);
+	#var_dump("URL=".$url);
+	#var_dump($post_check);
+	#die('Echec Validation IPN');
+
 	return false;
 }
