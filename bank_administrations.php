@@ -67,7 +67,6 @@ function bank_upgrade($nom_meta_base_version,$version_cible){
 	$maj = array();
 	$maj['create'] = array(
 		array('maj_tables',array('spip_transactions')),
-		array("echo","Paiement Install<br/>"),
 	);
 
 	$maj['0.1.3'] = array(
