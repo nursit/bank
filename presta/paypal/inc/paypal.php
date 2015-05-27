@@ -56,6 +56,7 @@ function paypal_url_serveur($config){
 function paypal_traite_response($config, $response){
 
 	$mode = $config['presta'];
+	$config_id = bank_config_id($config);
 	spip_log('Paypal IPN '.var_export($response,true),$mode);
 		
 	if (!isset($response['receiver_email']) OR ($response['receiver_email']!=$config['BUSINESS_USERNAME'])){
@@ -77,8 +78,13 @@ function paypal_traite_response($config, $response){
 			)
 		);
 	}
-	
-	list($id_transaction,$transaction_hash) = explode('|',$response['invoice']);
+
+	if (strpos($response['invoice'],"|")!==false){
+		list($id_transaction,$transaction_hash) = explode('|',$response['invoice']);
+	}
+	else {
+		list($id_transaction,$transaction_hash) = explode('-',$response['invoice']);
+	}
 	if (!$row = sql_fetsel("*","spip_transactions", "id_transaction=".intval($id_transaction) ." AND transaction_hash=".sql_quote($transaction_hash))){
 		return bank_transaction_invalide(0,
 			array(
@@ -97,6 +103,7 @@ function paypal_traite_response($config, $response){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
+				'config_id' => $config_id,
 				'erreur' => "payment_status=".$response['payment_status'],
 				'log' => var_export($response, true),
 			)
@@ -109,6 +116,7 @@ function paypal_traite_response($config, $response){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
+				'config_id' => $config_id,
 				'erreur' => "pas de txn_id (autorisation manquante)",
 				'log' => var_export($response, true),
 			)
@@ -122,6 +130,7 @@ function paypal_traite_response($config, $response){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
+				'config_id' => $config_id,
 				'erreur' => "txn_id deja en base (doublon autorisation)",
 				'log' => var_export($response, true),
 			)
@@ -140,6 +149,7 @@ function paypal_traite_response($config, $response){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
+				'config_id' => $config_id,
 				'erreur' => "devise mc_currency incorrecte",
 				'log' => var_export($response, true),
 			)
@@ -151,6 +161,7 @@ function paypal_traite_response($config, $response){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
+				'config_id' => $config_id,
 				'erreur' => "montant mc_gross incorrect",
 				'log' => var_export($response, true),
 			)
@@ -162,6 +173,7 @@ function paypal_traite_response($config, $response){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
+				'config_id' => $config_id,
 				'erreur' => "verification invalide (IPN!=VERIFIE)",
 				'log' => var_export($response, true),
 			)
@@ -170,7 +182,7 @@ function paypal_traite_response($config, $response){
 
 	$set = array(
 		"autorisation_id"=>$autorisation_id,
-		"mode"=>$mode,
+		"mode"=>"$mode/$config_id",
 		"montant_regle"=>$montant_regle,
 		"date_paiement"=>date('Y-m-d H:i:s'),
 		"statut"=>'ok',
