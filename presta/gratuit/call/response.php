@@ -37,7 +37,7 @@ function presta_gratuit_call_response_dist($config, $response=null){
 	}
 
 	$id_transaction = $response['id_transaction'];
-	$transaction_hash = $response['hash'];
+	$transaction_hash = $response['transaction_hash'];
 
 	if (!$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction))){
 		return bank_transaction_invalide($id_transaction,
