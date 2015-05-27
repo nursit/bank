@@ -54,7 +54,7 @@
 					<option value="#GET{val}">[(#VAL{bank:label_presta_}|concat{#VALEUR}|_T|textebrut)]</option>
 				</BOUCLE_prestas>
 			</select>
-			<button name="action_append" value="ajouter" style="float:right;">Ajouter</button>
+			<button type="submit" name="action_append" value="ajouter" style="float:right;">Ajouter</button>
 		</li>
 	</ul>
 	<BOUCLE_configs(POUR){tableau #REM|bank_lister_configs}>
@@ -69,9 +69,9 @@
 					<span class='erreur_message'>(#GET{erreurs})</span>
 					]
 					<div class="action" style="float:right">
-						<button name="action_up[#GET{casier}]" title="Monter" value="X">^</button>
-						<button name="action_down[#GET{casier}]" title="Descendre" value="X">v</button>
-						<button name="action_del[#GET{casier}]" title="Supprimer" value="X">X</button>
+						<button type="submit" name="action_up[#GET{casier}]" title="Monter" value="X">^</button>
+						<button type="submit" name="action_down[#GET{casier}]" title="Descendre" value="X">v</button>
+						<button type="submit" name="action_del[#GET{casier}]" title="Supprimer" value="X">X</button>
 					</div>
 					#SET{val,0}
 					<input type="hidden" name="#GET{casier}[actif]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>

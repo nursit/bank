@@ -42,6 +42,8 @@ function formulaires_configurer_bank_paiement_verifier_dist(){
 		if (_request('action_append')
 		  AND $presta = _request('action_append_presta')
 		  AND in_array($presta,bank_lister_prestas())){
+			set_request('action_append');
+			set_request('action_append_presta');
 			bank_ajouter_config($presta);
 		}
 	}
