@@ -48,7 +48,6 @@ include_spip('inc/date');
 function presta_cmcic_call_response_dist($config, $response=null){
 
 	include_spip('inc/bank');
-	$mode = $config['presta'];
 
 	// Cas B : retour depuis la banque (annulation avant paiement ou fin de la procédure)
 	if ($res = cmcic_terminer_transaction()) {
@@ -65,7 +64,7 @@ function presta_cmcic_call_response_dist($config, $response=null){
 		return array(0, false);
 	}
 
-	return cmcic_traite_reponse_transaction($mode, $response);
+	return cmcic_traite_reponse_transaction($config, $response);
 }
 
 
@@ -121,24 +120,33 @@ function cmcic_terminer_transaction() {
 /**
  * Traite la réponse de la banque
  *
- * @param string $mode
- *     Type de banque
+ * @param array $config
+ *     configuration du module
  * @param array $response
  *     Données envoyées par la banque
  * @return array(int $id_transaction, bool $paiement_ok)
 **/
-function cmcic_traite_reponse_transaction($mode, $response) {
+function cmcic_traite_reponse_transaction($config, $response) {
+	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
+	$config_id = bank_config_id($config);
 
-	spip_log("call_response : traitement d'une réponse de la banque $mode !", $mode);
+	#spip_log("call_response : traitement d'une réponse de la banque $mode !", $mode);
 	
 	// on verifie que notre transaction existe bien
 	$contenu = $response['texte-libre'];
 	$contenu = urldecode($contenu);
 	$contenu = @unserialize($contenu);
 	if ($contenu===false) {
-		spip_log("call_response : contenu non désérialisable !", $mode);
+		$res = bank_transaction_invalide(0,
+			array(
+				'mode'=>$mode,
+				'erreur' => "contenu non deserialisable",
+				'log' => var_export($response,true)
+			)
+		);
 		cmcic_notifier_banque_erreur();
-		return array(0, false);
+		return $res;
 	}
 
 	// id & hash
@@ -157,7 +165,6 @@ function cmcic_traite_reponse_transaction($mode, $response) {
 		"id_transaction=".intval($id_transaction),
 		'transaction_hash='.sql_quote($contenu['hash']))))
 	{
-		include_spip('inc/bank');
 		$res = bank_transaction_invalide($id_transaction,
 			array(
 				'mode'=>$mode,
@@ -170,26 +177,26 @@ function cmcic_traite_reponse_transaction($mode, $response) {
 	}
 
 	// ici on a tout bon !
-	spip_log("call_response : données de la banque correctes. On les traite.", $mode);
+	#spip_log("call_response : données de la banque correctes. On les traite.", $mode);
 
 	switch($response['code-retour']) {
 		case "Annulation" :
 			// Payment has been refused
 			// put your code here (email sending / Database update)
 			// Attention : an autorization may still be delivered for this payment
-			$retour = cmcic_gerer_transaction_annulee($id_transaction, $response, $row);
+			$retour = cmcic_gerer_transaction_annulee($config, $id_transaction, $response, $row);
 			break;
 
 		case "payetest":
 			// Payment has been accepeted on the test server
 			// put your code here (email sending / Database update)
-			$retour = cmcic_gerer_transaction_payee($id_transaction, $response, $row, true);
+			$retour = cmcic_gerer_transaction_payee($config, $id_transaction, $response, $row, true);
 			break;
 
 		case "paiement":
 			// Payment has been accepted on the productive server
 			// put your code here (email sending / Database update)
-			$retour = cmcic_gerer_transaction_payee($id_transaction, $response, $row);
+			$retour = cmcic_gerer_transaction_payee($config, $id_transaction, $response, $row);
 			break;
 
 
@@ -257,6 +264,7 @@ function cmcic_notifier_banque_erreur() {
 **/
 function cmcic_response($config) {
 	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
 
 	// Begin Main : Retrieve Variables posted by CMCIC Payment Server 
 	$CMCIC_bruteVars = getMethode();
@@ -313,6 +321,7 @@ function cmcic_response($config) {
 /**
  * Traiter l'annulation d'une transaction
  *
+ * @param array $config
  * @param int $id_transaction
  *     Identification de la transaction
  * @param array $response
@@ -323,8 +332,10 @@ function cmcic_response($config) {
  *    Message d'erreur eventuel
  * @return array
 **/ 
-function cmcic_gerer_transaction_annulee($id_transaction, $response, $row, $erreur=true) {
-	$mode = "cmcic";
+function cmcic_gerer_transaction_annulee($config, $id_transaction, $response, $row, $erreur=true) {
+	$mode = $config['presta'];
+	$config_id = bank_config_id($config);
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
 
 	// regarder si l'annulation n'arrive pas apres un reglement
 	// (internaute qui a ouvert 2 fenetres de paiement)
@@ -334,6 +345,7 @@ function cmcic_gerer_transaction_annulee($id_transaction, $response, $row, $erre
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode'=>$mode,
+				'config_id'=>$config_id,
 				'date_paiement' => $date_paiement,
 				'code_erreur' => $response['motifrefus'],
 				'erreur' => $erreur===true?"":$erreur,
@@ -348,6 +360,7 @@ function cmcic_gerer_transaction_annulee($id_transaction, $response, $row, $erre
 /**
  * Traiter le paiement d'une transaction
  *
+ * @param array $config
  * @param int $id_transaction
  *     Identification de la transaction
  * @param array $response
@@ -358,9 +371,10 @@ function cmcic_gerer_transaction_annulee($id_transaction, $response, $row, $erre
  *     Est-ce un paiement via le serveur de test ?
  * @return array
 **/ 
-function cmcic_gerer_transaction_payee($id_transaction, $response, $row, $paiement_test = false) {
-	$mode = "cmcic";
-	if ($paiement_test) $mode = "cmcic_test";
+function cmcic_gerer_transaction_payee($config, $id_transaction, $response, $row, $paiement_test = false) {
+	$mode = $config['presta'];
+	$config_id = bank_config_id($config);
+	if ($paiement_test) $mode .= "-test";
 
 	// ok, on traite le reglement
 	$date=time();
@@ -383,12 +397,13 @@ function cmcic_gerer_transaction_payee($id_transaction, $response, $row, $paieme
 
 	$set = array(
 		"autorisation_id"=>"$transaction/$autorisation_id",
-		"mode"=>$mode,
+		"mode"=>"$mode/$config_id",
 		"montant_regle"=>$montant_regle,
 		"date_paiement"=>$date_paiement,
 		"statut"=>'ok',
 		"reglee"=>'oui'
 	);
+
 	sql_updateq("spip_transactions", $set, "id_transaction=".intval($id_transaction));
 	spip_log("call_response : id_transaction $id_transaction, reglee", $mode);
 
@@ -396,4 +411,4 @@ function cmcic_gerer_transaction_payee($id_transaction, $response, $row, $paieme
 	$regler_transaction($id_transaction,array('row_prec'=>$row));
 	return array($id_transaction, true);
 }
-?>
+
