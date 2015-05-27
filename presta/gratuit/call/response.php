@@ -27,27 +27,47 @@ function presta_gratuit_call_response_dist($config, $response=null){
 		$response = bank_response_simple($mode);
 
 	if (!isset($response['id_transaction']) OR !isset($response['transaction_hash'])){
-		spip_log("id_transaction ou transaction_hash absent ".var_export($response,true),$mode._LOG_ERREUR);
-		return array(0,false);
+		return bank_transaction_invalide(0,
+			array(
+				'mode' => $mode,
+				'erreur' => "id_transaction ou transaction_hash absent",
+				'log' => bank_shell_args($response),
+			)
+		);
 	}
 
 	$id_transaction = $response['id_transaction'];
 	$transaction_hash = $response['hash'];
 
 	if (!$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction))){
-		spip_log("id_transaction $id_transaction non trouve",$mode._LOG_ERREUR);
-		return array($id_transaction,false);
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "transaction inconnue",
+				'log' => bank_shell_args($response)
+			)
+		);
 	}
 	if ($transaction_hash!=$row['transaction_hash']){
-		spip_log("id_transaction $id_transaction, hash $transaction_hash non conforme",$mode._LOG_ERREUR);
-		return array($id_transaction,false);
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "id_transaction $id_transaction, hash $transaction_hash non conforme",
+				'log' => bank_shell_args($response)
+			)
+		);
 	}
 
 	// verifier que la commande a bien un total nul, sinon ce mode de paiement n'est pas autorise
 	if (intval($row['montant'])>0
 	  OR floatval($row['montant'])>0.00){
-		spip_log("id_transaction $id_transaction, montant ".$row['montant'].">0 interdit pour ce mode de paiement",$mode._LOG_CRITIQUE);
-		return array($id_transaction,false);
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "id_transaction $id_transaction, montant ".$row['montant'].">0 interdit",
+				'log' => bank_shell_args($response)
+			)
+		);
 	}
 
 	// OK, on peut accepter le reglement
