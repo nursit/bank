@@ -144,6 +144,13 @@ function bank_config($presta,$abo=false){
 			$config = array('erreur'=>'inconnu');
 		}
 	}
+	// gratuit est un cas particulier
+	else {
+		$config = array(
+			'presta' => 'gratuit',
+			'actif' => true,
+		);
+	}
 
 	#if (!isset($config['actif']) OR !$config['actif']){
 	#	$config = array();
@@ -239,8 +246,10 @@ function bank_lister_configs($type=null){
  */
 function bank_shell_args($params){
 	$res = "";
-	foreach($params as $k=>$v){
-		$res .= " ".escapeshellcmd($k)."=".escapeshellcmd($v);
+	if ($params AND is_array($params)){
+		foreach($params as $k=>$v){
+			$res .= " ".escapeshellcmd($k)."=".escapeshellcmd($v);
+		}
 	}
 	return $res;
 }
