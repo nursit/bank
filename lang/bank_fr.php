@@ -7,6 +7,8 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'abonnement_avec' => 'Abonnement par <i>@nom@</i>',
 	'abonnement_choisissez_cb' => 'Choisissez votre carte bancaire&nbsp;:',
 	'abonnement_par_cb' => 'avec ma carte bancaire',
+	'abonnement_par_carte_bancaire' => 'Abonnement par carte bancaire :',
+	'abonnement_par_prelevement_sepa' => 'Abonnement par prélèvement automatique :',
 
 	'bouton_enregistrer_reglement_cheque' => 'R&eacute;gler par ch&egrave;que',
 	'bouton_enregistrer_reglement_ok' => 'Le r&eacute;glement a bien &eacute;t&eacute; re&ccedil;u',

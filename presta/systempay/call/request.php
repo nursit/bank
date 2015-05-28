@@ -381,14 +381,34 @@ vads_redirect_error_message = Redirection vers la boutique dans quelques instant
  * @param string $transaction_hash
  * @param array $config
  *   array cartes
+ * @param string $action
+ *   REGISTER : enregsitrement simple et on recupere un numero d'abonne/identifiant
+ *   REGISTER_UPDATE : mise a jour des coordonnes liees au numero d'abonne
+ *   REGISTER_PAY : payer et enregistrer
+ *   REGISTER_SUBSCRIBE : abonner et enregistrer
+ *   PAYMENT : avec un identifiant optionnel qui evite de resaisir les numeros de CB
+ *   SUBSCRIBE : abonner avec un identifiant qui evite de resaisir les numeros de CB
+ * @param string $abo_uid
+ *   utile pour les actions REGISTER_UPDATE, PAYMENT, SUBSCRIBE
  * @return array
  */
-function presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config = array()){
+function presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config = array(), $action="PAYMENT", $abo_uid=null){
 
+	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 
 	$cartes = array('CB','VISA','MASTERCARD','E-CARTEBLEUE');
 	if (isset($config['cartes']) AND $config['cartes'])
 		$cartes = $config['cartes'];
+
+	if (!in_array($action,array('REGISTER', 'REGISTER_UPDATE', 'REGISTER_PAY', 'REGISTER_SUBSCRIBE', 'PAYMENT', 'SUBSCRIBE'))){
+		spip_log("Action $action inconnue",$mode._LOG_ERREUR);
+		return false;
+	}
+	if (in_array($action,array('REGISTER_UPDATE', 'SUBSCRIBE')) AND !$abo_uid){
+		spip_log("Action $action : abo_uid manquant pour generer le formulaire",$mode._LOG_ERREUR);
+		return false;
+	}
 
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash)))
 		return array();
@@ -419,7 +439,10 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	$parm['vads_order_id'] = $row['id_transaction'];
 	$parm['vads_trans_date'] = gmdate ("YmdHis", strtotime($row['date_transaction']));
 
-	$parm['vads_page_action'] = "PAYMENT";
+	$parm['vads_page_action'] = $action;
+	if ($abo_uid){
+		$parm['vads_identifier'] = $abo_uid;
+	}
 	$parm['vads_action_mode'] = "INTERACTIVE";
 	$parm['vads_payment_config'] = "SINGLE";
 	//$parm['vads_capture_delay'] = 0;
@@ -447,6 +470,53 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	if (strpos($url_check,"localhost")===false){
 		$parm['vads_url_check'] = bank_url_api_retour($config,"autoresponse");
 	}
+
+
+	// c'est un abonnement ç
+	if (in_array($action,array('REGISTER_SUBSCRIBE', 'SUBSCRIBE'))){
+		// on decrit l'echeance
+		if (
+			$decrire_echeance = charger_fonction("decrire_echeance","abos",true)
+		  AND $echeance = $decrire_echeance($id_transaction)){
+			if ($echeance['montant']>0){
+
+				// on commence maintenant
+				$parm['vads_sub_effect_date'] = gmdate ("Ymd");
+
+				// montant de l'echeance
+				$parm['vads_sub_amount'] = intval(round(100*$echeance['montant'],0));
+				// meme devise que le paiement initial
+				$parm['vads_sub_currency'] = $parm['vads_currency'];
+
+				// regle de recurrence
+				$rule = "RRULE:";
+				$freq = "MONTHLY";
+				if (isset($echeance['freq']) AND $echeance['freq']=='yearly'){
+					$freq = "YEARLY";
+				}
+				$rule .= ";FREQ=$freq";
+
+				if (isset($echeance['count']) AND $nb = intval($echeance['count'])){
+					$rule .= ";COUNT=$nb";
+				}
+
+				$parm['vads_sub_desc'] = $rule;
+
+
+				if (isset($echeance['count_init']) AND ($nb=intval($echeance['count_init']))>0){
+					$parm['vads_sub_init_amount_number'] = $nb;
+					$parm['vads_sub_init_amount'] = $parm['vads_amount'];
+					if (isset($echeance['montant_init']) AND ($m=intval(round(100*$echeance['montant_init'],0)))>0){
+						$parm['vads_sub_init_amount'] = $m;
+					}
+				}
+
+			}
+			else
+				$parm['PBX_RETOUR'] .= 'ppps:U;';
+		}
+	}
+
 
 	// this is SPIP + bank
 	include_spip('inc/filtres');
