@@ -494,10 +494,10 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 				if (isset($echeance['freq']) AND $echeance['freq']=='yearly'){
 					$freq = "YEARLY";
 				}
-				$rule .= ";FREQ=$freq";
+				$rule .= "FREQ=$freq;";
 
 				if (isset($echeance['count']) AND $nb = intval($echeance['count'])){
-					$rule .= ";COUNT=$nb";
+					$rule .= "COUNT=$nb;";
 				}
 
 				$parm['vads_sub_desc'] = $rule;
@@ -511,9 +511,10 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 					}
 				}
 
+				// par pour les abonnements
+				unset($parm['vads_amount']);
+				unset($parm['vads_currency']);
 			}
-			else
-				$parm['PBX_RETOUR'] .= 'ppps:U;';
 		}
 	}
 
