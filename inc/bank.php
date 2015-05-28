@@ -202,6 +202,7 @@ function bank_config_id($config){
 			OR stripos($k,"secret")!==false
 			OR stripos($k,"signature")!==false
 			OR stripos($k,"certificat")!==false
+			OR stripos($k,"token")!==false
 		  // enlever les logo/advert/notice/adresse
 			OR stripos($k,"logo")!==false
 			OR stripos($k,"advert")!==false

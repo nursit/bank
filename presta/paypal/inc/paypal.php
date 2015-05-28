@@ -58,8 +58,14 @@ function paypal_traite_response($config, $response){
 	$mode = $config['presta'];
 	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
 	$config_id = bank_config_id($config);
-	spip_log('Paypal IPN '.var_export($response,true),$mode);
-		
+
+	// on a pas recu de reponse de Paypal, rien a faire
+	if (!$response){
+		spip_log("Pas de reponse Paypal, rien a faire",$mode);
+		return array(0,false);
+	}
+
+
 	if (!isset($response['receiver_email']) OR ($response['receiver_email']!=$config['BUSINESS_USERNAME'])){
 		return bank_transaction_invalide(0,
 			array(
@@ -169,18 +175,6 @@ function paypal_traite_response($config, $response){
 		);
 	}
 
-	// verifier que la notification vien bien de paypal !
-	if (!bank_paypal_verifie_notification($config, $response)){
-		return bank_transaction_echec($id_transaction,
-			array(
-				'mode' => $mode,
-				'config_id' => $config_id,
-				'erreur' => "verification invalide (IPN!=VERIFIE)",
-				'log' => var_export($response, true),
-			)
-		);
-	}
-
 	$set = array(
 		"autorisation_id"=>$autorisation_id,
 		"mode"=>"$mode/$config_id",
@@ -216,12 +210,107 @@ function paypal_echec_transaction($id_transaction,$message){
 /**
  * Verifier que la notification de paiement vient bien de paypal !
  * @param array $config
- * @param array $response
+ * @param bool $is_ipn
  * @return bool
  */
-function bank_paypal_verifie_notification($config, $response){
+function paypal_get_response($config, $is_ipn=false){
+	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
 
-	// marche bien avec la notif de test ci-dessous
+	$bank_recuperer_post_https = charger_fonction("bank_recuperer_post_https","inc");
+
+	// recuperer le POST
+	$response = array();
+	foreach ($_POST as $key => $value){
+		$response[$key] = $value;
+	}
+
+	if (isset($response['tx']) AND $response['tx']){
+		$tx = $response['tx'];
+	}
+	elseif (isset($response['txn_id']) AND $response['txn_id']){
+		$tx = $response['txn_id'];
+	}
+	else {
+		$tx = _request('tx');
+	}
+
+	if (!$tx) {
+		bank_transaction_invalide(0,
+			array(
+				'mode' => $mode,
+				'erreur' => "Reponse sans tx ni txn_id",
+				'log' => bank_shell_args($response),
+			)
+		);
+		return false;
+	}
+
+	// si on a un $tx et un identity token dans la config on l'utilise de preference (PDT)
+	if ($tx
+	  AND isset($config['IDENTITY_TOKEN'])
+		AND $config['IDENTITY_TOKEN']){
+
+		$post_check = array(
+			'cmd' => '_notify-synch',
+			'tx' => $tx,
+			'at' => $config['IDENTITY_TOKEN'],
+		);
+
+		// envoyer la demande de verif en post
+		// attention, c'est une demande en ssl, il faut avoir un php qui le supporte
+		$url = paypal_url_serveur($config);
+		list($resultat,$erreur,$erreur_msg) = $bank_recuperer_post_https($url,$post_check,isset($response['payer_id'])?$response['payer_id']:'');
+		$resultat = trim($resultat);
+		if (strncmp($resultat,"SUCCESS",7)==0){
+			$resultat = trim(substr($resultat,7));
+			$resultat = explode("\n",$resultat);
+			$resultat = array_map("trim",$resultat);
+			$resultat = implode("&",$resultat);
+			parse_str($resultat,$response);
+			return paypal_charset_reponse($response);
+		}
+
+		// donnees invalides
+		bank_transaction_invalide(0,
+			array(
+				'mode' => $mode,
+				'erreur' => "Retour PDT :$resultat:Erreur $erreur:$erreur_msg:",
+				'log' => bank_shell_args($response),
+			)
+		);
+		return false;
+	}
+
+	if (!$response){
+		bank_transaction_invalide(0,
+			array(
+				'mode' => $mode,
+				'sujet' => 'Paypal IDENTITY_TOKEN manquant',
+				'erreur' => "IDENTITY_TOKEN manquant pour decoder la reponse",
+				'log' => "tx=$tx",
+			)
+		);
+		return false;
+	}
+
+	// ce n'est pas l'IPN, on ne sait pas verifier autrement
+	// on "fait confiance" a la reponse telle quelle
+	if (!$is_ipn){
+		// mais on le log+mail pour information du webmestre
+		bank_transaction_invalide(0,
+			array(
+				'mode' => $mode,
+				'sujet' => 'Transaction non securisee',
+				'erreur' => "IDENTITY_TOKEN non configure, impossible de verifier la reponse de Paypal (possible fraude)",
+				'log' => bank_shell_args($response),
+			)
+		);
+		// et on utilise la response
+		return paypal_charset_reponse($response);
+	}
+
+	// notif de debug pour tests
 	/*
 	$response = json_decode
     (
@@ -283,20 +372,34 @@ function bank_paypal_verifie_notification($config, $response){
 		$c['mode_test'] = false;
 	}
 	$url = paypal_url_serveur($c);
-	$bank_recuperer_post_https = charger_fonction("bank_recuperer_post_https","inc");
 	list($resultat,$erreur,$erreur_msg) = $bank_recuperer_post_https($url,$post_check,isset($post_check['payer_id'])?$post_check['payer_id']:'');
 
+	if (strncmp(trim($resultat),'VERIFIE',7)==0){
+		return paypal_charset_reponse($response);
+	}
 
-	if (strncmp(trim($resultat),'VERIFIE',7)==0)
-		return true;
-
-
-	spip_log("Retour IPN :$resultat:Erreur $erreur:$erreur_msg: POST: ".http_build_query($post_check),$config['presta']._LOG_ERREUR);
-
-	#var_dump($resultat);
-	#var_dump("URL=".$url);
-	#var_dump($post_check);
-	#die('Echec Validation IPN');
+	bank_transaction_invalide(0,
+		array(
+			'mode' => $mode,
+			'erreur' => "Retour IPN :$resultat:Erreur $erreur:$erreur_msg:",
+			'log' => bank_shell_args($response),
+		)
+	);
 
 	return false;
+}
+
+/**
+ * Normaliser le charset de la reponse Paypal si besoin
+ * @param $response
+ * @return mixed
+ */
+function paypal_charset_reponse($response){
+	if (isset($response['charset']) AND $response['charset']!==$GLOBALS['meta']['charset']){
+		include_spip('inc/charsets');
+		foreach($response as $k=>$v){
+			$response[$k] = importer_charset($v,$response['charset']);
+		}
+	}
+	return $response;
 }

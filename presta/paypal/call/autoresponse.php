@@ -18,13 +18,13 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @param null|array $response
  * @return array
  */
-function presta_paypal_call_response($config, $response=null){
+function presta_paypal_call_autoresponse($config, $response=null){
 
 	include_spip('inc/bank');
 	include_spip('presta/paypal/inc/paypal');
 
 	if (!$response){
-		$response = paypal_get_response($config);
+		$response = paypal_get_response($config, true);
 	}
 
 	return paypal_traite_response($config, $response);

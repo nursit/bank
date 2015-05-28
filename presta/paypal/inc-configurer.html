@@ -5,5 +5,12 @@
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[BUSINESS_USERNAME]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{BUSINESS_USERNAME,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
+	#SET{name,#ENV{casier,''}_IDENTITY_TOKEN}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">IDENTITY_TOKEN</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[IDENTITY_TOKEN]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{IDENTITY_TOKEN,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
 	<INCLURE{fond=formulaires/inc-bank-config-mode_test,env} />
 </ul>
+<p class="explication">URL de renvoi&nbsp;: <br /><input type="text" class="text" readonly="readonly" value="[(#ENV{#ENV{casier,''}}|bank_url_autoresponse)]" /></p>
