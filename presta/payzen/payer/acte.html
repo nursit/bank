@@ -37,7 +37,7 @@
 <div class='payer_mode payer_payzen payer_ecv payer_acte'>
 	<p class="titre h4"><:bank:payer_par_e_cheque_vacances:></p>
 	<div class='boutons'>
-	<BOUCLE_ecv(POUR){tableau #ENV{hidden}}{cle=E_CV}>
+	<BOUCLE_ecv(POUR){tableau #ENV{hidden}}{cle=E_CVxx}>
 		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{payzen}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
 	</BOUCLE_ecv>
 	</div>

@@ -95,7 +95,7 @@ function systempay_available_cards($config){
 			// et les SEPA
 			$cartes_possibles['SDD'] = "SEPA_SDD.gif";
 			// et les e-cheques vacances
-			$cartes_possibles['E_CV'] = "E_CV.gif";
+			// $cartes_possibles['E_CV'] = "E_CV.gif";
 		}
 	}
 
