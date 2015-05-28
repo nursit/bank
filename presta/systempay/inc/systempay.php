@@ -302,6 +302,17 @@ function systempay_traite_reponse_transaction($config, $response){
 	sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
 	spip_log("call_response : id_transaction $id_transaction, reglee",$mode);
 
+
+	// si on dispose des informations utilisateurs, les utiliser pour peupler la gloable bank_session
+	// qui peut etre utilisee pour creer le compte client a la volee
+	$var_users = array('vads_cust_email' => 'email', 'vads_cust_name' => 'nom', 'vads_cust_title' => 'civilite');
+	foreach ($var_users as $kr => $ks){
+		if (isset($response[$kr]) AND $response[$kr]){
+			if (!isset($GLOBALS['bank_session'])) $GLOBALS['bank_session'] = array();
+			$GLOBALS['bank_session'][$ks] = $response[$kr];
+		}
+	}
+
 	$regler_transaction = charger_fonction('regler_transaction','bank');
 	$regler_transaction($id_transaction,array('row_prec'=>$row));
 	return array($id_transaction,true);

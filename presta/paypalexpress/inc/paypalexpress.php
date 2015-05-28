@@ -291,6 +291,27 @@ function bank_paypalexpress_checkoutpayment($payerid,$config){
 	);
 	spip_log("DoExpressCheckoutPayment : id_transaction $id_transaction, reglee", $mode . _LOG_INFO_IMPORTANTE);
 
+	if (isset($_SESSION['reshash']) AND $response = $_SESSION['reshash']){
+		// si on dispose des informations utilisateurs, les utiliser pour peupler la gloable bank_session
+		// qui peut etre utilisee pour creer le compte client a la volee
+		$var_users = array(
+			'EMAIL' => 'email',
+			'LASTNAME' => 'nom',
+			'FIRSTNAME' => 'prenom',
+			'SHIPTONAME'=>'nom',
+			'SHIPTOSTREET'=>'adresse',
+			'SHIPTOCITY'=>'ville',
+			'SHIPTOZIP'=>'code_postal',
+			'SHIPTOCOUNTRYCODE'=>'pays'
+		);
+		foreach ($var_users as $kr => $ks){
+			if (isset($response[$kr]) AND $response[$kr]){
+				if (!isset($GLOBALS['bank_session'])) $GLOBALS['bank_session'] = array();
+				$GLOBALS['bank_session'][$ks] = $response[$kr];
+			}
+		}
+	}
+
 	// a faire avant le reglement qui va poser d'autres variables de session
 	session_unset();
 
