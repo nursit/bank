@@ -269,7 +269,7 @@ function paybox_response($response = 'response'){
  */
 function paybox_traite_reponse_transaction($config, $response) {
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 	$config_id = bank_config_id($config);
 
 	// $response['id_transaction'] Peut contenir /email ou IBSxx... en cas d'abo

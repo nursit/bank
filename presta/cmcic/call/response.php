@@ -128,7 +128,7 @@ function cmcic_terminer_transaction() {
 **/
 function cmcic_traite_reponse_transaction($config, $response) {
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 	$config_id = bank_config_id($config);
 
 	#spip_log("call_response : traitement d'une réponse de la banque $mode !", $mode);
@@ -264,7 +264,7 @@ function cmcic_notifier_banque_erreur() {
 **/
 function cmcic_response($config) {
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 
 	// Begin Main : Retrieve Variables posted by CMCIC Payment Server 
 	$CMCIC_bruteVars = getMethode();
@@ -335,7 +335,7 @@ function cmcic_response($config) {
 function cmcic_gerer_transaction_annulee($config, $id_transaction, $response, $row, $erreur=true) {
 	$mode = $config['presta'];
 	$config_id = bank_config_id($config);
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 
 	// regarder si l'annulation n'arrive pas apres un reglement
 	// (internaute qui a ouvert 2 fenetres de paiement)
@@ -374,7 +374,7 @@ function cmcic_gerer_transaction_annulee($config, $id_transaction, $response, $r
 function cmcic_gerer_transaction_payee($config, $id_transaction, $response, $row, $paiement_test = false) {
 	$mode = $config['presta'];
 	$config_id = bank_config_id($config);
-	if ($paiement_test) $mode .= "-test";
+	if ($paiement_test) $mode .= "_test";
 
 	// ok, on traite le reglement
 	$date=time();

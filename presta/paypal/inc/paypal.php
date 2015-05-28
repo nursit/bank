@@ -56,7 +56,7 @@ function paypal_url_serveur($config){
 function paypal_traite_response($config, $response){
 
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 	$config_id = bank_config_id($config);
 
 	// on a pas recu de reponse de Paypal, rien a faire
@@ -225,7 +225,7 @@ function paypal_echec_transaction($id_transaction,$message){
  */
 function paypal_get_response($config, $is_ipn=false){
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "-test";
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 
 	$bank_recuperer_post_https = charger_fonction("bank_recuperer_post_https","inc");
 
