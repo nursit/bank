@@ -26,15 +26,31 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 			AND $config['actif']){
 
 			$presta = $config['presta']; // en cas de renommage
+			$test = "";
+			if (isset($config['mode_test']) AND $config['mode_test']) $test = "_test";
+
 
 			if (!$auto OR !$call_response = charger_fonction('autoresponse',"presta/$presta/call",true))
 				$call_response = charger_fonction('response',"presta/$presta/call");
 
 			if ($cancel)
 				define('_BANK_CANCEL_TRANSACTION',true);
-			spip_log('call_'.$auto.'response : '.$_SERVER['REQUEST_URI'],"$presta$auto");
+
+			// si on a recu un POST, le traduire en request_uri pour les logs et faciliter le code de certains modules
+			$GLOBALS['BANK_REQUEST_URI'] = $_SERVER['REQUEST_URI'];
+			if ($_SERVER['REQUEST_METHOD']=='POST'){
+				$q = http_build_query($_POST);
+				if (strpos($GLOBALS['BANK_REQUEST_URI'],"?")!==false){
+					$GLOBALS['BANK_REQUEST_URI'] .= "&$q";
+				}
+				else {
+					$GLOBALS['BANK_REQUEST_URI'] .= "?$q";
+				}
+			}
+
+			spip_log('call_'.$auto.'response : '.$GLOBALS['BANK_REQUEST_URI'],"$presta$auto$test");
 			list($id_transaction,$result)=$call_response($config);
-			spip_log('call_'.$auto.'response : '."$id_transaction/$result","$presta$auto");
+			spip_log('call_'.$auto.'response : '."$id_transaction/$result","$presta$auto$test");
 		}
 		else {
 			spip_log("Prestataire $presta inconnu ou inactif",'bank_response'._LOG_ERREUR);
