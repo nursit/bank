@@ -230,11 +230,13 @@ function systempay_traite_reponse_transaction($config, $response){
 		);
 	}
 
+	$is_sepa = (isset($response['vads_card_brand']) AND $response['vads_card_brand']=="SDD");
+
 	// ok, on traite le reglement
 	$date = $response['vads_effective_creation_date'];
 	// si c'est un paiement SEPA, on prend la date de presentation du SEPA comme date de paiement
 	// (date_paiement dans le futur donc)
-	if (isset($response['vads_card_brand']) AND $response['vads_card_brand']=="SDD"){
+	if ($is_sepa){
 		$date = $response['vads_presentation_date'];
 	}
 	$date_paiement = sql_format_date(
@@ -250,15 +252,26 @@ function systempay_traite_reponse_transaction($config, $response){
 		systempay_response_code($response['vads_result']),
 		systempay_auth_response_code($response['vads_auth_result'])
 	);
+
 	$erreur = array_filter($erreur);
 	$erreur = trim(implode(' ',$erreur));
+
 	$authorisation_id = $response['vads_payment_certificate'];
 	$transaction = $response['vads_auth_number'];
 
-	if (!$transaction
-	  OR !$authorisation_id
-	  OR !in_array($response['vads_trans_status'],array('AUTHORISED','CAPTURED'))
-	  OR $erreur){
+	// si c'est un SEPA, on a pas encore la transaction et le numero d'autorisation car il y a un delai avant presentation
+	// (paiement dans le futur)
+	if ($is_sepa AND !$transaction){
+		list($transaction,$authorisation_id) = explode("_",$response['vads_card_number']);
+	}
+
+	if (!$erreur AND !$transaction) {$erreur = "pas de vads_auth_number";}
+	if (!$erreur AND !$authorisation_id) {$erreur = "pas de vads_payment_certificate";}
+	if (!$erreur AND !in_array($response['vads_trans_status'],array('AUTHORISED','CAPTURED'))) {
+		$erreur = "vads_trans_status innatendu (!IN AUTHORISED',CAPTURED)";
+	}
+
+	if ($erreur){
 	 	// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
 	 	if ($row['reglee']=='oui') return array($id_transaction,true);
 	 	// sinon enregistrer l'absence de paiement et l'erreur
