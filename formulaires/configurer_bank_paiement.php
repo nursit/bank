@@ -120,3 +120,21 @@ function bank_deplacer_config($nom,$sens="up"){
 	}
 	ecrire_config("bank_paiement/",$new);
 }
+
+/**
+ * Compter si un presta est utiliser plusieurs fois pour permettre de mettre un label dessus
+ * @param string $presta
+ * @return string
+ */
+function bank_configure_label_presta($presta){
+	static $configs;
+	if (is_null($configs)){
+		$configs = bank_lister_configs();
+	}
+	$n = 0;
+	foreach($configs as $c){
+		if ($c['presta']==$presta) $n++;
+		if ($n>1) return ' ';
+	}
+	return '';
+}

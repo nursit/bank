@@ -79,6 +79,10 @@
 					<div class="choix[(#GET{disabled}|oui)muted]">
 						<input type="checkbox" name="#GET{casier}[actif]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#GET{casier}}|table_valeur{actif, #GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
 						<label for="#GET{name}_#GET{val}">Activer</label>
+						#SET{val,#ENV{#GET{casier}}|table_valeur{label}}
+						[(#GET{val}|ou{#VALEUR{presta}|bank_configure_label_presta})
+						<input type="text" name="#GET{casier}\[label\]" value="#GET{val}" class="text presta_label"/>
+						]
 					</div>
 					<input type="hidden" name="#GET{casier}\[presta\]" value="[(#VALEUR{presta})]" />
 					<input type="hidden" name="#GET{casier}\[type\]" value="acte" />
@@ -104,6 +108,7 @@
 	.suite {margin-left: 40px;font-size: 0.9em;}
 	.formulaire_spip .editer_presta {position: relative;}
 	.formulaire_spip .editer_presta .action {position:absolute;right:10px;top:10px;z-index: 2;}
+	.formulaire_spip .editer_presta .presta_label {width: 50%;margin-left: 1em;border:0;border-bottom: 1px solid #ddd;}
 </style>
 <script type="text/javascript">
 jQuery(function(){

@@ -189,6 +189,7 @@ function bank_config_id($config){
 		'type',
 		'cartes',
 		'mode_test',
+		'label',
 	        ) as $k){
 		if (isset($t[$k])){
 			unset($t[$k]);
