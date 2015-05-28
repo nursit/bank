@@ -512,8 +512,8 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 				}
 
 				// par pour les abonnements
-				unset($parm['vads_amount']);
-				unset($parm['vads_currency']);
+				#unset($parm['vads_amount']);
+				#unset($parm['vads_currency']);
 			}
 		}
 	}

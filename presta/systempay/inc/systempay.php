@@ -309,12 +309,26 @@ function systempay_traite_reponse_transaction($config, $response){
 
 	// si on a les infos de validite / card number, on les note ici
 	if (isset($response['vads_expiry_year'])){
-		$set['refcb'] = $response['vads_expiry_year']."/".$response['vads_expiry_month'];
+		$set['validite'] = $response['vads_expiry_year']."-".$response['vads_expiry_month'];
 
+		// par defaut on note brand et number dans refcb
+		// mais ecrase si le paiement a genere un identifiant de paiement
+		// qui peut etre reutilise
+		$set['refcb'] = '';
 		if (isset($response['vads_card_brand']))
 			$set['refcb'] .= " ".$response['vads_card_brand'];
 		if (isset($response['vads_card_number']))
 			$set['refcb'] .= " ".$response['vads_card_number'];
+		$set['refcb'] = trim($set['refcb']);
+	}
+
+	// si vads_identifier fourni on le note dans refcb : c'est un identifiant de paiement
+	if (isset($response['vads_identifier']) AND $response['vads_identifier']){
+		$set['refcb'] = $response['vads_identifier'];
+	}
+	// si on a un numero d'abonnement on le note dans abo_uid
+	if (isset($response['vads_subscription']) AND $response['vads_subscription']){
+		$set['abo_uid'] = $response['vads_subscription'];
 	}
 
 	sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
