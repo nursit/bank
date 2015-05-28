@@ -232,6 +232,11 @@ function systempay_traite_reponse_transaction($config, $response){
 
 	// ok, on traite le reglement
 	$date = $response['vads_effective_creation_date'];
+	// si c'est un paiement SEPA, on prend la date de presentation du SEPA comme date de paiement
+	// (date_paiement dans le futur donc)
+	if (isset($response['vads_card_brand']) AND $response['vads_card_brand']=="SDD"){
+		$date = $response['vads_presentation_date'];
+	}
 	$date_paiement = sql_format_date(
 		substr($date,0,4), //annee
 		substr($date,4,2), //mois
