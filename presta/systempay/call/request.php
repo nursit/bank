@@ -439,9 +439,14 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	$parm['vads_shop_name'] = textebrut($GLOBALS['meta']['nom_site']);
 
 	// Urls de retour
-	$parm['vads_return_mode'] = "GET";//"POST";
+	$parm['vads_return_mode'] = "GET"; // POST pour privacy et ne pas loger par Apache, mais GET pour ne pas avoir un message d'avertissement au retour utilisateur
 	$parm['vads_url_return'] = bank_url_api_retour($config,"response");
 	$parm['vads_url_cancel'] = bank_url_api_retour($config,"cancel");
+
+	$url_check = bank_url_api_retour($config,"autoresponse");
+	if (strpos($url_check,"localhost")===false){
+		$parm['vads_url_check'] = bank_url_api_retour($config,"autoresponse");
+	}
 
 	// this is SPIP + bank
 	include_spip('inc/filtres');
