@@ -283,6 +283,18 @@ function bank_email_porteur($transaction){
 }
 
 /**
+ * Calculer la date de fin de validite d'un moyen de paiement avec son annee/mois de validite
+ * @param string $annee
+ * @param string $mois
+ * @return string
+ */
+function bank_date_fin_mois($annee,$mois){
+	$date_fin = mktime(0,0,0,$mois,01,$annee);
+	$date_fin = strtotime("+1 month",$date_fin);
+	return date('Y-m-d H:i:s',$date_fin);
+}
+
+/**
  * Generer le message d'erreur d'une transaction invalide/incoherente
  * avec log et email eventuel
  *

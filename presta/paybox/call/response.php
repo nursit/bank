@@ -53,12 +53,8 @@ function presta_paybox_call_response_dist($config, $response=null){
 		if ($response['ETAT_PBX']!=='PBX_RECONDUCTION_ABT'
 			AND $success){
 	
-			// recuperer la date de validite de la carte
-			// ne sert pas ici, car on fixe la fin de l'abo a echeance+1jour
-			// ce qui le resiliera automatiquement en cas de non reconduction
-			$date_fin = mktime(0,0,0,substr($response['valid'],2,2),27,2000+intval(substr($response['valid'],0,2)))+5*24*3600;
-			$date_fin = mktime(0,0,0,date('m',$date_fin),date('d'),date('Y',$date_fin));
-			$date_fin = date('Y-m-d H:i:s',$date_fin);
+			// date de fin de mois de validite de la carte
+			$date_fin = bank_date_fin_mois(2000+intval(substr($response['valid'],0,2)),substr($response['valid'],2,2));
 
 			#spip_log('response:'.var_export($response,true),$mode.'db');
 			#spip_log('date_fin:'.$date_fin,$mode.'db');
