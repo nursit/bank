@@ -216,16 +216,6 @@ function systempay_traite_reponse_transaction($config, $response){
 		);
 	}
 
-	/*
-
-/bank.api/payzen-0C4B/autoresponse/
-?vads_amount=&vads_auth_mode=MARK&vads_auth_number=3fe8bb&vads_auth_result=00&vads_capture_delay=0&vads_card_brand=MASTERCARD&vads_card_number=597010XXXXXX0000&vads_payment_certificate=&vads_ctx_mode=TEST&vads_currency=978&vads_effective_amount=&vads_site_id=78542344&vads_trans_date=20150529071207&vads_trans_id=331275&vads_validation_mode=0&vads_version=V2&vads_warranty_result=NO&vads_payment_src=EC&vads_cust_email=cedric%40nursit.net&vads_contract_used=1234567&vads_recurrence_status=CREATED&vads_identifier_status=CREATED&vads_expiry_month=6&vads_expiry_year=2016&vads_bank_product=MCW&vads_pays_ip=FR&vads_identifier=f8437a467d634972b64eaf5e3bda1486&vads_subscription=20150529xJsgWe&vads_threeds_enrolled=&vads_threeds_cavv=&vads_threeds_eci=&vads_threeds_xid=&vads_threeds_cavvAlgorithm=&vads_threeds_status=&vads_threeds_sign_valid=&vads_threeds_error_code=&vads_threeds_exit_status=&vads_risk_control=COMMERCIAL_CARD%3DOK%3BECB%3DOK%3BIP_FRAUD%3DOK%3BSUSPECT_COUNTRY%3DOK%3BSYSTEMATIC_AUTO%3DOK&vads_result=00&vads_extra_result=  &vads_card_country=FR&vads_language=en&vads_action_mode=INTERACTIVE&vads_payment_config=SINGLE&vads_hash=d0f4e2caa7c35c944841e6f6c5b7f5bae2b14a87fa259650bbd67dab024995e1&vads_url_check_src=PAY&vads_contrib=SPIP+3.1.0-beta+%2B+https%3A%2F%2Fgithub.com%2Fnursit%2Fbank+3.0.0&vads_order_id=5&vads_page_action=REGISTER_SUBSCRIBE&vads_sub_amount=300&vads_sub_currency=978&vads_sub_desc=RRULE%3AFREQ%3DMONTHLY%3B&vads_sub_effect_date=20150529&vads_shop_name=Paypal+Test&vads_shop_url=http%3A%2F%2Ftest-bank.nursit.com&signature=d23b3150c6cceab8387f36e081a70766097c6721
-
-/bank.api/payzen-0C4B/response/
-?vads_amount=&vads_auth_mode=MARK&vads_auth_number=3fe8bb&vads_auth_result=00&vads_capture_delay=0&vads_card_brand=MASTERCARD&vads_card_number=597010XXXXXX0000&vads_payment_certificate=&vads_ctx_mode=TEST&vads_currency=978&vads_effective_amount=&vads_site_id=78542344&vads_trans_date=20150529071207&vads_trans_id=331275&vads_validation_mode=0&vads_version=V2&vads_warranty_result=NO&vads_payment_src=EC&vads_cust_email=cedric%40nursit.net&vads_contract_used=1234567&vads_recurrence_status=CREATED&vads_identifier_status=CREATED&vads_expiry_month=6&vads_expiry_year=2016&vads_bank_product=MCW&vads_pays_ip=FR&vads_identifier=f8437a467d634972b64eaf5e3bda1486&vads_subscription=20150529xJsgWe&vads_threeds_enrolled=&vads_threeds_cavv=&vads_threeds_eci=&vads_threeds_xid=&vads_threeds_cavvAlgorithm=&vads_threeds_status=&vads_threeds_sign_valid=&vads_threeds_error_code=&vads_threeds_exit_status=&vads_risk_control=COMMERCIAL_CARD%3DOK%3BECB%3DOK%3BIP_FRAUD%3DOK%3BSUSPECT_COUNTRY%3DOK%3BSYSTEMATIC_AUTO%3DOK&vads_result=00&vads_extra_result=00&vads_card_country=FR&vads_language=en&vads_action_mode=INTERACTIVE&vads_payment_config=SINGLE&vads_page_action=REGISTER_SUBSCRIBE&vads_sub_amount=300&vads_sub_currency=978&vads_sub_desc=RRULE%3AFREQ%3DMONTHLY%3B&vads_sub_effect_date=20150529&vads_shop_name=Paypal+Test&vads_shop_url=http%3A%2F%2Ftest-bank.nursit.com&signature=1b6745e747660ea51c042b490c3ae85ce5127976&&vads_contrib=SPIP+3.1.0-beta+%2B+https%3A%2F%2Fgithub.com%2Fnursit%2Fbank+3.0.0
-vads_order_id=5&
-
-	*/
 	$is_sepa = (isset($response['vads_card_brand']) AND $response['vads_card_brand']=="SDD");
 	$is_payment = true;
 	$is_registering = false;
@@ -290,7 +280,7 @@ vads_order_id=5&
 
 	// si c'est un SEPA, on a pas encore la transaction et le numero d'autorisation car il y a un delai avant presentation
 	// (paiement dans le futur)
-	if ($is_payment AND $is_sepa AND !$transaction){
+	if ($is_sepa AND !$transaction){
 		list($transaction,$authorisation_id) = explode("_",$response['vads_card_number']);
 	}
 
@@ -346,8 +336,10 @@ vads_order_id=5&
 		// mais ecrase si le paiement a genere un identifiant de paiement
 		// qui peut etre reutilise
 		$set['refcb'] = '';
-		if (isset($response['vads_card_brand']))
-			$set['refcb'] .= " ".$response['vads_card_brand'];
+		if (isset($response['vads_card_brand'])){
+			$set['refcb'] = $response['vads_card_brand'];
+			if ($set['refcb'] === "SDD") $set['refcb'] = "SEPA"; // more user friendly
+		}
 		if (isset($response['vads_card_number']))
 			$set['refcb'] .= " ".$response['vads_card_number'];
 		$set['refcb'] = trim($set['refcb']);
