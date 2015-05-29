@@ -388,11 +388,12 @@ vads_redirect_error_message = Redirection vers la boutique dans quelques instant
  *   REGISTER_SUBSCRIBE : abonner et enregistrer
  *   PAYMENT : avec un identifiant optionnel qui evite de resaisir les numeros de CB
  *   SUBSCRIBE : abonner avec un identifiant qui evite de resaisir les numeros de CB
- * @param string $abo_uid
- *   utile pour les actions REGISTER_UPDATE, PAYMENT, SUBSCRIBE
+ * @param array $options
+ *   string $abo_uid : utile pour les actions REGISTER_UPDATE, PAYMENT, SUBSCRIBE
+ *   int $delay : nombre de jours avant effet (vads_capture_delay pour les paiements ponctuels, vads_sub_effect_date pour les abonnements)
  * @return array
  */
-function presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config = array(), $action="PAYMENT", $abo_uid=null){
+function presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config = array(), $action="PAYMENT", $options= array()){
 
 	$mode = $config['presta'];
 	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
@@ -400,6 +401,15 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	$cartes = array('CB','VISA','MASTERCARD','E-CARTEBLEUE');
 	if (isset($config['cartes']) AND $config['cartes'])
 		$cartes = $config['cartes'];
+
+	$options = array_merge(
+		array(
+			'abo_uid' => '',
+			'delay' => 0,
+		)
+		,$options
+	);
+	$abo_uid = $options['abo_uid'];
 
 	if (!in_array($action,array('REGISTER', 'REGISTER_UPDATE', 'REGISTER_PAY', 'REGISTER_SUBSCRIBE', 'REGISTER_PAY_SUBSCRIBE', 'PAYMENT', 'SUBSCRIBE'))){
 		spip_log("Action $action inconnue",$mode._LOG_ERREUR);
@@ -481,7 +491,8 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 			if ($echeance['montant']>0){
 
 				// on commence maintenant
-				$parm['vads_sub_effect_date'] = gmdate ("Ymd");
+				$now = time();
+				$parm['vads_sub_effect_date'] = gmdate ("Ymd",$now+24*3600*intval($options['delay']));
 				$nb = 0;
 				$nb_init = 0;
 				if (isset($echeance['count'])){
@@ -533,6 +544,11 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 			}
 		}
 	}
+	else {
+		if ($options['delay']){
+			$parm['vads_capture_delay'] = intval($options['delay']);
+		}
+	}
 
 
 	// this is SPIP + bank
@@ -551,10 +567,17 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 
 	// cas particulier de la carte SDD : on ne peut pas faire un REGISTER_PAY_SUBSCRIBE dessus
 	// on la configurer en premier avec un REGISTER_SUBSCRIBE
-	if (isset($cartes_possibles['SDD']) AND in_array('SDD',$cartes) AND $action==="REGISTER_PAY_SUBSCRIBE"){
-		$c = $config;
-		$c['cartes'] = array('SDD');
-		$contexte = presta_systempay_call_request_dist($id_transaction, $transaction_hash, $c, "REGISTER_SUBSCRIBE", $abo_uid);
+	if (isset($cartes_possibles['SDD'])
+	  AND in_array('SDD',$cartes)
+	  AND ($action==="REGISTER_PAY_SUBSCRIBE" OR (in_array($action,array('REGISTER_SUBSCRIBE', 'SUBSCRIBE')) AND intval($options['delay'])<13))
+	  ){
+		$action_sdd = $action;
+		if ($action_sdd==="REGISTER_PAY_SUBSCRIBE") $action_sdd="REGISTER_SUBSCRIBE";
+		$config_sdd = $config;
+		$config_sdd['cartes'] = array('SDD');
+		$options_sdd = $options;
+		$options_sdd['delay'] = max($options_sdd['delay'],13); // minimum 13 jours pour un SEPA
+		$contexte = presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config_sdd, $action_sdd, $options_sdd);
 		unset($cartes_possibles['SDD']);
 	}
 	else {
