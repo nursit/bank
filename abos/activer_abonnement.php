@@ -41,6 +41,8 @@ function abos_activer_abonnement_dist($id_transaction,$abo_uid,$mode_paiement,$v
 
 	$id_abonnement = 0;
 
+	spip_log("abos/activer_abonnement id_transaction=$id_transaction abo_uid=$abo_uid mode=$mode_paiement validite=$validite","bank");
+
 	$id_abonnement = pipeline(
 		'bank_abos_activer_abonnement',
 		array(

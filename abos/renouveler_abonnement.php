@@ -29,6 +29,8 @@ include_spip('base/abstract_sql');
  */
 function abos_renouveler_abonnement_dist($id_transaction,$abo_uid,$mode_paiement){
 
+	spip_log("abos/renouveler_abonnement id_transaction=$id_transaction abo_uid=$abo_uid mode=$mode_paiement","bank");
+
 	$id_abonnement = 0;
 
 	$id_abonnement = pipeline(

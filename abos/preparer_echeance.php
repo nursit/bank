@@ -25,6 +25,8 @@ include_spip('base/abstract_sql');
  */
 function abos_preparer_echeance_dist($id){
 
+	spip_log("abos/preparer_echeance id=$id","bank");
+
 	/*
 	if (strncmp($id,"uid:",4)==0){
 		$where = "abonne_uid=".sql_quote(substr($id,4));
