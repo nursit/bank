@@ -59,7 +59,7 @@ function presta_systempay_call_response_dist($config, $response=null){
 	// depouillement de la transaction
 	list($id_transaction,$success) =  systempay_traite_reponse_transaction($config, $response);
 
-	if (strpos($response['vads_url_check_src'],"SUBSCRIBE")!==false
+	if (strpos($response['vads_page_action'],"SUBSCRIBE")!==false
 	  AND $abo_uid = $response['vads_subscription']
 	  AND $id_transaction){
 
@@ -86,8 +86,8 @@ function presta_systempay_call_response_dist($config, $response=null){
 		}
 
 
-		// c'est un renouvellement en echec, il faut le resilier
-		if ($recurence AND !$success){
+		// c'est un echec, il faut le resilier, que ce soit la premiere ou la Nieme transaction
+		if (!$success){
 
 			if ($resilier = charger_fonction('resilier','abos',true)){
 				$options = array(
