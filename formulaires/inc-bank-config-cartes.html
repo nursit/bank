@@ -3,10 +3,10 @@
 	<label>[(#ENV{label,''}|sinon{<:bank:label_configuration_cartes:>})]</label>
 	<BOUCLE_cards(POUR){tableau #ENV{cartes}}>
 	#SET{val,#CLE}
-	<div class="choix">
+	<span class="choix">
 		<input type="checkbox" name="#ENV{casier,''}[cartes][]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#GET{val}|in_any{#ENV*{#ENV{casier,''}}|table_valeur{cartes,#GET{defaut}}}|oui)checked="checked"] />
 		<label for="#GET{name}_#GET{val}" title="[(#CLE|bank_label_payer_par_carte|attribut_html)]">[(#VAL{paybox}|bank_trouver_logo{#VALEUR}|balise_img{#CLE|bank_label_payer_par_carte})]</label>
-	</div>
+	</span>
 	</BOUCLE_cards>
 	<style>.editer_[(#GET{name})] .choix{display: inline-block;line-height: 30px}.editer_[(#GET{name})] .choix label{margin-left: 0}.editer_[(#GET{name})] .choix label img {max-height:24px;width:auto;vertical-align:middle;}</style>
 </li>
