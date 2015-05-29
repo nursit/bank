@@ -265,11 +265,11 @@ function systempay_traite_reponse_transaction($config, $response){
 		list($transaction,$authorisation_id) = explode("_",$response['vads_card_number']);
 	}
 
+	if (!$erreur AND !in_array($response['vads_trans_status'],array('AUTHORISED','CAPTURED','WAITING_AUTHORISATION'))) {
+		$erreur = "vads_trans_status ".$response['vads_trans_status']." (!IN AUTHORISED',CAPTURED,WAITING_AUTHORISATION)";
+	}
 	if (!$erreur AND !$transaction) {$erreur = "pas de vads_auth_number";}
 	if (!$erreur AND !$authorisation_id) {$erreur = "pas de vads_payment_certificate";}
-	if (!$erreur AND !in_array($response['vads_trans_status'],array('AUTHORISED','CAPTURED'))) {
-		$erreur = "vads_trans_status innatendu (!IN AUTHORISED',CAPTURED)";
-	}
 
 	if ($erreur){
 	 	// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
