@@ -22,7 +22,8 @@
 
 	<pipeline nom="bank_abos_activer_abonnement" action="" />
 	<pipeline nom="bank_abos_decrire_echeance" action="" />
-	<pipeline nom="bank_abos_renouveler" action="" />
+	<!-- DEPRECIE --><pipeline nom="bank_abos_renouveler" action="" />
+	<pipeline nom="bank_abos_preparer_echeance" action="" />
 	<pipeline nom="bank_abos_resilier" action="" />
 	<pipeline nom="bank_facturer_reglement" action="" />
 	<pipeline nom="bank_traiter_reglement" action="" />

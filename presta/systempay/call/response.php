@@ -40,9 +40,9 @@ function presta_systempay_call_response_dist($config, $response=null){
 	// c'est une reconduction d'abonnement ?
 	if (isset($response['vads_url_check_src']) AND $response['vads_url_check_src']==='REC'){
 		// creer la transaction maintenant si besoin !
-		if ($renouveler = charger_fonction('renouveler','abos',true)){
+		if ($preparer_echeance = charger_fonction('preparer_echeance','abos',true)){
 			// on reinjecte le bon id de transaction ici si fourni
-			if ($id_transaction = $renouveler("uid:".$response['vads_subscription'])){
+			if ($id_transaction = $preparer_echeance("uid:".$response['vads_subscription'])){
 				$response['vads_order_id'] = $id_transaction;
 			}
 		}
