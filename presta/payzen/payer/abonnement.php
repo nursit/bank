@@ -22,6 +22,10 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 function presta_payzen_payer_abonnement_dist($config, $id_transaction, $transaction_hash, $options=array()){
 
 	$call_request = charger_fonction('request','presta/systempay/call');
+
+	// Tip : pour tester les workflow de paiement abonnement decomposes avec les CB
+	// utiliser ici REGISTER_SUBSCRIBE au lieu de REGISTER_PAY_SUBSCRIBE
+	// cela permet d'avoir un premier hit sans paiement puis un hit du paiement dans l'heure (arrivera 13j apres en SEPA)
 	$contexte = $call_request($id_transaction,$transaction_hash,$config,"REGISTER_PAY_SUBSCRIBE");
 
 	$contexte['sandbox'] = ($config['mode_test']?' ':'');
