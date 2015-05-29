@@ -105,8 +105,14 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 					$freq = "12";
 				}
 				$nbpaie = "00";
-				if (isset($echeance['count']) AND intval($echeance['count']) AND intval($echeance['count'])<100){
-					$nbpaie = str_pad(intval($echeance['count']), 2, "0", STR_PAD_LEFT);
+				if (isset($echeance['count']) AND $n = intval($echeance['count'])){
+					// paybox ne compte pas la premiere echeance, donc comptee ici (car pas dans count_init) il faut la deduire
+					if (!isset($echeance['count_init']) OR !$echeance['count_init']){
+						$n--;
+					}
+					if ($n AND $n<100){
+						$nbpaie = str_pad($n, 2, "0", STR_PAD_LEFT);
+					}
 				}
 				$parm['PBX_CMD'] .=
 				"IBS_2MONT$montant_echeance"

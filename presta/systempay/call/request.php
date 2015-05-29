@@ -497,6 +497,10 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 				$rule .= "FREQ=$freq;";
 
 				if (isset($echeance['count']) AND $nb = intval($echeance['count'])){
+					// dans le cas Payzen COUNT est le nombre total d'echeances, en incluant les echeances initiales
+					if (isset($echeance['count_init']) AND ($nbi=intval($echeance['count_init']))>0){
+						$nb+=$nbi;
+					}
 					$rule .= "COUNT=$nb;";
 				}
 
@@ -510,10 +514,6 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 						$parm['vads_sub_init_amount'] = $m;
 					}
 				}
-
-				// par pour les abonnements
-				#unset($parm['vads_amount']);
-				#unset($parm['vads_currency']);
 			}
 		}
 	}

@@ -20,7 +20,7 @@ include_spip('base/abstract_sql');
  * @return array|bool
  *   montant : montant de l'echeance / si on renvoie 0 il n'y aura pas de paiement automatique mensuel, mais on recuperera les infos CB si possible (paybox) pour prendre en charge les paiements mensuels
  *   montant_init : montant de l'echeance initiale (si differente de l'echeance principale)
- *   count_init : nombre d'echeances initiales (par defaut 1 si pas renseignee - autre valeur supportee uniquement par PayZen/SystemPay)
+ *   count_init : nombre d'echeances initiales (par defaut 0 si pas renseignee - autre valeur que 0 ou 1 supportee uniquement par PayZen/SystemPay)
  *   count : nombre d'echeances (sans compter l(es) echeance(s) initiale(s) - 0 si infini/pas de fin prevue supportee uniquement par PayBox/PayZen/SystemPay)
  *   freq : 'monthly' ou 'yearly' (tous les mois ou tous les 12 mois - yearly pas supporte par InternetPlus)
  *
