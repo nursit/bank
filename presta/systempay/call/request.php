@@ -472,7 +472,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	}
 
 
-	// c'est un abonnement ç
+	// c'est un abonnement
 	if (in_array($action,array('REGISTER_PAY_SUBSCRIBE', 'REGISTER_SUBSCRIBE', 'SUBSCRIBE'))){
 		// on decrit l'echeance
 		if (
@@ -482,6 +482,31 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 
 				// on commence maintenant
 				$parm['vads_sub_effect_date'] = gmdate ("Ymd");
+				$nb = 0;
+				$nb_init = 0;
+				if (isset($echeance['count'])){
+					$nb = intval($echeance['count']);
+				}
+				if (isset($echeance['count_init'])){
+					$nb_init = count($echeance['count_init']);
+				}
+				// dans le cas Payzen $nb est le nombre total d'echeances, en incluant les echeances initiales
+				if ($nb AND $nb_init){
+					$nb += $nb_init;
+				}
+				$freq = "MONTHLY";
+				if (isset($echeance['freq']) AND $echeance['freq']=='yearly'){
+					$freq = "YEARLY";
+				}
+
+				// si on fait le premier paiement maintenant, il ne faut pas le compter dans l'abonnement
+				if ($action==="REGISTER_PAY_SUBSCRIBE"){
+					// on decale l'effet a +1mois ou +1an
+					$parm['vads_sub_effect_date'] = gmdate ("Ymd",strtotime("+1".substr($freq,0,-2)));
+					// on le decompte du nombre d'echeance
+					if ($nb_init>0) $nb_init--;
+					if ($nb>0) $nb--;
+				}
 
 				// montant de l'echeance
 				$parm['vads_sub_amount'] = intval(round(100*$echeance['montant'],0));
@@ -490,24 +515,15 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 
 				// regle de recurrence
 				$rule = "RRULE:";
-				$freq = "MONTHLY";
-				if (isset($echeance['freq']) AND $echeance['freq']=='yearly'){
-					$freq = "YEARLY";
-				}
 				$rule .= "FREQ=$freq;";
 
-				if (isset($echeance['count']) AND $nb = intval($echeance['count'])){
-					// dans le cas Payzen COUNT est le nombre total d'echeances, en incluant les echeances initiales
-					if (isset($echeance['count_init']) AND ($nbi=intval($echeance['count_init']))>0){
-						$nb+=$nbi;
-					}
+				if ($nb>0){
 					$rule .= "COUNT=$nb;";
 				}
 
 				$parm['vads_sub_desc'] = $rule;
 
-
-				if (isset($echeance['count_init']) AND ($nb=intval($echeance['count_init']))>0){
+				if ($nb_init>0){
 					$parm['vads_sub_init_amount_number'] = $nb;
 					$parm['vads_sub_init_amount'] = $parm['vads_amount'];
 					if (isset($echeance['montant_init']) AND ($m=intval(round(100*$echeance['montant_init'],0)))>0){
@@ -531,15 +547,27 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	#$parm['vads_redirect_error_timeout'] = 1;
 	#$parm['vads_redirect_error_message'] = "Echec";
 
-	$contexte = array(
-		'hidden'=>array(),
-		'action'=>systempay_url_serveur($config),
-		'backurl'=>url_absolue(self()),
-		'id_transaction'=>$id_transaction,
-		'transaction_hash' => $transaction_hash
-	);
-
 	$cartes_possibles = systempay_available_cards($config);
+
+	// cas particulier de la carte SDD : on ne peut pas faire un REGISTER_PAY_SUBSCRIBE dessus
+	// on la configurer en premier avec un REGISTER_SUBSCRIBE
+	if (isset($cartes_possibles['SDD']) AND in_array('SDD',$cartes) AND $action==="REGISTER_PAY_SUBSCRIBE"){
+		$c = $config;
+		$c['cartes'] = array('SDD');
+		$contexte = presta_systempay_call_request_dist($id_transaction, $transaction_hash, $c, "REGISTER_SUBSCRIBE", $abo_uid);
+		unset($cartes_possibles['SDD']);
+	}
+	else {
+		$contexte = array(
+			'hidden'=>array(),
+			'action'=>systempay_url_serveur($config),
+			'backurl'=>url_absolue(self()),
+			'id_transaction'=>$id_transaction,
+			'transaction_hash' => $transaction_hash
+		);
+	}
+
+
 	foreach($cartes as $carte){
 		if (isset($cartes_possibles[$carte])){
 			$parm['vads_payment_cards'] = $carte;
