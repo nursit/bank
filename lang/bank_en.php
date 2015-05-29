@@ -1,29 +1,44 @@
 <?php
 
-// This is a SPIP language file  --  Ceci est un fichier langue de SPIP
+// Ceci est un fichier langue de SPIP -- This is a SPIP language file
+// Produit automatiquement par le plugin LangOnet à partir de la langue source fr
+// Module: bank
+// Langue: en
+// Date: 29-05-2015 10:10:17
+// Items: 109
+
+if (!defined('_ECRIRE_INC_VERSION')) return;
 
 $GLOBALS[$GLOBALS['idx_lang']] = array(
 
+// A
 	'abonnement_avec' => 'Subscription with <i>@nom@</i>',
 	'abonnement_choisissez_cb' => 'Select your Credit Card:',
+	'abonnement_par_carte_bancaire' => 'Subscription with Credit Card:',
 	'abonnement_par_cb' => 'with Credit Card',
+	'abonnement_par_prelevement_sepa' => 'Subscription with direct account debit (SEPA):',
 
+// B
 	'bouton_enregistrer_reglement_cheque' => 'Pay by check',
 	'bouton_enregistrer_reglement_ok' => 'Record payment achieved',
 	'bouton_enregistrer_reglement_virement' => 'Pay by bank transfer',
+	'bouton_rembourser' => 'Record as refunded',
 
+// C
 	'carte_bleu' => 'Credit Card',
 	'choisissez_cb' => 'Select your Credit Card:',
 	'confirme_reglement_annule' => 'The operation was cancelled. No payment has been achieved',
 	'confirme_reglement_pris_en_compte' => 'Your payment has been taken into account, thank you.',
 
+// E
+	'erreur_transaction_echec' => 'No payment has been achieved. (Transaction Ref. @ref@)',
+	'erreur_transaction_invalide' => 'An error has occured due to unexpected received data.',
 	'explication_page_configurer_paiement' => 'Set up active payment systems',
 
+// I
 	'info_1_transaction' => '1 transaction',
-	'info_nb_transactions' => '@nb@ transactions',
-	'info_cheque_etablir_ordre' => 'Check to the order of "<i>@ordre@</i>"',
-	'info_cheque_imprimer' => 'Send your check made out in Euros
--* to the order of “@ordre@&nbsp;”
+	'info_cheque_envoyer' => 'Send your check made out in Euros
+-* to the order of “@ordre@”
 -* for the exact amount
 -* drawn from a bank located in France
 -* accompanied by the transaction number, written on the back of the check.
@@ -31,10 +46,20 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 Transaction: #@transaction@
 _ Amount: @montant@',
 	'info_cheque_envoyer_adresse' => 'Thanks to send your check to the following address:',
+	'info_cheque_etablir_ordre' => 'Check to the order of "<i>@ordre@</i>"',
+	'info_cheque_imprimer' => 'Instructions about your check data will be provided after you click on ’Pay by check’.
+
+Transaction: #@transaction@
+_ Amount: @montant@',
 	'info_mode_reglement_enregistre' => 'Your choice for your payment mode has been recorded.',
 	'info_mode_test' => 'TEST mode (fake payment)',
+	'info_nb_transactions' => '@nb@ transactions',
 	'info_virement' => 'You can pay via bank transfer.
+Instructions about your bank transfer will be provided after you click on ’Pay by bank transfer’.
 
+Transaction: #@transaction@
+_ Amount: @montant@',
+	'info_virement_etablir' => '
 Reference for your transfer: #@transaction@
 _ Amount: @montant@
 _ Bank account:
@@ -43,43 +68,55 @@ _ Bank account:
 @adressebanque@
 -* IBAN: @iban@
 -* BIC: @bic@',
+
+// L
 	'label_actif' => 'Activate',
-	'label_carte_CB' => 'Blue Card',
-	'label_carte_VISA' => 'Visa card',
-	'label_carte_MASTERCARD' => 'MasterCard',
-	'label_carte_EUROCARD_MASTERCARD' => 'MasterCard',
-	'label_carte_E-CARTEBLEUE' => 'e-Blue Card',
-	'label_carte_E_CARD' => 'e-Blue Card',
+	'label_action_append_presta' => 'Add a payment provider',
 	'label_carte_AMEX' => 'American Express',
 	'label_carte_AURORE' => 'Aurore Card',
-	'label_carte_MAESTRO' => 'Maestro Card',
-	'label_carte_VISA_ELECTRON' => 'Visa Electron Card',
-	'label_carte_PAYLIB' => 'PayLib',
-	'label_carte_ONEY' => 'Oney Card',
-	'label_carte_JCB' => 'JCB Card',
+	'label_carte_CB' => 'Blue Card',
 	'label_carte_DINERS' => 'Diners Card',
-	'label_carte_SOFORT_BANKING' => 'Sofort Banking Card',
+	'label_carte_E-CARTEBLEUE' => 'e-Blue Card',
+	'label_carte_EUROCARD_MASTERCARD' => 'MasterCard',
+	'label_carte_E_CARD' => 'e-Blue Card',
+	'label_carte_E_CV' => '<span lang="fr">e-Chèque-Vacances</span>',
 	'label_carte_IDEAL' => 'Ideal Card',
+	'label_carte_JCB' => 'JCB Card',
+	'label_carte_MAESTRO' => 'Maestro Card',
+	'label_carte_MASTERCARD' => 'MasterCard',
+	'label_carte_ONEY' => 'Oney Card',
+	'label_carte_PAYLIB' => 'PayLib',
+	'label_carte_SDD' => 'Direct account debit SEPA',
+	'label_carte_SOFORT_BANKING' => 'Sofort Banking Card',
+	'label_carte_VISA' => 'Visa card',
+	'label_carte_VISA_ELECTRON' => 'Visa Electron Card',
+	'label_configuration_autres_moyens' => 'Use other payment methods:',
+	'label_configuration_cartes' => 'Use payment Cards:',
+	'label_configuration_cheque_adresse' => 'Address where checks should be sent',
 	'label_configuration_cheque_notice' => 'Additional displayed information',
 	'label_configuration_cheque_ordre' => 'Pay to the order of',
-	'label_configuration_cheque_adresse' => 'Address where checks should be sent',
+	'label_configuration_type' => 'Payments type',
+	'label_configuration_type_abo' => 'Recurring payments',
+	'label_configuration_type_abo_acte' => 'Both',
+	'label_configuration_type_acte' => 'Single payments',
+	'label_configuration_virement_adresse_banque' => 'Bank Address',
 	'label_configuration_virement_banque' => 'Beneficiary bank name',
 	'label_configuration_virement_bic' => 'BIC',
 	'label_configuration_virement_iban' => 'IBAN',
-	'label_configuration_virement_ordre' => 'Beneficiary Account Name',
-	'label_configuration_virement_adresse_banque' => 'Bank Address',
 	'label_configuration_virement_notice' => 'Additional displayed information',
-	'label_configuration_cartes' => 'Use Payment Cards:',
+	'label_configuration_virement_ordre' => 'Beneficiary Account Name',
+	'label_email_from_ticket_admin' => '<i>from</i> email  for transaction tickets',
+	'label_email_reporting' => 'Send a daily report of payments to email',
 	'label_email_ticket_admin' => 'Target email for transaction tickets',
-	'label_emailfrom__ticket_admin' => '<i>From</i> email for transaction tickets',
+	'label_enregistrer_reglement_reference' => 'Reference',
 	'label_inactif' => 'Disable',
 	'label_mode_paiement' => 'Transaction payment modes',
 	'label_mode_paiement_abo' => 'Subscriptions payment modes',
 	'label_mode_test' => 'Use in TEST mode (no real payment)',
 	'label_notifications' => 'Notifications',
+	'label_presta_abo_internetplus' => 'Internet +',
 	'label_presta_abo_paybox' => 'Paybox <a href="http://www.paybox.com/">http://www.paybox.com/</a>',
 	'label_presta_abo_simu' => 'Simulation (requires authorisation by define)',
-	'label_presta_abo_internetplus' => 'Internet +',
 	'label_presta_cheque' => 'Checks (manual check remittance)',
 	'label_presta_cmcic' => 'CMCIC <a href="https://www.cmcicpaiement.fr/fr/">cmcicpaiement.fr</a>',
 	'label_presta_cmcic_banque' => 'Bank',
@@ -94,28 +131,31 @@ _ Bank account:
 	'label_presta_sips_service' => 'Service',
 	'label_presta_systempay' => 'Systempay',
 	'label_presta_virement' => 'Bank Transfer',
+	'label_prestataires' => 'Payment Providers',
+	'label_remboursement_raison' => 'Reason of refunding',
 	'label_resilier_abonnement' => 'Cancel subscription',
-
 	'label_type_paiement_cb_generique' => 'Credit Card',
 	'label_type_paiement_cheque' => 'Check',
 	'label_type_paiement_paypal' => 'Paypal Account',
 	'label_type_paiement_simu' => 'Fake payment',
 	'label_type_paiement_virement' => 'Bank Transfer',
-
 	'legend_sips_logo_page_paiement' => 'Logos for payment page',
 
+// P
 	'payer' => 'Pay',
 	'payer_avec' => 'Pay with <i>@nom@</i>',
 	'payer_par_carte' => 'Pay by @carte@',
-	'payer_par_cheque' => 'Pay by check:',
 	'payer_par_carte_bancaire' => 'Pay by credit card:',
-	'payer_par_virement' => 'Payer with bank transfer:',
+	'payer_par_cheque' => 'Pay by check:',
+	'payer_par_e_cheque_vacances' => 'Pay by <span lang="fr">e-Chèque-Vacances</span>:',
+	'payer_par_prelevement_sepa' => 'Pay by direct account debit (SEPA):',
+	'payer_par_virement' => 'Pay by bank transfer:',
 
-
-	'titre_reglement_ok' => 'Successfull payment',
+// T
 	'titre_menu_configurer' => 'Online payments',
-	'titre_page_configurer_paiement' => 'Online payments',
 	'titre_menu_transactions' => 'Transactions',
+	'titre_page_configurer_paiement' => 'Online payments',
 	'titre_reglement_annule' => 'Cancellation',
-
+	'titre_reglement_ok' => 'Successfull payment',
 );
+?>
