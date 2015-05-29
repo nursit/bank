@@ -68,6 +68,15 @@ function presta_paybox_call_response_dist($config, $response=null){
 			}
 		}
 
+		// c'est un renouvellement reussi, il faut repercuter sur l'abonnement
+		if ($response['ETAT_PBX']==='PBX_RECONDUCTION_ABT'
+			AND $success){
+
+			if ($renouveler_abonnement = charger_fonction('renouveler_abonnement','abos',true)){
+				$renouveler_abonnement($id_transaction,$response['abo'],$mode);
+			}
+		}
+
 		// c'est un renouvellement en echec, il faut le resilier
 		if ($response['ETAT_PBX']==='PBX_RECONDUCTION_ABT'
 			AND !$success){

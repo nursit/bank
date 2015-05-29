@@ -39,14 +39,21 @@ function presta_systempay_call_response_dist($config, $response=null){
 	$recurence = false;
 	// c'est une reconduction d'abonnement ?
 	if (isset($response['vads_url_check_src']) AND $response['vads_url_check_src']==='REC'){
-		// creer la transaction maintenant si besoin !
-		if ($preparer_echeance = charger_fonction('preparer_echeance','abos',true)){
-			// on reinjecte le bon id de transaction ici si fourni
-			if ($id_transaction = $preparer_echeance("uid:".$response['vads_subscription'])){
-				$response['vads_order_id'] = $id_transaction;
+
+		// si la transaction reference n'existe pas ou a deja ete payee c'est bien une recurence
+		// sinon c'est le paiement de la premiere transaction
+		$trans = sql_fetsel("*","spip_transactions","id_transaction=".intval($response['vads_order_id']));
+		if (!$trans OR $trans['statut']=='ok'){
+			// creer la transaction maintenant si besoin !
+			if ($preparer_echeance = charger_fonction('preparer_echeance','abos',true)){
+				// on reinjecte le bon id de transaction ici si fourni
+				if ($id_transaction = $preparer_echeance("uid:".$response['vads_subscription'])){
+					$response['vads_order_id'] = $id_transaction;
+				}
 			}
+			$recurence = true;
 		}
-		$recurence = true;
+
 	}
 
 	// depouillement de la transaction
@@ -66,6 +73,15 @@ function presta_systempay_call_response_dist($config, $response=null){
 
 			if ($activer_abonnement = charger_fonction('activer_abonnement','abos',true)){
 				$activer_abonnement($id_transaction,$abo_uid,$mode,$date_fin);
+			}
+		}
+
+		// c'est un renouvellement reussi, il faut repercuter sur l'abonnement
+		if ($recurence
+			AND $success){
+
+			if ($renouveler_abonnement = charger_fonction('renouveler_abonnement','abos',true)){
+				$renouveler_abonnement($id_transaction,$abo_uid,$mode);
 			}
 		}
 
