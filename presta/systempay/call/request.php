@@ -488,7 +488,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 					$nb = intval($echeance['count']);
 				}
 				if (isset($echeance['count_init'])){
-					$nb_init = count($echeance['count_init']);
+					$nb_init = intval($echeance['count_init']);
 				}
 				// dans le cas Payzen $nb est le nombre total d'echeances, en incluant les echeances initiales
 				if ($nb AND $nb_init){
