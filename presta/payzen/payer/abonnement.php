@@ -22,7 +22,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 function presta_payzen_payer_abonnement_dist($config, $id_transaction, $transaction_hash, $options=array()){
 
 	$call_request = charger_fonction('request','presta/systempay/call');
-	$contexte = $call_request($id_transaction,$transaction_hash,$config,"REGISTER_SUBSCRIBE");
+	$contexte = $call_request($id_transaction,$transaction_hash,$config,"REGISTER_PAY_SUBSCRIBE");
 
 	$contexte['sandbox'] = ($config['mode_test']?' ':'');
 

@@ -216,8 +216,38 @@ function systempay_traite_reponse_transaction($config, $response){
 		);
 	}
 
-	// est-ce bien un debit
-	if ($response['vads_operation_type']!=="DEBIT"
+	/*
+
+/bank.api/payzen-0C4B/autoresponse/
+?vads_amount=&vads_auth_mode=MARK&vads_auth_number=3fe8bb&vads_auth_result=00&vads_capture_delay=0&vads_card_brand=MASTERCARD&vads_card_number=597010XXXXXX0000&vads_payment_certificate=&vads_ctx_mode=TEST&vads_currency=978&vads_effective_amount=&vads_site_id=78542344&vads_trans_date=20150529071207&vads_trans_id=331275&vads_validation_mode=0&vads_version=V2&vads_warranty_result=NO&vads_payment_src=EC&vads_cust_email=cedric%40nursit.net&vads_contract_used=1234567&vads_recurrence_status=CREATED&vads_identifier_status=CREATED&vads_expiry_month=6&vads_expiry_year=2016&vads_bank_product=MCW&vads_pays_ip=FR&vads_identifier=f8437a467d634972b64eaf5e3bda1486&vads_subscription=20150529xJsgWe&vads_threeds_enrolled=&vads_threeds_cavv=&vads_threeds_eci=&vads_threeds_xid=&vads_threeds_cavvAlgorithm=&vads_threeds_status=&vads_threeds_sign_valid=&vads_threeds_error_code=&vads_threeds_exit_status=&vads_risk_control=COMMERCIAL_CARD%3DOK%3BECB%3DOK%3BIP_FRAUD%3DOK%3BSUSPECT_COUNTRY%3DOK%3BSYSTEMATIC_AUTO%3DOK&vads_result=00&vads_extra_result=  &vads_card_country=FR&vads_language=en&vads_action_mode=INTERACTIVE&vads_payment_config=SINGLE&vads_hash=d0f4e2caa7c35c944841e6f6c5b7f5bae2b14a87fa259650bbd67dab024995e1&vads_url_check_src=PAY&vads_contrib=SPIP+3.1.0-beta+%2B+https%3A%2F%2Fgithub.com%2Fnursit%2Fbank+3.0.0&vads_order_id=5&vads_page_action=REGISTER_SUBSCRIBE&vads_sub_amount=300&vads_sub_currency=978&vads_sub_desc=RRULE%3AFREQ%3DMONTHLY%3B&vads_sub_effect_date=20150529&vads_shop_name=Paypal+Test&vads_shop_url=http%3A%2F%2Ftest-bank.nursit.com&signature=d23b3150c6cceab8387f36e081a70766097c6721
+
+/bank.api/payzen-0C4B/response/
+?vads_amount=&vads_auth_mode=MARK&vads_auth_number=3fe8bb&vads_auth_result=00&vads_capture_delay=0&vads_card_brand=MASTERCARD&vads_card_number=597010XXXXXX0000&vads_payment_certificate=&vads_ctx_mode=TEST&vads_currency=978&vads_effective_amount=&vads_site_id=78542344&vads_trans_date=20150529071207&vads_trans_id=331275&vads_validation_mode=0&vads_version=V2&vads_warranty_result=NO&vads_payment_src=EC&vads_cust_email=cedric%40nursit.net&vads_contract_used=1234567&vads_recurrence_status=CREATED&vads_identifier_status=CREATED&vads_expiry_month=6&vads_expiry_year=2016&vads_bank_product=MCW&vads_pays_ip=FR&vads_identifier=f8437a467d634972b64eaf5e3bda1486&vads_subscription=20150529xJsgWe&vads_threeds_enrolled=&vads_threeds_cavv=&vads_threeds_eci=&vads_threeds_xid=&vads_threeds_cavvAlgorithm=&vads_threeds_status=&vads_threeds_sign_valid=&vads_threeds_error_code=&vads_threeds_exit_status=&vads_risk_control=COMMERCIAL_CARD%3DOK%3BECB%3DOK%3BIP_FRAUD%3DOK%3BSUSPECT_COUNTRY%3DOK%3BSYSTEMATIC_AUTO%3DOK&vads_result=00&vads_extra_result=00&vads_card_country=FR&vads_language=en&vads_action_mode=INTERACTIVE&vads_payment_config=SINGLE&vads_page_action=REGISTER_SUBSCRIBE&vads_sub_amount=300&vads_sub_currency=978&vads_sub_desc=RRULE%3AFREQ%3DMONTHLY%3B&vads_sub_effect_date=20150529&vads_shop_name=Paypal+Test&vads_shop_url=http%3A%2F%2Ftest-bank.nursit.com&signature=1b6745e747660ea51c042b490c3ae85ce5127976&&vads_contrib=SPIP+3.1.0-beta+%2B+https%3A%2F%2Fgithub.com%2Fnursit%2Fbank+3.0.0
+vads_order_id=5&
+
+	*/
+	$is_sepa = (isset($response['vads_card_brand']) AND $response['vads_card_brand']=="SDD");
+	$is_payment = true;
+	$is_registering = false;
+	$is_subscribing = false;
+
+	// si c'est une souscription ou un register, lever les bons flags
+	// si pas de paiement on veut enregistrer les donnees et sortir de la sans generer d'erreur (le paiement arrivera plus tard)
+	if ($response['vads_page_action']
+	  AND in_array($response['vads_page_action'],array('REGISTER','REGISTER_SUBSCRIBE','REGISTER_PAY_SUBSCRIBE','SUBSCRIBE'))){
+		$is_registering = true;
+		if ($response['vads_page_action']!=='REGISTER_PAY_SUBSCRIBE'){
+			$is_payment = false;
+		}
+		if ($response['vads_page_action']!=='REGISTER'){
+			$is_subscribing = true;
+		}
+	}
+
+
+	// si c'est un debit, a-t-on bien l'operation attendue ?
+	if ($is_payment
+	  AND $response['vads_operation_type']!=="DEBIT"
 	  AND $response['vads_trans_status']!=='ABANDONED'){
 		return bank_transaction_invalide($id_transaction,
 			array(
@@ -230,7 +260,6 @@ function systempay_traite_reponse_transaction($config, $response){
 		);
 	}
 
-	$is_sepa = (isset($response['vads_card_brand']) AND $response['vads_card_brand']=="SDD");
 
 	// ok, on traite le reglement
 	$date = $response['vads_effective_creation_date'];
@@ -256,20 +285,20 @@ function systempay_traite_reponse_transaction($config, $response){
 	$erreur = array_filter($erreur);
 	$erreur = trim(implode(' ',$erreur));
 
-	$authorisation_id = $response['vads_payment_certificate'];
-	$transaction = $response['vads_auth_number'];
+	$authorisation_id = $response['vads_auth_number'];
+	$transaction = $response['vads_payment_certificate'];
 
 	// si c'est un SEPA, on a pas encore la transaction et le numero d'autorisation car il y a un delai avant presentation
 	// (paiement dans le futur)
-	if ($is_sepa AND !$transaction){
+	if ($is_payment AND $is_sepa AND !$transaction){
 		list($transaction,$authorisation_id) = explode("_",$response['vads_card_number']);
 	}
 
-	if (!$erreur AND !in_array($response['vads_trans_status'],array('AUTHORISED','CAPTURED','WAITING_AUTHORISATION'))) {
-		$erreur = "vads_trans_status ".$response['vads_trans_status']." (!IN AUTHORISED',CAPTURED,WAITING_AUTHORISATION)";
+	if ($is_payment AND !$erreur AND !in_array($response['vads_trans_status'],array('AUTHORISED','CAPTURED','WAITING_AUTHORISATION'))) {
+		$erreur = "vads_trans_status ".$response['vads_trans_status']." (!IN AUTHORISED,CAPTURED,WAITING_AUTHORISATION)";
 	}
-	if (!$erreur AND !$transaction) {$erreur = "pas de vads_auth_number";}
-	if (!$erreur AND !$authorisation_id) {$erreur = "pas de vads_payment_certificate";}
+	if (!$erreur AND $is_payment AND !$transaction) {$erreur = "pas de vads_payment_certificate";}
+	if (!$erreur AND !$authorisation_id) {$erreur = "pas de vads_auth_number";}
 
 	if ($erreur){
 	 	// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
@@ -288,29 +317,31 @@ function systempay_traite_reponse_transaction($config, $response){
 		);
 	}
 
-	// Ouf, le reglement a ete accepte
-
-	// on verifie que le montant est bon !
-	$montant_regle = $response['vads_effective_amount']/100;
-	if ($montant_regle!=$row['montant']){
-		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=".$row['montant'].":".bank_shell_args($response),$mode);
-		// on log ca dans un journal dedie
-		spip_log($t,$mode . '_reglements_partiels');
-	}
-
 	$set = array(
-		"autorisation_id" => "$transaction/$authorisation_id",
+		"autorisation_id" => "$authorisation_id/$transaction",
 		"mode" => "$mode/$config_id",
-		"montant_regle" => $montant_regle,
-		"date_paiement" => $date_paiement,
-		"statut"=>'ok',
-		"reglee"=>'oui'
 	);
+
+	if ($is_payment){
+		// Ouf, le reglement a ete accepte
+		// on verifie que le montant est bon !
+		$montant_regle = $response['vads_effective_amount']/100;
+		if ($montant_regle!=$row['montant']){
+			spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=".$row['montant'].":".bank_shell_args($response),$mode);
+			// on log ca dans un journal dedie
+			spip_log($t,$mode . '_reglements_partiels');
+		}
+		$set['montant_regle'] = $montant_regle;
+		$set['date_paiement'] = $date_paiement;
+		$set['statut'] = 'ok';
+		$set['reglee'] = 'oui';
+	}
 
 	// si on a les infos de validite / card number, on les note ici
 	if (isset($response['vads_expiry_year'])){
-		$set['validite'] = $response['vads_expiry_year']."-".$response['vads_expiry_month'];
-
+		$set['validite'] = $response['vads_expiry_year'] . "-" . $response['vads_expiry_month'];
+	}
+	if (isset($response['vads_card_brand']) OR isset($response['vads_card_number'])){
 		// par defaut on note brand et number dans refcb
 		// mais ecrase si le paiement a genere un identifiant de paiement
 		// qui peut etre reutilise
@@ -322,15 +353,72 @@ function systempay_traite_reponse_transaction($config, $response){
 		$set['refcb'] = trim($set['refcb']);
 	}
 
+
 	// si vads_identifier fourni on le note dans refcb : c'est un identifiant de paiement
 	if (isset($response['vads_identifier']) AND $response['vads_identifier']){
-		$set['refcb'] = $response['vads_identifier'];
+		$set['pay_id'] = $response['vads_identifier'];
 	}
+	// si c'est un enregistrement on a une erreur si pas d'identifier
+	elseif($is_registering){
+		// si pas de paiement, on genere un echec
+		if (!$is_payment){
+			return bank_transaction_echec($id_transaction,
+				array(
+					'mode' => $mode,
+					'config_id' => $config_id,
+					'date_paiement' => $date_paiement,
+					'erreur' => "Pas de vads_identifier sur operation " . $response['vads_operation_type'],
+					'log' => bank_shell_args($response),
+				)
+			);
+		}
+		else {
+			// sinon on enregistre l'erreur et on log+mail mais on fini le paiement en OK quand meme
+			$set['erreur'] = "Pas de vads_identifier sur operation ".$response['vads_operation_type'];
+			bank_transaction_invalide($id_transaction,
+				array(
+					'mode'=>$mode,
+					'sujet' => 'Echec REGISTER',
+					'erreur' => $set['erreur'],
+					'log' => bank_shell_args($response),
+				)
+			);
+		}
+	}
+
 	// si on a un numero d'abonnement on le note dans abo_uid
 	if (isset($response['vads_subscription']) AND $response['vads_subscription']){
 		$set['abo_uid'] = $response['vads_subscription'];
 	}
+	// si c'est un abonnement on a une erreur si pas de vads_subscription
+	elseif($is_subscribing){
+		// si pas de paiement, on genere un echec
+		if (!$is_payment){
+			return bank_transaction_echec($id_transaction,
+				array(
+					'mode' => $mode,
+					'config_id' => $config_id,
+					'date_paiement' => $date_paiement,
+					'erreur' => "Pas de vads_subscription sur operation " . $response['vads_operation_type'],
+					'log' => bank_shell_args($response),
+				)
+			);
+		}
+		else {
+			// sinon on enregistre l'erreur et on log+mail mais on fini le paiement en OK quand meme
+			$set['erreur'] = "Pas de vads_subscription sur operation ".$response['vads_operation_type'];
+			bank_transaction_invalide($id_transaction,
+				array(
+					'mode'=>$mode,
+					'sujet' => 'Echec SUBSCRIBE',
+					'erreur' => $set['erreur'],
+					'log' => bank_shell_args($response),
+				)
+			);
+		}
+	}
 
+	// OK on met a jour la transaction en base
 	sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
 	spip_log("call_response : id_transaction $id_transaction, reglee",$mode);
 
@@ -345,8 +433,13 @@ function systempay_traite_reponse_transaction($config, $response){
 		}
 	}
 
-	$regler_transaction = charger_fonction('regler_transaction','bank');
-	$regler_transaction($id_transaction,array('row_prec'=>$row));
+	// si transaction reglee, on poursuit le processus
+	if (isset($set['reglee']) AND $set['reglee']=='oui'){
+		$regler_transaction = charger_fonction('regler_transaction','bank');
+		$regler_transaction($id_transaction,array('row_prec'=>$row));
+	}
+
+	// c'est un succes
 	return array($id_transaction,true);
 }
 

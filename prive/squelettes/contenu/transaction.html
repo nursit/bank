@@ -15,6 +15,10 @@
 		[<div class="parrain">Parrain : (#PARRAIN)</div>]
 		[<div class="id_commande">Commande : <a href='[(#ID_COMMANDE|generer_url_entite{commande})]'(#ID_COMMANDE|oui)>##ID_COMMANDE[ - (#INFO_TITRE{commande,#ID_COMMANDE})]</a></div>]
 		[<div class="id_facture">Facture : <a href='[(#URL_PAGE{facture}|parametre_url{id_facture,#ID_FACTURE}|parametre_url{hash,#INFO_DETAILS{facture,#ID_FACTURE}|md5})]'(#ID_FACTURE|oui)>#ID_FACTURE</a></div>]
+		[<div class="abo_uid">No Abonnement : (#ABO_UID)</div>]
+		[<div class="refcb">Ref CB : (#REFCB)</div>]
+		[<div class="validite">Validite : (#VALIDITE)</div>]
+		[<div class="pay_id">ID Paiement : (#PAY_ID)</div>]
 	#BOITE_FERMER
 
 	[<div class="message">(#MESSAGE)</div>]

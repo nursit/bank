@@ -337,18 +337,30 @@ function paybox_traite_reponse_transaction($config, $response) {
 			"statut"=>'ok',
 			"reglee"=>'oui');
 
+
+	// type et numero de carte ?
+	if (isset($response['carte']) OR isset($response['BIN6'])){
+		// par defaut on note carte et BIN6 dans refcb
+		$set['refcb'] = '';
+		if (isset($response['carte']))
+			$set['refcb'] .= $response['carte'];
+		if (isset($response['BIN6']))
+			$set['refcb'] .= " ".$response['BIN6'];
+		$set['refcb'] = trim($set['refcb']);
+	}
+	// validite de carte ?
+	if (isset($response['valid']) AND $response['valid']){
+		$set['validite'] = "20" . substr($response['valid'],0,2) . "-" . substr($response['valid'],2,2);
+	}
+
 	// si on a envoye un U il faut recuperer les donnees CB et les stocker sur le compte client
-	$ppps = "";
-	if (isset($response['ppps'])){
-		$set['refcb'] = $response['ppps'];
+	if (isset($response['ppps']) AND $response['ppps']){
+		$set['pay_id'] = $response['ppps'];
 	}
 
 	// si abonnement, stocker les 2 infos importantes : uid et validite
 	if (isset($response['abo']) AND $response['abo']){
 		$set['abo_uid'] = $response['abo'];
-		if (isset($response['valid']) AND $response['valid']){
-			$set['validite'] = "20" . substr($response['valid'],0,2) . "-" . substr($response['valid'],2,2);
-		}
 	}
 
 	// il faudrait stocker le $transaction aussi pour d'eventuels retour vers paybox ?

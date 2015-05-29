@@ -82,7 +82,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	$parm['PBX_ANNULE'] = bank_url_api_retour($config,"cancel");
  	$parm['PBX_REPONDRE_A'] = bank_url_api_retour($config,"autoresponse");
 
-	$parm['PBX_RETOUR'] = 'montant:M;id_transaction:R;auth:A;trans:S;abo:B;erreur:E;valid:D;';
+	$parm['PBX_RETOUR'] = 'montant:M;id_transaction:R;auth:A;trans:S;abo:B;erreur:E;carte:C;BIN6:N;valid:D;';
 
 	if ($type=='abo' AND $config['type']!=='acte'){
 		// on decrit l'echeance, en indiquant qu'on peut la gerer manuellement grace a PayBoxDirectPlus

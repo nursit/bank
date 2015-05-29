@@ -401,7 +401,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	if (isset($config['cartes']) AND $config['cartes'])
 		$cartes = $config['cartes'];
 
-	if (!in_array($action,array('REGISTER', 'REGISTER_UPDATE', 'REGISTER_PAY', 'REGISTER_SUBSCRIBE', 'PAYMENT', 'SUBSCRIBE'))){
+	if (!in_array($action,array('REGISTER', 'REGISTER_UPDATE', 'REGISTER_PAY', 'REGISTER_SUBSCRIBE', 'REGISTER_PAY_SUBSCRIBE', 'PAYMENT', 'SUBSCRIBE'))){
 		spip_log("Action $action inconnue",$mode._LOG_ERREUR);
 		return false;
 	}
@@ -473,7 +473,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 
 
 	// c'est un abonnement ç
-	if (in_array($action,array('REGISTER_SUBSCRIBE', 'SUBSCRIBE'))){
+	if (in_array($action,array('REGISTER_PAY_SUBSCRIBE', 'REGISTER_SUBSCRIBE', 'SUBSCRIBE'))){
 		// on decrit l'echeance
 		if (
 			$decrire_echeance = charger_fonction("decrire_echeance","abos",true)

@@ -112,6 +112,10 @@ function bank_upgrade($nom_meta_base_version,$version_cible){
 	$maj['1.6.1'] = array(
 		array("bank_upgrade_config"),
 	);
+	$maj['1.6.3'] = array(
+		array("sql_alter","table spip_transactions ADD pay_id varchar(100) NOT NULL DEFAULT ''"),
+		array("sql_update","spip_transactions",array('pay_id'=>'refcb','refcb'=>"''"),"mode=".sql_quote('paybox')),
+	);
 
 	include_spip('base/upgrade');
 	maj_plugin($nom_meta_base_version, $version_cible, $maj);
