@@ -19,9 +19,11 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'abonnement_par_prelevement_sepa' => 'Abonnement par prélèvement automatique :',
 
 // B
+	'bouton_descendre' => 'descendre',
 	'bouton_enregistrer_reglement_cheque' => 'Régler par chèque',
 	'bouton_enregistrer_reglement_ok' => 'Le réglement a bien été reçu',
 	'bouton_enregistrer_reglement_virement' => 'Régler par virement bancaire',
+	'bouton_monter' => 'monter',
 	'bouton_rembourser' => 'Marquer comme remboursée',
 
 // C
@@ -153,6 +155,7 @@ _ Compte bancaire :
 	'payer_par_virement' => 'Payer par virement bancaire :',
 
 // T
+	'texte_confirmer_suppression_presta' => 'Supprimer ce prestataire bancaire ?',
 	'titre_menu_configurer' => 'Paiements en ligne',
 	'titre_menu_transactions' => 'Transactions',
 	'titre_page_configurer_paiement' => 'Paiements en ligne',

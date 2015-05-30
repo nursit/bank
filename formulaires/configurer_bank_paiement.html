@@ -54,7 +54,7 @@
 					<option value="#GET{val}">[(#VAL{bank:label_presta_}|concat{#VALEUR}|_T|textebrut)]</option>
 				</BOUCLE_prestas>
 			</select>
-			<button type="submit" name="action_append" value="ajouter" style="float:right;">Ajouter</button>
+			<input type="submit" name="action_append" value="<:bouton_ajouter|attribut_html:>" style="float:right;" />
 		</li>
 	</ul>
 	<BOUCLE_configs(POUR){tableau #REM|bank_lister_configs}>
@@ -69,9 +69,11 @@
 					<span class='erreur_message'>(#GET{erreurs})</span>
 					]
 					<span class="action">
-						<button type="submit" name="action_up[#GET{casier}]" title="Monter" value="X">^</button>
-						<button type="submit" name="action_down[#GET{casier}]" title="Descendre" value="X">v</button>
-						<button type="submit" name="action_del[#GET{casier}]" title="Supprimer" value="X">X</button>
+						<button type="submit" name="action_up[#GET{casier}]" title="<:bank:bouton_monter|attribut_html:>" value="X">[(#CHEMIN_IMAGE{up-12.png}|balise_img{<:bank:bouton_monter:>})]</button>
+						<button type="submit" name="action_down[#GET{casier}]" title="<:bank:bouton_descendre|attribut_html:>" value="X">[(#CHEMIN_IMAGE{down-12.png}|balise_img{<:bank:bouton_descendre:>})]</button>
+						<button type="submit" name="action_del[#GET{casier}]" title="<:lien_supprimer|attribut_html:>" value="X"
+							onclick="return confirm('<:bank:texte_confirmer_suppression_presta|attribut_html|texte_script:>');"
+							>[(#CHEMIN_IMAGE{supprimer-12.png}|balise_img{<:lien_supprimer:>})]</button>
 					</span>
 					#SET{val,0}
 					<input type="hidden" name="#GET{casier}[actif]" value="#GET{val}"[(#GET{disabled}|oui)disabled="disabled"]/>
@@ -107,7 +109,9 @@
 	.muted {opacity: 0.6;}
 	.suite {margin-left: 40px;font-size: 0.9em;}
 	.formulaire_spip .editer_presta {position: relative;}
-	.formulaire_spip .editer_presta .action {position:absolute;right:10px;top:10px;z-index: 2;}
+	.formulaire_spip .editer_presta .action {position:absolute;right:10px;top:10px;z-index: 2;opacity:0.7;}
+	.formulaire_spip .editer_presta:hover .action {opacity:1;}
+	.formulaire_spip .editer_presta .action button img {vertical-align: top;}
 	.formulaire_spip .editer_presta .presta_label {width: 50%;margin-left: 1em;border:0;border-bottom: 1px solid #ddd;}
 </style>
 <script type="text/javascript">

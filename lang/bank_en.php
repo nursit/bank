@@ -19,9 +19,11 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'abonnement_par_prelevement_sepa' => 'Subscription with direct account debit (SEPA):',
 
 // B
+	'bouton_descendre' => 'down',
 	'bouton_enregistrer_reglement_cheque' => 'Pay by check',
 	'bouton_enregistrer_reglement_ok' => 'Record payment achieved',
 	'bouton_enregistrer_reglement_virement' => 'Pay by bank transfer',
+	'bouton_monter' => 'up',
 	'bouton_rembourser' => 'Record as refunded',
 
 // C
@@ -152,6 +154,7 @@ _ Bank account:
 	'payer_par_virement' => 'Pay by bank transfer:',
 
 // T
+	'texte_confirmer_suppression_presta' => 'Remove this payment provider?',
 	'titre_menu_configurer' => 'Online payments',
 	'titre_menu_transactions' => 'Transactions',
 	'titre_page_configurer_paiement' => 'Online payments',
