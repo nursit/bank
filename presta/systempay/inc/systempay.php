@@ -430,6 +430,19 @@ function systempay_traite_reponse_transaction($config, $response){
 		$regler_transaction = charger_fonction('regler_transaction','bank');
 		$regler_transaction($id_transaction,array('row_prec'=>$row));
 	}
+	else {
+		$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
+		pipeline('trig_bank_reglement_en_attente',array(
+			'args' => array(
+				'statut'=>'attente',
+				'mode'=>$row['mode'],
+				'type'=>$row['abo_uid']?'abo':'acte',
+				'id_transaction'=>$id_transaction,
+				'row'=>$row,
+			),
+			'data' => '')
+		);
+	}
 
 	// c'est un succes
 	return array($id_transaction,true);
