@@ -15,6 +15,11 @@ Il peut aussi être complété par
 
 ## Prestataires pris en charge
 
+La configuration permet d'ajouter/supprimer/ordonner les prestataires bancaires que l'on souhaite utiliser.
+Il est possible d'avoir plusieurs configurations pour le meme prestataire technique.
+
+Le paiement par SEPA est pris en charge via PayZen.
+
 ### Paiements à l'acte
 
 Le plugin permet le paiement à l'acte via les plateformes techniques suivantes :
@@ -32,7 +37,8 @@ Par ailleurs, il est aussi possible d'utiliser les modes de paiement suivant :
 * Chèque
 * Virement
 
-Un mode de paiement "Simulation" permet de tester le workflow de paiement sans prestataire bancaire dans la phase de développement. Il utilise tout les même processus que le paiement par un prestataire en by-passant simplement celui-ci.
+Un mode de paiement "Simulation" permet de tester le workflow de paiement sans prestataire bancaire dans la phase de développement.
+Il utilise tout les même processus que le paiement par un prestataire en by-passant simplement celui-ci.
 
 ### Paiements récurrents
 
@@ -40,5 +46,6 @@ Le plugin permet aussi les paiements mensuels avec les plateformes techniques su
 
 * Internet+
 * Paybox
+* PayZen
 
 Un mode de paiement "Simulation" permet de tester le workflow de paiement pendant la phase de developpement.
