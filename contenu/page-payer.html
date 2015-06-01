@@ -1,16 +1,1 @@
-[(#REM)
-/*
- * Paiement Bancaire
- * module de paiement bancaire multi prestataires
- * stockage des transactions
- *
- * Auteurs :
- * Cedric Morin, Nursit.com
- * (c) 2012-2015 - Distribue sous licence GNU/GPL
- *
- */
-]
-<BOUCLE_payer(TRANSACTIONS){id_transaction}>
-	#AUTEUR <br /> Montant <strong>#MONTANT &euro;</strong>
-	[(#PAYER_ACTE{sips,#ID_TRANSACTION,#TRANSACTION_HASH})]
-</BOUCLE_payer>
+<INCLURE{fond=content/payer,env} />
