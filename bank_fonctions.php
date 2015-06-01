@@ -106,6 +106,16 @@ function bank_afficher_attente_reglement($mode,$id_transaction,$transaction_hash
 }
 
 /**
+ * Mise en forme du mode dans la liste des transactions
+ * @param string $mode
+ * @return string
+ */
+function bank_afficher_mode($mode){
+	$mode = preg_replace(",[/-]([0-9A-F]{4})$,Uims"," <span class='small'>\\1</span>",$mode);
+	return $mode;
+}
+
+/**
  * Urls d'auto response pour afficher dans la config de certains prestas
  * @param $mode
  * @return string
