@@ -11,6 +11,10 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
+/**
+ * @deprecated
+ * @param null|string $arg
+ */
 function action_bank_enregistrer_modereglement_dist($arg=null){
 
 	if (is_null($arg)){

@@ -326,6 +326,9 @@ function systempay_traite_reponse_transaction($config, $response){
 		$set['statut'] = 'ok';
 		$set['reglee'] = 'oui';
 	}
+	else {
+		$set['statut'] = 'attente';
+	}
 
 	// si on a les infos de validite / card number, on les note ici
 	if (isset($response['vads_expiry_year'])){
@@ -429,6 +432,7 @@ function systempay_traite_reponse_transaction($config, $response){
 	if (isset($set['reglee']) AND $set['reglee']=='oui'){
 		$regler_transaction = charger_fonction('regler_transaction','bank');
 		$regler_transaction($id_transaction,array('row_prec'=>$row));
+		$res = true;
 	}
 	else {
 		$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
@@ -442,10 +446,11 @@ function systempay_traite_reponse_transaction($config, $response){
 			),
 			'data' => '')
 		);
+		$res = 'wait';
 	}
 
 	// c'est un succes
-	return array($id_transaction,true);
+	return array($id_transaction,$res);
 }
 
 
