@@ -1,0 +1,30 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012-2015 - Distribue sous licence GNU/GPL
+ *
+ */
+]#CACHE{0}
+<BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
+<div class="payer_mode payer_cheque payer_acte payer_attente">
+	<p class="titre h4"><:bank:payer_par_cheque:></p>
+	#SET{ordre,#ENV{config/ordre,#NOM_SITE_SPIP}|wrap{'<b>'}}
+	#SET{montant,#MONTANT|affiche_monnaie|wrap{'<b>'}}
+	#SET{transaction,#ID_TRANSACTION|wrap{'<b>'}}
+	<p><:bank:info_mode_reglement_enregistre:> <:bank:confirme_reglement_attente:></p>
+	<p><:bank:info_cheque_envoyer{montant=#GET{montant},transaction=#GET{transaction},ordre=#GET{ordre}}|propre:></p>
+	<p><:bank:info_cheque_envoyer_adresse:></p>
+	<p>
+		[<strong>(#ENV{config/adresse}|propre|PtoBR|sinon{
+		#NOM_SITE_SPIP<br />
+		????<br />
+		????})</strong>]
+	</p>
+	[<p class="small">(#ENV{config/notice,''}|propre|PtoBR)</p>]
+</div>
+</BOUCLE_trans>

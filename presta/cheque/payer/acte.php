@@ -21,15 +21,24 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 function presta_cheque_payer_acte_dist($config,$id_transaction,$transaction_hash,$options=array()){
 
 	include_spip("inc/bank");
+
 	$contexte = array(
-		'action' => bank_url_api_retour($config,"response"),
 		'id_transaction' => $id_transaction,
 		'transaction_hash' => $transaction_hash,
-		'attente_mode' => _request('attente_mode'),
-		'config' => $config,
+		'autorisation_id' => 'wait',
 	);
-	$contexte = array_merge($options,$contexte);
+	$contexte['sign'] = bank_sign_response_simple($config['presta'], $contexte);
 
-	return recuperer_fond('presta/cheque/payer/acte', $contexte, array('ajax'=>true));
+	// url action
+	$action = bank_url_api_retour($config,'response');
+	foreach($contexte as $k=>$v){
+		$action = parametre_url($action,$k,$v);
+	}
+	$contexte['action'] = $action;
+	$contexte['config'] = $config;
+
+	$contexte = array_merge($options, $contexte);
+
+	return recuperer_fond('presta/cheque/payer/acte', $contexte);
 }
 

@@ -31,6 +31,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'choisissez_cb' => 'Choisissez votre carte bancaire :',
 	'confirme_reglement_annule' => 'L\'opération a été annulée. Aucun règlement n\'a été réalisé.',
 	'confirme_reglement_pris_en_compte' => 'Votre règlement a bien été pris en compte, et nous vous en remercions.',
+	'confirme_reglement_attente' => 'Votre règlement est en attente, nous vous informerons dès sa bonne réception.',
 
 // E
 	'erreur_transaction_echec' => 'Aucun règlement n\'a été réalisé. (Transaction Ref. @ref@)',
@@ -161,5 +162,6 @@ _ Compte bancaire :
 	'titre_page_configurer_paiement' => 'Paiements en ligne',
 	'titre_reglement_annule' => 'Annulation',
 	'titre_reglement_ok' => 'Règlement réussi',
+	'titre_reglement_attente' => 'Règlement en attente',
 );
 ?>

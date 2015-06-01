@@ -87,6 +87,23 @@ function bank_label_payer_par_carte($code_carte){
 	return _T('bank:payer_par_carte',array('carte'=>$carte));
 }
 
+/**
+ * Afficher l'inclusion attente reglement si elle existe,
+ * en fonction du presta
+ * @param string $mode
+ * @param int $id_transaction
+ * @param string $transaction_hash
+ * @return string
+ */
+function bank_afficher_attente_reglement($mode,$id_transaction,$transaction_hash){
+	include_spip('inc/bank');
+	$config = bank_config($mode);
+	$presta = $config['presta'];
+	if (trouver_fond("attente","presta/$presta/payer/")){
+		return recuperer_fond("presta/$presta/payer/attente",array('id_transaction'=>$id_transaction,'transaction_hash'=>$transaction_hash,'config'=>$config));
+	}
+	return "";
+}
 
 /**
  * Urls d'auto response pour afficher dans la config de certains prestas

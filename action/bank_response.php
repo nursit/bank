@@ -108,7 +108,8 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
  *
  * @param string $mode
  * @param string $acte_ou_abo
- * @param bool $succes
+ * @param bool|string $succes
+ *   true, false, 'wait'
  * @param int $id_transaction
  * @return string|void
  */
@@ -136,27 +137,41 @@ function redirige_apres_retour_transaction($mode,$acte_ou_abo,$succes,$id_transa
 		// si des urls retour ok ou echec sont definies pour cette transaction
 		// fournies par #FORMULAIRE_PAYER_ACTE
 		if ($row['url_retour'] AND $urls = unserialize($row['url_retour'])){
-			if ($succes AND isset($urls['url_retour_ok']))
+			if ($succes===true AND isset($urls['url_retour_ok']))
 				$redirect = $urls['url_retour_ok'];
+			elseif ($succes==='wait' AND isset($urls['url_retour_attente']))
+				$redirect = $urls['url_retour_attente'];
 			elseif (!$succes AND isset($urls['url_retour_echec']))
 				$redirect = $urls['url_retour_echec'];
 		}
 
-		// par defaut on revient sur une des pages reglees en define()
+		// par defaut on revient sur des pages standard,
+		// ou sur une des pages reglees en define()
 		if (!strlen($redirect)){
 			// _BANK_ACTE_NORMAL_RETURN_URL
+			// _BANK_ACTE_WAIT_RETURN_URL
 			// _BANK_ACTE_CANCEL_RETURN_URL
 			// _BANK_ABO_NORMAL_RETURN_URL
+			// _BANK_ABO_WAIT_RETURN_URL
 			// _BANK_ABO_CANCEL_RETURN_URL
 			$acte_ou_abo = ($acte_ou_abo=='acte' ? 'ACTE' : 'ABO');
-			$c = "_BANK_" . $acte_ou_abo . "_NORMAL_RETURN_URL";
 
-			if ($succes){
+			if ($succes===true){
+				$c = "_BANK_" . $acte_ou_abo . "_NORMAL_RETURN_URL";
 				if (defined($c))
 					$redirect = constant($c);
 				else
 					$redirect = generer_url_public('bank_retour_ok');
-			} else {
+			}
+			elseif($succes==='wait'){
+				$c = "_BANK_" . $acte_ou_abo . "_WAIT_RETURN_URL";
+				if (defined($c))
+					$redirect = constant($c);
+				else
+					$redirect = generer_url_public('bank_retour_attente');
+			}
+			else {
+				$c = "_BANK_" . $acte_ou_abo . "_CANCEL_RETURN_URL";
 				if (defined($c))
 					$redirect = constant($c);
 				else
@@ -193,18 +208,16 @@ function redirige_apres_retour_transaction($mode,$acte_ou_abo,$succes,$id_transa
 	#var_dump($redirect);die();
 	if (strlen($redirect)){
 		include_spip('inc/headers');
-		if (function_exists("redirige_formulaire"))
-			return redirige_formulaire($redirect);
-		else
-			redirige_par_entete($redirect);
-		exit;
+		return redirige_formulaire($redirect);
 	}
 
 	//on ne devrait jamais arriver la !
-	if ($succes)
+	if ($succes===true)
+		echo "Transaction $mode $acte_ou_abo $id_transaction terminee OK";
+	elseif ($succes==='wait')
 		echo "Transaction $mode $acte_ou_abo $id_transaction terminee OK";
 	else
 		echo "Transaction $mode $acte_ou_abo $id_transaction annulee";
 	die();
 }
-?>
+

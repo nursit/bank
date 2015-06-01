@@ -104,7 +104,7 @@ function bank_config($presta,$abo=false){
 
 	$id = "";
 	$mode = $presta;
-	if (preg_match(",-[A-F0-9]{4},Uims",$presta)){
+	if (preg_match(",[/-][A-F0-9]{4},Uims",$presta)){
 		$mode = substr($presta,0,-5);
 		$id = substr($presta,-4);
 	}
@@ -500,53 +500,67 @@ function bank_simple_call_response($config, $response=null){
 	}
 
 	$autorisation = (isset($response['autorisation_id'])?$response['autorisation_id']:'');
-	// si rien fourni l'autorisation refere l'id_auteur et le nom de celui qui accepte le cheque|virement
-	if (!$autorisation)
-		$autorisation = $GLOBALS['visiteur_session']['id_auteur']."/".$GLOBALS['visiteur_session']['nom'];
+	if ($autorisation==="wait"){
 
-	include_spip("inc/autoriser");
-	if (!autoriser('utilisermodepaiement',$mode)) {
-		return bank_transaction_invalide($id_transaction,
-			array(
-				'mode' => $mode,
-				'erreur' => "$mode pas autorisee",
-			)
+		// c'est un reglement en attente, on le note
+		$set = array(
+			"mode"=>"$mode/$config_id",
+			'autorisation_id'=>date('d/m/Y-H:i:s')."/".$GLOBALS['ip'],
+			"date_paiement"=>date('Y-m-d H:i:s'),
+			"statut"=>'attente',
 		);
+
+	}
+	else {
+		// si rien fourni l'autorisation refere l'id_auteur et le nom de celui qui accepte le cheque|virement
+		if (!$autorisation)
+			$autorisation = $GLOBALS['visiteur_session']['id_auteur']."/".$GLOBALS['visiteur_session']['nom'];
+
+		include_spip("inc/autoriser");
+		if (!autoriser('utilisermodepaiement',$mode)) {
+			return bank_transaction_invalide($id_transaction,
+				array(
+					'mode' => $mode,
+					'erreur' => "$mode pas autorisee",
+				)
+			);
+		}
+
+		if (!autoriser('encaisser'.$mode,'transaction',$id_transaction)){
+			return bank_transaction_invalide($id_transaction,
+				array(
+					'mode' => $mode,
+					'erreur' => "tentative d'encaisser un $mode par auteur #$autorisation pas autorise",
+				)
+			);
+		}
+
+		// est-ce une demande d'echec ? (cas de la simulation)
+		if (isset($response['fail']) AND $response['fail']){
+		  // sinon enregistrer l'absence de paiement et l'erreur
+			include_spip('inc/bank');
+			return bank_transaction_echec($id_transaction,
+				array(
+					'mode'=>$mode,
+					'config_id' => $config_id,
+					'code_erreur' => 'fail',
+					'erreur' => $response['fail'],
+				)
+			);
+		}
+
+		// OK, on peut accepter le reglement
+		$set = array(
+			"mode"=>"$mode/$config_id",
+			"autorisation_id"=>$autorisation,
+			"montant_regle"=>$row['montant'],
+			"date_paiement"=>date('Y-m-d H:i:s'),
+			"statut"=>'ok',
+			"reglee"=>'oui'
+		);
+
 	}
 
-	if (!autoriser('encaisser'.$mode,'transaction',$id_transaction)){
-		return bank_transaction_invalide($id_transaction,
-			array(
-				'mode' => $mode,
-				'erreur' => "tentative d'encaisser un $mode par auteur #$autorisation pas autorise",
-			)
-		);
-	}
-
-	// est-ce une demande d'echec ? (cas de la simulation)
-	if (isset($response['fail']) AND $response['fail']){
-	 	// sinon enregistrer l'absence de paiement et l'erreur
-		include_spip('inc/bank');
-		return bank_transaction_echec($id_transaction,
-			array(
-				'mode'=>$mode,
-				'config_id' => $config_id,
-				'code_erreur' => 'fail',
-				'erreur' => $response['fail'],
-			)
-		);
-	}
-
-
-	// OK, on peut accepter le reglement
-	$set = array(
-		"mode"=>"$mode/$config_id",
-		"autorisation_id"=>$autorisation,
-		"montant_regle"=>$row['montant'],
-		"date_paiement"=>date('Y-m-d H:i:s'),
-		"statut"=>'ok',
-		"reglee"=>'oui'
-	);
 
 	// est-ce un abonnement ?
 	if (isset($response['abo_uid']) AND $response['abo_uid']){
@@ -554,11 +568,35 @@ function bank_simple_call_response($config, $response=null){
 	}
 
 	sql_updateq("spip_transactions", $set,	"id_transaction=".intval($id_transaction));
-	spip_log("call_resonse : id_transaction $id_transaction, reglee",$mode);
 
-	$regler_transaction = charger_fonction('regler_transaction','bank');
-	$regler_transaction($id_transaction,array('row_prec'=>$row));
+	// si ok on regle
+	if ($set['statut']==='ok'){
+		spip_log("call_resonse : id_transaction $id_transaction, reglee",$mode);
 
+		$regler_transaction = charger_fonction('regler_transaction','bank');
+		$regler_transaction($id_transaction,array('row_prec'=>$row));
+
+		$res = true;
+	}
+	// sinon on trig les reglements en attente
+	else {
+		// cela permet de factoriser le code
+		$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction));
+		pipeline('trig_bank_reglement_en_attente',array(
+			'args' => array(
+				'statut'=>'attente',
+				'mode'=>$row['mode'],
+				'type'=>$row['abo_uid']?'abo':'acte',
+				'id_transaction'=>$id_transaction,
+				'row'=>$row,
+			),
+			'data' => '')
+		);
+
+		$res = 'wait';
+	}
+
+	// dans tous les cas (ok ou attente), on active l'abonnement si il y a lieu
 	if (isset($response['abo_uid'])
 	  AND $response['abo_uid']
 	  AND $activer_abonnement = charger_fonction('activer_abonnement','abos',true)){
@@ -567,5 +605,5 @@ function bank_simple_call_response($config, $response=null){
 	}
 
 
-	return array($id_transaction,true);
+	return array($id_transaction,$res);
 }

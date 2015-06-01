@@ -19,25 +19,9 @@
 		#SET{transaction,#ID_TRANSACTION|wrap{'<b>'}}
 		<:bank:info_cheque_imprimer{montant=#GET{montant},transaction=#GET{transaction},ordre=#GET{ordre}}|propre:>
 
-		[(#ENV{attente_mode,''}|=={cheque}|oui)
-			<div class="success">
-				<p><:bank:info_mode_reglement_enregistre:></p>
-				<p><:bank:info_cheque_envoyer{montant=#GET{montant},transaction=#GET{transaction},ordre=#GET{ordre}}|propre:></p>
-				<p><:bank:info_cheque_envoyer_adresse:></p>
-				<p>
-					[<strong>(#ENV{config/adresse}|propre|PtoBR|sinon{
-					#NOM_SITE_SPIP<br />
-					????<br />
-					????})</strong>]
-				</p>
-				[<p class="small">(#ENV{config/notice,''}|propre|PtoBR)</p>]
-			</div>
-		]
-		[(#ENV{attente_mode,''}|=={cheque}|non)
-			<div class='boutons'>
-			[(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_cheque:>,#URL_ACTION_AUTEUR{bank_enregistrer_modereglement,cheque-#ID_TRANSACTION,#SELF},ajax})]
-			</div>
-		]
+		<div class='boutons'>
+		[(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_cheque:>,#ENV*{action}})]
+		</div>
 
 	]
 	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive})
