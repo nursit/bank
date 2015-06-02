@@ -154,8 +154,9 @@ function bank_upgrade_config(){
 			$cfg = lire_config("bank_paiement/config_$mode");
 			$empty = true;
 			foreach($cfg as $k=>$v){
-				if (!in_array($k,array('actif','presta','type','mode_test'))){
-					if (is_array($v)?count($v):strlen($v)){
+				if (!in_array($k,array('actif','presta','type','mode_test','service'))){
+					if (is_array($v)?count($v):strlen($v)
+					  AND $v!=="your_email_username_for_paypal@example.org"){
 						$empty = false;
 					}
 				}
@@ -178,7 +179,7 @@ function bank_upgrade_config(){
 			$cfg = lire_config("bank_paiement/config_abo_$mode");
 			$empty = true;
 			foreach($cfg as $k=>$v){
-				if (!in_array($k,array('actif','presta','type','mode_test'))){
+				if (!in_array($k,array('actif','presta','type','mode_test','service'))){
 					if (is_array($v)?count($v):strlen($v)){
 						$empty = false;
 					}
