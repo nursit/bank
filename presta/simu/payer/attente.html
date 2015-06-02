@@ -15,5 +15,6 @@
 	<p class="titre h4">SIMULATION</p>
 	<p><:bank:confirme_reglement_attente:></p>
 	[(#BOUTON_ACTION{Confirmer le paiement en attente,#ENV{config}|bank_simu_url_fin_paiement{#ID_TRANSACTION,#TRANSACTION_HASH}})]
+	[(#BOUTON_ACTION{Echec du paiement en attente,#ENV{config}|bank_simu_url_fin_paiement{#ID_TRANSACTION,#TRANSACTION_HASH}|parametre_url{status,fail}})]
 </div>
 </BOUCLE_trans>

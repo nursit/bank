@@ -35,10 +35,17 @@ function presta_simu_call_response_dist($config, $response=null){
 		$response['fail'] = "Simulation echec paiement";
 	}
 
-	// generer un numero d'abonne simule si besoin
+	// generer un numero d'abonne simule si besoin (sauf si on en a deja un)
 	if (_request('abo')){
-		$response['abo_uid'] = substr(md5($response['id_transaction']."-".time()),0,10);
+		if ($response['id_transaction']
+			AND $abo_uid = sql_getfetsel("abo_uid","spip_transactions","id_transaction=".intval($response['id_transaction']))){
+			$response['abo_uid'] = $abo_uid;
+		}
+		else {
+			$response['abo_uid'] = substr(md5($response['id_transaction']."-".time()),0,10);
+		}
 	}
 
 	return bank_simple_call_response($config, $response);
+
 }
