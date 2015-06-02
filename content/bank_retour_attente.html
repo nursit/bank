@@ -13,6 +13,6 @@
 <h1><:bank:titre_reglement_attente:></h1>
 <BOUCLE_message(TRANSACTIONS){id_transaction}{transaction_hash}>[
 	(#MESSAGE|propre)
-][(#MODE|bank_afficher_attente_reglement{#ID_TRANSACTION,#TRANSACTION_HASH})]</BOUCLE_message>
+][(#MODE|bank_afficher_attente_reglement{#ID_TRANSACTION,#TRANSACTION_HASH,#ENV{type}})]</BOUCLE_message>
 <p><:bank:confirme_reglement_attente:></p>
 <//B_message>

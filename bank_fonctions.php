@@ -95,12 +95,12 @@ function bank_label_payer_par_carte($code_carte){
  * @param string $transaction_hash
  * @return string
  */
-function bank_afficher_attente_reglement($mode,$id_transaction,$transaction_hash){
+function bank_afficher_attente_reglement($mode,$id_transaction,$transaction_hash,$type){
 	include_spip('inc/bank');
 	$config = bank_config($mode);
 	$presta = $config['presta'];
 	if (trouver_fond("attente","presta/$presta/payer/")){
-		return recuperer_fond("presta/$presta/payer/attente",array('id_transaction'=>$id_transaction,'transaction_hash'=>$transaction_hash,'config'=>$config));
+		return recuperer_fond("presta/$presta/payer/attente",array('id_transaction'=>$id_transaction,'transaction_hash'=>$transaction_hash,'config'=>$config,'type'=>$type));
 	}
 	return "";
 }
