@@ -150,18 +150,48 @@ function bank_upgrade_config(){
 	}
 	if ($actifs = lire_config("bank_paiement/presta")){
 		foreach($actifs as $mode=>$actif){
-			ecrire_config("bank_paiement/config_$mode/actif",$actif);
-			ecrire_config("bank_paiement/config_$mode/presta",$mode);
-			ecrire_config("bank_paiement/config_$mode/type","acte");
+			// regarder si la config est vide ou non
+			$cfg = lire_config("bank_paiement/config_$mode");
+			$empty = true;
+			foreach($cfg as $k=>$v){
+				if (!in_array($k,array('actif','presta','type','mode_test'))){
+					if (is_array($v)?count($v):strlen($v)){
+						$empty = false;
+					}
+				}
+			}
+			if (!$empty){
+				ecrire_config("bank_paiement/config_$mode/actif",$actif);
+				ecrire_config("bank_paiement/config_$mode/presta",$mode);
+				ecrire_config("bank_paiement/config_$mode/type","acte");
+			}
+			else {
+				effacer_config("bank_paiement/config_$mode");
+			}
 		}
 		effacer_config("bank_paiement/presta");
 	}
 
 	if ($actifs_abo = lire_config("bank_paiement/presta_abo")){
 		foreach($actifs_abo as $mode=>$actif){
-			ecrire_config("bank_paiement/config_abo_$mode/actif",$actif);
-			ecrire_config("bank_paiement/config_abo_$mode/presta",$mode);
-			ecrire_config("bank_paiement/config_abo_$mode/type","abo");
+			// regarder si la config est vide ou non
+			$cfg = lire_config("bank_paiement/config_abo_$mode");
+			$empty = true;
+			foreach($cfg as $k=>$v){
+				if (!in_array($k,array('actif','presta','type','mode_test'))){
+					if (is_array($v)?count($v):strlen($v)){
+						$empty = false;
+					}
+				}
+			}
+			if (!$empty){
+				ecrire_config("bank_paiement/config_abo_$mode/actif",$actif);
+				ecrire_config("bank_paiement/config_abo_$mode/presta",$mode);
+				ecrire_config("bank_paiement/config_abo_$mode/type","abo");
+			}
+			else {
+				effacer_config("bank_paiement/config_abo_$mode");
+			}
 		}
 		effacer_config("bank_paiement/presta_abo");
 	}
