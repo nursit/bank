@@ -127,6 +127,8 @@ function bank_upgrade($nom_meta_base_version,$version_cible){
 }
 
 function bank_upgrade_config(){
+	include_spip('inc/config');
+	
 	// suppression d'une vieille config Paybox
 	if (lire_config("bank_paiement/config_paybox/pubkey",'')){
 		ecrire_config("bank_paiement/config_paybox/pubkey",null);
