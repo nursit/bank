@@ -33,7 +33,18 @@ function presta_simu_payer_abonnement_dist($config, $id_transaction, $transactio
 		$action = parametre_url($action,$k,$v);
 	}
 	$action = parametre_url($action,"abo","oui");
+
+	// paiement en attente
+	unset($contexte['sign']);
+	$contexte['autorisation_id'] = 'wait';
+	$contexte['sign'] = bank_sign_response_simple('simu', $contexte);
+	$action_wait = $action;
+	foreach($contexte as $k=>$v){
+		$action_wait = parametre_url($action_wait,$k,$v);
+	}
+
 	$contexte['action'] = $action;
+	$contexte['action_wait'] = $action_wait;
 
 	$contexte = array_merge($options, $contexte);
 
