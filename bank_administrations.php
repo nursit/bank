@@ -145,7 +145,7 @@ function bank_upgrade_config(){
 		ecrire_config("bank_paiement/presta",$prestas);
 	}
 	if (!is_null($c = lire_config("bank_paiement/config_cyberplus"))){
-		ecrire_config("bank_paiement/config_cyberplus",null);
+		effacer_config("bank_paiement/config_cyberplus");
 		if (!lire_config("bank_paiement/config_systempay",'')){
 			ecrire_config("bank_paiement/config_systempay",$c);
 		}
@@ -164,6 +164,19 @@ function bank_upgrade_config(){
 				}
 			}
 			if (!$empty){
+				// cles de test
+				if (isset($cfg['mode_test']) AND $cfg['mode_test']){
+					if ($mode=='paybox' AND isset($cfg['PBX_HMAC_KEY']) AND $cfg['PBX_HMAC_KEY']){
+						if (!isset($cfg['PBX_HMAC_KEY_test']) OR !$cfg['PBX_HMAC_KEY_test']){
+							ecrire_config("bank_paiement/config_$mode/PBX_HMAC_KEY_test",$cfg['PBX_HMAC_KEY']);
+						}
+					}
+					elseif ($mode=='systempay' AND isset($cfg['CLE']) AND $cfg['CLE']){
+						if (!isset($cfg['CLE_test']) OR !$cfg['CLE_test']){
+							ecrire_config("bank_paiement/config_$mode/CLE_test",$cfg['CLE']);
+						}
+					}
+				}
 				ecrire_config("bank_paiement/config_$mode/actif",$actif);
 				ecrire_config("bank_paiement/config_$mode/presta",$mode);
 				ecrire_config("bank_paiement/config_$mode/type","acte");
@@ -188,6 +201,14 @@ function bank_upgrade_config(){
 				}
 			}
 			if (!$empty){
+				// cles de test
+				if (isset($cfg['mode_test']) AND $cfg['mode_test']){
+					if ($mode=='paybox' AND isset($cfg['PBX_HMAC_KEY']) AND $cfg['PBX_HMAC_KEY']){
+						if (!isset($cfg['PBX_HMAC_KEY_test']) OR !$cfg['PBX_HMAC_KEY_test']){
+							ecrire_config("bank_paiement/config_$mode/PBX_HMAC_KEY_test",$cfg['PBX_HMAC_KEY']);
+						}
+					}
+				}
 				ecrire_config("bank_paiement/config_abo_$mode/actif",$actif);
 				ecrire_config("bank_paiement/config_abo_$mode/presta",$mode);
 				ecrire_config("bank_paiement/config_abo_$mode/type","abo");
