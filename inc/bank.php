@@ -108,6 +108,9 @@ function bank_config($presta,$abo=false){
 		$mode = substr($presta,0,-5);
 		$id = substr($presta,-4);
 	}
+	if (substr($mode,-5)==="_test"){
+		$mode = substr($mode,0,-5);
+	}
 
 	// renommage d'un prestataire : assurer la continuite de fonctionnement
 	if ($mode=="cyberplus") $mode = "systempay";
