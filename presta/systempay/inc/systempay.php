@@ -84,6 +84,8 @@ function systempay_available_cards($config){
 		}
 	}
 	if ($config['service']=='payzen'){
+		// les SEPA, abo ou non
+		$cartes_possibles['SDD'] = "SEPA_SDD.gif";
 		if ($config['type']!=='abo'){
 			$cartes_possibles['PAYLIB'] = "PAYLIB.gif";
 			$cartes_possibles['ONEY'] = "ONEY.gif";
@@ -92,8 +94,6 @@ function systempay_available_cards($config){
 			$cartes_possibles['SOFORT_BANKING'] = "SOFORT.gif";
 			$cartes_possibles['IDEAL'] = "IDEAL.gif";
 
-			// et les SEPA
-			$cartes_possibles['SDD'] = "SEPA_SDD.gif";
 			// et les e-cheques vacances
 			// $cartes_possibles['E_CV'] = "E_CV.gif";
 		}
