@@ -31,7 +31,8 @@ include_spip('presta/systempay/inc/systempay');
  *   SUBSCRIBE : abonner avec un identifiant qui evite de resaisir les numeros de CB
  * @param array $options
  *   string $abo_uid : utile pour les actions REGISTER_UPDATE, PAYMENT, SUBSCRIBE
- *   int $delay : nombre de jours avant effet (vads_capture_delay pour les paiements ponctuels, vads_sub_effect_date pour les abonnements)
+ *   int $delay : nb jours avant effet du paiement ponctuel (vads_capture_delay)
+ *   int $delay_subscribe : nb jours avant effet de l'abonnement (vads_sub_effect_date)
  * @return array
  */
 function presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config = array(), $action="PAYMENT", $options= array()){
@@ -47,6 +48,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 		array(
 			'abo_uid' => '',
 			'delay' => 0,
+			'delay_subscribe' => 0,
 		)
 		,$options
 	);
@@ -123,6 +125,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	}
 
 
+	$now = time();
 	// c'est un abonnement
 	if (in_array($action,array('REGISTER_PAY_SUBSCRIBE', 'REGISTER_SUBSCRIBE', 'SUBSCRIBE'))){
 		// on decrit l'echeance
@@ -132,8 +135,11 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 			if ($echeance['montant']>0){
 
 				// on commence maintenant
-				$now = time();
-				$parm['vads_sub_effect_date'] = gmdate ("Ymd",$now+24*3600*intval($options['delay']));
+				$date_effet = $now;
+				if (isset($options['delay_subscribe']) AND $options['delay_subscribe']){
+					$date_effet = strtotime("+".$options['delay_subscribe']." DAY",$now);
+				}
+				$parm['vads_sub_effect_date'] = gmdate ("Ymd",$date_effet);
 				$nb = 0;
 				$nb_init = 0;
 				if (isset($echeance['count'])){
@@ -154,7 +160,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 				// si on fait le premier paiement maintenant, il ne faut pas le compter dans l'abonnement
 				if ($action==="REGISTER_PAY_SUBSCRIBE"){
 					// on decale l'effet a +1mois ou +1an
-					$parm['vads_sub_effect_date'] = gmdate ("Ymd",strtotime("+1".substr($freq,0,-2)));
+					$parm['vads_sub_effect_date'] = gmdate ("Ymd",strtotime("+1 ".substr($freq,0,-2),$date_effet));
 					// on le decompte du nombre d'echeance
 					if ($nb_init>0) $nb_init--;
 					if ($nb>0) $nb--;
@@ -185,12 +191,11 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 			}
 		}
 	}
-	else {
+	if (in_array($action,array('REGISTER_PAY', 'REGISTER_PAY_SUBSCRIBE', 'PAYMENT'))){
 		if ($options['delay']){
-			$parm['vads_capture_delay'] = intval($options['delay']);
+			$parm['vads_capture_delay'] = $options['delay'];
 		}
 	}
-
 
 	// this is SPIP + bank
 	include_spip('inc/filtres');
@@ -210,14 +215,22 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	// on la configurer en premier avec un REGISTER_SUBSCRIBE
 	if (isset($cartes_possibles['SDD'])
 	  AND in_array('SDD',$cartes)
-	  AND ($action==="REGISTER_PAY_SUBSCRIBE" OR (in_array($action,array('REGISTER_SUBSCRIBE', 'SUBSCRIBE')) AND intval($options['delay'])<13))
+	  AND (
+	          ($action==="REGISTER_PAY_SUBSCRIBE" AND intval($options['delay'])<13)
+         OR (in_array($action,array('REGISTER_SUBSCRIBE', 'SUBSCRIBE')) AND intval($options['delay_subscribe'])<13)
+		    )
 	  ){
 		$action_sdd = $action;
-		if ($action_sdd==="REGISTER_PAY_SUBSCRIBE") $action_sdd="REGISTER_SUBSCRIBE";
+		//if ($action_sdd==="REGISTER_PAY_SUBSCRIBE") $action_sdd="REGISTER_SUBSCRIBE";
 		$config_sdd = $config;
 		$config_sdd['cartes'] = array('SDD');
 		$options_sdd = $options;
-		$options_sdd['delay'] = max($options_sdd['delay'],13); // minimum 13 jours pour un SEPA
+		if ($action==="REGISTER_PAY_SUBSCRIBE"){
+			$options_sdd['delay'] = max($options_sdd['delay'],13); // minimum 13 jours pour un SEPA
+		}
+		else {
+			$options_sdd['delay_subscribe'] = max($options_sdd['delay_subscribe'],13); // minimum 13 jours pour un SEPA
+		}
 		$contexte = presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config_sdd, $action_sdd, $options_sdd);
 		unset($cartes_possibles['SDD']);
 	}
