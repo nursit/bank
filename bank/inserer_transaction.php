@@ -74,8 +74,10 @@ function bank_inserer_transaction_dist($montant,$options=array()){
 	if (!$force){
 		$where = array();
 		foreach ($set as $k=>$v){
-			if ($k!=="date_transaction")
-				$where[] = "$k=".sql_quote($v);
+			if ($k!=="date_transaction"
+			  AND ($k!=="montant_ht" OR isset($options['montant_ht']))){
+				$where[] = "$k=".sql_quote($v,'',in_array($k,array('montant','montant_ht'))?'text':'');
+			}
 		}
 		$where[] = "statut=".sql_quote("commande");
 		$where[] = "date_transaction>".sql_quote(date('Y-m-d H:i:s',strtotime("-1 day")));
