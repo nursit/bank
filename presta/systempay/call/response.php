@@ -63,11 +63,14 @@ function presta_systempay_call_response_dist($config, $response=null){
 	  AND $abo_uid = $response['vads_subscription']
 	  AND $id_transaction){
 
+		$transaction = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
 		// c'est le premier paiement de l'abonnement ?
 		if (!$recurence AND $success){
-			// date de fin de mois de validite de la carte
+			// date de fin de mois de validite de la carte (mais pas pour un SEPA qui se reconduit tout seul)
 			$date_fin = "0000-00-00 00:00:00";
-			if (isset($response['vads_expiry_year']) AND isset($response['vads_expiry_month'])){
+			if (isset($response['vads_expiry_year'])
+			  AND isset($response['vads_expiry_month'])
+			  AND strncmp($transaction['refcb'],'SEPA',4)!==0){
 				$date_fin = bank_date_fin_mois($response['vads_expiry_year'],$response['vads_expiry_month']);
 			}
 
