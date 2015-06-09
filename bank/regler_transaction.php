@@ -80,6 +80,19 @@ function bank_regler_transaction_dist($id_transaction,$options = array()){
 
 	$notifier = ($notifier AND $row_prec['reglee']!='oui');
 
+	// d'abord un pipeline de pre-facturation (exemple, creer le compte auteur)
+	$message = pipeline('bank_pre_facturer_reglement',array(
+		'args'=>array(
+			'id_transaction'=>$id_transaction,
+			'new'=>$row_prec['reglee']!=='oui',
+			'confirm'=>$row_prec['reglee']=='oui',
+			'notifier'=>$notifier,
+			'avant'=>$row_prec,
+			'options' => $options,
+		),
+		'data'=>$message)
+	);
+
 	// d'abord un pipeline de facturation
 	$message = pipeline('bank_facturer_reglement',array(
 		'args'=>array(

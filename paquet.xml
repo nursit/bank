@@ -1,7 +1,7 @@
 <paquet
 	prefix="bank"
 	categorie="outil"
-	version="3.0.8"
+	version="3.0.9"
 	etat="test"
 	compatibilite="[3.0.0;3.1.*]"
 	logo="prive/themes/spip/images/credit-card-32.png"
@@ -29,6 +29,7 @@
 	<pipeline nom="bank_traiter_reglement" action="" />
 	<pipeline nom="bank_traiter_remboursement" action="" />
 	<pipeline nom="bank_editer_ticket_reglement" action="" />
+	<pipeline nom="bank_pre_facturer_reglement" action="" />
 	<pipeline nom="bank_redirige_apres_retour_transaction" action="" />
 	<pipeline nom="trig_bank_notifier_reglement" action="" />
 	<pipeline nom="trig_bank_reglement_en_attente" action="" />
