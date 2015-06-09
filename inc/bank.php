@@ -261,6 +261,7 @@ function bank_shell_args($params){
 
 
 /**
+ * Recuperer l'email du porteur de la transaction (ou celui de la session a defaut ?)
  * @param array $transaction
  * @return string
  */
@@ -276,6 +277,12 @@ function bank_porteur_email($transaction){
 		  AND email_valide($transaction['auteur'])){
 			$mail = $transaction['auteur'];
 		}
+		elseif(
+			(!isset($GLOBALS['visiteur_session']['id_auteur']) OR $GLOBALS['visiteur_session']['id_auteur']==$transaction['id_auteur'])
+			AND isset($GLOBALS['visiteur_session']['session_email'])
+			AND $GLOBALS['visiteur_session']['session_email']){
+			$mail = $GLOBALS['visiteur_session']['session_nom'];
+		}
 	}
 
 	// fallback : utiliser l'email du webmetre du site pour permettre le paiement coute que coute
@@ -284,6 +291,52 @@ function bank_porteur_email($transaction){
 
 	return $mail;
 }
+
+/**
+ * Recuperer le nom du porteur de la transaction (ou celui de la session a defaut ?)
+ * @param array $transaction
+ * @return string
+ */
+function bank_porteur_nom($transaction){
+	$nom = '';
+
+	// recuperer le nom
+	if (!$transaction['id_auteur']
+		OR !$nom = sql_getfetsel('nom','spip_auteurs','id_auteur='.intval($transaction['id_auteur']))){
+
+		if ($transaction['auteur'] AND strpos($transaction['auteur'],"@")===false){
+			$nom = $transaction['auteur'];
+		}
+		elseif(
+		  (!isset($GLOBALS['visiteur_session']['id_auteur']) OR $GLOBALS['visiteur_session']['id_auteur']==$transaction['id_auteur'])
+		  AND isset($GLOBALS['visiteur_session']['session_nom'])
+		  AND $GLOBALS['visiteur_session']['session_nom']){
+			$nom = $GLOBALS['visiteur_session']['session_nom'];
+		}
+	}
+
+	return $nom;
+}
+
+/**
+ * Recuperer le prenom du porteur de la transaction (ou celui de la session a defaut ?)
+ * @param array $transaction
+ * @return string
+ */
+function bank_porteur_prenom($transaction){
+	$prenom = '';
+
+	// recuperer le prenom
+  if(
+	  (!isset($GLOBALS['visiteur_session']['id_auteur']) OR $GLOBALS['visiteur_session']['id_auteur']==$transaction['id_auteur'])
+	  AND isset($GLOBALS['visiteur_session']['session_prenom'])
+	  AND $GLOBALS['visiteur_session']['session_prenom']){
+	  $prenom = $GLOBALS['visiteur_session']['session_prenom'];
+	}
+
+	return $prenom;
+}
+
 
 /**
  * Calculer la date de fin de validite d'un moyen de paiement avec son annee/mois de validite
