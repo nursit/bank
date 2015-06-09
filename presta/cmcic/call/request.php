@@ -102,7 +102,7 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	// dans une page de redirection pour les mobiles
 	$contexte['texte-libre'] = urlencode(serialize($contenu));
 
-	$contexte['mail']        = bank_email_porteur($row);
+	$contexte['mail']        = bank_porteur_email($row);
  
 
 	// Data to certify

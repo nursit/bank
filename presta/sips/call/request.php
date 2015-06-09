@@ -42,7 +42,7 @@ function presta_sips_call_request_dist($id_transaction, $transaction_hash, $conf
 		);
 	}
 
-	$mail = bank_email_porteur($row);
+	$mail = bank_porteur_email($row);
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
 	$montant = intval(round(100*$row['montant'],0));

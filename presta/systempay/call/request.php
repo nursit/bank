@@ -108,7 +108,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	$parm['vads_language'] = $GLOBALS['spip_lang'];
 
 	// recuperer l'email
-	$parm['vads_cust_email'] = bank_email_porteur($row);
+	$parm['vads_cust_email'] = bank_porteur_email($row);
 
 	// nom et url de la boutique
 	$parm['vads_shop_url'] = $GLOBALS['meta']['adresse_site'];

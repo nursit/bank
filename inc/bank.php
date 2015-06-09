@@ -264,7 +264,7 @@ function bank_shell_args($params){
  * @param array $transaction
  * @return string
  */
-function bank_email_porteur($transaction){
+function bank_porteur_email($transaction){
 	$mail = '';
 
 	// recuperer l'email

@@ -93,7 +93,7 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $con
 	$contexte['language'] = ogone_language_code($GLOBALS['spip_lang']);
 	
 	// recuperer l'email
-	$contexte['EMAIL'] = bank_email_porteur($row);
+	$contexte['EMAIL'] = bank_porteur_email($row);
 	$contexte['CN'] = "";
 
 	$contexte['ownerZIP'] = "";
