@@ -91,7 +91,11 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	$id += modulo($row['id_transaction'],10);
 	$parm['vads_trans_id'] = str_pad($id,6,"0",STR_PAD_LEFT);
 	$parm['vads_order_id'] = $row['id_transaction'];
-	$parm['vads_trans_date'] = gmdate ("YmdHis", strtotime($row['date_transaction']));
+
+	// il ne faut pas utiliser la date de la transaction qui peut dater de plusieurs heures/jour
+	// mais la date de generation du formulaire de paiement, car il y a une verif de coherence chez payzen
+	// la demande doit arriver entre -30min et +2h30 par rapport a cette date
+	$parm['vads_trans_date'] = gmdate ("YmdHis", $now);
 
 	$parm['vads_page_action'] = $action;
 	if ($abo_uid){
