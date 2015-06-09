@@ -211,26 +211,20 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 
 	$cartes_possibles = systempay_available_cards($config);
 
-	// cas particulier de la carte SDD : on ne peut pas faire un REGISTER_PAY_SUBSCRIBE dessus
-	// on la configurer en premier avec un REGISTER_SUBSCRIBE
+	// cas particulier de la carte SDD :
+	// si on fait un REGISTER_SUBSCRIBE ou un SUBSCRIBE il faut un delai minimum de 13j sur le subscribe
+	// pas de probleme avec le REGISTER_PAY_SUBSCRIBE car le subscribe est decale d'une echeance dans ce cas
 	if (isset($cartes_possibles['SDD'])
 	  AND in_array('SDD',$cartes)
 	  AND (
-	          ($action==="REGISTER_PAY_SUBSCRIBE" AND intval($options['delay'])<13)
-         OR (in_array($action,array('REGISTER_SUBSCRIBE', 'SUBSCRIBE')) AND intval($options['delay_subscribe'])<13)
+	       (in_array($action,array('REGISTER_SUBSCRIBE', 'SUBSCRIBE')) AND intval($options['delay_subscribe'])<13)
 		    )
 	  ){
 		$action_sdd = $action;
-		//if ($action_sdd==="REGISTER_PAY_SUBSCRIBE") $action_sdd="REGISTER_SUBSCRIBE";
 		$config_sdd = $config;
 		$config_sdd['cartes'] = array('SDD');
 		$options_sdd = $options;
-		if ($action==="REGISTER_PAY_SUBSCRIBE"){
-			$options_sdd['delay'] = max($options_sdd['delay'],13); // minimum 13 jours pour un SEPA
-		}
-		else {
-			$options_sdd['delay_subscribe'] = max($options_sdd['delay_subscribe'],13); // minimum 13 jours pour un SEPA
-		}
+		$options_sdd['delay_subscribe'] = max($options_sdd['delay_subscribe'],13); // minimum 13 jours pour un SEPA
 		$contexte = presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config_sdd, $action_sdd, $options_sdd);
 		unset($cartes_possibles['SDD']);
 	}
