@@ -87,11 +87,17 @@ function abos_resilier_notify_bank($abonne_uid,$mode_paiement){
 		$presta = $mode_paiement;
 		$presta = explode("/",$presta);
 		$presta = reset($presta);
-		if ($presta_resilier = charger_fonction('resilier_abonnement',"presta/$presta/call",true))
+		if ($presta_resilier = charger_fonction('resilier_abonnement',"presta/$presta/call",true)){
 			$ok = $presta_resilier($abonne_uid);
+			if (!$ok){
+				spip_log("Resiliation abo " . $abonne_uid . " refuse par le prestataire", 'abos_resil' . _LOG_ERREUR);
+			}
+		}
 
 		if (!$ok){
-			spip_log("Resiliation abo ".$abonne_uid." refuse par le prestataire",'abos_resil'._LOG_ERREUR);
+			bank_simple_call_resilier_abonnement($row['abonne_uid'],$row['mode_paiement']);
+			// TODO ajouter un message a l'abonnement pour le feedback user
+			spip_log("Envoi email de desabo " . $abonne_uid . " au webmestre", 'abos_resil' . _LOG_INFO_IMPORTANTE);
 
 			// neanmoins, si plus d'echeance prevue, on peut finir
 			// (cas d'un abos deja resilie fin de mois qu'on veut forcer a resilier immediatement)

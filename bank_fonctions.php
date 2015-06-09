@@ -57,6 +57,24 @@ function balise_PAYER_ABONNEMENT_dist($p){
 	return $p;
 }
 
+
+/**
+ * #GERER_ABONNEMENT{#MODE_PAIEMENT,#ABO_UID}
+ * @param $p
+ * @return mixed
+ */
+function balise_GERER_ABONNEMENT_dist($p){
+	$_mode = interprete_argument_balise(1,$p);
+	$_abo_uid = interprete_argument_balise(2,$p);
+	$p->code = "";
+
+	if ($_mode AND $_abo_uid)
+		$p->code = "bank_affiche_gerer_abonnement($_mode,$_abo_uid)";
+
+	$p->interdire_scripts = false;
+	return $p;
+}
+
 /**
  * Une fonction pour expliciter le mode de paiement en fonction du prestataire bancaire
  * par defaut c'est Carte Bancaire

@@ -688,3 +688,39 @@ function bank_simple_call_response($config, $response=null){
 
 	return array($id_transaction,$res);
 }
+
+
+
+/**
+ * Jamais appele directement dans le plugin bank/
+ * mais par une eventuelle methode abos/resilier d'un plugin externe
+ * c'est une fallback quand le presta ne sait pas gerer le desabonnement en appel serveur
+ * ou quand cela echoue
+ *
+ * @param string $uid
+ * @param array|string $config
+ * @return bool
+ */
+function bank_simple_call_resilier_abonnement($uid, $config){
+
+	include_spip('inc/bank');
+	if (!is_array($config)){
+		$mode = sql_getfetsel("mode","spip_transactions","abo_uid=".sql_quote($uid)." AND statut=".sql_quote('ok')." AND mode LIKE ".sql_quote($config.'%'));
+		$config = bank_config($mode);
+	}
+
+	// on envoie un mail au webmestre avec reference pour que le webmestre aille faire la resiliation manuellement
+	$sujet = "[".$GLOBALS['meta']['nom_site']."] Demande Resiliation Abonnement ".$config['presta'];
+	$message = "Abonne UID : $uid\nTransactions :\n";
+
+
+	$trans = sql_allfetsel("id_transaction,date_paiement,montant","spip_transactions","abo_uid=".sql_quote($uid)." AND statut=".sql_quote('ok')." AND mode LIKE ".sql_quote($config['presta'].'%'));
+	foreach($trans as $tran){
+		$message .= "#".$tran['id_transaction']." ".$tran['date_paiement']." ".affiche_monnaie($tran['montant'])."\n";
+	}
+
+	$envoyer_mail = charger_fonction("envoyer_mail","inc");
+	$envoyer_mail($GLOBALS['meta']['email_webmestre'],$sujet,$message);
+
+	return false;
+}

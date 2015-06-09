@@ -84,6 +84,27 @@ function bank_affiche_payer($config,$type,$id_transaction,$transaction_hash,$opt
 
 }
 
+/**
+ * Afficher le bouton pour gerer/interrompre un abonnement
+ * @param array|string $config
+ * @param string $abo_uid
+ * @return array|string
+ */
+function bank_affiche_gerer_abonnement($config,$abo_uid){
+	// $config de type string ?
+	include_spip('inc/bank');
+	if (is_string($config)){
+		$config = bank_config($config,true);
+	}
+
+	if ($trans = sql_fetsel("*","spip_transactions","abo_uid=".sql_quote($abo_uid).' AND mode LIKE '.sql_quote($config['presta'].'%')." AND statut=".sql_quote('ok'),'','id_transaction')){
+		$config = bank_config($trans['mode']);
+		return recuperer_fond("modeles/gerer_abonnement",array('presta'=>$config['presta'],'id_transaction'=>$trans['id_transaction'],'abo_uid'=>$abo_uid));
+	}
+
+	return "";
+}
+
 
 function bank_trouver_logo($mode,$logo){
 	// d'abord dans un dossier presta/

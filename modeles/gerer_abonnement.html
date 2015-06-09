@@ -10,6 +10,4 @@
  *
  */
 ]
-[(#CHEMIN{presta/#ENV{presta}/payer/gerer_abonnement.html}|oui)
-	#INCLURE{fond=presta/#ENV{presta}/payer/gerer_abonnement,env}
-]
+[(#BOUTON_ACTION{<:bank:label_resilier_abonnement:>,#URL_ACTION_AUTEUR{bank_resilier_abo,#ENV{abo_uid},#SELF},btn btn-small})]
