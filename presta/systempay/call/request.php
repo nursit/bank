@@ -43,6 +43,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	$cartes = array('CB','VISA','MASTERCARD','E-CARTEBLEUE');
 	if (isset($config['cartes']) AND $config['cartes'])
 		$cartes = $config['cartes'];
+	$cartes_possibles = systempay_available_cards($config);
 
 	$options = array_merge(
 		array(
@@ -109,6 +110,12 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 
 	// recuperer l'email
 	$parm['vads_cust_email'] = bank_porteur_email($row);
+
+	// si il y a du SEPA, il faut si possible nom et prenom
+	if (in_array('SDD',$cartes) AND isset($cartes_possibles['SDD'])){
+		$parm['vads_cust_first_name'] = bank_porteur_prenom($row);
+		$parm['vads_cust_last_name'] = bank_porteur_nom($row);
+	}
 
 	// nom et url de la boutique
 	$parm['vads_shop_url'] = $GLOBALS['meta']['adresse_site'];
@@ -208,8 +215,6 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	#$parm['vads_redirect_success_message'] = "OK";
 	#$parm['vads_redirect_error_timeout'] = 1;
 	#$parm['vads_redirect_error_message'] = "Echec";
-
-	$cartes_possibles = systempay_available_cards($config);
 
 	// cas particulier de la carte SDD :
 	// si on fait un REGISTER_SUBSCRIBE ou un SUBSCRIBE il faut un delai minimum de 13j sur le subscribe
