@@ -17,17 +17,16 @@ include_spip('presta/paybox/inc/paybox');
  * Jamais appele directement dans le plugin bank/
  * mais par une eventuelle methode abos/resilier d'un plugin externe
  *
- * TODO : recuperer $config depuis la transaction si pas fourni ?
- *
  * @param string $uid
- * @param array $config
+ * @param array|string $config
  * @return bool
  */
-function presta_paybox_call_resilier_abonnement_dist($uid, $config=null){
+function presta_paybox_call_resilier_abonnement_dist($uid, $config='paybox'){
 
 	include_spip('inc/bank');
-	if (!$config){
-		$config = bank_config("paybox",true);
+	if (!is_array($config)){
+		$mode = sql_getfetsel("mode","spip_transactions","abo_uid=".sql_quote($uid)." AND statut=".sql_quote('ok')." AND mode LIKE ".sql_quote($config.'%'));
+		$config = bank_config($mode);
 	}
 
 	$args = 
