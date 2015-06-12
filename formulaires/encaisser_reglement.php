@@ -13,20 +13,17 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-function formulaires_encaisser_reglement_charger_dist($id_transaction, $mode){
+function formulaires_encaisser_reglement_charger_dist($id_transaction, $config){
 
-	$prestas = array();
-	if (isset($GLOBALS['meta']['bank_paiement'])
-		AND $config = unserialize($GLOBALS['meta']['bank_paiement'])){
-
-		$prestas = (is_array($config['presta'])?$config['presta']:array());
-		$prestas = array_filter($prestas);
-		if (is_array($config['presta_abo']))
-			$prestas = array_merge($prestas,array_filter($config['presta_abo']));
+	if (!$config) return false;
+	include_spip('inc/bank');
+	if (is_string($config)){
+		$config = bank_config($config);
 	}
 
-	if (!((isset($prestas[$mode]) AND $prestas[$mode]) OR $mode=='gratuit'))
+	if (!$config OR $config['presta']=='gratuit')
 		return false;
+	$mode = $config['presta'];
 
 	$valeurs = array(
 		'_id_transaction' => $id_transaction,
@@ -38,7 +35,7 @@ function formulaires_encaisser_reglement_charger_dist($id_transaction, $mode){
 	return $valeurs;
 }
 
-function formulaires_encaisser_reglement_verifier_dist($id_transaction, $mode){
+function formulaires_encaisser_reglement_verifier_dist($id_transaction, $config){
 	$erreurs = array();
 	$autorisation_id = _request('autorisation_id');
 	$max_len = 55-strlen(autorisation_suffixe())-1;
@@ -51,7 +48,13 @@ function formulaires_encaisser_reglement_verifier_dist($id_transaction, $mode){
 	return $erreurs;
 }
 
-function formulaires_encaisser_reglement_traiter_dist($id_transaction, $mode){
+function formulaires_encaisser_reglement_traiter_dist($id_transaction, $config){
+
+	include_spip('inc/bank');
+	if (is_string($config)){
+		$config = bank_config($config);
+	}
+	$mode = $config['presta'];
 
 	$hash = sql_getfetsel("transaction_hash","spip_transactions","id_transaction=".intval($id_transaction));
 	$autorisation_id = autorisation_suffixe();
@@ -70,7 +73,7 @@ function formulaires_encaisser_reglement_traiter_dist($id_transaction, $mode){
 		set_request($k,$v);
 	}
 	set_request("sign",$sign);
-	set_request("bankp",$mode);
+	set_request("bankp",$mode."-".bank_config_id($config));
 
 	// on charge l'action et on l'appelle pour passer par tout le processus de paiement standard
 	$bank_response = charger_fonction("bank_response","action");

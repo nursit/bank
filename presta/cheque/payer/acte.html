@@ -26,7 +26,7 @@
 	]
 	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive})
 		<div class="ajax">
-			#FORMULAIRE_ENCAISSER_REGLEMENT{#ID_TRANSACTION,cheque}
+			#FORMULAIRE_ENCAISSER_REGLEMENT{#ID_TRANSACTION,#ENV{config}}
 		</div>
 	]
 </div>
