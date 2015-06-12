@@ -10,7 +10,7 @@
  *
  */
 ]#CACHE{0}
-<BOUCLE_macommande(TRANSACTIONS){id_transaction=#ENV{id_transaction}}{statut=commande}>
+<BOUCLE_macommande(TRANSACTIONS){id_transaction=#ENV{id_transaction}}{statut IN commande,attente}>
 	[(#REM) choix du mode de paiement]
 	<div id='formulaire_mode_paiement' class="abonnement">
 		<B_modes>
