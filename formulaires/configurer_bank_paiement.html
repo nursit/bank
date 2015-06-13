@@ -20,7 +20,7 @@
 	#ACTION_FORMULAIRE{#ENV{action}}
 	<fieldset>
 		<legend><:bank:label_notifications:></legend>
-		<ul>
+		<ul class="editer-groupe">
 			<li class="editer long_label editer_email_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
 				<label><:bank:label_email_ticket_admin:></label>[
 				<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_ticket_admin})</span>]
@@ -41,7 +41,7 @@
 	</fieldset>
 
 	<h3 class="titrem"><:bank:label_prestataires:></h3>
-	<ul>
+	<ul class="editer-groupe">
 		#SET{name,action_append_presta}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 		<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 			<label for="#GET{name}"><:bank:label_action_append_presta:></label>[
@@ -60,7 +60,7 @@
 	<BOUCLE_configs(POUR){tableau #REM|bank_lister_configs}>
 		<fieldset>
 			<legend>[(#VAL{bank:label_presta_}|concat{#VALEUR{presta}}|_T)][ \(<tt>(#VALEUR|bank_config_id)</tt>\)]</legend>
-			<ul>
+			<ul class="editer-groupe">
 				#SET{casier,config_#CLE}
 				#SET{name,#GET{casier}_actif}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 				#SET{disabled,''}

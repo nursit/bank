@@ -16,7 +16,7 @@
 
 <form method="post" action="#ENV{action}"><div>
 	#ACTION_FORMULAIRE{#ENV{action}}
-	<ul>
+	<ul class="editer-groupe">
 		#SET{name,montant}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
 		<li class="editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
 			<label>#GET{name}</label>[
