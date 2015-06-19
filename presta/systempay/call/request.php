@@ -193,7 +193,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 				$parm['vads_sub_desc'] = $rule;
 
 				if ($nb_init>0){
-					$parm['vads_sub_init_amount_number'] = $nb;
+					$parm['vads_sub_init_amount_number'] = $nb_init;
 					$parm['vads_sub_init_amount'] = $parm['vads_amount'];
 					if (isset($echeance['montant_init']) AND ($m=intval(round(100*$echeance['montant_init'],0)))>0){
 						$parm['vads_sub_init_amount'] = $m;
