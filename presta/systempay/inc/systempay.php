@@ -238,7 +238,8 @@ function systempay_traite_reponse_transaction($config, $response){
 	// si c'est un debit, a-t-on bien l'operation attendue ?
 	if ($is_payment
 	  AND $response['vads_operation_type']!=="DEBIT"
-	  AND $response['vads_trans_status']!=='ABANDONED'){
+	  // et pas un Abandon
+	  AND !in_array($response['vads_trans_status'],array('ABANDONED','NOT_CREATED'))){
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => $mode,
