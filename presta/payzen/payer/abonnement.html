@@ -25,6 +25,7 @@
 <B_sepa>
 <div class='payer_mode payer_payzen payer_sepa payer_abonnement'>
 	<p class="titre h4"><:bank:abonnement_par_prelevement_sepa:></p>
+	<p class="explication"><:bank:info_prelevement_sepa{presta=PayZen}:></p>
 	<div class='boutons'>
 	<BOUCLE_sepa(POUR){tableau #ENV{hidden}}{cle=SDD}>
 		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{payzen}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]

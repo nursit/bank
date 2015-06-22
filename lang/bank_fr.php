@@ -56,6 +56,7 @@ Transaction : #@transaction@
 _ Montant : @montant@',
 	'info_mode_reglement_enregistre' => 'Nous avons bien enregistré votre choix de mode de règlement.',
 	'info_mode_test' => '[@presta@] Mode TEST (paiement fictif)',
+	'info_prelevement_sepa' => 'Saisir votre R.I.B chez notre prestataire @presta@ pour la mise en place du prélèvement par SEPA.',
 	'info_nb_transactions' => '@nb@ transactions',
 	'info_virement' => 'Vous pouvez payer par virement bancaire.
 Les instructions concernant l’établissement du virement seront fournies après avoir cliqué sur ’Régler par virement bancaire’.
