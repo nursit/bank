@@ -140,6 +140,8 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 		'id_transaction'=>$id_transaction
 	);
 
+	// forcer le type de config pour n'avoir que les cartes possibles en cas d'abonnement
+	$config['type'] = $type;
 	$cartes_possibles = paybox_available_cards($config);
 	foreach($cartes as $carte){
 		if (isset($cartes_possibles[$carte])){
