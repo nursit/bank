@@ -43,7 +43,9 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	$cartes = array('CB','VISA','MASTERCARD','E-CARTEBLEUE');
 	if (isset($config['cartes']) AND $config['cartes'])
 		$cartes = $config['cartes'];
-	$cartes_possibles = systempay_available_cards($config);
+	$c = $config;
+	$c['type'] = (strpos($action,"SUBSCRIBE")!==false?'abo':'acte');
+	$cartes_possibles = systempay_available_cards($c);
 
 	$options = array_merge(
 		array(
