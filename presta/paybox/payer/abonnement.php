@@ -22,7 +22,7 @@ function presta_paybox_payer_abonnement_dist($config, $id_transaction, $transact
 
 
 	$call_request = charger_fonction('request','presta/paybox/call');
-	$contexte = $call_request($id_transaction,$transaction_hash,$config);
+	$contexte = $call_request($id_transaction,$transaction_hash,$config,"abo");
 
 	$contexte['sandbox'] = (paybox_is_sandbox($config)?' ':'');
 
