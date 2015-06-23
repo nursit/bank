@@ -22,18 +22,16 @@
 	    #SET{adressebanque,#ENV{config/adresse_banque}|nl2br}
 
 			<p><:bank:info_mode_reglement_enregistre:> <:bank:confirme_reglement_attente:></p>
-      <p>
-          [(#VAL{bank:info_virement_etablir}|
-          _T{#ARRAY{
-          ordre, #GET{ordre},
-          montant, #GET{montant},
-          transaction, #GET{transaction},
-          iban, #GET{iban},
-          bic, #GET{bic},
-          banque, #GET{banque},
-          adressebanque, #GET{adressebanque}}
-          }|propre)]
-      </p>
+      [(#VAL{bank:info_virement_etablir}|
+      _T{#ARRAY{
+      ordre, #GET{ordre},
+      montant, #GET{montant},
+      transaction, #GET{transaction},
+      iban, #GET{iban},
+      bic, #GET{bic},
+      banque, #GET{banque},
+      adressebanque, #GET{adressebanque}}
+      }|propre)]
 			[<p class="small">(#ENV{config/notice,''}|propre|PtoBR)</p>]
   </div>
 </BOUCLE_trans>
