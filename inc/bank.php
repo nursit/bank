@@ -231,12 +231,14 @@ function bank_lister_configs($type=null){
 	}
 
 	include_spip('inc/config');
-	$config = lire_config("bank_paiement/");
+	$config = lire_config("bank_paiement/",array());
 	$configs = array();
-	foreach($config as $k=>$v){
-		if (strncmp($k,"config_",7)==0){
-			if (!$type OR ($v['type']==$type) OR $v['type']=='abo_acte'){
-				$configs[substr($k,7)] = $v;
+	if (is_array($config)){
+		foreach($config as $k=>$v){
+			if (strncmp($k,"config_",7)==0){
+				if (!$type OR ($v['type']==$type) OR $v['type']=='abo_acte'){
+					$configs[substr($k,7)] = $v;
+				}
 			}
 		}
 	}

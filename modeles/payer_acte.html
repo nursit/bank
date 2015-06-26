@@ -16,22 +16,24 @@
 	<BOUCLE_macommande(TRANSACTIONS){id_transaction=#ENV{id_transaction}}{statut IN commande,attente}>
 		[(#REM) choix du mode de paiement]
 		<div id='formulaire_mode_paiement' class="acte">
-			<B_modes>
-				<h3 class='selectionnez'>
-				[(#ENV{title,Je choisis mon mode de paiement s&eacute;curis&eacute; :})]
-				</h3>
-			<BOUCLE_modes(POUR){tableau #VAL{acte}|bank_lister_configs}{si #MONTANT|floatval|>{0.0}}>
-			[(#VALEUR{actif}|oui)
-				#PAYER_ACTE{#VALEUR,#ID_TRANSACTION,#TRANSACTION_HASH,#ENV{title,''}}
-			]
-			</BOUCLE_modes>
-				[(#MONTANT|floatval|>{0.0}|non)
+			<BOUCLE_payant(CONDITION){si #MONTANT|floatval|>{0.0}}>
+				<B_modes>
+					<h3 class='selectionnez'>
+					[(#ENV{title,Je choisis mon mode de paiement s&eacute;curis&eacute; :})]
+					</h3>
+				<BOUCLE_modes(POUR){tableau #VAL{acte}|bank_lister_configs}>
+				[(#VALEUR{actif}|oui)
+					#PAYER_ACTE{#VALEUR,#ID_TRANSACTION,#TRANSACTION_HASH,#ENV{title,''}}
+				]
+				</BOUCLE_modes>
+					<p class="error"><:bank:erreur_aucun_moyen_paiement:></p>
+				<//B_modes>
+			</BOUCLE_payant>
 				<h3 class='selectionnez'>
 				[(#ENV{title,Rien à payer})]
 				</h3>
 				#PAYER_ACTE{gratuit,#ID_TRANSACTION,#TRANSACTION_HASH,#ENV{title,''}}
-				]
-			<//B_modes>
+			<//B_payant>
 		</div>
 	</BOUCLE_macommande>
 <//B_si>

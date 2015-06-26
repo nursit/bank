@@ -34,6 +34,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'confirme_reglement_attente' => 'Votre règlement est en attente, nous vous informerons dès sa bonne réception.',
 
 // E
+	'erreur_aucun_moyen_paiement' => 'Aucun moyen de paiement n\'est disponible',
 	'erreur_transaction_echec' => 'Aucun règlement n\'a été réalisé. (Transaction Ref. @ref@)',
 	'erreur_transaction_invalide' => 'Une erreur est survenue, les données reçues ne sont pas conformes.',
 	'explication_page_configurer_paiement' => 'Configurez les systèmes de paiement actifs',
