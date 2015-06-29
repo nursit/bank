@@ -56,6 +56,34 @@ function autoriser_transaction_encaissercheque_dist($faire, $type, $id_transacti
 }
 
 /**
+ * Seuls les webmestres peuvent encaisser un virement
+ * webmaster.
+ * @param $faire
+ * @param $type
+ * @param $id_transaction
+ * @param $qui
+ * @param $opt
+ * @return bool
+ */
+function autoriser_transaction_encaisservirement_dist($faire, $type, $id_transaction, $qui, $opt) {
+	return autoriser('webmestre');
+}
+
+/**
+ * Tout le monde peut encaisser sa simu de virement
+ *
+ * @param $faire
+ * @param $type
+ * @param $id_transaction
+ * @param $qui
+ * @param $opt
+ * @return bool
+ */
+function autoriser_transaction_encaissersimu_dist($faire, $type, $id_transaction, $qui, $opt) {
+	return true;
+}
+
+/**
  * Seuls les webmestres peuvent rembourser une transaction
  * webmaster.
  * @param $faire
