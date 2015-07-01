@@ -1,37 +1,41 @@
 <BOUCLE_trans(TRANSACTIONS){id_transaction}>
-	<table class="spip panier">
-		[<caption>(#ENV{titre})</caption>]
-		<thead>
-		<th class="produit">Produit</th>
-		<th class="prix">Prix</th>
-		</thead>
-		<tbody>
-	#SET{items,#CONTENU*|appliquer_filtre{paniers_explique_cookie}}
-	<BOUCLE_detail(POUR){tableau #GET{items}}>
-	<tr class="[(#COMPTEUR_BOUCLE|alterner{odd,even})]">
-		<td class="produit">[(#VALEUR{id}|appliquer_filtre{affiche_produit_clair,#VALEUR{quantity}})]</td>
-		<td class="prix">[(#VALEUR{net_price}|affiche_monnaie)]</td>
-	</tr>
-	</BOUCLE_detail>
-	<tr class="odd">
-		<td class="produit">#CONTENU</td>
-		<td class="prix"></td>
-	</tr>
-	<//B_detail>
-		</tbody>
-		<tfoot>
-		<tr>
-			<td class="produit" colspan="1">Total HT</td>
-			<td class="prix">[(#MONTANT_HT|affiche_monnaie)]</td>
-		</tr>
-		<tr>
-			<td class="produit" colspan="1">TVA</td>
-			<td class="prix">[(#MONTANT|moins{#MONTANT_HT}|affiche_monnaie)]</td>
-		</tr>
-		<tr>
-			<td class="produit"  colspan="1">Total TTC</td>
-			<td class="prix">[(#MONTANT|affiche_monnaie)]</td>
-		</tr>
-		</tfoot>
-	</table>
+	<BOUCLE_commande(COMMANDES?){id_commande}{id_commande>0}>
+		<INCLURE{fond=inclure/commande,id_commande} />
+	</BOUCLE_commande>
+		<table class="spip panier">
+			[<caption>(#ENV{titre})</caption>]
+			<thead>
+			<th class="produit">Produit</th>
+			<th class="prix">Prix</th>
+			</thead>
+			<tbody>
+				#SET{items,#CONTENU*|appliquer_filtre{paniers_explique_cookie}}
+				<BOUCLE_detail(POUR){tableau #GET{items}}>
+				<tr class="[(#COMPTEUR_BOUCLE|alterner{odd,even})]">
+					<td class="produit">[(#VALEUR{id}|appliquer_filtre{affiche_produit_clair,#VALEUR{quantity}})]</td>
+					<td class="prix">[(#VALEUR{net_price}|affiche_monnaie)]</td>
+				</tr>
+				</BOUCLE_detail>
+				[<tr class="odd">
+					<td class="produit">(#CONTENU)</td>
+					<td class="prix"></td>
+				</tr>]
+				<//B_detail>
+			</tbody>
+			<tfoot>
+			<tr>
+				<td class="produit" colspan="1">Total HT</td>
+				<td class="prix">[(#MONTANT_HT|affiche_monnaie)]</td>
+			</tr>
+			<tr>
+				<td class="produit" colspan="1">TVA</td>
+				<td class="prix">[(#MONTANT|moins{#MONTANT_HT}|affiche_monnaie)]</td>
+			</tr>
+			<tr>
+				<td class="produit"  colspan="1">Total TTC</td>
+				<td class="prix">[(#MONTANT|affiche_monnaie)]</td>
+			</tr>
+			</tfoot>
+		</table>
+	<//B_commande>
 </BOUCLE_trans>
