@@ -59,8 +59,13 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	if (strlen($montant)<3)
 		$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
 
-	//		Affectation des parametres obligatoires
+	// Affectation des parametres obligatoires
+	// seuls les PBX_ sont envoyees dans le formulaire
 	$parm = $config;
+
+	// cas de PBX_RANG : paybox fournit 001 mais il faut envoyer 01 au serveur
+	$parm['PBX_RANG'] = str_pad(intval($parm['PBX_RANG']),2,'0',STR_PAD_LEFT);
+
 	$parm['PBX_OUTPUT']="C"; // recuperer uniquement les hidden
 	$parm['PBX_LANGUE']="FRA";
 	$parm['PBX_DEVISE']="978";

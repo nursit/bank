@@ -64,6 +64,9 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	//		Affectation des parametres obligatoires
 	$parm = array('VERSION'=>'00104','SITE'=>$config['PBX_SITE'],'RANG'=>$config['PBX_RANG'],'IDENTIFIANT'=>'');
 
+	// cas de PBX_RANG : paybox fournit 001 mais il faut envoyer 01 au serveur
+	$parm['RANG'] = str_pad(intval($parm['RANG']),2,'0',STR_PAD_LEFT);
+
 	$parm['CLE'] = $config['DIRECT_PLUS_CLE'];
 	$parm['DATEQ'] = date('dmYHis');
 	$parm['TYPE'] = _PAYBOX_DIRECTPLUS_AUTHDEBIT_ABONNE;
