@@ -722,7 +722,7 @@ function bank_simple_call_resilier_abonnement($uid, $config){
 	}
 
 	$envoyer_mail = charger_fonction("envoyer_mail","inc");
-	$envoyer_mail($GLOBALS['meta']['email_webmestre'],$sujet,$message);
+	$envoyer_mail($GLOBALS['meta']['email_webmaster'],$sujet,$message);
 
 	return false;
 }
