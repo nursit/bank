@@ -95,7 +95,7 @@ function abos_resilier_notify_bank($abonne_uid,$mode_paiement){
 		}
 
 		if (!$ok){
-			bank_simple_call_resilier_abonnement($row['abonne_uid'],$row['mode_paiement']);
+			bank_simple_call_resilier_abonnement($abonne_uid,$mode_paiement);
 			// TODO ajouter un message a l'abonnement pour le feedback user
 			spip_log("Envoi email de desabo " . $abonne_uid . " au webmestre", 'abos_resil' . _LOG_INFO_IMPORTANTE);
 
