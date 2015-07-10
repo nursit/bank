@@ -233,6 +233,15 @@ function systempay_traite_reponse_transaction($config, $response){
 			$is_subscribing = true;
 		}
 	}
+	// cas appel depuis BO
+	elseif($response['vads_url_check_src']=='BO') {
+		if (isset($response['vads_identifier']) AND $response['vads_identifier']){
+			$is_registering = true;
+		}
+		if (isset($response['vads_subscription']) AND $response['vads_subscription']){
+			$is_subscribing = true;
+		}
+	}
 
 
 	// si c'est un debit, a-t-on bien l'operation attendue ?
