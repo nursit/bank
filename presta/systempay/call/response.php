@@ -48,6 +48,8 @@ function presta_systempay_call_response_dist($config, $response=null){
 			if ($preparer_echeance = charger_fonction('preparer_echeance','abos',true)){
 				// on reinjecte le bon id de transaction ici si fourni
 				if ($id_transaction = $preparer_echeance("uid:".$response['vads_subscription'])){
+					$response['vads_auth_number'] = $response['vads_order_id'];
+					$response['vads_payment_certificate'] = $response['vads_trans_id'];
 					$response['vads_order_id'] = $id_transaction;
 				}
 			}
