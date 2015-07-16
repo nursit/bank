@@ -173,6 +173,7 @@ _ Compte bancaire :
 
 // T
 	'texte_confirmer_suppression_presta' => 'Supprimer ce prestataire bancaire ?',
+	'texte_confirmer_resilier' => 'Résilier cet abonnement ?',
 	'titre_menu_configurer' => 'Paiements en ligne',
 	'titre_menu_transactions' => 'Transactions',
 	'titre_page_configurer_paiement' => 'Paiements en ligne',
