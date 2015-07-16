@@ -97,9 +97,13 @@ function bank_affiche_gerer_abonnement($config,$abo_uid){
 		$config = bank_config($config,true);
 	}
 
-	if ($trans = sql_fetsel("*","spip_transactions","abo_uid=".sql_quote($abo_uid).' AND mode LIKE '.sql_quote($config['presta'].'%')." AND statut=".sql_quote('ok'),'','id_transaction')){
+	if ($trans = sql_fetsel("*","spip_transactions",$w="abo_uid=".sql_quote($abo_uid).' AND mode LIKE '.sql_quote($config['presta'].'%')." AND ".sql_in('statut',array('ok','attente')),'','id_transaction')){
 		$config = bank_config($trans['mode']);
-		return recuperer_fond("modeles/gerer_abonnement",array('presta'=>$config['presta'],'id_transaction'=>$trans['id_transaction'],'abo_uid'=>$abo_uid));
+		$fond = "modeles/gerer_abonnement";
+		if (trouver_fond($f="presta/".$config['presta']."/payer/gerer_abonnement")){
+			$fond = $f;
+		}
+		return recuperer_fond($fond,array('presta'=>$config['presta'],'id_transaction'=>$trans['id_transaction'],'abo_uid'=>$abo_uid));
 	}
 
 	return "";
