@@ -47,11 +47,14 @@ function presta_payzen_call_resilier_abonnement_dist($uid, $config = 'payzen'){
 	}
 
 	if ($e = $response->cancelSubscriptionResult->commonResponse->responseCode){
-		// 33 : Invalid Subscription => on est donc bien desabonne
-		if ($e==33) return true;
-
 		spip_log($s="call_resilier_abonnement $uid : erreur $e : ".$response->cancelSubscriptionResult->commonResponse->responseCodeDetail,$mode._LOG_ERREUR);
-		return false;
+		// 33 : Invalid Subscription => on est donc bien desabonne
+		if ($e==33) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 
 	return true;
