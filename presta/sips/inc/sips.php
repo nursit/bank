@@ -289,7 +289,7 @@ function sips_traite_reponse_transaction($config, $response) {
 				'mode'=>$mode,
 				'config_id' => $config_id,
 				'date_paiement' => $date_paiement,
-				'code_erreur' => $response['response_code'].":".$response['bank_response_code'],
+				'code_erreur' => $response['response_code'].(strlen($response['bank_response_code'])?":".$response['bank_response_code']:''),
 				'erreur' => trim($response_code." ".$bank_response_code),
 				'log' => sips_shell_args($response),
 				'send_mail' => $response['response_code']=='03',
@@ -370,9 +370,9 @@ function sips_bank_response_code($code){
 		98 => "Serveur indisponible routage reseau demande a nouveau",
 		99 => "Incident domaine initiateur"
 	);
-	if (isset($codes[intval($code)]))
+	if (strlen($code) AND isset($codes[intval($code)]))
 		return $codes[intval($code)];
-	return false;
+	return "";
 }
 
 /**
@@ -395,7 +395,7 @@ function sips_response_code($code){
 		90 => "Service temporairement indisponible");
 	if (isset($codes[intval($code)]))
 		return $codes[intval($code)];
-	return false;
+	return "";
 }
 
 ?>
