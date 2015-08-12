@@ -25,9 +25,9 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 function presta_sips_call_request_dist($id_transaction, $transaction_hash, $config){
 
 	$mode = 'sips';
-	if (!is_array($config) OR !isset($config['type']) OR !isset($config['config'])){
+	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
 		spip_log("call_request : config invalide ".var_export($config,true),$mode._LOG_ERREUR);
-		$mode = $config['config'];
+		$mode = $config['presta'];
 	}
 
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash))){
