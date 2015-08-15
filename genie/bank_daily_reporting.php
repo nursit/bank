@@ -55,7 +55,7 @@ $lignes
 				'date_paiement,sum(montant_ht) as total_ht,sum(montant) as total,count(id_transaction) as nb',
 				'spip_transactions',
 				'statut='.sql_quote('ok').' AND date_paiement>='.sql_quote($jm365),
-				'MONTH(date_paiement)','date_paiement DESC'
+				"DATE_FORMAT(date_paiement,'%Y-%m')",'date_paiement DESC'
 			);
 			$lignes = "";
 			foreach($mois as $moi){
