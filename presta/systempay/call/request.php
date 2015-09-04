@@ -188,6 +188,24 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 				$rule = "RRULE:";
 				$rule .= "FREQ=$freq;";
 
+				if ($freq=="MONTHLY"){
+					$monthday = intval(substr($parm['vads_sub_effect_date'],-2));
+					switch($monthday){
+						case 31:
+							$rule .= "BYMONTHDAY=28,29,30,31;BYSETPOS=-1;";
+							break;
+						case 30:
+							$rule .= "BYMONTHDAY=28,29,30;BYSETPOS=-1;";
+							break;
+						case 29:
+							$rule .= "BYMONTHDAY=28,29;BYSETPOS=-1;";
+							break;
+						default:
+							$rule .= "BYMONTHDAY=$monthday;";
+							break;
+					}
+				}
+
 				if ($nb>0){
 					$rule .= "COUNT=$nb;";
 				}
