@@ -22,7 +22,7 @@ include_spip('base/abstract_sql');
  */
 function abos_resilier_dist($id,$options=array()){
 
-	spip_log("abos/resilier id=$id","bank");
+	spip_log("abos/resilier id=$id","abos_resil");
 
 	/*
 	if (strncmp($id,"uid:",4)==0){
@@ -79,19 +79,28 @@ function abos_resilier_dist($id,$options=array()){
 function abos_resilier_notify_bank($abonne_uid,$mode_paiement){
 
 	// TODO : recuperer le presta et la config depuis la transaction
+	spip_log("abos/resilier_notify_bank abonne_uid=$abonne_uid mode=$mode_paiement","abos_resil");
 
 	$ok = true;
 	// notifier au presta bancaire si besoin
 	if ($mode_paiement
 	  AND $abonne_uid){
-		$presta = $mode_paiement;
-		$presta = explode("/",$presta);
-		$presta = reset($presta);
-		if ($presta_resilier = charger_fonction('resilier_abonnement',"presta/$presta/call",true)){
+
+		include_spip("inc/bank");
+		if (!$config = bank_config($mode_paiement,true)
+		  OR !isset($config['presta'])
+			OR !$presta = $config['presta']){
+			spip_log("abos/resilier_notify_bank presta inconnu pour mode=$mode_paiement","abos_resil"._LOG_ERREUR);
+		}
+
+		if ($presta AND $presta_resilier = charger_fonction('resilier_abonnement',"presta/$presta/call",true)){
 			$ok = $presta_resilier($abonne_uid);
 			if (!$ok){
 				spip_log("Resiliation abo " . $abonne_uid . " refuse par le prestataire", 'abos_resil' . _LOG_ERREUR);
 			}
+		}
+		else {
+			spip_log("abos/resilier_notify_bank : pas de methode resilier_abonnement pour le presta $presta","abos_resil"._LOG_INFO_IMPORTANTE);
 		}
 
 		if (!$ok){
