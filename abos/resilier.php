@@ -76,15 +76,16 @@ function abos_resilier_dist($id,$options=array()){
  * @return bool
  *   renvoie false si le presta bancaire indique un echec, true dans tous les autres cas
  */
-function abos_resilier_notify_bank($abonne_uid,$mode_paiement){
+function abos_resilier_notify_bank($abonne_uid,$mode_paiement=null){
 
-	// TODO : recuperer le presta et la config depuis la transaction
+	if (!$mode_paiement){
+		$mode_paiement = sql_getfetsel("mode","spip_transactions","abo_uid=".sql_quote($abonne_uid,'','text'),"","id_transaction DESC");
+	}
 	spip_log("abos/resilier_notify_bank abonne_uid=$abonne_uid mode=$mode_paiement","abos_resil");
 
 	$ok = true;
 	// notifier au presta bancaire si besoin
-	if ($mode_paiement
-	  AND $abonne_uid){
+	if ($mode_paiement AND $abonne_uid){
 
 		include_spip("inc/bank");
 		if (!$config = bank_config($mode_paiement,true)
