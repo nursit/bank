@@ -249,6 +249,8 @@ function systempay_traite_reponse_transaction($config, $response){
 	  AND $response['vads_operation_type']!=="DEBIT"
 	  // et pas un Abandon ou Refus
 	  AND !in_array($response['vads_trans_status'],array('ABANDONED','NOT_CREATED','REFUSED'))){
+		// si la transaction est deja reglee, ne pas la modifier, c'est OK
+		if ($row['statut']=='ok') return array($id_transaction,true);
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => $mode,
