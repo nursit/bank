@@ -45,8 +45,14 @@ function presta_systempay_call_response_dist($config, $response=null){
 		// sinon c'est le paiement de la premiere transaction
 		$trans = sql_fetsel("*","spip_transactions","id_transaction=".intval($response['vads_order_id']));
 		if (!$trans OR $trans['statut']=='ok'){
+			// verifier qu'on a pas deja traite cette recurrence !
+			if ($trans = sql_fetsel("*","spip_transactions","autorisation_id=".sql_quote($response['vads_order_id']."/".$response['vads_trans_id']))){
+				$response['vads_auth_number'] = $response['vads_order_id'];
+				$response['vads_payment_certificate'] = $response['vads_trans_id'];
+				$response['vads_order_id'] = $trans['id_transaction'];
+			}
 			// creer la transaction maintenant si besoin !
-			if ($preparer_echeance = charger_fonction('preparer_echeance','abos',true)){
+			elseif ($preparer_echeance = charger_fonction('preparer_echeance','abos',true)){
 				// on reinjecte le bon id de transaction ici si fourni
 				if ($id_transaction = $preparer_echeance("uid:".$response['vads_subscription'])){
 					$response['vads_auth_number'] = $response['vads_order_id'];
@@ -56,7 +62,6 @@ function presta_systempay_call_response_dist($config, $response=null){
 			}
 			$recurence = true;
 		}
-
 	}
 
 	// depouillement de la transaction
