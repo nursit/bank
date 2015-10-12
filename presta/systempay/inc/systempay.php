@@ -234,7 +234,7 @@ function systempay_traite_reponse_transaction($config, $response){
 		}
 	}
 	// cas appel depuis BO
-	elseif(in_array($response['vads_url_check_src'],array('BO','REC'))) {
+	elseif(in_array($response['vads_url_check_src'],array('BO','REC','RETRY'))) {
 		if (isset($response['vads_identifier']) AND $response['vads_identifier']){
 			$is_registering = true;
 		}

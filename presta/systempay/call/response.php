@@ -38,7 +38,8 @@ function presta_systempay_call_response_dist($config, $response=null){
 
 	$recurence = false;
 	// c'est une reconduction d'abonnement ?
-	if (isset($response['vads_url_check_src']) AND $response['vads_url_check_src']==='REC'){
+	if (isset($response['vads_url_check_src']) AND in_array($response['vads_url_check_src'],array('REC','RETRY'))
+		  AND isset($response['vads_recurrence_number']) AND $response['vads_recurrence_number']){
 
 		// si la transaction reference n'existe pas ou a deja ete payee c'est bien une recurence
 		// sinon c'est le paiement de la premiere transaction
@@ -61,7 +62,7 @@ function presta_systempay_call_response_dist($config, $response=null){
 	// depouillement de la transaction
 	list($id_transaction,$success) =  systempay_traite_reponse_transaction($config, $response);
 
-	if (strpos($response['vads_page_action'],"SUBSCRIBE")!==false
+	if (($recurence OR strpos($response['vads_page_action'],"SUBSCRIBE")!==false)
 	  AND $abo_uid = $response['vads_subscription']
 	  AND $id_transaction){
 
