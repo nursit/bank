@@ -149,8 +149,11 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 
 				// on commence maintenant
 				$date_effet = $now;
+				if (isset($echeance['date_start']) AND $echeance['date_start'] AND strtotime($echeance['date_start'])>$now){
+					$date_effet = strtotime($echeance['date_start']);
+				}
 				if (isset($options['delay_subscribe']) AND $options['delay_subscribe']){
-					$date_effet = strtotime("+".$options['delay_subscribe']." DAY",$now);
+					$date_effet = strtotime("+".$options['delay_subscribe']." DAY",$date_effet);
 				}
 				$parm['vads_sub_effect_date'] = gmdate ("Ymd",$date_effet);
 				$nb = 0;
