@@ -82,9 +82,10 @@ function balise_GERER_ABONNEMENT_dist($p){
  * @param $presta
  * @return mixed|string
  */
-function bank_titre_type_paiement($presta){
-	$presta = explode("/",$presta);
-	$presta = reset($presta);
+function bank_titre_type_paiement($mode){
+	include_spip('inc/bank');
+	$config = bank_config($mode);
+	$presta = $config['presta'];
 	$titre = _T("bank:label_type_paiement_$presta",array('presta'=>$presta),array('force'=>false));
 	if (!$titre)
 		$titre = _T("bank:label_type_paiement_cb_generique",array('presta'=>$presta));
