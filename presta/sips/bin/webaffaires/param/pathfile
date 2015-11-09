@@ -15,28 +15,33 @@ DEBUG!NO!
 #
 # ------------------------------------------------------------------------
 # Chemin vers le répertoire des logos depuis le web alias  
-# Exemple pour le répertoire www.merchant.com/mercanet/payment/logo/
+# Exemple pour le répertoire www.merchant.com/sogenactif/payment/logo/
 # indiquer:
 # ------------------------------------------------------------------------
 #
-D_LOGO!/mercanet/payment/logo/!
+D_LOGO!/sogenactif/payment/logo/!
 #
 # --------------------------------------------------------------------------
-#  Fichiers parametres lies a l'api mercanet paiement
+#  Fichiers paramètres liés a l'api sogenactif paiement	
 # --------------------------------------------------------------------------
-#
-# fichier des  parametres mercanet
-#
-F_DEFAULT!/home/mercanet/payment/param/parmcom.mercanet!
-#
-# fichier parametre commercant
-#
-F_PARAM!/home/mercanet/payment/param/parmcom!
 #
 # certificat du commercant
 #
-F_CERTIFICATE!/home/mercanet/payment/param/certif!
+F_CERTIFICATE!/home/sogenactif/payment/param/certif!
 #
-# --------------------------------------------------------------------------
-# 	end of file
-# --------------------------------------------------------------------------
+# type du certificat
+#
+F_CTYPE!php!
+#
+# fichier paramètre commercant
+#
+F_PARAM!/home/sogenactif/payment/param/parmcom!
+#
+# fichier des paramètres sogenactif
+#
+F_DEFAULT!/home/sogenactif/payment/param/parmcom.sogenactif!
+#
+#########################################################################
+# End of file
+#########################################################################
+

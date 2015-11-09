@@ -15,27 +15,27 @@ DEBUG!NO!
 #
 # ------------------------------------------------------------------------
 # Chemin vers le répertoire des logos depuis le web alias  
-# Exemple pour le répertoire www.merchant.com/mercanet/payment/logo/
+# Exemple pour le répertoire www.merchant.com/sherlocks/payment/logo/
 # indiquer:
 # ------------------------------------------------------------------------
 #
-D_LOGO!/mercanet/payment/logo/!
+D_LOGO!/sherlocks/payment/logo/!
 #
 # --------------------------------------------------------------------------
-#  Fichiers parametres lies a l'api mercanet paiement
+#  Fichiers parametres lies a l'api sherlocks paiement
 # --------------------------------------------------------------------------
 #
-# fichier des  parametres mercanet
+# fichier des  parametres sherlocks
 #
-F_DEFAULT!/home/mercanet/payment/param/parmcom.mercanet!
+F_DEFAULT!/home/sherlocks/payment/param/parmcom.sherlocks!
 #
 # fichier parametre commercant
 #
-F_PARAM!/home/mercanet/payment/param/parmcom!
+F_PARAM!/home/sherlocks/payment/param/parmcom!
 #
 # certificat du commercant
 #
-F_CERTIFICATE!/home/mercanet/payment/param/certif!
+F_CERTIFICATE!/home/sherlocks/payment/param/certif!
 #
 # --------------------------------------------------------------------------
 # 	end of file

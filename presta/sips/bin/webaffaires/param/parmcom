@@ -1,0 +1,29 @@
+###############################################################################
+#
+#	Fichier des parametres du commercant
+#
+#	Remarque :	Ce fichier paramètre est sous la responsabilité du
+#				commercant
+#
+###############################################################################
+
+# Logo du commercant (il apparait en haut a gauche des pages de paiement)
+
+LOGO!merchant.gif!
+
+# URL de retour automatique de la reponse du paiement
+
+#AUTO_RESPONSE_URL!!
+
+# URL de retour suite a paiement refuse
+
+CANCEL_URL!http://!
+
+# URL de retour suite a paiement accepte
+
+RETURN_URL!http://!
+
+
+# END OF FILE
+
+

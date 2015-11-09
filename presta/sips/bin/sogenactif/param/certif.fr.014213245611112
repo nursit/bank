@@ -1,11 +1,3 @@
-<?php
-/*__DEBUT__
-merchant_id!014213245611112!
-merchant_country!fr!
-certificate_expired!20130607!
-certificate_version!1.0!
-certificate_type!php!
-certificate_data!
 RMqyhPQKk4a97wq48nQ3wgRbfmnlm2xRIcSXSklqu9tF2AphmXXLgwxDj1ZKNvAbyH
 rzNnmlYl2AJ02xQQxE2ylEHiUKw6HPxXm4K5tPLmfcTUIV5wTza2lPYRospVeLTbt8
 PJJr5pVE5iVOvk2R88M0Tkt6YmfBq6ZpNBzeJDQODpEotiMyTDRjg4PNU7B76br1MU
@@ -50,5 +42,3 @@ qRYApJkYmWXLLANZn46w0I65L63PlBVrpYPSvFAu25aUMaSwcELNUKcpgFq5tsI1wG
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 sogenactifdemo,11/08/1999,V4,SOGENACTIF,DEMO++++++++++++++++++++++
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++END
-__FIN__*/
-php>
