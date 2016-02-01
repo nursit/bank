@@ -50,7 +50,9 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 		return "";
 	}
 
-	if (!$row['id_auteur'] AND $GLOBALS['visiteur_session']['id_auteur'])
+	if (!$row['id_auteur']
+	  AND isset($GLOBALS['visiteur_session']['id_auteur'])
+	  AND $GLOBALS['visiteur_session']['id_auteur'])
 		sql_updateq("spip_transactions",array("id_auteur"=>$row['id_auteur'] = $GLOBALS['visiteur_session']['id_auteur']),"id_transaction=".intval($id_transaction));
 	
 	// recuperer l'email

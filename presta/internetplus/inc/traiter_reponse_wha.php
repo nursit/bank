@@ -47,7 +47,7 @@ function presta_internetplus_inc_traiter_reponse_wha_dist($config,$m,$args,$part
 	}
 	
 	if (!$row['id_auteur']) {
-		if (!$GLOBALS['visiteur_session']['id_auteur']){
+		if (!isset($GLOBALS['visiteur_session']['id_auteur']) OR !$GLOBALS['visiteur_session']['id_auteur']){
 			$_SESSION['wha_traiter_reponse_wha'] = array('m'=>$m,'args'=>$args,'partnerId'=>$partnerId,'keyId'=>$keyId);
 			return array($id_transaction,'delayed',$mp);
 		}
