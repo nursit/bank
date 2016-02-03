@@ -302,18 +302,19 @@ function bank_porteur_email($transaction){
 function bank_porteur_nom($transaction){
 	$nom = '';
 
+	// si prenom et nom en session on les utilise
+	if(
+	  (!isset($GLOBALS['visiteur_session']['id_auteur']) OR $GLOBALS['visiteur_session']['id_auteur']==$transaction['id_auteur'])
+	  AND isset($GLOBALS['visiteur_session']['session_prenom'])
+	  AND isset($GLOBALS['visiteur_session']['session_nom'])){
+		$nom = $GLOBALS['visiteur_session']['session_nom'];
+	}
 	// recuperer le nom
-	if (!$transaction['id_auteur']
+	elseif (!$transaction['id_auteur']
 		OR !$nom = sql_getfetsel('nom','spip_auteurs','id_auteur='.intval($transaction['id_auteur']))){
 
 		if ($transaction['auteur'] AND strpos($transaction['auteur'],"@")===false){
 			$nom = $transaction['auteur'];
-		}
-		elseif(
-		  (!isset($GLOBALS['visiteur_session']['id_auteur']) OR $GLOBALS['visiteur_session']['id_auteur']==$transaction['id_auteur'])
-		  AND isset($GLOBALS['visiteur_session']['session_nom'])
-		  AND $GLOBALS['visiteur_session']['session_nom']){
-			$nom = $GLOBALS['visiteur_session']['session_nom'];
 		}
 	}
 
