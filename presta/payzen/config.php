@@ -55,7 +55,7 @@ function presta_payzen_titre_type_paiement_dist($mode, $id_transaction) {
 
 	if ($id_transaction
 	  AND $trans = sql_fetsel("refcb","spip_transactions","id_transaction=".intval($id_transaction))
-	  AND $trans['refcb']=="SEPA"){
+	  AND strncmp($trans['refcb'],"SEPA",4)==0){
 		return _T("bank:label_type_paiement_sepa",array('presta'=>"Payzen"));
 	}
 
