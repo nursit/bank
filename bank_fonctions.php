@@ -79,13 +79,22 @@ function balise_GERER_ABONNEMENT_dist($p){
  * Une fonction pour expliciter le mode de paiement en fonction du prestataire bancaire
  * par defaut c'est Carte Bancaire
  * sauf si une chaine de langue specifique existe
- * @param $presta
- * @return mixed|string
+ * @param string $mode
+ * @param int $id_transaction
+ * @return string
  */
-function bank_titre_type_paiement($mode){
+function bank_titre_type_paiement($mode, $id_transaction=0){
 	include_spip('inc/bank');
 	$config = bank_config($mode);
 	$presta = $config['presta'];
+
+	// si le presta dispose d'une fonction specifique (pour faire difference entre CB et SEPA par exemple)
+	if ($presta_titre_type_paiement = charger_fonction("titre_type_paiement","presta/$presta",true)){
+		$titre =  $presta_titre_type_paiement($mode, $id_transaction);
+		if ($titre) return $titre;
+	}
+
+	// sinon chaine de langue specifique ou generique
 	$titre = _T("bank:label_type_paiement_$presta",array('presta'=>$presta),array('force'=>false));
 	if (!$titre)
 		$titre = _T("bank:label_type_paiement_cb_generique",array('presta'=>$presta));
@@ -155,8 +164,8 @@ function filtre_bank_lister_configs_dist($type){
  * Afficher la liste des transactions d'un auteur sur la page auteur de l'espace prive
  *
  * @pipeline affiche_auteurs_interventions
- * @param  array $flux Données du pipeline
- * @return array       Données du pipeline
+ * @param  array $flux Donnï¿½es du pipeline
+ * @return array       Donnï¿½es du pipeline
  */
 function bank_affiche_auteurs_interventions($flux) {
 	if ($id_auteur = intval($flux['args']['id_auteur'])) {

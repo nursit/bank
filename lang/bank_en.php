@@ -153,6 +153,7 @@ _ Bank account:
 	'label_type_paiement_cb_generique' => 'Credit Card',
 	'label_type_paiement_cheque' => 'Check',
 	'label_type_paiement_paypal' => 'Paypal Account',
+	'label_type_paiement_sepa' => 'Debit',
 	'label_type_paiement_simu' => 'Fake payment',
 	'label_type_paiement_virement' => 'Bank Transfer',
 	'legend_sips_logo_page_paiement' => 'Logos for payment page',

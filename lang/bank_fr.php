@@ -157,6 +157,7 @@ _ Compte bancaire :
 	'label_type_paiement_cb_generique' => 'Carte bancaire',
 	'label_type_paiement_cheque' => 'Chèque',
 	'label_type_paiement_paypal' => 'Compte Paypal',
+	'label_type_paiement_sepa' => 'Prélèvement',
 	'label_type_paiement_simu' => 'Paiement fictif',
 	'label_type_paiement_virement' => 'Virement',
 	'legend_sips_logo_page_paiement' => 'Logos page de paiement',

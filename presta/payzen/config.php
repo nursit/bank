@@ -43,3 +43,21 @@ function payzen_lister_cartes_config($c,$cartes = true){
 	}
 	return $liste;
 }
+
+
+/**
+ * Titre "paiement SEPA" eventuel
+ * @param $mode
+ * @param $id_transaction
+ * @return mixed|string
+ */
+function presta_payzen_titre_type_paiement_dist($mode, $id_transaction) {
+
+	if ($id_transaction
+	  AND $trans = sql_fetsel("refcb","spip_transactions","id_transaction=".intval($id_transaction))
+	  AND $trans['refcb']=="SEPA"){
+		return _T("bank:label_type_paiement_sepa",array('presta'=>"Payzen"));
+	}
+
+	return "";
+}
