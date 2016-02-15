@@ -17,13 +17,13 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 		$auto = ($auto ? "auto":"");
 		$result = false;
 
-		// intercepter les retours depuis un presta actif
+		// intercepter les retours depuis un presta
+		// actif ou non (le paiement a ete fait en banque, on le decode dans tous les cas du moment qu'on sait le faire)
 		if (!$presta) $presta = _request('bankp');
 		include_spip('inc/bank');
 		if ($presta
 			AND $config = bank_config($presta)
-			AND !isset($config['erreur'])
-			AND $config['actif']){
+			AND !isset($config['erreur'])){
 
 			$presta = $config['presta']; // en cas de renommage
 			$test = "";
@@ -48,12 +48,16 @@ function action_bank_response_dist($cancel=null, $auto=null, $presta=null){
 				}
 			}
 
-			spip_log('call_'.$auto.'response : '.$GLOBALS['BANK_REQUEST_URI'],"$presta$auto$test");
+			$inactif = "";
+			if (!$config['actif']) {
+				$inactif = "(inactif) ";
+			}
+			spip_log('call_'.$auto.'response '.$inactif.': '.$GLOBALS['BANK_REQUEST_URI'],"$presta$auto$test");
 			list($id_transaction,$result)=$call_response($config);
-			spip_log('call_'.$auto.'response : '."$id_transaction/$result","$presta$auto$test");
+			spip_log('call_'.$auto.'response '.$inactif.': '."$id_transaction/$result","$presta$auto$test");
 		}
 		else {
-			spip_log("Prestataire $presta inconnu ou inactif",'bank_response'._LOG_ERREUR);
+			spip_log("Prestataire $presta inconnu",'bank_response'._LOG_ERREUR);
 		}
 
 		// fall back si le presta n'a rien renvoye de lisible
