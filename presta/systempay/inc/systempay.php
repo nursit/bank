@@ -261,6 +261,7 @@ function systempay_traite_reponse_transaction($config, $response){
 			AND !isset($response['vads_subscription'])
 			AND isset($response['vads_sequence_number']) AND $response['vads_sequence_number']){
 			$is_subscribing = true;
+			if (!$response['vads_card_number']) $response['vads_card_number']='X_X';
 		}
 	}
 
