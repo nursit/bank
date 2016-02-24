@@ -46,15 +46,27 @@ function presta_systempay_call_response_dist($config, $response=null){
 		$trans = sql_fetsel("*","spip_transactions","id_transaction=".intval($response['vads_order_id']));
 		if (!$trans OR $trans['statut']=='ok'){
 			// verifier qu'on a pas deja traite cette recurrence !
-			if ($trans = sql_fetsel("*","spip_transactions","autorisation_id=".sql_quote($response['vads_order_id']."/".$response['vads_trans_id']))){
+			if ($t2 = sql_fetsel("*","spip_transactions","autorisation_id=".sql_quote($response['vads_order_id']."/".$response['vads_trans_id']))){
 				$response['vads_auth_number'] = $response['vads_order_id'];
 				$response['vads_payment_certificate'] = $response['vads_trans_id'];
-				$response['vads_order_id'] = $trans['id_transaction'];
+				$response['vads_order_id'] = $t2['id_transaction'];
 			}
 			// creer la transaction maintenant si besoin !
 			elseif ($preparer_echeance = charger_fonction('preparer_echeance','abos',true)){
+				$id_transaction = 0;
+				// si c'est un RETRY qui n'a pas son vads_subscription, on le prend de la transaction si possible
+				$abo_uid = $response['vads_subscription'];
+				if (!$abo_uid AND $trans AND $trans['abo_uid']){
+					$abo_uid = $trans['abo_uid'];
+				}
+				if (!$abo_uid OR !$id_transaction = $preparer_echeance("uid:".$abo_uid)){
+					// si on avait pas le abo_uid dans la transaction initiale, essayer avec id_transaction
+					if ($trans AND !$trans['abo_uid']){
+						$id_transaction = $preparer_echeance("uid:".$trans['id_transaction']);
+					}
+				}
 				// on reinjecte le bon id de transaction ici si fourni
-				if ($id_transaction = $preparer_echeance("uid:".$response['vads_subscription'])){
+				if ($id_transaction){
 					$response['vads_auth_number'] = $response['vads_order_id'];
 					$response['vads_payment_certificate'] = $response['vads_trans_id'];
 					$response['vads_order_id'] = $id_transaction;
