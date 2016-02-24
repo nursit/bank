@@ -67,7 +67,11 @@ function presta_systempay_call_response_dist($config, $response=null){
 	// depouillement de la transaction
 	list($id_transaction,$success) =  systempay_traite_reponse_transaction($config, $response);
 
-	if (($recurence OR strpos($response['vads_page_action'],"SUBSCRIBE")!==false)
+	if (
+		($recurence
+			OR strpos($response['vads_page_action'],"SUBSCRIBE")!==false
+	    OR in_array($response['vads_url_check_src'],array('RETRY')))
+	  AND isset($response['vads_subscription'])
 	  AND $abo_uid = $response['vads_subscription']
 	  AND $id_transaction){
 

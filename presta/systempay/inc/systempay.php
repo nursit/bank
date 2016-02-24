@@ -185,7 +185,19 @@ function systempay_recupere_reponse($config){
 	}
 	$reponse['signature'] = (isset($_REQUEST['signature'])?$_REQUEST['signature']:'');
 
-	if (!systempay_verifie_signature($reponse,systempay_key($config))){
+	$ok = systempay_verifie_signature($reponse,systempay_key($config));
+	// si signature invalide, verifier si
+	// on rejoue manuellement un call vads_url_check_src=RETRY incomplet
+	// en lui ajoutant le vads_subscription
+	if (!$ok
+		AND isset($reponse['vads_url_check_src'])
+		AND $reponse['vads_url_check_src']==='RETRY'
+	  AND isset($reponse['vads_subscription'])){
+		$response_part = $reponse;
+		unset($response_part['vads_subscription']);
+		$ok = systempay_verifie_signature($response_part,systempay_key($config));
+	}
+	if (!$ok){
 		spip_log("recupere_reponse : signature invalide ".var_export($reponse,true),$config['presta']._LOG_ERREUR);
 		return false;
 	}
@@ -239,6 +251,15 @@ function systempay_traite_reponse_transaction($config, $response){
 			$is_registering = true;
 		}
 		if (isset($response['vads_subscription']) AND $response['vads_subscription']){
+			$is_subscribing = true;
+		}
+		// si on a pas de vads_subscription renseigne, mais bien un vads_identifier ET vads_sequence_number
+		// on note que c'est bien un $is_subscribing pour lever une erreur paiement invalide par email
+		// il faudra le traiter a la main
+		// car c'est un bug chez PayZen qui oublie d'envoyer l'info vads_subscription dans ce cas
+		elseif ($is_registering
+			AND !isset($response['vads_subscription'])
+			AND isset($response['vads_sequence_number']) AND $response['vads_sequence_number']){
 			$is_subscribing = true;
 		}
 	}
