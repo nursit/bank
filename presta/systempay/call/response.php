@@ -44,7 +44,8 @@ function presta_systempay_call_response_dist($config, $response=null){
 		// si la transaction reference n'existe pas ou a deja ete payee c'est bien une recurence
 		// sinon c'est le paiement de la premiere transaction
 		$trans = sql_fetsel("*","spip_transactions","id_transaction=".intval($response['vads_order_id']));
-		if (!$trans OR $trans['statut']=='ok'){
+		// pour $response['vads_recurrence_number']=1 on est pas sur, mais au dela c'est une recurence certaine
+		if (!$trans OR $trans['statut']=='ok' OR $response['vads_recurrence_number']>1){
 			// verifier qu'on a pas deja traite cette recurrence !
 			if ($t2 = sql_fetsel("*","spip_transactions","autorisation_id=".sql_quote($response['vads_order_id']."/".$response['vads_trans_id']))){
 				$response['vads_auth_number'] = $response['vads_order_id'];
