@@ -292,14 +292,32 @@ function systempay_traite_reponse_transaction($config, $response){
 	if ($is_sepa){
 		$date = $response['vads_presentation_date'];
 	}
-	$date_paiement = sql_format_date(
-		substr($date,0,4), //annee
-		substr($date,4,2), //mois
-		substr($date,6,2), //jour
+
+
+	// date paiement et date transaction
+	$t = gmmktime(
 		substr($date,8,2), //Heures
 		substr($date,10,2), //min
-		substr($date,12,2) //sec
+		substr($date,12,2), //sec
+		substr($date,4,2), //mois
+		substr($date,6,2), //jour
+		substr($date,0,4) //annee
 	);
+	$date_paiement = date('Y-m-d H:i:s',$t);
+	$date_transaction = $date_paiement;
+	if (isset($response['vads_presentation_date'])){
+		$date = $response['vads_trans_date'];
+		$t = gmmktime(
+			substr($date,8,2), //Heures
+			substr($date,10,2), //min
+			substr($date,12,2), //sec
+			substr($date,4,2), //mois
+			substr($date,6,2), //jour
+			substr($date,0,4) //annee
+		);
+		$date_transaction = date('Y-m-d H:i:s',$t);
+	}
+
 
 	$erreur = array(
 		systempay_response_code($response['vads_result']),
@@ -362,6 +380,13 @@ function systempay_traite_reponse_transaction($config, $response){
 	}
 	else {
 		$set['statut'] = 'attente';
+	}
+
+	// si la date de transaction Systempay est anterieure a celle du site - 1h, on la met a jour
+	// (cas ou l'on rejoue a posteriori une notification qui n'a pas marche)
+	if ($date_transaction<$row['date_transaction']
+	  OR $date_paiement<$row['date_transaction']){
+		$set['date_transaction'] = $date_transaction;
 	}
 
 	// si on a les infos de validite / card number, on les note ici
