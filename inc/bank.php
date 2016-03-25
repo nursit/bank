@@ -363,6 +363,8 @@ function bank_date_fin_mois($annee,$mois){
  *   string erreur :  texte en clair de l'erreur
  *   string log : texte complementaire pour les logs
  *   bool send_mail : avertir le webmestre par mail
+ *   string sujet : sujet du mail
+ *   bool update : mettre a jour la transaction en base ou non (false par defaut)
  * @return array
  */
 function bank_transaction_invalide($id_transaction="",$args=array()){

@@ -41,6 +41,22 @@ function presta_paybox_call_response_dist($config, $response=null){
 			if ($id_transaction = $preparer_echeance("uid:".$response['abo'])){
 				$response['id_transaction'] = $id_transaction;
 			}
+			// si c'est une recurrence mais qu'on a pas su generer une transaction nouvelle il faut loger
+			// avertir et sortir d'ici car on va foirer la transaction de reference sinon
+			// le webmestre rejouera la transaction
+			else {
+				return bank_transaction_invalide(
+					intval($response['id_transaction']).'PBX_RECONDUCTION_ABT',
+					array(
+						'mode' => $mode,
+						'sujet' => 'Echec creation transaction echeance',
+						'erreur' => "uid:".$response['abo'].' inconnu de $preparer_echeance',
+						'log' => bank_shell_args($response),
+						'update' => false,
+						'send_mail' => true,
+					)
+				);
+			}
 		}
 	}
 	

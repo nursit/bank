@@ -76,6 +76,22 @@ function presta_systempay_call_response_dist($config, $response=null){
 					$response['vads_payment_certificate'] = $response['vads_trans_id'];
 					$response['vads_order_id'] = $id_transaction;
 				}
+				// si c'est une recurrence mais qu'on a pas su generer une transaction nouvelle il faut loger
+				// avertir et sortir d'ici car on va foirer la transaction de reference sinon
+				// le webmestre rejouera la transaction
+				else {
+					return bank_transaction_invalide(
+						$response['vads_order_id'].'R'.$response['vads_recurrence_number'],
+						array(
+							'mode' => $mode,
+							'sujet' => 'Echec creation transaction echeance',
+							'erreur' => "uid:".$response['abo'].' inconnu de $preparer_echeance',
+							'log' => bank_shell_args($response),
+							'update' => false,
+							'send_mail' => true,
+						)
+					);
+				}
 			}
 			$recurence = true;
 		}
