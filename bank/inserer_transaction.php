@@ -64,7 +64,7 @@ function bank_inserer_transaction_dist($montant,$options=array()){
 		'auteur'=>isset($options['auteur'])?$options['auteur']:"",
 		'parrain'=>isset($options['parrain'])?$options['parrain']:"",
 		'tracking_id'=>isset($options['tracking_id'])?$options['tracking_id']:0,
-		'date_transaction'=>date('Y-m-d H:i:s'),
+		'date_transaction'=>date('Y-m-d H:i:s',$_SERVER['REQUEST_TIME']),
 	);
 
 	if (isset($options['champs']) AND is_array($options['champs']))

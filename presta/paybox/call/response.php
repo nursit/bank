@@ -35,8 +35,13 @@ function presta_paybox_call_response_dist($config, $response=null){
 	}
 
 	if ($response['ETAT_PBX']==='PBX_RECONDUCTION_ABT'){
-		// c'est un revouvellement initie par paybox : creer la transaction maintenant si besoin !
-		if ($preparer_echeance = charger_fonction('preparer_echeance','abos',true)){
+		// c'est un revouvellement initie par paybox
+		// verifier qu'on a pas deja traite cette recurrence !
+		if ($t2 = sql_fetsel("*","spip_transactions","autorisation_id=".sql_quote($response['trans']."/".$response['auth']))){
+			$response['id_transaction'] = $t2['id_transaction'];
+		}
+		// creer la transaction maintenant si besoin !
+		elseif ($preparer_echeance = charger_fonction('preparer_echeance','abos',true)){
 			// on reinjecte le bon id de transaction ici si fourni
 			if ($id_transaction = $preparer_echeance("uid:".$response['abo'])){
 				$response['id_transaction'] = $id_transaction;

@@ -134,7 +134,7 @@ function paybox_form_hidden($params){
 		if (!isset($params['PBX_TIME']))
 			$params['PBX_TIME'] = date("c");
 
-		// On calcule l?empreinte (a renseigner dans le parametre PBX_HMAC) grace à la fonction hash_hmac et
+		// On calcule l?empreinte (a renseigner dans le parametre PBX_HMAC) grace a la fonction hash_hmac et
 		// la cle binaire
 		// On envoie via la variable PBX_HASH l'algorithme de hachage qui a ete utilise (SHA512 dans ce cas)
 		// Pour afficher la liste des algorithmes disponibles sur votre environnement, decommentez la ligne
@@ -168,7 +168,7 @@ function paybox_form_hidden($params){
 		// Si la cle est en ASCII, On la transforme en binaire
 		$binKey = pack("H*", $key);
 
-		// La chaîne sera envoyée en majuscules, d'où l'utilisation de strtoupper()
+		// La chaine sera envoyee en majuscules, d'ou l'utilisation de strtoupper()
 		$hmac = strtoupper(hash_hmac($hash_method, $message, $binKey));
 
 		$params_att['PBX_HMAC'] = $hmac;
@@ -203,6 +203,15 @@ function paybox_response($response = 'response'){
 		$sign = base64_decode($sign);
 		// recuperer les variables
 		$vars = $url['query'];
+
+		// cas ou l'on rejoue une transaction a une date anterieure
+		// on peut y ajouter un &var_replay_date=2016-03-25 pour prendre en compte cette date
+		// de transaction/paiement
+		if (_request('var_replay_date')){
+			$vars = preg_replace(',&var_replay_date=.*$,','',$vars);
+			// $_SERVER['REQUEST_TIME'] sera modifie plus bas, une fois que la signature aura ete verifiee
+		}
+
 		// enlever la signature des data
 		$vars = preg_replace(',&sign=.*$,','',$vars);
 
@@ -258,7 +267,14 @@ function paybox_response($response = 'response'){
 	parse_str($url['query'],$response);
 	unset($response['page']);
 	unset($response['sign']);
-	
+
+	// cas ou l'on rejoue une transaction a une date anterieure
+	// on peut y ajouter un &var_replay_date=2016-03-25 pour prendre en compte cette date
+	// de transaction/paiement
+	if (_request('var_replay_date')){
+		$_SERVER['REQUEST_TIME'] = strtotime(_request('var_replay_date'));
+	}
+
 	return $response;
 }
 
@@ -285,7 +301,7 @@ function paybox_traite_reponse_transaction($config, $response) {
 	}
 
 	// ok, on traite le reglement
-	$date=time();
+	$date=$_SERVER['REQUEST_TIME'];
 	$date_paiement = sql_format_date(
 	date('Y',$date), //annee
 	date('m',$date), //mois
