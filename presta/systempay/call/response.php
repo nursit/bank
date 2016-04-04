@@ -64,9 +64,18 @@ function presta_systempay_call_response_dist($config, $response=null){
 				if (!$abo_uid OR !$id_transaction = $preparer_echeance("uid:".$abo_uid)){
 					// si on avait pas le abo_uid dans la transaction initiale, essayer avec id_transaction
 					if ($trans AND !$trans['abo_uid']){
-						$id_transaction = $preparer_echeance("uid:".$trans['id_transaction']);
-						if ($id_transaction){
-							$response['vads_subscription'] = $trans['id_transaction'];
+						// si c'est la 1ere recurence essayer de reparer la transaction initiale
+						if ($response['vads_recurrence_number']==1 AND $response['vads_subscription']){
+							sql_updateq("spip_transactions",array('abo_uid'=>$response['vads_subscription']),'id_transaction='.intval($trans['id_transaction']));
+							$trans['abo_uid'] = $response['vads_subscription'];
+							$id_transaction = $preparer_echeance("uid:".$abo_uid);
+						}
+						// sinon essayer avec le numero de transaction comme numero d'abonnement
+						if (!$id_transaction){
+							$id_transaction = $preparer_echeance("uid:".$trans['id_transaction']);
+							if ($id_transaction){
+								$response['vads_subscription'] = $trans['id_transaction'];
+							}
 						}
 					}
 				}
