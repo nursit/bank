@@ -11,7 +11,7 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-function action_abandonner_commande_dist($id_transaction=null){
+function action_abandonner_transaction_dist($id_transaction=null){
 
 	if (is_null($id_transaction)){
 		$securiser_action = charger_fonction('securiser_action','inc');
@@ -25,7 +25,12 @@ function action_abandonner_commande_dist($id_transaction=null){
 		sql_updateq('spip_transactions',array('statut'=>'abandon'),"id_transaction=".intval($id_transaction));
 
 		if ($row['id_panier']
-		  AND $abandonner_panier = charger_fonction('abandonner_panier','action',true))
+		  AND $abandonner_panier = charger_fonction('abandonner_panier','action',true)) {
 			$abandonner_panier($row['id_panier']);
+		}
+		if ($row['id_commande']
+		  AND $abandonner_commande = charger_fonction('abandonner_commande','action',true)) {
+			$abandonner_commande($row['id_commande']);
+		}
 	}
 }

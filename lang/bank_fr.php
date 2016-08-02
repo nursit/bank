@@ -25,6 +25,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'bouton_enregistrer_reglement_virement' => 'Régler par virement bancaire',
 	'bouton_monter' => 'monter',
 	'bouton_rembourser' => 'Marquer comme remboursée',
+	'bouton_abondonner_transaction' => 'Abandonner cette transaction',
 
 // C
 	'carte_bleu' => 'Carte Bleue',
@@ -181,5 +182,7 @@ _ Compte bancaire :
 	'titre_reglement_annule' => 'Annulation',
 	'titre_reglement_ok' => 'Règlement réussi',
 	'titre_reglement_attente' => 'Règlement en attente',
+	'titre_transaction' => 'Transaction',
+	'titre_payer_transaction' => 'Payer la transaction',
 );
 ?>

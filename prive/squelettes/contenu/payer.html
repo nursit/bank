@@ -1,12 +1,13 @@
 [(#AUTORISER{regler,transaction,#ID_TRANSACTION}|sinon_interdire_acces)]
 <B_trans>
-<h1 class="grostitre">Commande #ID_TRANSACTION</h1>
+[(#BOUTON_ACTION{<:bank:bouton_abondonner_transaction:>,#URL_ACTION_AUTEUR{abandonner_transaction,#ID_TRANSACTION,#VAL{transactions}|generer_url_ecrire{id_transaction=#ID_TRANSACTION,0,#EVAL{true}}},right small})]
+<h1 class="grostitre"><:bank:titre_transaction:> ##ID_TRANSACTION</h1>
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}{statut IN commande,attente}>
-	[(#SET{titre,[Commande #(#ID_TRANSACTION) / [(#DATE_TRANSACTION|affdate_heure)]]})]
+	[(#SET{titre,[<:bank:titre_transaction:> #(#ID_TRANSACTION) / [(#DATE_TRANSACTION|affdate_heure)]]})]
 	<INCLURE{fond=modeles/transaction_details,id_transaction,titre=#GET{titre}} />
-	<a class="right small" href="#URL_ACTION_AUTEUR{abandonner_commande,#ID_TRANSACTION,#VAL{transactions}|generer_url_ecrire{id_transaction=#ID_TRANSACTION,0,#EVAL{true}}}">Abandonner cette commande</a>
 
-	#SET{titre,#VAL{Payer la commande #}|concat{#ID_TRANSACTION,'&nbsp;: ',#MONTANT|affiche_monnaie}}
+
+	[(#SET{titre,[<:bank:titre_payer_transaction:>(#VAL{' #'}|concat{#ID_TRANSACTION,'&nbsp;: ',#MONTANT|affiche_monnaie})]})]
 
 	<BOUCLE_client(AUTEURS){id_auteur}{statut==.*}>
 		[(#VAL{client_adresse_facture}|trouver_fond{modeles}|oui)
@@ -25,6 +26,6 @@
 .payer_mode .titre {font-weight: bold;font-size: 1.2em;}
 .payer_mode .boutons form,
 .payer_mode .boutons div {display: inline;}
-a.right {text-align: right;display: block;float: right;}
+.bouton_action_post.right {float: right;}
 
 </style>
