@@ -30,7 +30,7 @@
 				<//B_modes>
 			</BOUCLE_payant>
 				<h3 class='selectionnez'>
-				[(#ENV{title,Rien à payer})]
+				[(#ENV{title,<:bank:titre_rien_a_payer:>})]
 				</h3>
 				#PAYER_ACTE{gratuit,#ID_TRANSACTION,#TRANSACTION_HASH,#ENV{title,''}}
 			<//B_payant>

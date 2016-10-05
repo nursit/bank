@@ -25,14 +25,17 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'bouton_enregistrer_reglement_virement' => 'Pay by bank transfer',
 	'bouton_monter' => 'up',
 	'bouton_rembourser' => 'Record as refunded',
+	'bouton_abondonner_transaction' => 'Cancel this transaction',
 
 // C
 	'carte_bleu' => 'Credit Card',
 	'choisissez_cb' => 'Select your Credit Card:',
 	'confirme_reglement_annule' => 'The operation was cancelled. No payment has been achieved',
 	'confirme_reglement_pris_en_compte' => 'Your payment has been taken into account, thank you.',
+	'confirme_reglement_attente' => 'Your payment is pending, we will inform you as soon as recieved.',
 
 // E
+	'erreur_aucun_moyen_paiement' => 'No payment method available',
 	'erreur_transaction_echec' => 'No payment has been achieved. (Transaction Ref. @ref@)',
 	'erreur_transaction_invalide' => 'An error has occured due to unexpected received data.',
 	'explication_page_configurer_paiement' => 'Set up active payment systems',
@@ -55,6 +58,7 @@ Transaction: #@transaction@
 _ Amount: @montant@',
 	'info_mode_reglement_enregistre' => 'Your choice for your payment mode has been recorded.',
 	'info_mode_test' => 'TEST mode (fake payment)',
+	'info_prelevement_sepa' => 'Provide your IBAN to our provider @presta@ for activation of debit by SEPA.',
 	'info_nb_transactions' => '@nb@ transactions',
 	'info_virement' => 'You can pay via bank transfer.
 Instructions about your bank transfer will be provided after you click on ’Pay by bank transfer’.
@@ -165,15 +169,23 @@ _ Bank account:
 	'payer_par_carte_bancaire' => 'Pay by credit card:',
 	'payer_par_cheque' => 'Pay by check:',
 	'payer_par_e_cheque_vacances' => 'Pay by <span lang="fr">e-Chèque-Vacances</span>:',
+	'payer_par_gratuit' => 'You have nothing to pay',
 	'payer_par_prelevement_sepa' => 'Pay by direct account debit (SEPA):',
 	'payer_par_virement' => 'Pay by bank transfer:',
 
 // T
+	'titre_bouton_payer_gratuit' => 'Validate the order',
 	'texte_confirmer_suppression_presta' => 'Remove this payment provider?',
+	'texte_confirmer_resilier' => 'Cancel this subscription?',
 	'titre_menu_configurer' => 'Online payments',
 	'titre_menu_transactions' => 'Transactions',
+	'titre_mode_paiement_securise' => 'I choose a secure method of payment:',
 	'titre_page_configurer_paiement' => 'Online payments',
+	'titre_payer_transaction' => 'Pay this transaction',
 	'titre_reglement_annule' => 'Cancellation',
 	'titre_reglement_ok' => 'Successfull payment',
+	'titre_reglement_attente' => 'Payment pending',
+	'titre_rien_a_payer' => 'Nothing to pay',
+	'titre_transaction' => 'Transaction',
 );
 ?>

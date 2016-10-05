@@ -64,8 +64,7 @@ _ Montant : @montant@',
 Les instructions concernant l’établissement du virement seront fournies après avoir cliqué sur ’Régler par virement bancaire’.
 
 Transaction : #@transaction@
-_ Montant : @montant@
-',
+_ Montant : @montant@',
 	'info_virement_etablir' => '
 Libellé de votre virement : #@transaction@
 _ Montant : @montant@
@@ -170,19 +169,23 @@ _ Compte bancaire :
 	'payer_par_carte_bancaire' => 'Payer par carte bancaire :',
 	'payer_par_cheque' => 'Payer par chèque :',
 	'payer_par_e_cheque_vacances' => 'Payer par e-Chèque-Vacances :',
+	'payer_par_gratuit' => 'Vous n\'avez rien à payer',
 	'payer_par_prelevement_sepa' => 'Payer par prélèvement automatique :',
 	'payer_par_virement' => 'Payer par virement bancaire :',
 
 // T
+	'titre_bouton_payer_gratuit' => 'Valider la commande',
 	'texte_confirmer_suppression_presta' => 'Supprimer ce prestataire bancaire ?',
 	'texte_confirmer_resilier' => 'Résilier cet abonnement ?',
 	'titre_menu_configurer' => 'Paiements en ligne',
 	'titre_menu_transactions' => 'Transactions',
+	'titre_mode_paiement_securise' => 'Je choisis mon mode de paiement sécurisé :',
 	'titre_page_configurer_paiement' => 'Paiements en ligne',
+	'titre_payer_transaction' => 'Payer la transaction',
 	'titre_reglement_annule' => 'Annulation',
 	'titre_reglement_ok' => 'Règlement réussi',
 	'titre_reglement_attente' => 'Règlement en attente',
+	'titre_rien_a_payer' => 'Rien à payer',
 	'titre_transaction' => 'Transaction',
-	'titre_payer_transaction' => 'Payer la transaction',
 );
 ?>
