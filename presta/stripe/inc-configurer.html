@@ -1,0 +1,28 @@
+<ul class="editer-groupe">
+	#SET{name,#ENV{casier,''}_SECRET_KEY}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">Live Secret Key</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[SECRET_KEY]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{SECRET_KEY,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	#SET{name,#ENV{casier,''}_PUBLISHABLE_KEY}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">Live Publishable Key</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[PUBLISHABLE_KEY]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{PUBLISHABLE_KEY,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	<INCLURE{fond=formulaires/inc-bank-config-type,env} />
+	<INCLURE{fond=formulaires/inc-bank-config-mode_test,env} />
+	#SET{name,#ENV{casier,''}_SECRET_KEY_test}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">TEST Secret Key</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[SECRET_KEY_test]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{SECRET_KEY_test,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	#SET{name,#ENV{casier,''}_PUBLISHABLE_KEY_test}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">TEST Publishable Key</label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[PUBLISHABLE_KEY_test]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{PUBLISHABLE_KEY_test,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+</ul>

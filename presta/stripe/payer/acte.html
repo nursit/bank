@@ -1,0 +1,36 @@
+[(#REM)
+/*
+* Paiement Bancaire
+* module de paiement bancaire multi prestataires
+* stockage des transactions
+*
+* Auteurs :
+* Cedric Morin, Nursit.com
+* (c) 2012-2015 - Distribue sous licence GNU/GPL
+*
+*/
+]#CACHE{0}
+<BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
+  <div class="payer_mode payer_stripe payer_acte">
+	  <p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
+	  <div class='boutons'>
+		  <form action="#ENV*{action}" method="POST">
+			  [<div>(#ENV**{hidden})</div>]
+		    <script
+		      src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+		      [data-key="(#ENV{key}|attribut_html)"]
+		      [data-amount="(#ENV{amount}|attribut_html)"]
+		      [data-email="(#ENV{email}|attribut_html)"]
+		      [data-name="(#ENV{name}|attribut_html)"]
+		      [data-description="(#ENV{description}|attribut_html)"]
+		      [data-image="(#ENV{image}|attribut_html)"]
+		      data-label="<:bank:bouton_enregistrer_reglement_carte|attribut_html:>"
+		      data-locale="auto"
+		      data-zip-code="true"
+		      data-currency="eur">
+		    </script>
+		  </form>
+	  </div>
+	  [(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=Stripe}:></div>]
+  </div>
+</BOUCLE_trans>
