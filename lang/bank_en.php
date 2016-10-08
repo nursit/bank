@@ -20,6 +20,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 // B
 	'bouton_descendre' => 'down',
+	'bouton_enregistrer_reglement_carte' => 'Pay by card',
 	'bouton_enregistrer_reglement_cheque' => 'Pay by check',
 	'bouton_enregistrer_reglement_ok' => 'Record payment achieved',
 	'bouton_enregistrer_reglement_virement' => 'Pay by bank transfer',
@@ -41,6 +42,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'explication_page_configurer_paiement' => 'Set up active payment systems',
 
 // I
+	'info_aucune_transaction' => 'No transaction',
 	'info_1_transaction' => '1 transaction',
 	'info_cheque_envoyer' => 'Send your check made out in Euros
 -* to the order of “@ordre@”

@@ -20,6 +20,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 // B
 	'bouton_descendre' => 'descendre',
+	'bouton_enregistrer_reglement_carte' => 'Payer par carte',
 	'bouton_enregistrer_reglement_cheque' => 'Régler par chèque',
 	'bouton_enregistrer_reglement_ok' => 'Le réglement a bien été reçu',
 	'bouton_enregistrer_reglement_virement' => 'Régler par virement bancaire',
@@ -41,6 +42,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'explication_page_configurer_paiement' => 'Configurez les systèmes de paiement actifs',
 
 // I
+	'info_aucune_transaction' => 'Aucune transaction',
 	'info_1_transaction' => '1 transaction',
 	'info_cheque_envoyer' => 'Envoyez votre chèque libellé en euros
 -* à l\'ordre de « @ordre@ » ;

@@ -14,8 +14,13 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 function bank_transactions_statuts(){
 	$statuts = sql_allfetsel("statut, count(id_transaction) as n","spip_transactions","","statut");
-	$statuts = array_combine(array_map('reset',$statuts),array_map('end',$statuts));
-	ksort($statuts);
+	if ($statuts){
+		$statuts = array_combine(array_map('reset',$statuts),array_map('end',$statuts));
+		ksort($statuts);
+	}
+	else {
+		$statuts = array('ok'=>0);
+	}
 
 	$all = array(''=>array_sum($statuts));
 	foreach(array('ok','commande','attente') as $s){
