@@ -138,6 +138,7 @@ _ Compte bancaire :
 	'label_presta_internetplus' => 'Internet +',
 	'label_presta_ogone' => 'Ogone <a href="http://www.ogone.fr/">http://www.ogone.fr/</a>',
 	'label_presta_paybox' => 'Paybox <a href="http://www.paybox.com/">http://www.paybox.com/</a>',
+	'label_presta_stripe' => 'Stripe <a href="https://stripe.com/fr">https://stripe.com/fr</a>',
 	'label_presta_paypal' => 'Paypal (faiblement sécurisé) <a href="http://www.paypal.fr/">http://www.paypal.fr/</a>',
 	'label_presta_paypalexpress' => 'Paypal Express Checkout <a href="http://www.paypal.fr/">http://www.paypal.fr/</a>',
 	'label_presta_payzen' => 'PayZen <a href="https://www.payzen.eu/">https://www.payzen.eu/</a>',
