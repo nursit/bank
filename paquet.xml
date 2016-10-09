@@ -1,12 +1,12 @@
 <paquet
 	prefix="bank"
 	categorie="outil"
-	version="3.2.14"
+	version="3.2.15"
 	etat="test"
 	compatibilite="[3.0.0;3.1.*]"
 	logo="prive/themes/spip/images/credit-card-32.png"
 	documentation="http://contrib.spip.net/4627"
-	schema="1.6.4"
+	schema="1.6.5"
 >
 
 	<nom>Banque&amp;paiement</nom>

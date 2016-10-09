@@ -119,6 +119,9 @@ function bank_upgrade($nom_meta_base_version,$version_cible){
 	$maj['1.6.4'] = array(
 		array("sql_updateq","spip_transactions",array('statut'=>'attente'),"statut=".sql_quote('commande')." AND mode<>'' AND autorisation_id<>''"),
 	);
+	$maj['1.6.5'] = array(
+		array("sql_alter","table spip_transactions CHANGE autorisation_id autorisation_id varchar(255) NOT NULL DEFAULT ''"),
+	);
 
 	include_spip('base/upgrade');
 	maj_plugin($nom_meta_base_version, $version_cible, $maj);
