@@ -64,6 +64,7 @@ function stripe_traite_reponse_transaction($config, $response) {
 	$montant = intval(round(100*$row['montant'],0));
 	if (strlen($montant)<3)
 		$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
+	$email = bank_porteur_email($row);
 
 	$key = ($config['mode_test']?$config['SECRET_KEY_test']:$config['SECRET_KEY']);
 	$c = array(
@@ -71,10 +72,12 @@ function stripe_traite_reponse_transaction($config, $response) {
 		"currency" => "eur",
 	  "source" => $response['token'],
 	  "description" => "Transaction #".$id_transaction,
+		"receipt_email" => $email,
 		"metadata" => array(
 			"id_transaction" => $id_transaction
 		),
 	);
+
 
 	// ok, on traite le reglement
 	$date=$_SERVER['REQUEST_TIME'];
@@ -93,20 +96,27 @@ function stripe_traite_reponse_transaction($config, $response) {
 	try {
 
 	  $charge = \Stripe\Charge::create($c);
-		var_dump($charge);
-		die();
-		$response = array_merge($response, $charge);
+
+		// pour les logs en cas d'echec
+		$r = $charge->getLastResponse()->json;
+		$response = array_merge($response, $r);
 
 	} catch(\Stripe\Error\Card $e) {
-
-		var_dump($e);
-		die();
 
 		// Since it's a decline, \Stripe\Error\Card will be caught
 	  $body = $e->getJsonBody();
 	  $err  = $body['error'];
-
 		list($erreur_code, $erreur) = stripe_error_code($err);
+
+	} catch (Exception $e) {
+		if ($body = $e->getJsonBody()){
+			$err  = $body['error'];
+			list($erreur_code, $erreur) = stripe_error_code($err);
+		}
+		else {
+			$erreur = $e->getMessage();
+			$erreur_code = 'error';
+		}
 	}
 
 	// Ouf, le reglement a ete accepte
@@ -114,6 +124,10 @@ function stripe_traite_reponse_transaction($config, $response) {
 	if (!$erreur_code and !$charge['paid']) {
 		$erreur_code = 'not_paid';
 		$erreur = 'echec paiement stripe';
+		if ($charge['failure_code'] or $charge['failure_message']) {
+			$erreur_code = $charge['failure_code'];
+			$erreur = $charge['failure_message'];
+		}
 	}
 
 	if ($erreur or $erreur_code) {
@@ -144,8 +158,8 @@ function stripe_traite_reponse_transaction($config, $response) {
 	}
 
 
-	$transaction = $charge['id'];
-	$authorisation_id = $charge['balance_transaction'];
+	$transaction = $charge['balance_transaction'];
+	$authorisation_id = $charge['id'];
 
 	$set = array(
 		"autorisation_id" => "$transaction/$authorisation_id",
@@ -155,6 +169,7 @@ function stripe_traite_reponse_transaction($config, $response) {
 		"statut"=>'ok',
 		"reglee"=>'oui'
 	);
+
 
 	// type et numero de carte ?
 	if (isset($charge['source']) and $charge['source']['object']=='card'){
@@ -175,6 +190,7 @@ function stripe_traite_reponse_transaction($config, $response) {
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
 	$regler_transaction($id_transaction,array('row_prec'=>$row));
+
 	return array($id_transaction,true);
 
 }
