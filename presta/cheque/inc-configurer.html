@@ -1,4 +1,4 @@
-<ul>
+<ul class="editer-groupe">
 	#SET{name,#ENV{casier,''}_ordre}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 		<label for="#GET{name}"><:bank:label_configuration_cheque_ordre:></label>[

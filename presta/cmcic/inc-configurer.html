@@ -1,4 +1,4 @@
-<ul>
+<ul class="editer-groupe">
 	#SET{name,#ENV{casier,''}_service}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 		<label for="#GET{name}"><:bank:label_presta_cmcic_banque:></label>[
@@ -7,7 +7,7 @@
 			#SET{val,CIC}
 			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>C.I.C.</option>
 			#SET{val,CMUT}
-			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>Crédit Mutuel</option>
+			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>CrÃ©dit Mutuel</option>
 			#SET{val,OBC}
 			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>O.B.C.</option>
 		</select>
