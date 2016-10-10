@@ -13,9 +13,29 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 include_spip('inc/bank');
 
+/**
+ * Initialiser l'API Stripe : chargement de la lib et inits des static
+ * @param $config
+ */
+function stripe_init_api($config){
+
+	include_spip('presta/stripe/lib/stripe-php-4.0.0/init');
+
+	// Set secret key
+	// See keys here: https://dashboard.stripe.com/account/apikeys
+	$key = ($config['mode_test']?$config['SECRET_KEY_test']:$config['SECRET_KEY']);
+	\Stripe\Stripe::setApiKey($key);
+
+	// debug : pas de verif des certificats
+	\Stripe\Stripe::$verifySslCerts = false;
+
+	// s'annoncer fierement : SPIP + bank vx
+	\Stripe\Stripe::$appInfo = bank_annonce_version_plugin();
+
+}
+
 
 function stripe_traite_reponse_transaction($config, $response) {
-	include_spip('presta/stripe/lib/stripe-php-4.0.0/init');
 
 	$mode = $config['presta'];
 	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
@@ -67,7 +87,6 @@ function stripe_traite_reponse_transaction($config, $response) {
 		$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
 	$email = bank_porteur_email($row);
 
-	$key = ($config['mode_test']?$config['SECRET_KEY_test']:$config['SECRET_KEY']);
 	$c = array(
 		'amount' => $montant,
 		"currency" => "eur",
@@ -88,11 +107,8 @@ function stripe_traite_reponse_transaction($config, $response) {
 	$erreur = "";
 	$erreur_code = 0;
 
-	// Set your secret key
-	// See your keys here: https://dashboard.stripe.com/account/apikeys
-	\Stripe\Stripe::setApiKey($key);
-	// debug
-	\Stripe\Stripe::$verifySslCerts = false;
+	// charger l'API Stripe avec la cle
+	stripe_init_api($config);
 
 	// essayer de retrouver ou creer un customer pour l'id_auteur
 	$customer = null;
