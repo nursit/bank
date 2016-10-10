@@ -18,6 +18,7 @@ function stripe_traite_reponse_transaction($config, $response) {
 	include_spip('presta/stripe/lib/stripe-php-4.0.0/init');
 
 	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 	$config_id = bank_config_id($config);
 
 	if (!isset($response['id_transaction']) OR !isset($response['transaction_hash'])){
@@ -74,7 +75,8 @@ function stripe_traite_reponse_transaction($config, $response) {
 	  "description" => "Transaction #".$id_transaction,
 		"receipt_email" => $email,
 		"metadata" => array(
-			"id_transaction" => $id_transaction
+			'id_transaction' => $id_transaction,
+			'id_auteur' => $row['id_auteur'],
 		),
 	);
 
@@ -92,8 +94,56 @@ function stripe_traite_reponse_transaction($config, $response) {
 	// debug
 	\Stripe\Stripe::$verifySslCerts = false;
 
+	// essayer de retrouver ou creer un customer pour l'id_auteur
+	$customer = null;
+	$customer_id = 0;
+	try {
+		if ($row['id_auteur']) {
+			$customer_id = sql_getfetsel('pay_id','spip_transactions','pay_id!='.sql_quote('').' AND id_auteur='.intval($row['id_auteur']).' AND statut='.sql_quote('ok').' AND mode='.sql_quote("$mode/$config_id"),'','date_paiement DESC','0,1');
+			if ($customer_id){
+				$customer = \Stripe\Customer::retrieve($customer_id);
+			}
+		}
+		// si customer retrouve, on ajoute la source et la transaction
+		if ($customer and $customer->email===$email) {
+			$customer->source = $c['source'];
+			$metadata = $customer->metadata;
+			if (!$metadata) $metadata = array();
+			if (isset($metadata['id_transaction'])) {
+				$metadata['id_transaction'] .= ','.$id_transaction;
+			}
+			else {
+				$metadata['id_transaction'] = $id_transaction;
+			}
+			$metadata['id_auteur'] = $row['id_auteur'];
+			$customer->metadata = $metadata;
+			$customer->description = sql_getfetsel('nom','spip_auteurs','id_auteur='.intval($row['id_auteur']));
+			$customer->save();
+		}
+		else {
+			$d = array(
+				'email' => $email,
+				'source' => $c['source'],
+				'metadata' => $c['metadata'],
+			);
+			if ($row['id_auteur']) {
+				$d['description'] = sql_getfetsel('nom','spip_auteurs','id_auteur='.intval($row['id_auteur']));
+			}
+			$customer = \Stripe\Customer::create($d);
+		}
+	} catch (Exception $e) {
+		spip_log("Echec creation/recherche customer transaction #$id_transaction",$mode._LOG_ERREUR);
+	}
+
 	// Create a charge: this will charge the user's card
 	try {
+
+		// Create a Customer
+		if ($customer and $customer->id) {
+			$c['customer'] = $customer->id;
+			$response['pay_id'] = $customer->id; // permet de faire de nouveau paiement sans saisie CB
+			unset($c['source']);
+		}
 
 	  $charge = \Stripe\Charge::create($c);
 
@@ -170,6 +220,9 @@ function stripe_traite_reponse_transaction($config, $response) {
 		"reglee"=>'oui'
 	);
 
+	if (isset($response['pay_id'])) {
+		$set['pay_id'] = $response['pay_id'];
+	}
 
 	// type et numero de carte ?
 	if (isset($charge['source']) and $charge['source']['object']=='card'){
@@ -177,6 +230,10 @@ function stripe_traite_reponse_transaction($config, $response) {
 		$set['refcb'] = '';
 		if (isset($charge['source']['brand']))
 			$set['refcb'] .= $charge['source']['brand'];
+
+		if (isset($charge['source']['last4']) and $charge['source']['last4'])
+			$set['refcb'] .= ' ****'.$charge['source']['last4'];
+
 		$set['refcb'] = trim($set['refcb']);
 		// validite de carte ?
 		if (isset($charge['source']['exp_month']) AND $charge['source']['exp_year']){

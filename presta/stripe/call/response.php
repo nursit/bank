@@ -30,14 +30,20 @@ function presta_stripe_call_response_dist($config, $response=null){
 		$response = bank_response_simple($mode);
 	}
 
-	// Get the credit card details submitted by the form
-	$token = $_POST['stripeToken'];
+	// Stripe token
+	$token = '';
+	if (isset($_REQUEST['stripeToken'])){
+		$token = $_REQUEST['stripeToken'];
+	}
 
 	if (!$response or !$token) {
 		return array(0,false);
 	}
 
 	$response['token'] = $token;
+	if (isset($_REQUEST['stripeTokenType'])){
+		$response['token_type'] = $_REQUEST['stripeTokenType'];
+	}
 
 
 	// depouillement de la transaction
