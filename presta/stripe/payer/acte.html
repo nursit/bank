@@ -14,22 +14,47 @@
   <div class="payer_mode payer_stripe payer_acte">
 	  <p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
 	  <div class='boutons'>
-		  <form action="#ENV*{action}" method="POST">
-			  [<div>(#ENV**{hidden})</div>]
-		    <script
-		      src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-		      [data-key="(#ENV{key}|attribut_html)"]
-		      [data-amount="(#ENV{amount}|attribut_html)"]
-		      [data-email="(#ENV{email}|attribut_html)"]
-		      [data-name="(#ENV{name}|attribut_html)"]
-		      [data-description="(#ENV{description}|attribut_html)"]
-		      [data-image="(#ENV{image}|attribut_html)"]
-		      data-label="<:bank:bouton_enregistrer_reglement_carte|attribut_html:>"
-		      data-locale="auto"
-		      data-zip-code="true"
-		      data-currency="eur">
-		    </script>
-		  </form>
+		  [(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_carte:>,#ENV*{action},stripe_button_#ID_TRANSACTION,'','',[stripe_button_(#ID_TRANSACTION)_callback\(\)]})]
+		  <script type="text/javascript" src="https://checkout.stripe.com/checkout.js"></script>
+		  <script type="text/javascript">
+			  var stripe_handler_#ID_TRANSACTION = StripeCheckout.configure({
+			    key: '[(#ENV{key}|texte_script)]',
+			    image: '[(#ENV{image}|texte_script)]',
+			    locale: 'auto',
+			    token: function(token) {
+			      // You can access the token ID with `token.id`.
+			      // Get the token ID to your server-side code for use.
+				    console.log(token);
+				    var i = '<input type="hidden" name="stripeToken" value="'+token.id+'" />';
+				    i = i + '<input type="hidden" name="stripeTokenType" value="'+token.type+'" />';
+				    if (typeof(jQuery)!=='undefined'){
+					    jQuery('.stripe_button_#ID_TRANSACTION').after(i).closest('form').get(0).submit();
+				    } else {
+					    var h = document.getElementsByClassName('stripe_button_#ID_TRANSACTION');
+					    h[0].insertAdjacentHTML('afterend', i);
+					    var form = (h[0].parentNode).parentNode;
+					    form.submit();
+				    }
+			    }
+			  });
+			  function stripe_button_#ID_TRANSACTION_callback(){
+					// Open Checkout with further options:
+				  stripe_handler_#ID_TRANSACTION.open({
+					  amount: [(#ENV{amount}|intval)],
+				    email: '[(#ENV{email}|texte_script)]',
+				    name: '[(#ENV{name}|texte_script)]',
+				    description: '[(#ENV{description}|texte_script)]',
+				    zipCode: true,
+					  currency: '[(#ENV{currency}|texte_script)]',
+				  });
+				  //e.preventDefault();
+				  return false;
+			  }
+			  // Close Checkout on page navigation:
+			  window.addEventListener('popstate', function() {
+				  stripe_handler_#ID_TRANSACTION.close();
+			  });
+		  </script>
 	  </div>
 	  [(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=Stripe}:></div>]
   </div>

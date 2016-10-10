@@ -64,13 +64,12 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		'transaction_hash' => $transaction_hash,
 	);
 	$contexte['sign'] = bank_sign_response_simple($config['presta'], $contexte);
-	$hidden = "";
-	foreach($contexte as $k=>$v){
-		$hidden .= "<input type='hidden' name='$k' value='$v' />";
-	}
-	$contexte['hidden'] = $hidden;
-	$contexte['action'] = bank_url_api_retour($config,"response");
 
+	$action = bank_url_api_retour($config,"response");
+	foreach($contexte as $k=>$v){
+		$action = parametre_url($action, $k, $v);
+	}
+	$contexte['action'] = $action;
 	$contexte['email'] = $email;
 	$contexte['amount'] = $montant;
 	$contexte['currency'] = 'eur';
