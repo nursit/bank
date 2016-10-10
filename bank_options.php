@@ -119,3 +119,16 @@ function bank_trouver_logo($mode,$logo){
 		return $f;
 	return "";
 }
+
+/**
+ * Annoncer SPIP + plugin&version pour les logs de certains providers
+ * @return string
+ */
+function bank_annonce_version_plugin(){
+	$header = "SPIP ".$GLOBALS['spip_version_branche']." + https://github.com/nursit/bank";
+	include_spip('inc/filtres');
+	if ($info_plugin = chercher_filtre("info_plugin")){
+		$header .= " " . $info_plugin("bank","version");
+	}
+	return $header;
+}

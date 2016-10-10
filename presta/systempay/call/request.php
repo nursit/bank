@@ -234,12 +234,8 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 		}
 	}
 
-	// this is SPIP + bank
-	include_spip('inc/filtres');
-	$parm['vads_contrib'] = "SPIP ".$GLOBALS['spip_version_branche']." + https://github.com/nursit/bank";
-	if ($info_plugin = chercher_filtre("info_plugin")){
-		$parm['vads_contrib'] .= " " . $info_plugin("bank","version");
-	}
+	// s'annoncer fierement : SPIP + bank vx
+	$parm['vads_contrib'] = bank_annonce_version_plugin();
 
 	#$parm['vads_redirect_success_timeout'] = 1;
 	#$parm['vads_redirect_success_message'] = "OK";
