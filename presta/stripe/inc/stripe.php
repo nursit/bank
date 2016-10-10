@@ -87,7 +87,8 @@ function stripe_traite_reponse_transaction($config, $response) {
 		$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
 	$email = bank_porteur_email($row);
 
-	$c = array(
+	// preparer le paiement
+	$desc_charge = array(
 		'amount' => $montant,
 		"currency" => "eur",
 	  "source" => $response['token'],
@@ -110,6 +111,91 @@ function stripe_traite_reponse_transaction($config, $response) {
 	// charger l'API Stripe avec la cle
 	stripe_init_api($config);
 
+	// est-ce un abonnement ?
+
+	$now = time();
+	// c'est un abonnement
+	if ($is_abo){
+		// on decrit l'echeance
+		if (
+			$decrire_echeance = charger_fonction("decrire_echeance","abos",true)
+		  AND $echeance = $decrire_echeance($id_transaction)){
+			if ($echeance['montant']>0){
+
+				$montant_echeance = intval(round(100*$echeance['montant'],0));
+				if (strlen($montant_echeance)<3)
+					$montant_echeance = str_pad($montant_echeance,3,'0',STR_PAD_LEFT);
+
+				$interval = 'month';
+				if (isset($echeance['freq']) AND $echeance['freq']=='yearly'){
+					$interval = 'year';
+				}
+
+				$desc_plan = array(
+				  'amount' => $montant_echeance,
+				  'interval' => $interval,
+				  'name' => $GLOBALS['meta']['adresse_site']." - #$id_transaction",
+				  'currency' => $desc_charge['currency'],
+				);
+				// si une echeance initiale avec montant different, la gerer par un paiement unique maintenant
+				// + 1 periode en essai sans paiement sur l'abonnement
+				if (isset($echeance['count_init']) AND $echeance['count_init']==1
+					AND $montant_echeance !== $montant){
+
+					$time_start = strtotime($date_paiement);
+					$time_paiement_1_interval = strtotime("+1 $interval",$time_start);
+					$nb_days = ($time_paiement_1_interval - $time_start) / 86400;
+					$desc_plan['trial_period_days'] = $nb_days;
+
+				}
+				// sinon on annule le paiement unique, inutile
+				else {
+					$desc_charge['amount'] = 0;
+				}
+				$desc_plan['id'] = md5(json_encode($desc_plan)."-$transaction_hash");
+
+
+				try {
+					if (!$plan = \Stripe\Plan::retrieve($desc_plan['id'])){
+						$plan = \Stripe\Plan::create($desc_plan);
+					}
+
+					if (!$plan) {
+						$erreur = "Erreur creation plan d'abonnement";
+						$erreur_code = "plan_failed";
+					}
+				} catch (Exception $e) {
+					if ($body = $e->getJsonBody()){
+						$err  = $body['error'];
+						list($erreur_code, $erreur) = stripe_error_code($err);
+					}
+					else {
+						$erreur = $e->getMessage();
+						$erreur_code = 'error';
+					}
+				}
+
+				if ($erreur or $erreur_code) {
+					// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
+				 	if ($row['reglee']=='oui') return array($id_transaction,true);
+
+					// sinon enregistrer l'absence de paiement et l'erreur
+					return bank_transaction_echec($id_transaction,
+						array(
+							'mode' => $mode,
+							'config_id' => $config_id,
+							'date_paiement' => $date_paiement,
+							'code_erreur' => $erreur_code,
+							'erreur' => $erreur,
+							'log' => var_export($response, true),
+						)
+					);
+				}
+
+			}
+		}
+	}
+
 	// essayer de retrouver ou creer un customer pour l'id_auteur
 	$customer = null;
 	$customer_id = 0;
@@ -122,7 +208,7 @@ function stripe_traite_reponse_transaction($config, $response) {
 		}
 		// si customer retrouve, on ajoute la source et la transaction
 		if ($customer and $customer->email===$email) {
-			$customer->source = $c['source'];
+			$customer->source = $desc_charge['source'];
 			$metadata = $customer->metadata;
 			if (!$metadata) $metadata = array();
 			if (isset($metadata['id_transaction'])) {
@@ -139,33 +225,81 @@ function stripe_traite_reponse_transaction($config, $response) {
 		else {
 			$d = array(
 				'email' => $email,
-				'source' => $c['source'],
-				'metadata' => $c['metadata'],
+				'source' => $desc_charge['source'],
+				'metadata' => $desc_charge['metadata'],
 			);
 			if ($row['id_auteur']) {
 				$d['description'] = sql_getfetsel('nom','spip_auteurs','id_auteur='.intval($row['id_auteur']));
 			}
 			$customer = \Stripe\Customer::create($d);
 		}
-	} catch (Exception $e) {
-		spip_log("Echec creation/recherche customer transaction #$id_transaction",$mode._LOG_ERREUR);
-	}
 
-	// Create a charge: this will charge the user's card
-	try {
-
-		// Create a Customer
-		if ($customer and $customer->id) {
-			$c['customer'] = $customer->id;
-			$response['pay_id'] = $customer->id; // permet de faire de nouveau paiement sans saisie CB
-			unset($c['source']);
+		if ($is_abo and !$customer){
+			$erreur = "Erreur creation customer";
+			$erreur_code = "cust_failed";
 		}
 
-	  $charge = \Stripe\Charge::create($c);
 
-		// pour les logs en cas d'echec
-		$r = $charge->getLastResponse()->json;
-		$response = array_merge($response, $r);
+	} catch (Exception $e) {
+		if ($body = $e->getJsonBody()){
+			$err  = $body['error'];
+			list($erreur_code, $erreur) = stripe_error_code($err);
+		}
+		else {
+			$erreur = $e->getMessage();
+			$erreur_code = 'error';
+		}
+		spip_log("Echec creation/recherche customer transaction #$id_transaction $erreur",$mode._LOG_ERREUR);
+	}
+
+	if ($is_abo and ($erreur or $erreur_code)){
+		// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
+	 	if ($row['reglee']=='oui') return array($id_transaction,true);
+
+		// sinon enregistrer l'absence de paiement et l'erreur
+		return bank_transaction_echec($id_transaction,
+			array(
+				'mode' => $mode,
+				'config_id' => $config_id,
+				'date_paiement' => $date_paiement,
+				'code_erreur' => $erreur_code,
+				'erreur' => $erreur,
+				'log' => var_export($response, true),
+			)
+		);
+	}
+
+	// Create a charge if needed: this will charge the user's card
+	try {
+
+		// If we have a Customer
+		if ($customer and $customer->id) {
+			$desc_charge['customer'] = $customer->id;
+			$response['pay_id'] = $customer->id; // permet de faire de nouveau paiement sans saisie CB
+			unset($desc_charge['source']);
+		}
+
+		if ($desc_charge['amount']){
+			$charge = \Stripe\Charge::create($desc_charge);
+			// pour les logs en cas d'echec
+			$r = $charge->getLastResponse()->json;
+			$response = array_merge($response, $r);
+
+			if (!$charge){
+				$erreur = "Erreur creation charge";
+				$erreur_code = "charge_failed";
+			}
+			elseif (!$charge['paid']) {
+				$erreur_code = 'not_paid';
+				$erreur = 'echec paiement stripe';
+				if ($charge['failure_code'] or $charge['failure_message']) {
+					$erreur_code = $charge['failure_code'];
+					$erreur = $charge['failure_message'];
+				}
+			}
+
+		}
+
 
 	} catch(\Stripe\Error\Card $e) {
 
@@ -185,16 +319,35 @@ function stripe_traite_reponse_transaction($config, $response) {
 		}
 	}
 
-	// Ouf, le reglement a ete accepte
+	if ($is_abo and $plan and $customer){
+		$desc_sub = array(
+			'customer' => $customer->id,
+			'plan' => $plan->id,
+			'metadata' => array(
+				'id_transaction' => $id_transaction,
+			),
+		);
 
-	if (!$erreur_code and !$charge['paid']) {
-		$erreur_code = 'not_paid';
-		$erreur = 'echec paiement stripe';
-		if ($charge['failure_code'] or $charge['failure_message']) {
-			$erreur_code = $charge['failure_code'];
-			$erreur = $charge['failure_message'];
+		try {
+			$sub = \Stripe\Subscription::create($desc_sub);
+			if (!$sub){
+				$erreur = "Erreur creation subscription";
+				$erreur_code = "sub_failed";
+			}
+			$response['abo_uid'] = $sub->id;
+		} catch (Exception $e) {
+			if ($body = $e->getJsonBody()){
+				$err  = $body['error'];
+				list($erreur_code, $erreur) = stripe_error_code($err);
+			}
+			else {
+				$erreur = $e->getMessage();
+				$erreur_code = 'error';
+			}
 		}
 	}
+
+	// Ouf, le reglement a ete accepte
 
 	if ($erreur or $erreur_code) {
 		// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
@@ -215,7 +368,13 @@ function stripe_traite_reponse_transaction($config, $response) {
 
 
 	// on verifie que le montant est bon !
-	$montant_regle = $charge['amount']/100;
+	$montant_regle = 0;
+	if ($charge){
+		$montant_regle = $charge['amount']/100;
+	}
+	elseif($sub){
+		$montant_regle = $sub->plan->amount;
+	}
 
 	if ($montant_regle != $row['montant']){
 		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=".$row['montant'].":".var_export($charge, true),$mode);
@@ -224,8 +383,14 @@ function stripe_traite_reponse_transaction($config, $response) {
 	}
 
 
-	$transaction = $charge['balance_transaction'];
-	$authorisation_id = $charge['id'];
+	if ($charge){
+		$transaction = $charge['balance_transaction'];
+		$authorisation_id = $charge['id'];
+	}
+	elseif($sub){
+		$transaction = $sub->id;
+		$authorisation_id = $plan->id;
+	}
 
 	$set = array(
 		"autorisation_id" => "$transaction/$authorisation_id",
@@ -239,21 +404,26 @@ function stripe_traite_reponse_transaction($config, $response) {
 	if (isset($response['pay_id'])) {
 		$set['pay_id'] = $response['pay_id'];
 	}
+	if (isset($response['abo_uid'])) {
+		$set['abo_uid'] = $response['abo_uid'];
+	}
 
 	// type et numero de carte ?
-	if (isset($charge['source']) and $charge['source']['object']=='card'){
-		// par defaut on note carte et BIN6 dans refcb
-		$set['refcb'] = '';
-		if (isset($charge['source']['brand']))
-			$set['refcb'] .= $charge['source']['brand'];
+	if ($charge){
+		if (isset($charge['source']) and $charge['source']['object']=='card'){
+			// par defaut on note carte et BIN6 dans refcb
+			$set['refcb'] = '';
+			if (isset($charge['source']['brand']))
+				$set['refcb'] .= $charge['source']['brand'];
 
-		if (isset($charge['source']['last4']) and $charge['source']['last4'])
-			$set['refcb'] .= ' ****'.$charge['source']['last4'];
+			if (isset($charge['source']['last4']) and $charge['source']['last4'])
+				$set['refcb'] .= ' ****'.$charge['source']['last4'];
 
-		$set['refcb'] = trim($set['refcb']);
-		// validite de carte ?
-		if (isset($charge['source']['exp_month']) AND $charge['source']['exp_year']){
-			$set['validite'] = $charge['source']['exp_year'] . "-" . str_pad($charge['source']['exp_month'], 2, '0', STR_PAD_LEFT);
+			$set['refcb'] = trim($set['refcb']);
+			// validite de carte ?
+			if (isset($charge['source']['exp_month']) AND $charge['source']['exp_year']){
+				$set['validite'] = $charge['source']['exp_year'] . "-" . str_pad($charge['source']['exp_month'], 2, '0', STR_PAD_LEFT);
+			}
 		}
 	}
 

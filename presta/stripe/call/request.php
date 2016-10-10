@@ -50,6 +50,37 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		);
 	}
 
+	// si c'est un abonnement, verifier qu'on saura le traiter vu les limitations de Stripe
+	// c'est un abonnement
+	if ($type==='abo'){
+		// on decrit l'echeance
+		if (
+			$decrire_echeance = charger_fonction("decrire_echeance","abos",true)
+		  AND $echeance = $decrire_echeance($id_transaction)){
+			if ($echeance['montant']>0){
+
+				// si plus d'une echeance initiale prevue on ne sait pas faire avec Stripe
+				if (isset($echeance['count_init']) AND $echeance['count_init']>1){
+					spip_log("Transaction #$id_transaction : nombre d'echeances init ".$echeance['count_init'].">1 non supporte",$mode._LOG_ERREUR);
+					return "";
+				}
+				
+				// si nombre d'echeances limitees, on ne sait pas faire avec Stripe
+				if (isset($echeance['count']) AND $echeance['count']>0){
+					spip_log("Transaction #$id_transaction : nombre d'echeances ".$echeance['count'].">0 non supporte",$mode._LOG_ERREUR);
+					return "";
+				}
+
+				if (isset($echeance['date_start']) AND $echeance['date_start'] AND strtotime($echeance['date_start'])>time()){
+					spip_log("Transaction #$id_transaction : date_start ".$echeance['date_start']." non supportee",$mode._LOG_ERREUR);
+					return "";
+				}
+
+			}
+		}
+	}
+	
+	
 	$email = bank_porteur_email($row);
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
