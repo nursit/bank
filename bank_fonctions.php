@@ -164,8 +164,8 @@ function filtre_bank_lister_configs_dist($type){
  * Afficher la liste des transactions d'un auteur sur la page auteur de l'espace prive
  *
  * @pipeline affiche_auteurs_interventions
- * @param  array $flux Donn�es du pipeline
- * @return array       Donn�es du pipeline
+ * @param  array $flux Donnees du pipeline
+ * @return array       Donnees du pipeline
  */
 function bank_affiche_auteurs_interventions($flux) {
 	if ($id_auteur = intval($flux['args']['id_auteur'])) {
