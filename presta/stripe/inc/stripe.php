@@ -30,7 +30,7 @@ function stripe_init_api($config){
 	\Stripe\Stripe::$verifySslCerts = false;
 
 	// s'annoncer fierement : SPIP + bank vx
-	\Stripe\Stripe::$appInfo = bank_annonce_version_plugin();
+	\Stripe\Stripe::$appInfo = bank_annonce_version_plugin('array');
 
 }
 
@@ -40,6 +40,7 @@ function stripe_traite_reponse_transaction($config, $response) {
 	$mode = $config['presta'];
 	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 	$config_id = bank_config_id($config);
+	$is_abo = (isset($response['abo']) and $response['abo']);
 
 	if (!isset($response['id_transaction']) OR !isset($response['transaction_hash'])){
 		return bank_transaction_invalide(0,

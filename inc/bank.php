@@ -476,7 +476,7 @@ function bank_transaction_echec($id_transaction,$args=array()){
  * @return array|bool
  */
 function bank_response_simple($mode){
-	$vars = array('id_transaction','transaction_hash','autorisation_id');
+	$vars = array('id_transaction','transaction_hash','autorisation_id','abo');
 	$response = array();
 	foreach($vars as $k) {
 		if (!is_null($v = _request($k)))

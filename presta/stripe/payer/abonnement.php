@@ -22,7 +22,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 function presta_stripe_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
 
 	$call_request = charger_fonction('request','presta/stripe/call');
-	$contexte = $call_request($id_transaction, $transaction_hash, $config);
+	$contexte = $call_request($id_transaction, $transaction_hash, $config, 'abo');
 	// si moyen de paiement pas applicable
 	if (!$contexte) { 
 		return '';
@@ -32,6 +32,6 @@ function presta_stripe_payer_acte_dist($config, $id_transaction, $transaction_ha
 
 	$contexte = array_merge($options, $contexte);
 
-	return recuperer_fond('presta/stripe/payer/acte', $contexte);
+	return recuperer_fond('presta/stripe/payer/abonnement', $contexte);
 }
 

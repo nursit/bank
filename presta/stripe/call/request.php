@@ -52,7 +52,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 
 	// si c'est un abonnement, verifier qu'on saura le traiter vu les limitations de Stripe
 	// c'est un abonnement
-	if ($type==='abo'){
+	if ($type === 'abo'){
 		// on decrit l'echeance
 		if (
 			$decrire_echeance = charger_fonction("decrire_echeance","abos",true)
@@ -94,6 +94,9 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		'id_transaction' => $id_transaction,
 		'transaction_hash' => $transaction_hash,
 	);
+	if ($type === 'abo'){
+		$contexte['abo'] = 1;
+	}
 	$contexte['sign'] = bank_sign_response_simple($config['presta'], $contexte);
 
 	$action = bank_url_api_retour($config,"response");

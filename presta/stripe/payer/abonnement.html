@@ -11,12 +11,12 @@
 */
 ]#CACHE{0}
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
-  <div class="payer_mode payer_stripe payer_acte">
-	  <p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
+  <div class="payer_mode payer_stripe payer_abonnement">
+	  <p class="titre h4"><:bank:abonnement_par_carte_bancaire:></p>
 	  <div class='boutons'>
 		  [(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_carte:>,#ENV*{action},stripe_button_#ID_TRANSACTION,'','',[stripe_button_(#ID_TRANSACTION)_callback\(\)]})]
 		  [<script type="text/javascript" src="https://checkout.stripe.com/checkout.js"></script>
-		  <script type="text/javascript">(#INCLURE{fond=presta/stripe/payer/inc-checkout-js,env,id=[acte(#ID_TRANSACTION)]}|compacte{js})</script>]
+		  <script type="text/javascript">(#INCLURE{fond=presta/stripe/payer/inc-checkout-js,env,id=#ID_TRANSACTION}|compacte{js})</script>]
 	  </div>
 	  [(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=Stripe}:></div>]
   </div>
