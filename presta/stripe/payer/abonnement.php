@@ -19,10 +19,11 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @param array $options
  * @return array|string
  */
-function presta_stripe_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
+function presta_stripe_payer_abonnement_dist($config, $id_transaction, $transaction_hash, $options=array()){
 
 	$call_request = charger_fonction('request','presta/stripe/call');
 	$contexte = $call_request($id_transaction, $transaction_hash, $config, 'abo');
+
 	// si moyen de paiement pas applicable
 	if (!$contexte) { 
 		return '';
