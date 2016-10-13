@@ -26,4 +26,7 @@
 		]<input type="text" name="#ENV{casier,''}[PUBLISHABLE_KEY_test]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{PUBLISHABLE_KEY_test,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
 </ul>
-<p class="explication"><a target='_blank' rel='noopener' href="https://dashboard.stripe.com/account/apikeys">https://dashboard.stripe.com/account/apikeys</a></p>
+<p class="explication">
+	API Keys&nbsp;: <a target='_blank' rel='noopener' href="https://dashboard.stripe.com/account/apikeys">https://dashboard.stripe.com/account/apikeys</a><br />
+	Webhook Endpoint (<a target='_blank' rel='noopener' href="https://dashboard.stripe.com/account/webhooks">https://dashboard.stripe.com/account/webhooks</a>)&nbsp;: <br /><input type="text" class="text" readonly="readonly" value="[(#ENV{#ENV{casier,''}}|bank_url_autoresponse)]" />
+</p>
