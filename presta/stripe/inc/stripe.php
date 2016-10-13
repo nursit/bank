@@ -94,7 +94,7 @@ function stripe_traite_reponse_transaction($config, &$response) {
 	$email = bank_porteur_email($row);
 	
 	// ok, on traite le reglement
-	$date=$_SERVER['REQUEST_TIME'];
+	$date = $_SERVER['REQUEST_TIME'];
 	$date_paiement = date('Y-m-d H:i:s', $date);
 
 	$erreur = "";
@@ -103,27 +103,48 @@ function stripe_traite_reponse_transaction($config, &$response) {
 	// charger l'API Stripe avec la cle
 	stripe_init_api($config);
 
+	// preparer le paiement
+	$nom_site = textebrut($GLOBALS['meta']['nom_site']);
+	$desc_charge = array(
+		'amount' => $montant,
+		"currency" => "eur",
+		"source" => $response['token'],
+		"description" => "Transaction #" . $id_transaction ." [$nom_site]",
+		"receipt_email" => $email,
+		"metadata" => array(
+			'id_transaction' => $id_transaction,
+			'id_auteur' => $row['id_auteur'],
+			'nom_site' => $nom_site,
+			'url_site' => $GLOBALS['meta']['adresse_site'],
+		),
+	);
+
 	// la charge existe deja (autoresponse webhook sur abonnement)
 	if (isset($response['charge']) and $response['charge']){
-		$charge = $response['charge'];
+		try {
+			$charge = \Stripe\Charge::retrieve($response['charge']);
+			$charge->description = $desc_charge['description'];
+			$charge->metadata = $desc_charge['metadata'];
+			$charge->save();
+
+			if (!$charge->paid) {
+				$erreur_code = 'unpaid';
+				$erreur = 'payment failed';
+			}
+
+		} catch (Exception $e) {
+			if ($body = $e->getJsonBody()) {
+				$err = $body['error'];
+				list($erreur_code, $erreur) = stripe_error_code($err);
+			} else {
+				$erreur = $e->getMessage();
+				$erreur_code = 'error';
+			}
+		}
+
 	}
 
 	else {
-		// preparer le paiement
-		$nom_site = textebrut($GLOBALS['meta']['nom_site']);
-		$desc_charge = array(
-			'amount' => $montant,
-			"currency" => "eur",
-			"source" => $response['token'],
-			"description" => "Transaction #" . $id_transaction ." [$nom_site]",
-			"receipt_email" => $email,
-			"metadata" => array(
-				'id_transaction' => $id_transaction,
-				'id_auteur' => $row['id_auteur'],
-				'nom_site' => $nom_site,
-				'url_site' => $GLOBALS['meta']['adresse_site'],
-			),
-		);
 
 		// est-ce un abonnement ?
 		if ($is_abo) {
@@ -132,6 +153,7 @@ function stripe_traite_reponse_transaction($config, &$response) {
 				$decrire_echeance = charger_fonction("decrire_echeance", "abos", true)
 				AND $echeance = $decrire_echeance($id_transaction)
 			) {
+
 				if ($echeance['montant'] > 0) {
 
 					$montant_echeance = intval(round(100 * $echeance['montant'], 0));
@@ -139,7 +161,7 @@ function stripe_traite_reponse_transaction($config, &$response) {
 						$montant_echeance = str_pad($montant_echeance, 3, '0', STR_PAD_LEFT);
 					}
 
-					$interval = 'month';
+					$interval = 'day'; //'month';
 					if (isset($echeance['freq']) AND $echeance['freq'] == 'yearly') {
 						$interval = 'year';
 					}
@@ -162,12 +184,17 @@ function stripe_traite_reponse_transaction($config, &$response) {
 					// un id unique (sauf si on rejoue le meme paiement)
 					$desc_plan['id'] = md5(json_encode($desc_plan) . "-$transaction_hash");
 
+					try {
+						$plan = \Stripe\Plan::retrieve($desc_plan['id']);
+					} catch (Exception $e) {
+						// erreur si on ne retrouve pas le plan, on ignore
+						$plan = false;
+					}
 
 					try {
-						if (!$plan = \Stripe\Plan::retrieve($desc_plan['id'])) {
+						if (!$plan) {
 							$plan = \Stripe\Plan::create($desc_plan);
 						}
-
 						if (!$plan) {
 							$erreur = "Erreur creation plan d'abonnement";
 							$erreur_code = "plan_failed";
@@ -363,29 +390,28 @@ function stripe_traite_reponse_transaction($config, &$response) {
 				$erreur_code = "sub_failed";
 			}
 		}
-
-		if ($erreur or $erreur_code) {
-			// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
-			if ($row['reglee'] == 'oui') {
-				return array($id_transaction, true);
-			}
-
-			// sinon enregistrer l'absence de paiement et l'erreur
-			return bank_transaction_echec($id_transaction,
-				array(
-					'mode' => $mode,
-					'config_id' => $config_id,
-					'date_paiement' => $date_paiement,
-					'code_erreur' => $erreur_code,
-					'erreur' => $erreur,
-					'log' => var_export($response, true),
-				)
-			);
-		}
-
-		// Ouf, le reglement a ete accepte
 		
 	}
+	if ($erreur or $erreur_code) {
+		// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
+		if ($row['reglee'] == 'oui') {
+			return array($id_transaction, true);
+		}
+
+		// sinon enregistrer l'absence de paiement et l'erreur
+		return bank_transaction_echec($id_transaction,
+			array(
+				'mode' => $mode,
+				'config_id' => $config_id,
+				'date_paiement' => $date_paiement,
+				'code_erreur' => $erreur_code,
+				'erreur' => $erreur,
+				'log' => var_export($response, true),
+			)
+		);
+	}
+
+	// Ouf, le reglement a ete accepte
 
 
 	// on verifie que le montant est bon !
@@ -456,6 +482,7 @@ function stripe_traite_reponse_transaction($config, &$response) {
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
 	$regler_transaction($id_transaction,array('row_prec'=>$row));
+
 
 	return array($id_transaction,true);
 
