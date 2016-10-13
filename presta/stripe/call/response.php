@@ -36,19 +36,23 @@ function presta_stripe_call_response_dist($config, $response=null){
 		$token = $_REQUEST['stripeToken'];
 	}
 
-	if (!$response or !$token) {
+	if (!$response or (!$token and !$response['charge'])) {
 		return array(0,false);
 	}
 
-	$response['token'] = $token;
+	if ($token){
+		$response['token'] = $token;
+	}
 	if (isset($_REQUEST['stripeTokenType'])){
 		$response['token_type'] = $_REQUEST['stripeTokenType'];
 	}
 
 	$recurence = false;
 	// c'est une reconduction d'abonnement ?
-	// TODO
-	
+	if ($response['charge'] and $response['abo_uid']){
+		$recurence = true;
+		// TODO autre chose ?
+	}
 
 	// depouillement de la transaction
 	// stripe_traite_reponse_transaction modifie $response
@@ -94,7 +98,7 @@ function presta_stripe_call_response_dist($config, $response=null){
 			if (!$success){
 				if ($resilier = charger_fonction('resilier','abos',true)){
 					$options = array(
-						'notify_bank' => false, // pas la peine : paybox a deja resilie l'abo vu paiement refuse
+						'notify_bank' => false, // pas la peine : stripe a deja resilie l'abo vu paiement refuse
 						'immediat' => true,
 						'message' => "[bank] Transaction #$id_transaction refusee",
 					);
