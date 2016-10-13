@@ -110,15 +110,18 @@ function stripe_traite_reponse_transaction($config, &$response) {
 
 	else {
 		// preparer le paiement
+		$nom_site = textebrut($GLOBALS['meta']['nom_site']);
 		$desc_charge = array(
 			'amount' => $montant,
 			"currency" => "eur",
 			"source" => $response['token'],
-			"description" => "Transaction #" . $id_transaction,
+			"description" => "Transaction #" . $id_transaction ." [$nom_site]",
 			"receipt_email" => $email,
 			"metadata" => array(
 				'id_transaction' => $id_transaction,
 				'id_auteur' => $row['id_auteur'],
+				'nom_site' => $nom_site,
+				'url_site' => $GLOBALS['meta']['adresse_site'],
 			),
 		);
 
