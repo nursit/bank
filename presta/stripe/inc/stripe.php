@@ -34,8 +34,13 @@ function stripe_init_api($config){
 
 }
 
-
-function stripe_traite_reponse_transaction($config, $response) {
+/**
+ * Gerer la reponse du POST JS sur paiement/abonnement
+ * @param array $config
+ * @param array $response
+ * @return array
+ */
+function stripe_traite_reponse_transaction($config, &$response) {
 
 	$mode = $config['presta'];
 	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
@@ -138,21 +143,16 @@ function stripe_traite_reponse_transaction($config, $response) {
 				  'name' => $GLOBALS['meta']['adresse_site']." - #$id_transaction",
 				  'currency' => $desc_charge['currency'],
 				);
-				// si une echeance initiale avec montant different, la gerer par un paiement unique maintenant
-				// + 1 periode en essai sans paiement sur l'abonnement
-				if (isset($echeance['count_init']) AND $echeance['count_init']==1
-					AND $montant_echeance !== $montant){
+				
+				// dans tous les cas on fait preleve la premiere echeance en paiement unique
+				// et en faisant démarrer l'abonnement par "1 periode" en essai sans paiement
+				// ca permet de gerer le cas paiement initial different, et de recuperer les infos de CB dans tous les cas
+				$time_start = strtotime($date_paiement);
+				$time_paiement_1_interval = strtotime("+1 $interval",$time_start);
+				$nb_days = intval(round(($time_paiement_1_interval - $time_start) / 86400));
+				$desc_plan['trial_period_days'] = $nb_days;
 
-					$time_start = strtotime($date_paiement);
-					$time_paiement_1_interval = strtotime("+1 $interval",$time_start);
-					$nb_days = ($time_paiement_1_interval - $time_start) / 86400;
-					$desc_plan['trial_period_days'] = $nb_days;
-
-				}
-				// sinon on annule le paiement unique, inutile
-				else {
-					$desc_charge['amount'] = 0;
-				}
+				// un id unique (sauf si on rejoue le meme paiement)
 				$desc_plan['id'] = md5(json_encode($desc_plan)."-$transaction_hash");
 
 
@@ -199,7 +199,6 @@ function stripe_traite_reponse_transaction($config, $response) {
 
 	// essayer de retrouver ou creer un customer pour l'id_auteur
 	$customer = null;
-	$customer_id = 0;
 	try {
 		if ($row['id_auteur']) {
 			$customer_id = sql_getfetsel('pay_id','spip_transactions','pay_id!='.sql_quote('').' AND id_auteur='.intval($row['id_auteur']).' AND statut='.sql_quote('ok').' AND mode='.sql_quote("$mode/$config_id"),'','date_paiement DESC','0,1');
@@ -223,6 +222,7 @@ function stripe_traite_reponse_transaction($config, $response) {
 			$customer->description = sql_getfetsel('nom','spip_auteurs','id_auteur='.intval($row['id_auteur']));
 			$customer->save();
 		}
+		// sinon on cree le customer
 		else {
 			$d = array(
 				'email' => $email,
@@ -320,31 +320,39 @@ function stripe_traite_reponse_transaction($config, $response) {
 		}
 	}
 
-	if ($is_abo and $plan and $customer){
-		$desc_sub = array(
-			'customer' => $customer->id,
-			'plan' => $plan->id,
-			'metadata' => array(
-				'id_transaction' => $id_transaction,
-			),
-		);
+	// si abonnement : on a un customer et un plan, creer la subscription
+	if ($is_abo) {
+		
+		if ($plan and $customer) {
+			$desc_sub = array(
+				'customer' => $customer->id,
+				'plan' => $plan->id,
+				'metadata' => array(
+					'id_transaction' => $id_transaction,
+				),
+			);
 
-		try {
-			$sub = \Stripe\Subscription::create($desc_sub);
-			if (!$sub){
-				$erreur = "Erreur creation subscription";
-				$erreur_code = "sub_failed";
+			try {
+				$sub = \Stripe\Subscription::create($desc_sub);
+				if (!$sub) {
+					$erreur = "Erreur creation subscription";
+					$erreur_code = "sub_failed";
+				} else {
+					$response['abo_uid'] = $sub->id;
+				}
+			} catch (Exception $e) {
+				if ($body = $e->getJsonBody()) {
+					$err = $body['error'];
+					list($erreur_code, $erreur) = stripe_error_code($err);
+				} else {
+					$erreur = $e->getMessage();
+					$erreur_code = 'error';
+				}
 			}
-			$response['abo_uid'] = $sub->id;
-		} catch (Exception $e) {
-			if ($body = $e->getJsonBody()){
-				$err  = $body['error'];
-				list($erreur_code, $erreur) = stripe_error_code($err);
-			}
-			else {
-				$erreur = $e->getMessage();
-				$erreur_code = 'error';
-			}
+		}
+		else {
+			$erreur = "Erreur creation subscription (plan or customer missing)";
+			$erreur_code = "sub_failed";
 		}
 	}
 
@@ -427,6 +435,8 @@ function stripe_traite_reponse_transaction($config, $response) {
 			}
 		}
 	}
+
+	$response = array_merge($response, $set);
 
 	// il faudrait stocker le $charge aussi pour d'eventuels retour ?
 	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
