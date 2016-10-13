@@ -18,11 +18,10 @@
 				<h3 class='selectionnez'>
 				[(#ENV{title,Je choisis mon mode de paiement s&eacute;curis&eacute; :})]
 				</h3>
-			<BOUCLE_modes(POUR){tableau #VAL{abo}|bank_lister_configs}{si #MONTANT|floatval|>{0.0}}>
-			[(#VALEUR{actif}|oui)
+			<BOUCLE_modes(POUR){tableau #VAL{abo}|bank_lister_configs}{si #MONTANT|floatval|>{0.0}}>[
+				(#VALEUR{actif}|oui)
 				#PAYER_ABONNEMENT{#VALEUR,#ID_TRANSACTION,#TRANSACTION_HASH,#ENV{title,''}}
-			]
-			</BOUCLE_modes>
+			]</BOUCLE_modes>
 				<p class="error"><:bank:erreur_aucun_moyen_paiement:></p>
 			<//B_modes>
 		</BOUCLE_payant>
