@@ -169,8 +169,9 @@ function stripe_traite_reponse_transaction($config, &$response) {
 					$desc_plan = array(
 						'amount' => $montant_echeance,
 						'interval' => $interval,
-						'name' => $GLOBALS['meta']['adresse_site'] . " - #$id_transaction",
+						'name' => "#$id_transaction [$nom_site]",
 						'currency' => $desc_charge['currency'],
+						'metadata' => $desc_charge['metadata'],
 					);
 
 					// dans tous les cas on fait preleve la premiere echeance en paiement unique
