@@ -1,8 +1,8 @@
 <paquet
 	prefix="bank"
 	categorie="outil"
-	version="3.3.0"
-	etat="test"
+	version="3.3.1"
+	etat="stable"
 	compatibilite="[3.0.0;3.1.*]"
 	logo="prive/themes/spip/images/credit-card-32.png"
 	documentation="http://contrib.spip.net/4627"

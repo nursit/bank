@@ -164,7 +164,7 @@ function stripe_traite_reponse_transaction($config, &$response) {
 						$montant_echeance = str_pad($montant_echeance, 3, '0', STR_PAD_LEFT);
 					}
 
-					$interval = 'day'; //'month';
+					$interval = 'month';
 					if (isset($echeance['freq']) AND $echeance['freq'] == 'yearly') {
 						$interval = 'year';
 					}
