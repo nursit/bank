@@ -56,11 +56,14 @@ function stripe_traite_reponse_transaction($config, &$response) {
 			)
 		);
 	}
-	if (!isset($response['token']) OR !$response['token']){
+	if ( 
+		    (!isset($response['charge_id']) OR !$response['charge_id'])
+		and (!isset($response['token']) OR !$response['token'])
+	){
 		return bank_transaction_invalide(0,
 			array(
 				'mode' => $mode,
-				'erreur' => "token absent dans la reponse",
+				'erreur' => "token/charge_id absent dans la reponse",
 				'log' => var_export($response,true),
 			)
 		);
@@ -120,9 +123,9 @@ function stripe_traite_reponse_transaction($config, &$response) {
 	);
 
 	// la charge existe deja (autoresponse webhook sur abonnement)
-	if (isset($response['charge']) and $response['charge']){
+	if (isset($response['charge_id']) and $response['charge_id']){
 		try {
-			$charge = \Stripe\Charge::retrieve($response['charge']);
+			$charge = \Stripe\Charge::retrieve($response['charge_id']);
 			$charge->description = $desc_charge['description'];
 			$charge->metadata = $desc_charge['metadata'];
 			$charge->save();

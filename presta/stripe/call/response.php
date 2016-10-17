@@ -49,9 +49,41 @@ function presta_stripe_call_response_dist($config, $response=null){
 
 	$recurence = false;
 	// c'est une reconduction d'abonnement ?
-	if ($response['charge'] and $response['abo_uid']){
+	if ($response['charge_id'] and $response['abo_uid']){
+
+		// verifier qu'on a pas deja traite cette recurrence !
+		if ($t = sql_fetsel("*","spip_transactions","autorisation_id LIKE ".sql_quote("%/".$response['charge_id']))){
+			$response['id_transaction'] = $t['id_transaction'];
+			$response['transaction_hash'] = $t['transaction_hash'];
+		}
+		// creer la transaction maintenant si besoin !
+		elseif ($preparer_echeance = charger_fonction('preparer_echeance','abos',true)){
+			$abo_uid = $response['abo_uid'];
+			$id_transaction = $preparer_echeance("uid:".$abo_uid);
+			// on reinjecte le bon id de transaction ici si fourni
+			if ($id_transaction){
+				$response['id_transaction'] = $id_transaction;
+				$response['transaction_hash'] = sql_getfetsel('transaction_hash','spip_transactions','id_transaction='.intval($id_transaction));
+			}
+			// si c'est une recurrence mais qu'on a pas su generer une transaction nouvelle il faut loger
+			// avertir et sortir d'ici car on va foirer la transaction de reference sinon
+			// le webmestre rejouera la transaction
+			else {
+				return bank_transaction_invalide(
+					$response['abo_uid'].'/'.$response['charge_id'],
+					array(
+						'mode' => $mode,
+						'sujet' => 'Echec creation transaction echeance',
+						'erreur' => "uid:".$response['abo_uid'].' inconnu de $preparer_echeance',
+						'log' => bank_shell_args($response),
+						'update' => false,
+						'send_mail' => true,
+					)
+				);
+			}
+		}
 		$recurence = true;
-		// TODO autre chose ?
+
 	}
 
 	// depouillement de la transaction

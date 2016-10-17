@@ -106,13 +106,13 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event) {
 			$response['pay_uid'] = $invoice->subscription;
 		}
 		if ($invoice->charge){
-			$response['charge'] = $invoice->charge;
+			$response['charge_id'] = $invoice->charge;
 		}
 	}
 
 	spip_log($event,"stripe_db");
 
-	if (isset($response['charge'])
+	if (isset($response['charge_id'])
 	  and isset($response['abo_uid'])
 	  and isset($response['pay_uid'])) {
 		$call_response = charger_fonction('response', 'presta/stripe/call');
@@ -142,13 +142,13 @@ function stripe_webhook_invoice_payment_failed_dist($config, $event) {
 			$response['pay_uid'] = $invoice->subscription;
 		}
 		if ($invoice->charge){
-			$response['charge'] = $invoice->charge;
+			$response['charge_id'] = $invoice->charge;
 		}
 	}
 
 	spip_log($event,"stripe_db");
 
-	if (isset($response['charge'])
+	if (isset($response['charge_id'])
 	  and isset($response['abo_uid'])
 	  and isset($response['pay_uid'])) {
 		$call_response = charger_fonction('response', 'presta/stripe/call');
