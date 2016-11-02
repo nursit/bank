@@ -12,8 +12,9 @@
 
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-include_spip('inc/bank');
+session_start();
 
+include_spip('inc/bank');
 
 /****************************************************
  * CallerService.php

@@ -25,7 +25,6 @@
  *
  */
 
-session_start();
 
 /****************************************************
 Constantes par defaut pour le paiement PAYPAL, a configurer dans mes_options

@@ -11,6 +11,7 @@
  */
 ]#CACHE{0}
 <BOUCLE_si(CONDITION){si #VAL{confirm}|_request|oui}>
+	<!-- #EVAL{session_start()} -->
 	<INCLURE{fond=modeles/confirmer_payer_acte,id_transaction=#EVAL{$_SESSION}|table_valeur{id_transaction},order_resume=#EVAL{$_SESSION}|table_valeur{order_resume},checkout=#VAL{checkout}|_request} />
 </BOUCLE_si>
 	<BOUCLE_macommande(TRANSACTIONS){id_transaction=#ENV{id_transaction}}{statut IN commande,attente}>
