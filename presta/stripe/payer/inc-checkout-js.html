@@ -1,38 +1,43 @@
 [(#REM)<script>]
 var stripe_handler_#ENV{id} = StripeCheckout.configure({
-  key: '[(#ENV{key}|texte_script)]',
-  image: '[(#ENV{image}|texte_script)]',
-  locale: 'auto',
-  token: function(token) {
-    // You can access the token ID with `token.id`.
-    // Get the token ID to your server-side code for use.
-   console.log(token);
-   var i = '<input type="hidden" name="stripeToken" value="'+token.id+'" />';
-   i = i + '<input type="hidden" name="stripeTokenType" value="'+token.type+'" />';
-   if (typeof(jQuery)!=='undefined'){
-    jQuery('.stripe_button_#ENV{id}').after(i).closest('form').get(0).submit();
-   } else {
-    var h = document.getElementsByClassName('stripe_button_#ENV{id}');
-    h[0].insertAdjacentHTML('afterend', i);
-    var form = (h[0].parentNode).parentNode;
-    form.submit();
-   }
-  }
+	key: '[(#ENV{key}|texte_script)]',
+	image: '[(#ENV{image}|texte_script)]',
+	locale: 'auto',
+	token: function (token){
+		// You can access the token ID with `token.id`.
+		// Get the token ID to your server-side code for use.
+		// console.log(token);
+		var i = '<input type="hidden" name="stripeToken" value="'+token.id+'" />';
+		i = i+'<input type="hidden" name="stripeTokenType" value="'+token.type+'" />';
+		if (typeof(jQuery)!=='undefined'){
+			jQuery('.stripe_button_#ENV{id}_form').append(i).get(0).submit();
+		} else {
+			var form = document.getElementsByClassName('stripe_button_#ENV{id}_form');
+			form[0].innerHTML = form[0].innerHTML + i;
+			form[0].submit();
+		}
+	}
 });
-function stripe_button_#ENV{id}_callback(){
-// Open Checkout with further options:
- stripe_handler_#ENV{id}.open({
-  amount: [(#ENV{amount}|intval)],
-   email: '[(#ENV{email}|texte_script)]',
-   name: '[(#ENV{name}|texte_script)]',
-   description: '[(#ENV{description}|texte_script)]',
-   zipCode: true,
-  currency: '[(#ENV{currency}|texte_script)]'
- });
- //e.preventDefault();
- return false;
+function stripe_button_#ENV{id}_callback() {
+	var h = document.getElementsByClassName('stripe_button_#ENV{id}');
+	if (!h.length) return false;
+	h = h[0];
+	while (h.nodeName!=='FORM'){ h = h.parentNode; }
+	h.className += ' stripe_button_#ENV{id}_form';
+	// check the element is matchable when coming back from stripe
+	h = document.getElementsByClassName('stripe_button_#ENV{id}_form');
+	if (!h.length || h[0].nodeName!=='FORM') return false;
+	// Open Checkout with further options:
+	stripe_handler_#ENV{id}.open({
+		amount: [(#ENV{amount}|intval)],
+		email: '[(#ENV{email}|texte_script)]',
+		name: '[(#ENV{name}|texte_script)]',
+		description: '[(#ENV{description}|texte_script)]',
+		zipCode: true,
+		currency: '[(#ENV{currency}|texte_script)]'
+	});
+	//e.preventDefault();
+	return false;
 }
 // Close Checkout on page navigation:
-window.addEventListener('popstate', function() {
- stripe_handler_#ENV{id}.close();
-});
+window.addEventListener('popstate', function (){stripe_handler_#ENV{id}.close();});
