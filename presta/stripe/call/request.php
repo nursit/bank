@@ -35,6 +35,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		return "";
 	}
 	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash))){
 		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable",$mode._LOG_ERREUR);
@@ -97,7 +98,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	if ($type === 'abo'){
 		$contexte['abo'] = 1;
 	}
-	$contexte['sign'] = bank_sign_response_simple($config['presta'], $contexte);
+	$contexte['sign'] = bank_sign_response_simple($mode, $contexte);
 
 	$action = bank_url_api_retour($config,"response");
 	foreach($contexte as $k=>$v){

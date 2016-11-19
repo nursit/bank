@@ -24,6 +24,7 @@ function presta_stripe_call_response_dist($config, $response=null){
 
 	include_spip('inc/bank');
 	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 
 	// recuperer la reponse en post et la decoder, en verifiant la signature
 	if (!$response) {
@@ -37,6 +38,7 @@ function presta_stripe_call_response_dist($config, $response=null){
 	}
 
 	if (!$response or (!$token and !$response['charge'])) {
+		spip_log("call_response : token/charge invalide",$mode._LOG_ERREUR);
 		return array(0,false);
 	}
 
