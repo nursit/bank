@@ -110,13 +110,18 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	$contexte['currency'] = 'eur';
 	$contexte['key'] = ($config['mode_test']?$config['PUBLISHABLE_KEY_test']:$config['PUBLISHABLE_KEY']);
 	$contexte['name'] = textebrut($GLOBALS['meta']['nom_site']);
-	$contexte['image'] = '';
 	$contexte['description'] = _T('bank:titre_transaction') . '#'.$id_transaction;
+	$contexte['image'] = find_in_path('img/logo-paiement-stripe.png');
 
-	$chercher_logo = charger_fonction('chercher_logo','inc');
-	if ($logo = $chercher_logo(0,'site')){
-		$logo = reset($logo);
-		$contexte['image'] = url_absolue($logo);
+	if (!$contexte['image']) {
+		$chercher_logo = charger_fonction('chercher_logo','inc');
+		if ($logo = $chercher_logo(0,'site')){
+			$logo = reset($logo);
+			$contexte['image'] = $logo;
+		}
+	}
+	if ($contexte['image']) {
+		$contexte['image'] = url_absolue($contexte['image']);
 	}
 
 	return $contexte;
