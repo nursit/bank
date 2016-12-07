@@ -86,21 +86,13 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	$parm['vads_ctx_mode'] = ($config['mode_test']?"TEST":"PRODUCTION");
 	$parm['vads_version'] = _SYSTEMPAY_VERSION;
 
-	// pour vads_trans_id on utilise
-	// le nombre de secondes depuis le debut de la journee x 10 + id_transaction%10
-	// soit 864009
-	// ce qui autorise 10 paiements/secondes. Au pire si collision il suffit de recommencer
-	// deux presentations de la meme transaction donnent 2 vads_trans_id differents
-	$now = time();
-	$id = 10*(date('s',$now)+60*(date('i',$now)+60*date('H',$now)));
-	$id += modulo($row['id_transaction'],10);
-	$parm['vads_trans_id'] = str_pad($id,6,"0",STR_PAD_LEFT);
+	$parm['vads_trans_id'] = bank_transaction_id($row);
 	$parm['vads_order_id'] = $row['id_transaction'];
 
 	// il ne faut pas utiliser la date de la transaction qui peut dater de plusieurs heures/jour
 	// mais la date de generation du formulaire de paiement, car il y a une verif de coherence chez payzen
 	// la demande doit arriver entre -30min et +2h30 par rapport a cette date
-	$parm['vads_trans_date'] = gmdate ("YmdHis", $now);
+	$parm['vads_trans_date'] = gmdate ("YmdHis");
 
 	$parm['vads_page_action'] = $action;
 	if ($abo_uid){

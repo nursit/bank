@@ -261,6 +261,24 @@ function bank_shell_args($params){
 	return $res;
 }
 
+/**
+ * Generer un numero de transaction sur 6 chiffres unique pour une journee
+ * Utilise par systempay et sips
+ * pour le generer on utilise
+ * le nombre de secondes depuis le debut de la journee x 10 + id_transaction%10
+ * soit 864009
+ * ce qui autorise 10 paiements/secondes. Au pire si collision il suffit de recommencer
+ * deux presentations de la meme transaction donnent 2 vads_trans_id differents
+ *
+ * @param array $row
+ * @return string
+ */
+function bank_transaction_id($row) {
+	$now = time();
+	$id = 10*(date('s',$now)+60*(date('i',$now)+60*date('H',$now)));
+	$id += modulo($row['id_transaction'],10);
+	return str_pad($id,6,"0",STR_PAD_LEFT);
+}
 
 /**
  * Recuperer l'email du porteur de la transaction (ou celui de la session a defaut ?)

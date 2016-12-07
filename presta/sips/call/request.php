@@ -61,7 +61,7 @@ function presta_sips_call_request_dist($id_transaction, $transaction_hash, $conf
 	$parm['amount']=$montant;
 	$parm['customer_id']=intval($row['id_auteur'])?$row['id_auteur']:$row['auteur_id'];
 	$parm['order_id']=intval($id_transaction);
-	$parm['transaction_id']=modulo($row['transaction_hash'],999999);
+	$parm['transaction_id']=bank_transaction_id($row);
 	$parm['customer_email']=substr($mail,0,128);
 
 	$parm['normal_return_url']=bank_url_api_retour($config,'response');
@@ -94,4 +94,3 @@ function presta_sips_call_request_dist($id_transaction, $transaction_hash, $conf
 
 	return $res;
 }
-?>
