@@ -237,7 +237,7 @@ function sips_traite_reponse_transaction($config, $response) {
 	$config_id = bank_config_id($config);
 
 	$id_transaction = $response['order_id'];
-	$transaction_hash = $response['transaction_id'];
+	$transaction_id = $response['transaction_id'];
 	$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
 	if (!$row){
 		return bank_transaction_invalide($id_transaction,
@@ -249,6 +249,7 @@ function sips_traite_reponse_transaction($config, $response) {
 		);
 	}
 
+	/*
 	include_spip('inc/filtres');
 	if ($transaction_hash!=modulo($row['transaction_hash'],999999)){
 		return bank_transaction_invalide($id_transaction,
@@ -259,6 +260,7 @@ function sips_traite_reponse_transaction($config, $response) {
 			)
 		);
 	}
+	*/
 
 	// ok, on traite le reglement
 	$date='payment';
