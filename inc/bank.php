@@ -702,6 +702,7 @@ function bank_simple_call_response($config, $response=null){
 					'notify_bank' => false, // pas la peine : abo deja resilie vu paiement refuse
 					'immediat' => true,
 					'message' => "[bank] Transaction #$id_transaction refusee",
+					'erreur' => true,
 				);
 				$resilier("uid:".$abo_uid,$options);
 			}

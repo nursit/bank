@@ -151,6 +151,7 @@ function presta_systempay_call_response_dist($config, $response=null){
 					'notify_bank' => false, // pas la peine : abo deja resilie vu paiement refuse
 					'immediat' => true,
 					'message' => "[bank] Transaction #$id_transaction refusee",
+					'erreur' => true,
 				);
 				$resilier("uid:".$abo_uid,$options);
 			}

@@ -26,7 +26,13 @@ function presta_internetplus_call_autoresponse_dist($config){
 	if ($uoid
 		AND $resil
 	  AND $resilier = charger_fonction('resilier','abos',true)){
-		$resilier("uid:$uoid",array('immediat'=>reset($resil),'message'=>end($resil)));
+		$options = array(
+			'notify_bank' => false, // pas la peine : abo deja resilie vu paiement refuse
+			'immediat' => reset($resil),
+			'message' => end($resil),
+			'erreur' => true
+		);
+		$resilier("uid:$uoid",$options);
 	}
 
 	// peu importe, on die() apres car c'est une autoresponse silencieuse

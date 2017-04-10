@@ -135,6 +135,7 @@ function presta_stripe_call_response_dist($config, $response=null){
 						'notify_bank' => false, // pas la peine : stripe a deja resilie l'abo vu paiement refuse
 						'immediat' => true,
 						'message' => "[bank] Transaction #$id_transaction refusee",
+						'erreur' => true,
 					);
 					$resilier("uid:$abo_uid", $options);
 				}

@@ -39,11 +39,14 @@ function abos_resilier_dist($id,$options=array()){
 		$options['immediat'] = false;
 	if (!isset($options['notify_bank']))
 		$options['notify_bank'] = true;
+	if (!isset($options['erreur']))
+		$options['erreur'] = false;
 
 	$args = array(
 		'id' => $id,
 		'message' => $options['message'],
 		'notify_bank' => $options['notify_bank'],
+		'erreur' => $options['erreur'],
 	);
 	$now = date('Y-m-d H:i:s');
 	if ($options['immediat']){
