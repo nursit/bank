@@ -24,20 +24,20 @@ function presta_simu_payer_abonnement_dist($config, $id_transaction, $transactio
 	$contexte = array(
 		'id_transaction' => $id_transaction,
 		'transaction_hash' => $transaction_hash,
+		'abo' => 'oui',
 	);
-	$contexte['sign'] = bank_sign_response_simple('simu', $contexte);
+	$contexte['sign'] = bank_sign_response_simple($config['presta'], $contexte);
 
 	// url action
 	$action = bank_url_api_retour($config,'response');
 	foreach($contexte as $k=>$v){
 		$action = parametre_url($action,$k,$v);
 	}
-	$action = parametre_url($action,"abo","oui");
 
 	// paiement en attente
 	unset($contexte['sign']);
 	$contexte['autorisation_id'] = 'wait';
-	$contexte['sign'] = bank_sign_response_simple('simu', $contexte);
+	$contexte['sign'] = bank_sign_response_simple($config['presta'], $contexte);
 	$action_wait = $action;
 	foreach($contexte as $k=>$v){
 		$action_wait = parametre_url($action_wait,$k,$v);
