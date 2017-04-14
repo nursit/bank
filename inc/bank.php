@@ -592,8 +592,14 @@ function bank_simple_call_response($config, $response=null){
 	}
 	else {
 		// si rien fourni l'autorisation refere l'id_auteur et le nom de celui qui accepte le cheque|virement
-		if (!$autorisation)
-			$autorisation = $GLOBALS['visiteur_session']['id_auteur']."/".$GLOBALS['visiteur_session']['nom'];
+		if (!$autorisation) {
+			if (isset($GLOBALS['visiteur_session']['id_auteur']) and $GLOBALS['visiteur_session']['id_auteur']) {
+				$autorisation = $GLOBALS['visiteur_session']['id_auteur']."/".$GLOBALS['visiteur_session']['nom'];
+			}
+			else {
+				$autorisation = $GLOBALS['ip']."/".date('d/m/Y-H:i:s');
+			}
+		}
 
 		include_spip("inc/autoriser");
 		if (!autoriser('utilisermodepaiement',$mode)) {

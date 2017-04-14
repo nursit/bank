@@ -170,7 +170,7 @@ function filtre_bank_lister_configs_dist($type){
 function bank_affiche_auteurs_interventions($flux) {
 	if ($id_auteur = intval($flux['args']['id_auteur'])) {
 
-		$flux['data'] .= recuperer_fond('prive/objets/liste/transactions', array(
+		$flux['data'] .= '<!--bank-->' . recuperer_fond('prive/objets/liste/transactions', array(
 			'id_auteur' => $id_auteur,
 		), array('ajax' => true));
 
