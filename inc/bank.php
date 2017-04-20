@@ -301,7 +301,7 @@ function bank_porteur_email($transaction){
 			(!isset($GLOBALS['visiteur_session']['id_auteur']) OR $GLOBALS['visiteur_session']['id_auteur']==$transaction['id_auteur'])
 			AND isset($GLOBALS['visiteur_session']['session_email'])
 			AND $GLOBALS['visiteur_session']['session_email']){
-			$mail = $GLOBALS['visiteur_session']['session_nom'];
+			$mail = $GLOBALS['visiteur_session']['session_email'];
 		}
 	}
 
