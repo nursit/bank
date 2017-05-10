@@ -16,7 +16,11 @@
 	#SET{ordre,#ENV{config/ordre,#NOM_SITE_SPIP}|wrap{'<b>'}}
 	#SET{montant,#MONTANT|affiche_monnaie|wrap{'<b>'}}
 	#SET{transaction,#ID_TRANSACTION|wrap{'<b>'}}
-	<p><:bank:info_mode_reglement_enregistre:> <:bank:confirme_reglement_attente:></p>
+	[(#PIPELINE{bank_afficher_reglement_en_attente,
+			#ARRAY{
+			args,#ARRAY{id_transaction,#ID_TRANSACTION},
+			data,<p><:bank:info_mode_reglement_enregistre:> <:bank:confirme_reglement_attente:></p>}}
+	)]
 	<:bank:info_cheque_envoyer{montant=#GET{montant},transaction=#GET{transaction},ordre=#GET{ordre}}|propre:>
 	<:bank:info_cheque_envoyer_adresse|propre:>
 	<p>

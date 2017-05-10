@@ -13,7 +13,11 @@
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 <div class="payer_mode payer_simu payer_acte payer_attente">
 	<p class="titre h4">SIMULATION</p>
-	<p><:bank:confirme_reglement_attente:></p>
+	[(#PIPELINE{bank_afficher_reglement_en_attente,
+			#ARRAY{
+			args,#ARRAY{id_transaction,#ID_TRANSACTION},
+			data,<p><:bank:info_mode_reglement_enregistre:> <:bank:confirme_reglement_attente:></p>}}
+	)]
 	[(#BOUTON_ACTION{Confirmer le paiement en attente,#ENV{config}|bank_simu_url_fin_paiement{#ID_TRANSACTION,#TRANSACTION_HASH}})]
 	[(#BOUTON_ACTION{Echec du paiement en attente,#ENV{config}|bank_simu_url_fin_paiement{#ID_TRANSACTION,#TRANSACTION_HASH}|parametre_url{status,fail}})]
 </div>
