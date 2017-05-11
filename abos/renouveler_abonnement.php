@@ -34,14 +34,12 @@ function abos_renouveler_abonnement_dist($id_transaction,$abo_uid,$mode_paiement
 	$id_abonnement = 0;
 
 	$id_abonnement = pipeline(
-		'bank_abos_activer_abonnement',
+		'bank_abos_renouveler_abonnement',
 		array(
 			'args'=>array(
 				'id_transaction'=>$id_transaction,
 				'abo_uid'=>$abo_uid,
 				'mode_paiement'=>$mode_paiement,
-				'validite'=>$validite,
-				'id_auteur'=>$id_auteur,
 			),
 			'data' => $id_abonnement,
 		)
