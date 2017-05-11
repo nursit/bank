@@ -190,5 +190,5 @@ _ Compte bancaire :
 	'titre_reglement_attente' => 'Règlement en attente',
 	'titre_rien_a_payer' => 'Rien à payer',
 	'titre_transaction' => 'Transaction',
+	'titre_transactions' => 'Transactions',
 );
-?>

@@ -41,6 +41,10 @@ function autoriser_utilisermodepaiementabo_dist($faire, $mode='', $id=0, $qui = 
 	return true;
 }
 
+function autoriser_transaction_iconifier_dist($faire, $mode='', $id=0, $qui = NULL, $opt = NULL){
+	return false;
+}
+
 /**
  * Seuls les webmestres peuvent encaisser un cheque
  * webmaster.

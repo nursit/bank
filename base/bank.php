@@ -21,9 +21,14 @@ function bank_declarer_tables_interfaces($interface){
 function bank_declarer_tables_objets_sql($tables){
 	$tables['spip_transactions'] = array(
 		'page' => false,
-		'titre' => "id_transaction, ''",
+		'titre' => "id_transaction as titre, '' as lang",
 		'date' => 'date_transaction',
 		'principale' => 'oui',
+		'texte_objets' => 'bank:titre_transactions',
+		'texte_objet' => 'bank:titre_transaction',
+		'info_aucun_objet' => 'bank:info_aucune_transaction',
+		'info_1_objet' => 'bank:info_1_transaction',
+		'info_nb_objets' => 'bank:info_nb_transactions',
 		'field' => array(
 			"id_transaction" 	=> "bigint(21) NOT NULL",
 			"id_auteur" 	=> "bigint(21) NOT NULL", // auteur (spip) loge qui realise la transaction

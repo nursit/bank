@@ -189,5 +189,6 @@ _ Bank account:
 	'titre_reglement_attente' => 'Payment pending',
 	'titre_rien_a_payer' => 'Nothing to pay',
 	'titre_transaction' => 'Transaction',
+	'titre_transactions' => 'Transactions',
 );
-?>
+
