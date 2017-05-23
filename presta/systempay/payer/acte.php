@@ -25,6 +25,7 @@ function presta_systempay_payer_acte_dist($config, $id_transaction, $transaction
 	$contexte = $call_request($id_transaction,$transaction_hash,$config);
 
 	$contexte['sandbox'] = ($config['mode_test']?' ':'');
+	$contexte['config'] = $config;
 
 	$contexte = array_merge($options, $contexte);
 

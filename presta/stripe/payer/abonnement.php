@@ -30,6 +30,7 @@ function presta_stripe_payer_abonnement_dist($config, $id_transaction, $transact
 	}
 
 	$contexte['sandbox'] = ($config['mode_test']?' ':'');
+	$contexte['config'] = $config;
 
 	$contexte = array_merge($options, $contexte);
 

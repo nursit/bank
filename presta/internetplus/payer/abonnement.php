@@ -43,13 +43,14 @@ function presta_internetplus_payer_abonnement_dist($config, $id_transaction, $tr
 
 	$url_payer = wha_url_abonnement($echeance['wha_oid'],$id_transaction,$config);
 
-	return recuperer_fond('presta/internetplus/payer/abonnement',
-		array(
-			'id_transaction' => $id_transaction,
-			'transaction_hash' => $transaction_hash,
-			'url_payer' => $url_payer,
-			'logo' => wha_logo_detecte_fai_visiteur(),
-			'sandbox' => wha_is_sandbox($config),
-		)
+	$contexte = array(
+		'id_transaction' => $id_transaction,
+		'transaction_hash' => $transaction_hash,
+		'url_payer' => $url_payer,
+		'logo' => wha_logo_detecte_fai_visiteur(),
+		'sandbox' => wha_is_sandbox($config),
 	);
+	$contexte['config'] = $config;
+
+	return recuperer_fond('presta/internetplus/payer/abonnement', $contexte);
 }

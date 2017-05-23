@@ -25,6 +25,7 @@ function presta_ogone_payer_acte_dist($config, $id_transaction, $transaction_has
 	$contexte = $call_request($id_transaction,$transaction_hash,$config);
 
 	$contexte['sandbox'] = (ogone_is_sandbox($config)?' ':'');
+	$contexte['config'] = $config;
 
 	$contexte = array_merge($options,$contexte);
 

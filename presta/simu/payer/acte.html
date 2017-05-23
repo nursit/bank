@@ -13,6 +13,7 @@
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 <div class='payer_mode payer_simu payer_acte'>
 	<p class="titre h4">R&egrave;gler [SIMULATION] :</p>
+	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 		#BOUTON_ACTION{'Simuler le paiement',#ENV{action}}
 		#BOUTON_ACTION{'Simuler un echec du paiement',#ENV{action}|parametre_url{status,fail}}

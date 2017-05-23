@@ -45,6 +45,7 @@ function presta_simu_payer_abonnement_dist($config, $id_transaction, $transactio
 
 	$contexte['action'] = $action;
 	$contexte['action_wait'] = $action_wait;
+	$contexte['config'] = $config;
 
 	$contexte = array_merge($options, $contexte);
 

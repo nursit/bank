@@ -25,6 +25,7 @@ function presta_paybox_payer_abonnement_dist($config, $id_transaction, $transact
 	$contexte = $call_request($id_transaction,$transaction_hash,$config,"abo");
 
 	$contexte['sandbox'] = (paybox_is_sandbox($config)?' ':'');
+	$contexte['config'] = $config;
 
 	$contexte = array_merge($options,$contexte);
 

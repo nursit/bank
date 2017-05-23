@@ -14,6 +14,7 @@
 <B_cb>
 <div class='payer_mode payer_payzen payer_acte'>
 	<p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
+	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 	<BOUCLE_cb(POUR){tableau #ENV{hidden}}{cle !IN SDD,E_CV}>
 		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{payzen}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
@@ -25,6 +26,7 @@
 <B_sepa>
 <div class='payer_mode payer_payzen payer_sepa payer_acte'>
 	<p class="titre h4"><:bank:payer_par_prelevement_sepa:></p>
+	[<p class="explication">(#ENV{config/presta}|concat{_sepa}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 	<BOUCLE_sepa(POUR){tableau #ENV{hidden}}{cle=SDD}>
 		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{payzen}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
@@ -36,6 +38,7 @@
 <B_ecv>
 <div class='payer_mode payer_payzen payer_ecv payer_acte'>
 	<p class="titre h4"><:bank:payer_par_e_cheque_vacances:></p>
+	[<p class="explication">(#ENV{config/presta}|concat{_ecv}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 	<BOUCLE_ecv(POUR){tableau #ENV{hidden}}{cle=E_CVxx}>
 		[(#INCLURE{fond=presta/systempay/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{payzen}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]

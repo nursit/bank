@@ -21,6 +21,7 @@ function presta_gratuit_payer_acte_dist($config, $id_transaction,$transaction_ha
 	);
 	$contexte['sign'] = bank_sign_response_simple("gratuit",$contexte);
 	$contexte['action'] = bank_url_api_retour($config,"response");
+	$contexte['config'] = $config;
 
 	$contexte = array_merge($options,$contexte);
 

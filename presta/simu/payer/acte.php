@@ -33,6 +33,7 @@ function presta_simu_payer_acte_dist($config, $id_transaction, $transaction_hash
 		$action = parametre_url($action,$k,$v);
 	}
 	$contexte['action'] = $action;
+	$contexte['config'] = $config;
 
 	$contexte = array_merge($options, $contexte);
 

@@ -12,6 +12,7 @@
 ]#CACHE{0}
 <div class='payer_mode payer_paybox payer_acte'>
 	<p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
+	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 		<BOUCLE_cb(POUR){tableau #ENV{hidden}}>
 		[(#INCLURE{fond=presta/paybox/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{paybox}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]

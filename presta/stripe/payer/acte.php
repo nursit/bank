@@ -29,6 +29,7 @@ function presta_stripe_payer_acte_dist($config, $id_transaction, $transaction_ha
 	}
 
 	$contexte['sandbox'] = ($config['mode_test']?' ':'');
+	$contexte['config'] = $config;
 
 	$contexte = array_merge($options, $contexte);
 

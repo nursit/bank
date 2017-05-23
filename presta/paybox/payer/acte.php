@@ -24,6 +24,7 @@ function presta_paybox_payer_acte_dist($config, $id_transaction, $transaction_ha
 	$contexte = $call_request($id_transaction,$transaction_hash,$config,"acte");
 
 	$contexte['sandbox'] = (paybox_is_sandbox($config)?' ':'');
+	$contexte['config'] = $config;
 
 	$contexte = array_merge($options,$contexte);
 

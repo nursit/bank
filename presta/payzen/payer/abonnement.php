@@ -29,6 +29,7 @@ function presta_payzen_payer_abonnement_dist($config, $id_transaction, $transact
 	$contexte = $call_request($id_transaction,$transaction_hash,$config,"REGISTER_PAY_SUBSCRIBE");
 
 	$contexte['sandbox'] = ($config['mode_test']?' ':'');
+	$contexte['config'] = $config;
 
 	$contexte = array_merge($options, $contexte);
 

@@ -13,6 +13,7 @@
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 <div class='payer_mode payer_gratuit payer_acte'>
 	<p class="titre h4"><:bank:payer_par_gratuit:></p>
+	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 	[(#BOUTON_ACTION{<:bank:titre_bouton_payer_gratuit:>,#ENV{action}|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH}|parametre_url{sign,#SIGN}})]
 	</div>

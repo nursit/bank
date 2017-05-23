@@ -32,6 +32,7 @@ function presta_internetplus_payer_acte_dist($config,$id_transaction,$transactio
 		'logo' => wha_logo_detecte_fai_visiteur(),
 		'sandbox' => (wha_is_sandbox($config)?' ':''),
 	);
+	$contexte['config'] = $config;
 
 	return recuperer_fond('presta/internetplus/payer/acte', $contexte);
 }

@@ -116,6 +116,18 @@ function bank_label_payer_par_carte($code_carte){
 }
 
 /**
+ * Explication facultative des modes de paiement, chaine de langue a fournir pour les afficher
+ * @param string $mode
+ * @return string
+ */
+function bank_explication_mode_paiement($mode) {
+	$mode = preg_replace(",[/-]([0-9A-F]{4})$,Uims"," <span class='small'>\\1</span>",$mode);
+	$explication = _T('bank:explication_mode_paiement_'.$mode,array(),array('force'=>false));
+	return $explication;
+}
+
+
+/**
  * Afficher l'inclusion attente reglement si elle existe,
  * en fonction du presta
  * @param string $mode

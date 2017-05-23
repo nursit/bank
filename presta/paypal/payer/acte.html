@@ -13,6 +13,7 @@
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 <div class='payer_mode payer_paypal payer_acte'>
 	<p class="titre h4"><:bank:payer_avec{nom=Paypal}:></p>
+	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 		<form action="#ENV{action}" method="post" class="noajax">
 			<button type="submit" title="<:bank:payer_avec{nom=Paypal}|attribut_html:>">[(#ENV{logo}|balise_img{<:bank:payer_avec{nom=Paypal}:>})]</button>
