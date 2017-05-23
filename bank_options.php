@@ -112,6 +112,9 @@ function bank_affiche_gerer_abonnement($config,$abo_uid){
 
 function bank_trouver_logo($mode,$logo){
 	// d'abord dans un dossier presta/
+	if (substr($logo,-4) == '.gif'
+		and $f=find_in_path("presta/$mode/logo/".basename($logo,'.gif') . '.png'))
+		return $f;
 	if ($f=find_in_path("presta/$mode/logo/$logo"))
 		return $f;
 	// sinon le dossier generique
