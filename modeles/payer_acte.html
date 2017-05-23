@@ -22,18 +22,23 @@
 					<h3 class='selectionnez'>
 					[(#ENV*{title,Je choisis mon mode de paiement s&eacute;curis&eacute; :})]
 					</h3>
-				<BOUCLE_modes(POUR){tableau #VAL{acte}|bank_lister_configs}>
-				[(#VALEUR{actif}|oui)
-					#PAYER_ACTE{#VALEUR,#ID_TRANSACTION,#TRANSACTION_HASH,#ENV{title,''}}
-				]
-				</BOUCLE_modes>
+					<B_modes>
+					<div class="payer_modes">
+						<BOUCLE_modes(POUR){tableau #VAL{acte}|bank_lister_configs}>[(#VALEUR{actif}|oui)
+							#PAYER_ACTE{#VALEUR,#ID_TRANSACTION,#TRANSACTION_HASH,#ENV{title,''}}
+
+						]</BOUCLE_modes>
+					</div>
+					</B_modes>
 					<p class="error"><:bank:erreur_aucun_moyen_paiement:></p>
 				<//B_modes>
 			</BOUCLE_payant>
 				<h3 class='selectionnez'>
 				[(#ENV{title,<:bank:titre_rien_a_payer:>})]
 				</h3>
-				#PAYER_ACTE{gratuit,#ID_TRANSACTION,#TRANSACTION_HASH,#ENV{title,''}}
+				<div class="payer_modes">
+					#PAYER_ACTE{gratuit,#ID_TRANSACTION,#TRANSACTION_HASH,#ENV{title,''}}
+				</div>
 			<//B_payant>
 		</div>
 	</BOUCLE_macommande>
