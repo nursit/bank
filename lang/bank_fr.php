@@ -169,12 +169,12 @@ _ Compte bancaire :
 	'payer' => 'Payer',
 	'payer_avec' => 'Payer avec <i>@nom@</i>',
 	'payer_par_carte' => 'Payer par @carte@',
-	'payer_par_carte_bancaire' => 'Payer par carte bancaire :',
-	'payer_par_cheque' => 'Payer par chèque :',
-	'payer_par_e_cheque_vacances' => 'Payer par e-Chèque-Vacances :',
+	'payer_par_carte_bancaire' => 'Payer par carte bancaire',
+	'payer_par_cheque' => 'Payer par chèque',
+	'payer_par_e_cheque_vacances' => 'Payer par e-Chèque-Vacances',
 	'payer_par_gratuit' => 'Vous n\'avez rien à payer',
-	'payer_par_prelevement_sepa' => 'Payer par prélèvement automatique :',
-	'payer_par_virement' => 'Payer par virement bancaire :',
+	'payer_par_prelevement_sepa' => 'Payer par prélèvement automatique',
+	'payer_par_virement' => 'Payer par virement bancaire',
 
 // T
 	'titre_bouton_payer_gratuit' => 'Valider la commande',

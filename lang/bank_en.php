@@ -168,12 +168,12 @@ _ Bank account:
 	'payer' => 'Pay',
 	'payer_avec' => 'Pay with <i>@nom@</i>',
 	'payer_par_carte' => 'Pay by @carte@',
-	'payer_par_carte_bancaire' => 'Pay by credit card:',
-	'payer_par_cheque' => 'Pay by check:',
-	'payer_par_e_cheque_vacances' => 'Pay by <span lang="fr">e-Chèque-Vacances</span>:',
+	'payer_par_carte_bancaire' => 'Pay by credit card',
+	'payer_par_cheque' => 'Pay by check',
+	'payer_par_e_cheque_vacances' => 'Pay by <span lang="fr">e-Chèque-Vacances</span>',
 	'payer_par_gratuit' => 'You have nothing to pay',
-	'payer_par_prelevement_sepa' => 'Pay by direct account debit (SEPA):',
-	'payer_par_virement' => 'Pay by bank transfer:',
+	'payer_par_prelevement_sepa' => 'Pay by direct account debit (SEPA)',
+	'payer_par_virement' => 'Pay by bank transfer',
 
 // T
 	'titre_bouton_payer_gratuit' => 'Validate the order',
