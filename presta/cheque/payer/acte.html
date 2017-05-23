@@ -20,10 +20,13 @@
 		#SET{transaction,#ID_TRANSACTION|wrap{'<b>'}}
 		<:bank:info_cheque_imprimer{montant=#GET{montant},transaction=#GET{transaction},ordre=#GET{ordre}}|propre:>
 
+		[(#SET{texte,<:bank:bouton_enregistrer_reglement_cheque:>})]
 		<div class='boutons'>
-		[(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_cheque:>,#ENV*{action}})]
+		[(#BOUTON_ACTION{[(#ENV{logo}
+							|balise_img{#GET{texte}}
+							|inserer_attribut{title,#GET{texte}}
+							|sinon{#GET{texte}})],#ENV*{action}})]
 		</div>
-
 	]
 	[(#AUTORISER{encaissercheque,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive})
 		<div class="ajax">

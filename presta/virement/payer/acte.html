@@ -32,9 +32,14 @@
 				banque, #GET{banque},
 				adressebanque, #GET{adressebanque}}}|propre)
 		  ]
+		  [(#SET{texte,<:bank:bouton_enregistrer_reglement_virement:>})]
 			<div class='boutons'>
-			[(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_virement:>,#ENV*{action}})]
+			[(#BOUTON_ACTION{[(#ENV{logo}
+								|balise_img{#GET{texte}}
+								|inserer_attribut{title,#GET{texte}}
+								|sinon{#GET{texte}})],#ENV*{action}})]
 			</div>
+
     ]
     [(#AUTORISER{encaisservirement,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive})
 		  #FORMULAIRE_ENCAISSER_REGLEMENT{#ID_TRANSACTION,#ENV{config}}
