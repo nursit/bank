@@ -94,7 +94,7 @@ function presta_systempay_call_response_dist($config, $response=null){
 						array(
 							'mode' => $mode,
 							'sujet' => 'Echec creation transaction echeance',
-							'erreur' => "uid:".$response['abo'].' inconnu de $preparer_echeance',
+							'erreur' => "uid:".$response['vads_subscription'].' inconnu de $preparer_echeance',
 							'log' => bank_shell_args($response),
 							'update' => false,
 							'send_mail' => true,
