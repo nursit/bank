@@ -94,7 +94,7 @@ $lignes
 		$tableau = "";
 		foreach ($transactions as $transaction) {
 			$ligne = "";
-			foreach (array('id_transaction','id_auteur','auteur','date_transaction','montant','mode','statut','finie') as $k) {
+			foreach (array('id_transaction','id_auteur','auteur','date_transaction','montant','mode','statut','id_commande','id_facture','finie') as $k) {
 				$ligne .= "<td>".$transaction[$k]."</td>";
 			}
 			$tableau .= "<tr>$ligne</tr>\n";
@@ -102,7 +102,7 @@ $lignes
 
 		$tableau = "<table class='spip'>
 <thead>
-<tr><td>#</td><td>id_auteur</td><td>auteur</td><td>date</td><td>montant</td><td>mode</td><td>statut</td><td>finie</td></tr>
+<tr><td>#</td><td>id_auteur</td><td>auteur</td><td>date</td><td>montant</td><td>mode</td><td>statut</td><td>id_commande</td><td>id_facture</td><td>finie</td></tr>
 </thead>
 <tbody>
 $tableau
