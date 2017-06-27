@@ -81,6 +81,49 @@ $lignes
 		}
 	}
 
+	// une alerte mail sur les transactions dont le traitement du paiement a ete interrompu
+	if ($transactions = sql_allfetsel('*','spip_transactions','finie='.intval(-1))) {
+		include_spip('inc/filtres');
+		$c = unserialize($GLOBALS['meta']['bank_paiement']);
+		$email = $GLOBALS['meta']['email_webmaster'];
+		if (isset($c['email_ticket_admin'])) {
+			$email = $c['email_ticket_admin'];
+		}
+
+
+		$tableau = "";
+		foreach ($transactions as $transaction) {
+			$ligne = "";
+			foreach (array('id_transaction','id_auteur','auteur','date_transaction','montant','mode','statut','finie') as $k) {
+				$ligne .= "<td>".$transaction[$k]."</td>";
+			}
+			$tableau .= "<tr>$ligne</tr>\n";
+		}
+
+		$tableau = "<table class='spip'>
+<thead>
+<tr><td>#</td><td>id_auteur</td><td>auteur</td><td>date</td><td>montant</td><td>mode</td><td>statut</td><td>finie</td></tr>
+</thead>
+<tbody>
+$tableau
+</tbody>
+</table>";
+
+		$nb = count($transactions);
+		$nb = singulier_ou_pluriel($nb,'bank:info_1_transaction','bank:info_nb_transactions');
+		$titre = "$nb en ECHEC";
+
+		$texte = "<html><h1>$titre</h1>\n$tableau</html>";
+		$header = "MIME-Version: 1.0\n".
+			"Content-Type: text/html; charset=".$GLOBALS['meta']['charset']."\n".
+			"Content-Transfer-Encoding: 8bit\n";
+		$sujet = "[".$GLOBALS['meta']['nom_site']."][ERREUR] $titre";
+
+		$envoyer_mail = charger_fonction('envoyer_mail','inc');
+		$envoyer_mail($email,$sujet,$texte,'',$header);
+
+	}
+
 
 	return 1;
 }
