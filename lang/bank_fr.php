@@ -40,6 +40,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'erreur_transaction_echec' => 'Aucun règlement n\'a été réalisé. (Transaction Ref. @ref@)',
 	'erreur_transaction_invalide' => 'Une erreur est survenue, les données reçues ne sont pas conformes.',
 	'explication_page_configurer_paiement' => 'Configurez les systèmes de paiement actifs',
+	'erreur_transaction_traitement_incomplet' => 'La prise en compte du paiement de cette transaction a été interrompu en cours de traitement. Une réparation manuelle de la base de données est nécessaire.',
 
 // I
 	'info_aucune_transaction' => 'Aucune transaction',

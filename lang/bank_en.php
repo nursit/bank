@@ -40,6 +40,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'erreur_transaction_echec' => 'No payment has been achieved. (Transaction Ref. @ref@)',
 	'erreur_transaction_invalide' => 'An error has occured due to unexpected received data.',
 	'explication_page_configurer_paiement' => 'Set up active payment systems',
+	'erreur_transaction_traitement_incomplet' => 'Processing of the payment for this transaction has been interrupted. Manual repair of database is required.',
 
 // I
 	'info_aucune_transaction' => 'No transaction',

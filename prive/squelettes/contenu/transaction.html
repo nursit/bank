@@ -6,6 +6,8 @@
 		<BOUCLE_auteur(AUTEURS){id_auteur}{tout}>
 		<div class="qui">Liée à [<a href='[(#ID_AUTEUR|generer_url_entite{auteur})]'>(#NOM)</a>[ \((#EMAIL)\)]]</div>
 		</BOUCLE_auteur>
+		[<div class="qui">Liée à (#AUTEUR)</div>]
+		<//B_auteur>
 		[<div class="date">Date : (#DATE_TRANSACTION|affdate)</div>]
 		[<div class="mode">Mode : (#MODE)</div>]
 		[<div class="autorisation_id">Autorisation : (#AUTORISATION_ID)</div>]
@@ -20,6 +22,10 @@
 		[<div class="validite">Validite : (#VALIDITE)</div>]
 		[<div class="pay_id">ID Paiement : (#PAY_ID)</div>]
 	#BOITE_FERMER
+
+	[(#FINIE|<{0}|oui)
+	<div class="error"><:bank:erreur_transaction_traitement_incomplet:></div>
+	]
 
 	[<div class="message">(#MESSAGE)</div>]
 
