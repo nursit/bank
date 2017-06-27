@@ -8,7 +8,7 @@
 		</BOUCLE_auteur>
 		[<div class="qui">Liée à (#AUTEUR)</div>]
 		<//B_auteur>
-		[<div class="date">Date : (#DATE_TRANSACTION|affdate)</div>]
+		[<div class="date">Date : (#DATE_TRANSACTION|affdate_heure)</div>]
 		[<div class="mode">Mode : (#MODE)</div>]
 		[<div class="autorisation_id">Autorisation : (#AUTORISATION_ID)</div>]
 		[<div class="montant">Montant : (#MONTANT_HT|affiche_monnaie) HT[ / (#MONTANT|affiche_monnaie) TTC]</div>]
@@ -26,6 +26,8 @@
 	[(#FINIE|<{0}|oui)
 	<div class="error"><:bank:erreur_transaction_traitement_incomplet:></div>
 	]
+
+	[<div class="warning">(#ERREUR)</div>]
 
 	[<div class="message">(#MESSAGE)</div>]
 
