@@ -38,7 +38,7 @@ function presta_systempay_call_response_dist($config, $response=null){
 
 	$recurence = false;
 	// c'est une reconduction d'abonnement ?
-	if (isset($response['vads_url_check_src']) AND in_array($response['vads_url_check_src'],array('REC','RETRY'))
+	if (isset($response['vads_url_check_src']) AND in_array($response['vads_url_check_src'],array('REC','RETRY','BO'))
 		  AND isset($response['vads_recurrence_number']) AND $response['vads_recurrence_number']){
 
 		// si la transaction reference n'existe pas ou a deja ete payee c'est bien une recurence
@@ -47,9 +47,12 @@ function presta_systempay_call_response_dist($config, $response=null){
 		// pour $response['vads_recurrence_number']=1 on est pas sur, mais au dela c'est une recurence certaine
 		if (!$trans OR $trans['statut']=='ok' OR $response['vads_recurrence_number']>1){
 			// verifier qu'on a pas deja traite cette recurrence !
-			if ($t2 = sql_fetsel("*","spip_transactions","autorisation_id=".sql_quote($response['vads_order_id']."/".$response['vads_trans_id']))){
+			$day = substr($response['vads_trans_date'],0,4) . '-' . substr($response['vads_trans_date'],4,2) . '-' . substr($response['vads_trans_date'],6,2);
+			if ($t2 = sql_fetsel("*","spip_transactions","autorisation_id=".sql_quote($response['vads_order_id']."/".$response['vads_trans_uuid']))
+				// compat : avant on utilisait vads_trans_id comme pour vads_payment_certificate mais il n'est unique que pour une journee donnee
+				or $t2 = sql_fetsel("*","spip_transactions","autorisation_id=".sql_quote($response['vads_order_id']."/".$response['vads_trans_id']).' AND date_transaction LIKE '.sql_quote("$day%"))) {
 				$response['vads_auth_number'] = $response['vads_order_id'];
-				$response['vads_payment_certificate'] = $response['vads_trans_id'];
+				$response['vads_payment_certificate'] = $response['vads_trans_uuid'];
 				$response['vads_order_id'] = $t2['id_transaction'];
 			}
 			// creer la transaction maintenant si besoin !
@@ -82,7 +85,7 @@ function presta_systempay_call_response_dist($config, $response=null){
 				// on reinjecte le bon id de transaction ici si fourni
 				if ($id_transaction){
 					$response['vads_auth_number'] = $response['vads_order_id'];
-					$response['vads_payment_certificate'] = $response['vads_trans_id'];
+					$response['vads_payment_certificate'] = $response['vads_trans_uuid'];
 					$response['vads_order_id'] = $id_transaction;
 				}
 				// si c'est une recurrence mais qu'on a pas su generer une transaction nouvelle il faut loger

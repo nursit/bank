@@ -318,7 +318,6 @@ function systempay_traite_reponse_transaction($config, $response){
 		$date_transaction = date('Y-m-d H:i:s',$t);
 	}
 
-
 	$erreur = array(
 		systempay_response_code($response['vads_result']),
 		systempay_auth_response_code($response['vads_auth_result'])
