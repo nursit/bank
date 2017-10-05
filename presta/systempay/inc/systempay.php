@@ -259,7 +259,7 @@ function systempay_traite_reponse_transaction($config, $response){
 		// car c'est un bug chez PayZen qui oublie d'envoyer l'info vads_subscription dans ce cas
 		elseif ($is_registering
 			AND !isset($response['vads_subscription'])
-			AND isset($response['vads_sequence_number']) AND $response['vads_sequence_number']){
+			AND isset($response['vads_recurrence_number']) AND $response['vads_recurrence_number']){
 			$is_subscribing = true;
 			if (!$response['vads_card_number']) $response['vads_card_number']='X_X';
 		}
