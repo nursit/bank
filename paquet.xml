@@ -1,9 +1,9 @@
 <paquet
 	prefix="bank"
 	categorie="outil"
-	version="3.5.8"
+	version="3.5.9"
 	etat="stable"
-	compatibilite="[3.0.0;3.1.*]"
+	compatibilite="[3.0.0;3.2.*]"
 	logo="prive/themes/spip/images/credit-card-32.png"
 	documentation="http://contrib.spip.net/4627"
 	schema="1.6.5"
