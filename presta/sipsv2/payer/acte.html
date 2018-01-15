@@ -1,0 +1,20 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012-2015 - Distribue sous licence GNU/GPL
+ *
+ */
+]#CACHE{0}
+<div class='payer_mode payer_sips [payer_sips_(#ENV{service})] payer_acte'>
+	<p class="titre h4">[(#ENV{code,''}|?{'Erreur appel API de paiement.',<:bank:payer_par_carte_bancaire:>})]</p>
+	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
+	[<div class="error">(#ENV*{error})</div>]
+	[<div class='boutons'>
+		(#ENV*{buffer})
+	</div>]
+</div>
