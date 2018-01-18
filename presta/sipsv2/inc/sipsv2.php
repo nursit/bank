@@ -14,103 +14,115 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 include_spip('inc/bank');
 
 /**
- * Ecrire les fichiers de config/parametres a la volee avant l'appel a un binaire SIPS
- * @param string $service
- * @param string $merchant_id
- * @param string $certificat
- * @param string $dir_logo
- * @return string
- */
-function sipsv2_ecrire_config_merchant($service,$merchant_id,$certificat,$dir_logo){
-	// creer les fichiers config pour la transaction
-	$pathfile = sous_repertoire(_DIR_TMP,"sips");
-	$pathfile = sous_repertoire($pathfile,$service);
-	$realdir = realpath($pathfile);
-	$config_file =
-	"DEBUG!NO!\n"
-	. "D_LOGO!".substr($dir_logo,strlen(_DIR_RACINE))."!\n"
-	. "F_DEFAULT!$realdir/parmcom.sips!\n"
-	. "F_PARAM!$realdir/parmcom!\n"
-	. "F_CERTIFICATE!$realdir/certif!";
-
-	ecrire_fichier($p=$pathfile."pathfile",$config_file);
-
-	// le fichier par defaut
-	if (!file_exists($pathfile."parmcom.sips"))
-		copy(_DIR_PLUGIN_BANK."presta/sips/bin/$service/param/parmcom.sips",$pathfile."parmcom.sips");
-	// le fichier du merchant
-	if (!file_exists($pathfile."parmcom.$merchant_id"))
-		copy(_DIR_PLUGIN_BANK."presta/sips/bin/$service/param/parmcom",$pathfile."parmcom.$merchant_id");
-	// le certificat
-	if ($merchant_id)
-		ecrire_fichier($p=$pathfile."certif.fr.$merchant_id",$certificat);
-
-	return $realdir;
-}
-
-/**
- * Echapper les arguments en ligne de commande
- * @param $params
- * @return string
- */
-function sipsv2_shell_args($params){
-	$res = "";
-	foreach($params as $k=>$v){
-		if (preg_match(',[^A-Z0-9],i',$v))
-			$v="'".addslashes($v)."'";
-		else
-			$v = escapeshellcmd($v);
-		$res .= " ".escapeshellcmd($k)."=".$v;
-	}
-	return $res;
-}
-
-/**
- * Generer la requete d'appel
+ * Determiner l'URL d'appel serveur en fonction de la config
  *
- * @param $service
- * @param $params
- * @param $certificat
- * @param string $request
+ * @param array $config
+ * @return string
+ */
+function sipsv2_url_serveur($config){
+
+	$host = "";
+	switch($config['service']){
+		case "sogenactif":
+			if ($config['mode_test']) {
+				$host = "https://payment-webinit.simu.sogenactif.com";
+			}
+			else {
+				$host = "https://payment-webinit.sogenactif.com";
+			}
+			break;
+		default:
+			$host = "https://payment-webinit.simu.sogenactif.com";
+			break;
+	}
+
+	return "$host/paymentInit";
+}
+
+/**
+ * Determiner la cle de signature en fonction de la config
+ * @param array $config
  * @return array
  */
-function sipsv2_request($service,$params,$certificat,$request = "request"){
-	// enlever les header moches
-	$params['header_flag'] = 'no';
-
-	$dir_logo = find_in_path("presta/sips/logo/"); // permettre la surcharge des images
-	$sipsv2_exec_request = charger_fonction("exec_request","presta/sips");
-	$result = $sipsv2_exec_request($service,$params,$certificat,$dir_logo,$request);
-
-	//	sortie de la fonction : $result=!code!error!buffer!
-	//	    - code=0	: la fonction genere une page html contenue dans la variable buffer
-	//	    - code=-1 	: La fonction retourne un message d'erreur dans la variable error
-
-	//On separe les differents champs et on les met dans une variable tableau
-	$result = explode ("!", $result);
-	// supprimer les align="center" desuet
-	$result[3] = preg_replace(',align=([\'"]?)center(\\1),Uims','',$result[3]);
-
-	$result['code'] = $result[1];
-	$result['error'] = $result[2];
-	$result['buffer'] = $result[3];
-
-	if (( $result['code'] == "" ) && ( $result['error'] == "" ) ) {
- 		$result['buffer'] = "<p>erreur appel $request</p>executable $request non trouve";
- 		spip_log("erreur appel $request : executable $request non trouve",'sips');
+function sipsv2_key($config){
+	if ($config['mode_test']) {
+		return array($config['key_version_test'], $config['secret_key_test']);
 	}
 
-	if (preg_match_all(",<form\b[^>]*>,UimsS",$result['buffer'], $regs, PREG_PATTERN_ORDER)){
-		foreach($regs as $reg){
-			$class = extraire_attribut($reg[0],"class");
-			$class .= ($class?" ":"") . "noajax";
-			$form = inserer_attribut($reg[0],"class",$class);
-			$result['buffer'] = str_replace($reg[0],$form,$result['buffer']);
-		}
-	}
-
-	return $result;
+	return array($config['key_version'], $config['secret_key']);
 }
+
+
+/**
+ * Liste des cartes CB possibles selon la config
+ * @param $config
+ * @return array
+ */
+function sipsv2_available_cards($config){
+
+	$mode = $config['presta'];
+	$cartes_possibles = array(
+		'CB'=>"CB.gif",
+		'VISA'=>"VISA.gif",
+		'MASTERCARD'=>"MASTERCARD.gif",
+		'AMEX' => "AMEX.gif",
+	);
+
+	return $cartes_possibles;
+}
+
+
+/**
+ * Generer les hidden du form en signant les parametres au prealable
+ * @param array $config
+ *   configuration du prestataire paiement
+ * @param array $parms
+ *   parametres du form
+ * @return string
+ */
+function sipsv2_form_hidden($config,$parms){
+
+	list($key_version, $secret_key) = sipsv2_key($config);
+	$h = array();
+	$data = array();
+	foreach($parms as $k=>$v) {
+		if (is_array($v)) {
+			$v = implode(',', $v);
+		}
+		$data[] = "$k=$v";
+	}
+	$data[] = "keyVersion=".$key_version;
+
+	$h['Data'] = implode('|', $data);
+	//$h['Encode'] = 'base64';
+	//$h['Data'] = base64_encode($h['Data']);
+	$h['InterfaceVersion'] = 'HP_2.16';
+
+	$h = sipsv2_signe_contexte($h, $secret_key);
+
+	$hidden = "";
+	foreach($h as $k=>$v){
+		$hidden .= "<input type='hidden' name='$k' value='".str_replace("'", "&#39;", $v)."' />";
+	}
+
+	return $hidden;
+}
+
+
+/**
+ * Signer le contexte en SHA, avec une cle secrete $key
+ * @param array $contexte
+ * @param string $secretKey
+ * @return array
+ */
+function sipsv2_signe_contexte($contexte, $secretKey) {
+
+	$s = hash('sha256', $contexte['Data'] . $secretKey);
+	$contexte['Seal'] = $s;
+
+	return $contexte;
+}
+
 
 /**
  * Decoder la reponse de retour

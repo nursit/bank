@@ -19,7 +19,7 @@ include_spip('inc/date');
  * @param null|array $response
  * @return array
  */
-function presta_sips_call_response_dist($config, $response=null){
+function presta_sipsv2_call_response_dist($config, $response=null){
 
 	include_spip('inc/bank');
 	$mode = $config['presta'];

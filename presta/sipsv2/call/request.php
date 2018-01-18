@@ -22,13 +22,21 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *   configuration du module
  * @return array
  */
-function presta_sips_call_request_dist($id_transaction, $transaction_hash, $config){
+function presta_sipsv2_call_request_dist($id_transaction, $transaction_hash, $config){
 
-	$mode = 'sips';
+	include_spip('presta/sipsv2/inc/sipsv2');
+
+	$mode = 'sipsv2';
 	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
 		spip_log("call_request : config invalide ".var_export($config,true),$mode._LOG_ERREUR);
 		$mode = $config['presta'];
 	}
+
+	$cartes = array('CB','VISA','MASTERCARD');
+	if (isset($config['cartes']) AND $config['cartes']) {
+		$cartes = $config['cartes'];
+	}
+	$cartes_possibles = sipsv2_available_cards($config);
 
 	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash))){
 		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable",$mode._LOG_ERREUR);
@@ -51,46 +59,37 @@ function presta_sips_call_request_dist($id_transaction, $transaction_hash, $conf
 
 	$merchant_id = $config['merchant_id'];
 	$service = $config['service'];
-	$certif = $config['certificat'];
 
 	//		Affectation des parametres obligatoires
 	$parm = array();
-	$parm['merchant_id']=$merchant_id;
-	$parm['merchant_country']="fr";
-	$parm['currency_code']="978";
+	$parm['merchantID']=$merchant_id;
 	$parm['amount']=$montant;
-	$parm['customer_id']=intval($row['id_auteur'])?$row['id_auteur']:$row['auteur_id'];
-	$parm['order_id']=intval($id_transaction);
-	$parm['transaction_id']=bank_transaction_id($row);
-	$parm['customer_email']=substr($mail,0,128);
+	$parm['currencyCode']="978";
 
-	$parm['normal_return_url']=bank_url_api_retour($config,'response');
-	$parm['cancel_return_url']=bank_url_api_retour($config,'cancel');
-	$parm['automatic_response_url']=bank_url_api_retour($config,'autoresponse');
+	$parm['customerId']=intval($row['id_auteur'])?$row['id_auteur']:$row['auteur_id'];
+	$parm['orderId']=intval($id_transaction);
+	$parm['transactionReference']=bank_transaction_id($row);
+	//$parm['customerContact.email']=substr($mail,0,128);
 
-	// ajouter les logos de paiement si configures
-	foreach(array('logo_id','logo_id2','advert') as $logo_key){
-		if (isset($config[$logo_key])
-		  AND $file = $config[$logo_key]){
-			$parm[$logo_key]=$file;
+	$parm['normalReturnUrl']=bank_url_api_retour($config,'response');
+	//$parm['cancelReturnUrl']=bank_url_api_retour($config,'cancel');
+	$parm['automaticResponseUrl']=bank_url_api_retour($config,'autoresponse');
+
+
+	$contexte = array(
+		'id_transaction' => $id_transaction,
+		'transaction_hash' => $transaction_hash,
+		'action' => sipsv2_url_serveur($config),
+		'hidden' => array(),
+		'logo' => array(),
+	);
+	foreach($cartes as $carte){
+		if (isset($cartes_possibles[$carte])){
+			$parm['paymentMeanBrandList'] = $carte;
+			$contexte['hidden'][$carte] = sipsv2_form_hidden($config,$parm);
+			$contexte['logo'][$carte] = $cartes_possibles[$carte];
 		}
 	}
 
-	//		Les valeurs suivantes ne sont utilisables qu'en pre-production
-	//		Elles necessitent l'installation de vos fichiers sur le serveur de paiement
-	//
-	// 		$parm="$parm normal_return_logo=";
-	// 		$parm="$parm cancel_return_logo=";
-	// 		$parm="$parm submit_logo=";
-	// 		$parm="$parm logo_id=";
-	// 		$parm="$parm logo_id2=";
-	// 		$parm="$parm advert=";
-	// 		$parm="$parm background_id=";
-	// 		$parm="$parm templatefile=";
-
-	include_spip("presta/sips/inc/sips");
-	$res = sips_request($service,$parm,$certif);
-	$res['service'] = $service;
-
-	return $res;
+	return $contexte;
 }

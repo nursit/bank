@@ -4,18 +4,8 @@
 		<label for="#GET{name}"><:bank:label_presta_sips_service:></label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<select name="#ENV{casier,''}[service]" class="select" id="#GET{name}">
-			#SET{val,elysnet}
-			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>[(#GET{val}|ucfirst)] (HSBC)</option>
-			#SET{val,mercanet}
-			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>[(#GET{val}|ucfirst)] (BNP)</option>
-			#SET{val,scellius}
-			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>[(#GET{val}|ucfirst)] (La Banque Postale)</option>
-			#SET{val,sherlocks}
-			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>[(#GET{val}|ucfirst)] (LCL)</option>
 			#SET{val,sogenactif}
 			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>[(#GET{val}|ucfirst)] (Soci&eacute;t&eacute; G&eacute;n&eacute;rale)</option>
-			#SET{val,webaffaires}
-			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>[(#GET{val}|ucfirst)] (Cr&eacute;dit du Nord)</option>
 		</select>
 	</li>
 	#SET{name,#ENV{casier,''}_merchant_id}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
@@ -24,31 +14,30 @@
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[merchant_id]" class="text" value="#ENV*{#ENV{casier,''}/merchant_id,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
-	#SET{name,#ENV{casier,''}_certificat}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	#SET{name,#ENV{casier,''}_key_version}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer haut editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-		<label for="#GET{name}">Certificat</label>[
+		<label for="#GET{name}">Version de la clé</label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
-		]<textarea name="#ENV{casier,''}[certificat]" class="textarea" style='font-family:monospace;font-size:11px' rows="10">
-#ENV*{#ENV{casier,''}/certificat,#GET{defaut}}</textarea>
+		]<input type="text" name="#ENV{casier,''}[key_version]" class="text" value="#ENV*{#ENV{casier,''}/key_version,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
-	<li class="fieldset"><fieldset><legend><:bank:legend_sips_logo_page_paiement:></legend><ul>
-	#SET{name,#ENV{casier,''}_logo_id}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
-	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-		<label for="#GET{name}">Logo_id</label>[
+	#SET{name,#ENV{casier,''}_secret_key}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer haut editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">Clé secrète (Production)</label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
-		]<input type="text" name="#ENV{casier,''}[logo_id]" class="text" value="#ENV*{#ENV{casier,''}/logo_id,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+		]<input type="text" name="#ENV{casier,''}[secret_key]" class="text" value="#ENV*{#ENV{casier,''}/secret_key,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
-	#SET{name,#ENV{casier,''}_logo_id2}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
-	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-		<label for="#GET{name}">Logo_id2</label>[
+	<INCLURE{fond=formulaires/inc-bank-config-cartes,env,cartes=#ENV{#ENV{casier,''}}|sipsv2_lister_cartes_config} />
+	<INCLURE{fond=formulaires/inc-bank-config-mode_test,env} />
+	#SET{name,#ENV{casier,''}_key_version_test}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer haut editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">Version de la clé</label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
-		]<input type="text" name="#ENV{casier,''}[logo_id2]" class="text" value="#ENV*{#ENV{casier,''}/logo_id2,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+		]<input type="text" name="#ENV{casier,''}[key_version_test]" class="text" value="#ENV*{#ENV{casier,''}/key_version_test,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
-	#SET{name,#ENV{casier,''}_advert}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
-	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-		<label for="#GET{name}">Advert</label>[
+	#SET{name,#ENV{casier,''}_secret_key_test}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer haut editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}">Clé secrète (Test)</label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
-		]<input type="text" name="#ENV{casier,''}[advert]" class="text" value="#ENV*{#ENV{casier,''}/advert,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+		]<input type="text" name="#ENV{casier,''}[secret_key_test]" class="text" value="#ENV*{#ENV{casier,''}/secret_key_test,#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
-	</ul></fieldset></li>
 </ul>

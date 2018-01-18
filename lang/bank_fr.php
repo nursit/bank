@@ -145,6 +145,7 @@ _ Compte bancaire :
 	'label_presta_payzen' => 'PayZen <a href="https://www.payzen.eu/">https://www.payzen.eu/</a>',
 	'label_presta_simu' => 'Simulation (necessite une autorisation par define)',
 	'label_presta_sips' => 'SIPS',
+	'label_presta_sipsv2' => 'SIPS v2',
 	'label_presta_sips_service' => 'Service',
 	'label_presta_systempay' => 'Systempay',
 	'label_presta_virement' => 'Virement bancaire',

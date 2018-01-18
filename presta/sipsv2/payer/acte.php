@@ -19,15 +19,16 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @param array $options
  * @return array|string
  */
-function presta_sips_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
+function presta_sipsv2_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
 
-	$call_request = charger_fonction('request','presta/sips/call');
+	$call_request = charger_fonction('request','presta/sipsv2/call');
 	$contexte = $call_request($id_transaction,$transaction_hash,$config);
 	$contexte['config'] = $config;
 
+	$contexte['sandbox'] = ($config['mode_test']?' ':'');
 	$contexte = array_merge($options, $contexte);
 
-	return recuperer_fond('presta/sips/payer/acte',$contexte);
+	return recuperer_fond('presta/sipsv2/payer/acte',$contexte);
+
 }
 
-?>

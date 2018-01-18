@@ -10,11 +10,15 @@
  *
  */
 ]#CACHE{0}
-<div class='payer_mode payer_sips [payer_sips_(#ENV{service})] payer_acte'>
-	<p class="titre h4">[(#ENV{code,''}|?{'Erreur appel API de paiement.',<:bank:payer_par_carte_bancaire:>})]</p>
+<BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
+<div class='payer_mode payer_sipsv2 payer_acte'>
+	<p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
 	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
-	[<div class="error">(#ENV*{error})</div>]
-	[<div class='boutons'>
-		(#ENV*{buffer})
-	</div>]
+	<div class='boutons'>
+	<BOUCLE_cb(POUR){tableau #ENV{hidden}}>
+		[(#INCLURE{fond=presta/sipsv2/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{sipsv2}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
+	</BOUCLE_cb>
+	</div>
+	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=SIPSv2}:></div>]
 </div>
+</BOUCLE_trans>
