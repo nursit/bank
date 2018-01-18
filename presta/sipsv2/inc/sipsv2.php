@@ -94,8 +94,8 @@ function sipsv2_form_hidden($config,$parms){
 	$data[] = "keyVersion=".$key_version;
 
 	$h['Data'] = implode('|', $data);
-	//$h['Encode'] = 'base64';
-	//$h['Data'] = base64_encode($h['Data']);
+	$h['Encode'] = 'base64';
+	$h['Data'] = base64_encode($h['Data']);
 	$h['InterfaceVersion'] = 'HP_2.16';
 
 	$h = sipsv2_signe_contexte($h, $secret_key);
