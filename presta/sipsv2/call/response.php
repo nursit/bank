@@ -8,8 +8,9 @@
  * (c) 2007-2009 - Distribue sous licence GNU/GPL
  *
  */
+if (!defined('_ECRIRE_INC_VERSION')) return;
 
-include_spip('presta/sips/inc/sips');
+include_spip('presta/sipsv2/inc/sipsv2');
 include_spip('inc/date');
 
 /**
@@ -24,25 +25,22 @@ function presta_sipsv2_call_response_dist($config, $response=null){
 	include_spip('inc/bank');
 	$mode = $config['presta'];
 
-	include_spip('inc/config');
-	$merchant_id = $config['merchant_id'];
-	$service = $config['service'];
-	$certif = $config['certificat'];
-
 	// recuperer la reponse en post et la decoder
 	if (is_null($response)){
-		$response = sips_response($service, $merchant_id, $certif);
+		$response = sipsv2_recupere_reponse($config);
 	}
 
-	if ($response['merchant_id']!==$merchant_id) {
+	$merchant_id = $config['merchant_id'];
+	if (!isset($response['Data']['merchantId'])
+		or $response['Data']['merchantId']!==$merchant_id) {
 		return bank_transaction_invalide(0,
 			array(
 				'mode' => $mode,
-				'erreur' => "merchant_id invalide",
-				'log' => sips_shell_args($response)
+				'erreur' => "merchantId invalide",
+				'log' => bank_shell_args($response)
 			)
 		);
 	}
 
-	return sips_traite_reponse_transaction($config, $response);
+	return sipsv2_traite_reponse_transaction($config, $response);
 }

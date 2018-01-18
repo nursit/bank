@@ -112,12 +112,12 @@ function sipsv2_form_hidden($config,$parms){
 /**
  * Signer le contexte en SHA, avec une cle secrete $key
  * @param array $contexte
- * @param string $secretKey
+ * @param string $secret_key
  * @return array
  */
-function sipsv2_signe_contexte($contexte, $secretKey) {
+function sipsv2_signe_contexte($contexte, $secret_key) {
 
-	$s = hash('sha256', $contexte['Data'] . $secretKey);
+	$s = hash('sha256', $contexte['Data'] . $secret_key);
 	$contexte['Seal'] = $s;
 
 	return $contexte;
@@ -125,116 +125,73 @@ function sipsv2_signe_contexte($contexte, $secretKey) {
 
 
 /**
- * Decoder la reponse de retour
- *
- * @param $service
- * @param $merchant_id
- * @param $certificat
- * @param string $response
- * @return array
+ * Verifier la signature de la reponse SIPS
+ * @param $values
+ * @param $key
+ * @return bool
  */
-function sipsv2_response($service, $merchant_id, $certificat, $response = 'response'){
+function sipsv2_verifie_signature($values, $key) {
+	$seal = (isset($values['Seal'])? $values['Seal'] : null);
+	unset($values['Seal']);
+	$values = sipsv2_signe_contexte($values, $key);
 
-	$params = array('message'=>_request('DATA'));
-	$params['merchant_id'] = $merchant_id;
+	if(isset($values['Seal'])
+		AND ($values['Seal'] == $seal))	{
 
-	$dir_logo = find_in_path("presta/sips/logo/"); // permettre la surcharge des images
-	$sipsv2_exec_response = charger_fonction("exec_response","presta/sips");
-	$result = $sipsv2_exec_response($service,$params,$certificat,$dir_logo,$response);
-
-	//	Sortie de la fonction : !code!error!v1!v2!v3!...!v29
-	//		- code=0	: la fonction retourne les donnees de la transaction dans les variables v1, v2, ...
-	//				: Ces variables sont decrites dans le GUIDE DU PROGRAMMEUR
-	//		- code=-1 	: La fonction retourne un message d'erreur dans la variable error
-
-	//	on separe les differents champs et on les met dans une variable tableau
-	$result = explode ("!", $result);
-
-	if ($response=='response') {
-		//	Recuperation des donnees de la reponse
-		$result['code'] = $result[1];
-		$result['error'] = $result[2];
-		$result['merchant_id'] = $result[3];
-		$result['merchant_country'] = $result[4];
-		$result['amount'] = $result[5];
-		$result['transaction_id'] = $result[6];
-		$result['payment_means'] = $result[7];
-		$result['transmission_date'] = $result[8];
-		$result['payment_time'] = $result[9];
-		$result['payment_date'] = $result[10];
-		$result['response_code'] = $result[11];
-		$result['payment_certificate'] = $result[12];
-		$result['authorisation_id'] = $result[13];
-		$result['currency_code'] = $result[14];
-		$result['card_number'] = $result[15];
-		$result['cvv_flag'] = $result[16];
-		$result['cvv_response_code'] = $result[17];
-		$result['bank_response_code'] = $result[18];
-		$result['complementary_code'] = $result[19];
-		$result['complementary_info'] = $result[20];
-		$result['return_context'] = $result[21];
-		$result['caddie'] = $result[22];
-		$result['receipt_complement'] = $result[23];
-		$result['merchant_language'] = $result[24];
-		$result['language'] = $result[25];
-		$result['customer_id'] = $result[26];
-		$result['order_id'] = $result[27];
-		$result['customer_email'] = $result[28];
-		$result['customer_ip_address'] = $result[29];
-		$result['capture_day'] = $result[30];
-		$result['capture_mode'] = $result[31];
-		$result['data'] = $result[32];
+		return true;
 	}
-	elseif ($response=='responseabo'){
-		$result['code'] = $result[1];
-		$result['error'] = $result[2];
-		$result['merchant_id'] = $result[3];
-		$result['transaction_id'] = $result[4];
-		$result['transmission_date'] = $result[5];
-		$result['sub_time'] = $result[6];
-		$result['sub_date'] = $result[7];
-		$result['response_code'] = $result[8];
-		$result['bank_response_code'] = $result[9];
-		$result['cvv_response_code'] = $result[10];
-		$result['cvv_flag'] = $result[11];
-		$result['complementary_code'] = $result[12];
-		$result['complementary_info'] = $result[13];
-		$result['sub_payment_mean'] = $result[14];
-		$result['card_number'] = $result[15];
-		$result['card_validity'] = $result[16];
-		$result['payment_certificate'] = $result[17];
-		$result['authorisation_id'] = $result[18];
-		$result['currency_code'] = $result[19];
-		$result['sub_type'] = $result[20];
-		$result['sub_amount'] = $result[21];
-		$result['capture_day'] = $result[22];
-		$result['capture_mode'] = $result[23];
-		$result['merchant_language'] = $result[24];
-		$result['merchant_country'] = $result[25];
-		$result['language'] = $result[26];
-		$result['receipt_complement'] = $result[27];
-		$result['caddie'] = $result[28];
-		$result['data'] = $result[29];
-		$result['return_context'] = $result[30];
-		$result['customer_ip_address'] = $result[31];
-		$result['order_id'] = $result[32];
-		$result['sub_operation_code'] = $result[33];
 
-		$result['sub_subscriber_id'] = $result[34];
-		$result['sub_civil_status'] = $result[35];
-		$result['sub_lastname'] = $result[36];
-		$result['sub_firstname'] = $result[37];
-		$result['sub_address1'] = $result[38];
-		$result['sub_address2'] = $result[39];
-		$result['sub_zipcode'] = $result[40];
-		$result['sub_city'] = $result[41];
-		$result['sub_country'] = $result[42];
-		$result['sub_telephone'] = $result[43];
-		$result['sub_email'] = $result[44];
-		$result['sub_description'] = $result[45];
-	}
-	return $result;
+	return false;
 }
+
+
+/**
+ * Recuperer le POST/GET de la reponse dans un tableau
+ * en verifiant la signature
+ *
+ * @param array $config
+ * @return array|bool
+ */
+function sipsv2_recupere_reponse($config){
+	$reponse = array();
+	foreach($_REQUEST as $k=>$v){
+		if (in_array($k, array('Data','Encode','Seal','InterfaceVersion'))){
+			$reponse[$k] = $v;
+		}
+	}
+
+	list($key_version, $secret_key) = sipsv2_key($config);
+	$ok = sipsv2_verifie_signature($reponse, $secret_key);
+
+	// si signature invalide
+	if (!$ok){
+		spip_log("recupere_reponse : signature invalide ".var_export($reponse,true),$config['presta']._LOG_ERREUR);
+		return false;
+	}
+
+	// ok on peut deserializer le champ Data
+	$data = $reponse['Data'];
+	if (isset($reponse['Encode'])) {
+		if ($reponse['Encode'] == 'base64') {
+			$data = base64_decode($data);
+		}
+		if ($reponse['Encode'] == 'base64url') {
+			$data = base64_decode($data); // ?? base64url inconnu
+		}
+	}
+
+	$data = explode('|', $data);
+	$reponse['Data'] = array();
+
+	foreach ($data as $d){
+		list($k, $v) = explode('=', $d, 2);
+		$reponse['Data'][$k] = $v;
+	}
+
+	return $reponse;
+}
+
+
 
 /**
  * Traiter la reponse apres son decodage
@@ -244,6 +201,44 @@ function sipsv2_response($service, $merchant_id, $certificat, $response = 'respo
  * @return array
  */
 function sipsv2_traite_reponse_transaction($config, $response) {
+
+
+/*
+  $response :
+	array(4) {
+		["Data"]=> array(26) {
+			["captureDay"]=> string(1) "0"
+			["captureMode"]=> string(14) "AUTHOR_CAPTURE"
+			["currencyCode"]=> string(3) "978"
+			["merchantId"]=> string(15) "002001000000001"
+			["orderChannel"]=> string(8) "INTERNET"
+			["responseCode"]=> string(2) "00"
+			["transactionDateTime"]=> string(25) "2018-01-18T17:57:56+01:00"
+			["transactionReference"]=> string(6) "636692"
+			["keyVersion"]=> string(1) "1"
+			["acquirerResponseCode"]=> string(2) "00"
+			["amount"]=> string(3) "600"
+			["authorisationId"]=> string(5) "12345"
+			["guaranteeIndicator"]=> string(1) "Y"
+			["cardCSCResultCode"]=> string(2) "4D"
+			["panExpiryDate"]=> string(6) "201802"
+			["paymentMeanBrand"]=> string(10) "MASTERCARD"
+			["paymentMeanType"]=> string(4) "CARD"
+			["customerId"]=> string(2) "13"
+			["customerIpAddress"]=> string(14) "83.193.193.137"
+			["maskedPan"]=> string(16) "5100##########00"
+			["orderId"]=> string(1) "2"
+			["holderAuthentRelegation"]=> string(1) "N"
+			["holderAuthentStatus"]=> string(10) "3D_SUCCESS"
+			["tokenPan"]=> string(16) "g02550747644dd9d"
+			["transactionOrigin"]=> string(8) "INTERNET"
+			["paymentPattern"]=> string(8) "ONE_SHOT"
+		}
+		["Seal"]=> string(64) "0365353697e20eacb00bfe4acbd07d4d99024734fb7799b89ba7c9a22c3dad75"
+		["InterfaceVersion"]=> string(6) "HP_2.0"
+		["Encode"]=> string(6) "base64"
+	}
+*/
 
 	$mode = $config['presta'];
 	$config_id = bank_config_id($config);
