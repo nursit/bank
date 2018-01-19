@@ -30,9 +30,9 @@ function presta_sipsv2_call_response_dist($config, $response=null){
 		$response = sipsv2_recupere_reponse($config);
 	}
 
-	$merchant_id = $config['merchant_id'];
-	if (!isset($response['Data']['merchantId'])
-		or $response['Data']['merchantId']!==$merchant_id) {
+	list($merchant_id, $key_version, $secret_key) = sipsv2_key($config);
+	if (!isset($response['merchantId'])
+		or $response['merchantId']!==$merchant_id) {
 		return bank_transaction_invalide(0,
 			array(
 				'mode' => $mode,

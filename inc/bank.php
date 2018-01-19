@@ -397,9 +397,10 @@ function bank_transaction_invalide($id_transaction="",$args=array()){
 		'where' => 'call_response',
 	);
 	$args = array_merge($default,$args);
+	$logname = str_replace(array('1','2','3','4','5','6','7','8','9'), array('un','deux','trois','quatre','cinq','six','sept','huit','neuf'), $args['mode']);
 
-	spip_log($t=$args['where']." : ".$args['sujet']." #$id_transaction (".$args['erreur'].") ".$args['log'], $args['mode']._LOG_ERREUR);
-	spip_log($t, $args['mode']."_invalides"._LOG_ERREUR);
+	spip_log($t=$args['where']." : ".$args['sujet']." #$id_transaction (".$args['erreur'].") ".$args['log'], $logname._LOG_ERREUR);
+	spip_log($t, $logname."_invalides"._LOG_ERREUR);
 
 	if ($args['send_mail']){
 		// avertir le webmestre
@@ -458,8 +459,9 @@ function bank_transaction_echec($id_transaction,$args=array()){
 		'where' => 'call_response',
 	);
 	$args = array_merge($default,$args);
+	$logname = str_replace(array('1','2','3','4','5','6','7','8','9'), array('un','deux','trois','quatre','cinq','six','sept','huit','neuf'), $args['mode']);
 
-	spip_log($t=$args['where']." : transaction $id_transaction refusee ou annulee pour : ".$args['code_erreur']." (".$args['erreur'].") ".$args['log'], $args['mode']._LOG_ERREUR);
+	spip_log($t=$args['where']." : transaction $id_transaction refusee ou annulee pour : ".$args['code_erreur']." (".$args['erreur'].") ".$args['log'], $logname._LOG_ERREUR);
 	$set = array(
 		"mode" => $args['mode'].(isset($args['config_id'])?'/'.$args['config_id']:''),
 		"statut" => 'echec'.($args['code_erreur']?'['.$args['code_erreur'].']':''),

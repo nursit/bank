@@ -46,10 +46,10 @@ function sipsv2_url_serveur($config){
  */
 function sipsv2_key($config){
 	if ($config['mode_test']) {
-		return array($config['key_version_test'], $config['secret_key_test']);
+		return array($config['merchant_id_test'], $config['key_version_test'], $config['secret_key_test']);
 	}
 
-	return array($config['key_version'], $config['secret_key']);
+	return array($config['merchant_id'], $config['key_version'], $config['secret_key']);
 }
 
 
@@ -82,7 +82,7 @@ function sipsv2_available_cards($config){
  */
 function sipsv2_form_hidden($config,$parms){
 
-	list($key_version, $secret_key) = sipsv2_key($config);
+	list($merchant_id, $key_version, $secret_key) = sipsv2_key($config);
 	$h = array();
 	$data = array();
 	foreach($parms as $k=>$v) {
@@ -160,12 +160,13 @@ function sipsv2_recupere_reponse($config){
 		}
 	}
 
-	list($key_version, $secret_key) = sipsv2_key($config);
+	list($merchant_id, $key_version, $secret_key) = sipsv2_key($config);
 	$ok = sipsv2_verifie_signature($reponse, $secret_key);
 
 	// si signature invalide
 	if (!$ok){
-		spip_log("recupere_reponse : signature invalide ".var_export($reponse,true),$config['presta']._LOG_ERREUR);
+		$logname = str_replace(array('1','2','3','4','5','6','7','8','9'), array('un','deux','trois','quatre','cinq','six','sept','huit','neuf'), $config['presta']);
+		spip_log("recupere_reponse : signature invalide ".var_export($reponse,true),$logname._LOG_ERREUR);
 		return false;
 	}
 
@@ -188,7 +189,7 @@ function sipsv2_recupere_reponse($config){
 		$reponse['Data'][$k] = $v;
 	}
 
-	return $reponse;
+	return $reponse['Data'];
 }
 
 
@@ -205,8 +206,7 @@ function sipsv2_traite_reponse_transaction($config, $response) {
 
 /*
   $response :
-	array(4) {
-		["Data"]=> array(26) {
+		array(26) {
 			["captureDay"]=> string(1) "0"
 			["captureMode"]=> string(14) "AUTHOR_CAPTURE"
 			["currencyCode"]=> string(3) "978"
@@ -234,57 +234,31 @@ function sipsv2_traite_reponse_transaction($config, $response) {
 			["transactionOrigin"]=> string(8) "INTERNET"
 			["paymentPattern"]=> string(8) "ONE_SHOT"
 		}
-		["Seal"]=> string(64) "0365353697e20eacb00bfe4acbd07d4d99024734fb7799b89ba7c9a22c3dad75"
-		["InterfaceVersion"]=> string(6) "HP_2.0"
-		["Encode"]=> string(6) "base64"
-	}
 */
 
 	$mode = $config['presta'];
 	$config_id = bank_config_id($config);
+	$logname = str_replace(array('1','2','3','4','5','6','7','8','9'), array('un','deux','trois','quatre','cinq','six','sept','huit','neuf'), $mode);
 
-	$id_transaction = $response['order_id'];
-	$transaction_id = $response['transaction_id'];
+	$id_transaction = $response['orderId'];
+	$transaction_id = $response['transactionReference'];
 	$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
 	if (!$row){
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => $mode,
 				'erreur' => "transaction inconnue",
-				'log' => sipsv2_shell_args($response)
+				'log' => bank_shell_args($response)
 			)
 		);
 	}
-
-	/*
-	include_spip('inc/filtres');
-	if ($transaction_hash!=modulo($row['transaction_hash'],999999)){
-		return bank_transaction_invalide($id_transaction,
-			array(
-				'mode'=>$mode,
-				'erreur' => "hash $transaction_hash invalide",
-				'log' => sipsv2_shell_args($response)
-			)
-		);
-	}
-	*/
 
 	// ok, on traite le reglement
-	$date='payment';
-	if ($mode == 'sipsabo')
-		$date='sub';
 	//"Y-m-d H:i:s"
-	$date_paiement =
-	    substr($response[$date.'_date'],0,4)."-" //annee
-	  . substr($response[$date.'_date'],4,2)."-" //mois
-	  . substr($response[$date.'_date'],6,2)." " //jour
-	  . substr($response[$date.'_time'],0,2).":" //Heures
-	  . substr($response[$date.'_time'],2,2).":" //min
-	  . substr($response[$date.'_time'],4,2) //sec
-	;
+	$date_paiement = date('Y-m-d H:i:s',strtotime($response['transactionDateTime']));
 
-	$response_code = sipsv2_response_code($response['response_code']);
-	$bank_response_code = sipsv2_bank_response_code($response['bank_response_code']);
+	$response_code = sipsv2_response_code($response['responseCode']);
+	$bank_response_code = sipsv2_bank_response_code($response['acquirerResponseCode']);
 
 	if ($response_code!==true
 	 OR $bank_response_code!==true){
@@ -298,10 +272,10 @@ function sipsv2_traite_reponse_transaction($config, $response) {
 				'mode'=>$mode,
 				'config_id' => $config_id,
 				'date_paiement' => $date_paiement,
-				'code_erreur' => $response['response_code'].(strlen($response['bank_response_code'])?":".$response['bank_response_code']:''),
+				'code_erreur' => $response['responseCode'].(strlen($response['acquirerResponseCode'])?":".$response['acquirerResponseCode']:''),
 				'erreur' => trim($response_code." ".$bank_response_code),
-				'log' => sipsv2_shell_args($response),
-				'send_mail' => $response['response_code']=='03',
+				'log' => bank_shell_args($response),
+				'send_mail' => $response['responseCode']=='03',
 			)
 		);
 	}
@@ -309,17 +283,17 @@ function sipsv2_traite_reponse_transaction($config, $response) {
 	// Ouf, le reglement a ete accepte
 
 	// on verifie que le montant est bon !
-	$montant_regle = $response[($mode == 'sipsabo'?'sub_':'').'amount']/100;
+	$montant_regle = round($response['amount']/100, 2);
 	if ($montant_regle!=$row['montant']){
-		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=".$row['montant'].":".sipsv2_shell_args($response),$mode);
+		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=".$row['montant'].":".bank_shell_args($response),$logname . _LOG_ERREUR);
 		// on log ca dans un journal dedie
-		spip_log($t,$mode . '_reglements_partiels');
+		spip_log($t,$logname . '_reglements_partiels' . _LOG_ERREUR);
 	}
 
 	// mais sinon on note regle quand meme,
 	// pour ne pas creer des problemes hasardeux
 	// (il y a des fois une erreur d'un centime)
-	$authorisation_id = $response['authorisation_id'];
+	$authorisation_id = $response['authorisationId'];
 	$set = array(
 		"autorisation_id"=>$authorisation_id,
 		"mode"=>"$mode/$config_id",
@@ -328,8 +302,33 @@ function sipsv2_traite_reponse_transaction($config, $response) {
 		"statut"=>'ok',
 		"reglee"=>'oui'
 	);
+
+	// si on a les infos de validite / card number, on les note ici
+	if (isset($response['panExpiryDate']) and strlen($response['panExpiryDate']) == 6){
+		$set['validite'] = substr($response['panExpiryDate'],0,4) . "-" . substr($response['panExpiryDate'],4,2);
+	}
+	if (isset($response['paymentMeanBrand']) OR isset($response['maskedPan'])){
+		// par defaut on note brand et number dans refcb
+		// mais ecrase si le paiement a genere un identifiant de paiement
+		// qui peut etre reutilise
+		$set['refcb'] = '';
+		if (isset($response['paymentMeanBrand']) and $response['paymentMeanBrand']){
+			$set['refcb'] = $response['paymentMeanBrand'];
+		}
+		if (isset($response['maskedPan']) and $response['maskedPan']) {
+			$set['refcb'] .= " ".$response['maskedPan'];
+		}
+		$set['refcb'] = trim($set['refcb']);
+	}
+
+	// si vads_identifier fourni on le note dans refcb : c'est un identifiant de paiement
+	if (isset($response['tokenPan']) AND $response['tokenPan']){
+		$set['pay_id'] = $response['tokenPan'];
+	}
+
+
 	sql_updateq("spip_transactions", $set,"id_transaction=".intval($id_transaction));
-	spip_log("call_response : id_transaction $id_transaction, reglee",$mode);
+	spip_log("call_response : id_transaction $id_transaction, reglee",$logname . _LOG_INFO_IMPORTANTE);
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
 	$regler_transaction($id_transaction,array('row_prec'=>$row));
