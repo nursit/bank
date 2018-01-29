@@ -85,6 +85,14 @@ function presta_systempay_call_response_dist($config, $response=null){
 				// on reinjecte le bon id de transaction ici si fourni
 				if ($id_transaction){
 					$response['vads_auth_number'] = $response['vads_order_id'];
+					// cas particulier : l'abonnement recurrent chez Payzen a ete supprime puis refait, l'abo_uid a bien ete change en base dans SPIP
+					// mais cote payzen le order_id n'a pas ete renseigne, du coup il faut le retrouver ici sinon le paiement sera refuse
+					if (!$response['vads_auth_number']) {
+						$order_id = sql_getfetsel('id_transaction','spip_transactions','statut='.sql_quote('ok') . ' AND abo_uid=' . sql_quote($abo_uid),'','id_transaction','0,1');
+						if ($order_id != $id_transaction) {
+							$response['vads_auth_number'] = $order_id;
+						}
+					}
 					$response['vads_payment_certificate'] = $response['vads_trans_uuid'];
 					$response['vads_order_id'] = $id_transaction;
 				}
