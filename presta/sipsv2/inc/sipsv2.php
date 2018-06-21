@@ -23,6 +23,14 @@ function sipsv2_url_serveur($config){
 
 	$host = "";
 	switch($config['service']){
+		case "mercanet":
+			if ($config['mode_test']) {
+				$host = "https://payment-webinit.simu.mercanet.bnpparibas.net";
+			}
+			else {
+				$host = "https://payment-webinit.mercanet.bnpparibas.net";
+			}
+			break;
 		case "sogenactif":
 			if ($config['mode_test']) {
 				$host = "https://payment-webinit.simu.sogenactif.com";
