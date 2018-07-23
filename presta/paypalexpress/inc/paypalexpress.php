@@ -362,6 +362,10 @@ function bank_paypalexpress_hash_call($config, $methodName, $nvpStr){
 		//turning off the server and peer verification(TrustManager Concept).
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+		if (!defined('CURL_SSLVERSION_TLSv1_2')) {
+			define('CURL_SSLVERSION_TLSv1_2', 6);
+		}
+		curl_setopt ($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HEADER, false);
