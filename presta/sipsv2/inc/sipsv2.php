@@ -39,6 +39,14 @@ function sipsv2_url_serveur($config){
 				$host = "https://payment-webinit.sogenactif.com";
 			}
 			break;
+		case "scellius":
+			if ($config['mode_test']) {
+				$host = "https://payment-webinit.simu.scellius.labanquepostale.fr";
+			}
+			else {
+				$host = "https://payment-webinit.scellius.labanquepostale.fr";
+			}
+			break;
 		default:
 			$host = "https://payment-webinit.simu.sogenactif.com";
 			break;
