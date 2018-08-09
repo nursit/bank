@@ -68,6 +68,13 @@ function presta_sips_call_request_dist($id_transaction, $transaction_hash, $conf
 	$parm['cancel_return_url']=bank_url_api_retour($config,'cancel');
 	$parm['automatic_response_url']=bank_url_api_retour($config,'autoresponse');
 
+	// Fix : les notifications serveurs en https depuis SIPSv1 semblent poser probleme et provoquent parfois des erreurs 500
+	// on donne donc l'url en http, c'est une mauvaise solution mais on en a pas de meilleure.
+	// Passer a un autre presta ou en sipsv2 si besoin
+	if (strncmp($parm['automatic_response_url'], 'https://', 8) == 0) {
+		$parm['automatic_response_url'] = "http://" . substr($parm['automatic_response_url'], 8);
+	}
+
 	// ajouter les logos de paiement si configures
 	foreach(array('logo_id','logo_id2','advert') as $logo_key){
 		if (isset($config[$logo_key])
