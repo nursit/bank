@@ -107,7 +107,7 @@ function stripe_traite_reponse_transaction($config, &$response) {
 	stripe_init_api($config);
 
 	// preparer le paiement
-	$nom_site = textebrut($GLOBALS['meta']['nom_site']);
+	$nom_site = bank_nom_site();
 	$desc_charge = array(
 		'amount' => $montant,
 		"currency" => "eur",

@@ -120,7 +120,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 
 	// nom et url de la boutique
 	$parm['vads_shop_url'] = $GLOBALS['meta']['adresse_site'];
-	$parm['vads_shop_name'] = textebrut($GLOBALS['meta']['nom_site']);
+	$parm['vads_shop_name'] = bank_nom_site();
 
 	// Urls de retour
 	$parm['vads_return_mode'] = "GET"; // POST pour privacy et ne pas loger par Apache, mais GET pour ne pas avoir un message d'avertissement au retour utilisateur

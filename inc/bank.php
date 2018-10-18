@@ -280,6 +280,18 @@ function bank_transaction_id($row) {
 	return str_pad($id,6,"0",STR_PAD_LEFT);
 }
 
+
+/**
+ * Nom du site nettoye : pas de balises html ni de retour ligne
+ * @return mixed
+ */
+function bank_nom_site() {
+	if (!function_exists('textebrut')) {
+		include_spip('inc/filtres');
+	}
+	return str_replace(array("\r\n","\r","\n"), array(' ', ' ', ' '), textebrut($GLOBALS['meta']['nom_site']));
+}
+
 /**
  * Recuperer l'email du porteur de la transaction (ou celui de la session a defaut ?)
  * @param array $transaction
