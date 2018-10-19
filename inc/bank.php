@@ -289,7 +289,7 @@ function bank_nom_site() {
 	if (!function_exists('textebrut')) {
 		include_spip('inc/filtres');
 	}
-	return str_replace(array("\r\n","\r","\n"), array(' ', ' ', ' '), textebrut($GLOBALS['meta']['nom_site']));
+	return str_replace(array("\r\n","\r","\n"), ' ', textebrut($GLOBALS['meta']['nom_site']));
 }
 
 /**
