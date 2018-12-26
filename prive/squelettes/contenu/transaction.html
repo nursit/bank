@@ -31,6 +31,12 @@
 
 	[<div class="message">(#MESSAGE)</div>]
 
+	[(#STATUT|in_array{#LISTE{commande,attente}}|et{#AUTORISER{regler,transaction,#ID_TRANSACTION}})
+	#BOITE_OUVRIR{'',info center}
+		<a href="[(#URL_ECRIRE{payer,id_transaction=#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]"><:bank:payer:></a>
+	#BOITE_FERMER
+	]
+
 	#FORMULAIRE_REMBOURSER_TRANSACTION{#ID_TRANSACTION}
 </div>
 </BOUCLE_transaction>
