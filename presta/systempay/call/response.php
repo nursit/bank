@@ -129,8 +129,7 @@ function presta_systempay_call_response_dist($config, $response=null){
 	  AND $id_transaction){
 
 		$transaction = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
-		// c'est le premier paiement de l'abonnement ?
-		if (!$recurence AND $success){
+		if ($success) {
 			// date de fin de mois de validite de la carte (mais pas pour un SEPA qui se reconduit tout seul)
 			$date_fin = "0000-00-00 00:00:00";
 			if (isset($response['vads_expiry_year'])
@@ -138,21 +137,22 @@ function presta_systempay_call_response_dist($config, $response=null){
 			  AND strncmp($transaction['refcb'],'SEPA',4)!==0){
 				$date_fin = bank_date_fin_mois($response['vads_expiry_year'],$response['vads_expiry_month']);
 			}
+			// c'est le premier paiement de l'abonnement ?
+			if (!$recurence){
 
-			if ($activer_abonnement = charger_fonction('activer_abonnement','abos',true)){
-				$activer_abonnement($id_transaction,$abo_uid,$mode,$date_fin);
+				if ($activer_abonnement = charger_fonction('activer_abonnement','abos',true)){
+					$activer_abonnement($id_transaction,$abo_uid,$mode,$date_fin);
+				}
+			}
+
+			// c'est un renouvellement reussi, il faut repercuter sur l'abonnement
+			if ($recurence){
+
+				if ($renouveler_abonnement = charger_fonction('renouveler_abonnement','abos',true)){
+					$renouveler_abonnement($id_transaction,$abo_uid,$mode,$date_fin);
+				}
 			}
 		}
-
-		// c'est un renouvellement reussi, il faut repercuter sur l'abonnement
-		if ($recurence
-			AND $success){
-
-			if ($renouveler_abonnement = charger_fonction('renouveler_abonnement','abos',true)){
-				$renouveler_abonnement($id_transaction,$abo_uid,$mode);
-			}
-		}
-
 
 		// c'est un echec, il faut le resilier, que ce soit la premiere ou la Nieme transaction
 		if (!$success){

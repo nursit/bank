@@ -24,10 +24,14 @@ include_spip('base/abstract_sql');
  *   numero d'abonne chez le presta bancaire
  * @param string $mode_paiement
  *   mode de paiement (presta bancaire)
+ * @param string $validite
+ *   date de fin validite du moyen de paiement (expiration de la CB)
+ *   ou "echeance" pour dire que l'abonnement s'arrete automatiquement a la prochaine echeance
+ *   (est utilise si par exemple on doit reactiver un abonnement expire suite a reception hors delai de la notification de paiement)
  * @return bool|int
  *   false si pas reussi
  */
-function abos_renouveler_abonnement_dist($id_transaction,$abo_uid,$mode_paiement){
+function abos_renouveler_abonnement_dist($id_transaction,$abo_uid,$mode_paiement,$validite=""){
 
 	spip_log("abos/renouveler_abonnement id_transaction=$id_transaction abo_uid=$abo_uid mode=$mode_paiement","bank");
 
@@ -40,6 +44,7 @@ function abos_renouveler_abonnement_dist($id_transaction,$abo_uid,$mode_paiement
 				'id_transaction'=>$id_transaction,
 				'abo_uid'=>$abo_uid,
 				'mode_paiement'=>$mode_paiement,
+				'validite'=>$validite,
 			),
 			'data' => $id_abonnement,
 		)
