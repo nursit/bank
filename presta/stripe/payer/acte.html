@@ -17,7 +17,7 @@
 	  <div class='boutons'>
 		  [(#SET{id,[acte(#ID_TRANSACTION)]})]
 		  [(#BOUTON_ACTION{<:bank:bouton_enregistrer_reglement_carte:>,#ENV*{action},stripe_button_#GET{id},'','',[stripe_button_(#GET{id})_callback\(\)]})]
-		  [<script type="text/javascript" src="https://checkout.stripe.com/checkout.js"></script>
+		  [<script src="https://js.stripe.com/v3/"></script>
 		  <script type="text/javascript">(#INCLURE{fond=presta/stripe/payer/inc-checkout-js,env,id=#GET{id}}|compacte{js})</script>]
 	  </div>
 	  [(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=Stripe}:></div>]

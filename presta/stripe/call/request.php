@@ -100,11 +100,14 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	}
 	$contexte['sign'] = bank_sign_response_simple($mode, $contexte);
 
-	$action = bank_url_api_retour($config,"response");
+	$url_success = bank_url_api_retour($config,"response");
+	$url_cancel = bank_url_api_retour($config,"cancel");
 	foreach($contexte as $k=>$v){
-		$action = parametre_url($action, $k, $v);
+		$url_success = parametre_url($url_success, $k, $v);
+		$url_cancel = parametre_url($url_cancel, $k, $v);
 	}
-	$contexte['action'] = $action;
+
+	$contexte['action'] = $url_success;
 	$contexte['email'] = $email;
 	$contexte['amount'] = $montant;
 	$contexte['currency'] = 'eur';
@@ -113,6 +116,19 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	$contexte['description'] = _T('bank:titre_transaction') . '#'.$id_transaction;
 	$contexte['image'] = find_in_path('img/logo-paiement-stripe.png');
 
+	$item = [
+		'name' => _T('bank:titre_transaction') . " #$id_transaction",
+		'amount' => $contexte['amount'],
+		'currency' => $contexte['currency'],
+    'quantity' => 1,
+	];
+
+	if ($id_commande = $row['id_commande']
+		and test_plugin_actif('commande')
+	  and $ref = sql_getfetsel('reference', 'spip_commandes', 'id_commande='.intval($id_commande))) {
+		$item['name'] = _T('commande:commande_numero') . " #$id_commande";
+		$item['description'] = _T('commande:commande_reference_numero') . " $ref";
+	}
 	if (!$contexte['image']) {
 		$chercher_logo = charger_fonction('chercher_logo','inc');
 		if ($logo = $chercher_logo(0,'site')){
@@ -122,7 +138,22 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	}
 	if ($contexte['image']) {
 		$contexte['image'] = url_absolue($contexte['image']);
+		$item['images'] = [$contexte['image']];
 	}
+
+	stripe_init_api($config);
+
+	$session = \Stripe\Checkout\Session::create([
+	  'payment_method_types' => ['card'],
+	  'line_items' => [[$item]],
+	  'success_url' => $url_success,
+	  'cancel_url' => $url_success,
+		'customer_email' => $contexte['email'],
+		'locale' => $GLOBALS['spip_lang'],
+	]);
+
+	$contexte['checkout_session_id'] = $session->id;
+
 
 	return $contexte;
 }
