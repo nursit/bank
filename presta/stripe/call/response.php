@@ -26,6 +26,29 @@ function presta_stripe_call_response_dist($config, $response=null){
 	$mode = $config['presta'];
 	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 
+
+	include_spip('presta/stripe/call/autoresponse');
+
+	list($event, $erreur, $erreur_code) = stripe_retrieve_event($config);
+
+	$inactif = "";
+	if (!$config['actif']) {
+		$inactif = "(inactif) ";
+	}
+
+	if ($erreur or $erreur_code) {
+		spip_log($s = 'call_response '.$inactif.': '."$erreur_code - $erreur", $mode . _LOG_ERREUR);
+		die($s);
+		//return array(0,false);
+	}
+	else {
+		$res = stripe_dispatch_event($config, $event);
+		return $res;
+	}
+
+	die('dead???');
+	// Code mort ?
+
 	// recuperer la reponse en post et la decoder, en verifiant la signature
 	if (!$response) {
 		$response = bank_response_simple($mode);
