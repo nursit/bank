@@ -19,7 +19,7 @@ include_spip('inc/bank');
  */
 function stripe_init_api($config){
 
-	include_spip('presta/stripe/lib/stripe-php-4.0.0/init');
+	include_spip('presta/stripe/lib/stripe-php-6/init');
 
 	// Set secret key
 	// See keys here: https://dashboard.stripe.com/account/apikeys
