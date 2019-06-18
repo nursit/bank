@@ -42,7 +42,6 @@ Le paiement par SEPA est pris en charge via PayZen.
 Le plugin permet le paiement à l'acte via les plateformes techniques suivantes :
 
 * CMCIC (C.I.C, Crédit Mutuel, O.B.C.)
-* Internet+ (prise en charge full PHP sans serveur Tomcat, mais sans support du service technique Internet+)
 * Ogone
 * Paybox
 * Paypal (par formulaire simple ou Paypal Express)
@@ -63,7 +62,6 @@ Il utilise tout les même processus que le paiement par un prestataire en by-pas
 
 Le plugin permet aussi les paiements mensuels avec les plateformes techniques suivantes :
 
-* Internet+
 * Paybox
 * PayZen
 * Stripe
