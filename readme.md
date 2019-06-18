@@ -64,7 +64,7 @@ Le plugin permet aussi les paiements mensuels avec les plateformes techniques su
 
 * Paybox
 * PayZen
-* Stripe
+* Stripe [ Deprecated : plus de nouveau paiement par abonnement, a refaire suite à la mise en place des SCA https://stripe.com/docs/billing/migration/strong-customer-authentication]
 
 Un mode de paiement "Simulation" permet de tester le workflow de paiement pendant la phase de developpement. 
 
