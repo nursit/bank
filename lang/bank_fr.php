@@ -41,6 +41,8 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'erreur_transaction_invalide' => 'Une erreur est survenue, les données reçues ne sont pas conformes.',
 	'explication_page_configurer_paiement' => 'Configurez les systèmes de paiement actifs',
 	'erreur_transaction_traitement_incomplet' => 'La prise en compte du paiement de cette transaction a été interrompue en cours de traitement. Une réparation manuelle de la base de données est nécessaire.',
+	'erreur_serveur_indisponible' => 'Une erreur est survenue ou le service de paiement ne réponds pas.',
+	'erreur_ressayer_plus_tard' => 'Ré-essayez dans quelques minutes',
 
 // I
 	'info_aucune_transaction' => 'Aucune transaction',

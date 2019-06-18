@@ -29,55 +29,43 @@ function presta_stripe_call_response_dist($config, $response=null){
 
 	include_spip('presta/stripe/call/autoresponse');
 
-	list($event, $erreur, $erreur_code) = stripe_retrieve_event($config);
-
-	$inactif = "";
-	if (!$config['actif']) {
-		$inactif = "(inactif) ";
-	}
-
-	if ($erreur or $erreur_code) {
-		spip_log($s = 'call_response '.$inactif.': '."$erreur_code - $erreur", $mode . _LOG_ERREUR);
-		die($s);
-		//return array(0,false);
-	}
-	else {
-		$res = stripe_dispatch_event($config, $event);
-		return $res;
-	}
-
-	die('dead???');
-	// Code mort ?
-
 	// recuperer la reponse en post et la decoder, en verifiant la signature
 	if (!$response) {
 		$response = bank_response_simple($mode);
 	}
 
-	// Stripe token
-	$token = '';
-	if (isset($_REQUEST['stripeToken'])){
-		$token = $_REQUEST['stripeToken'];
+	// Stripe session_id
+	$checkout_session_id = '';
+	if (isset($response['checkout_session_id'])) {
+		$checkout_session_id = $response['checkout_session_id'];
+	}
+	elseif (isset($_REQUEST['session_id'])){
+		$checkout_session_id = $_REQUEST['session_id'];
 	}
 
-	if (!$response or (!$token and !$response['charge'])) {
-		spip_log("call_response : token/charge invalide",$mode._LOG_ERREUR);
+	if (!$response or (!$checkout_session_id and !$response['charge_id'] and !$response['payment_id'])) {
+		spip_log("call_response : checkout_session_id invalide / no payment_id",$mode._LOG_ERREUR);
 		return array(0,false);
 	}
 
-	if ($token){
-		$response['token'] = $token;
-	}
-	if (isset($_REQUEST['stripeTokenType'])){
-		$response['token_type'] = $_REQUEST['stripeTokenType'];
+	// charger l'API Stripe avec la cle
+	stripe_init_api($config);
+
+	if ($checkout_session_id){
+		$response['checkout_session_id'] = $checkout_session_id;
+		$session = \Stripe\Checkout\Session::retrieve($checkout_session_id);
+		if (isset($session->payment_intent) && $session->payment_intent) {
+			$response['payment_id'] = $session->payment_intent;
+			$payment = \Stripe\PaymentIntent::retrieve($response['payment_id']);
+		}
 	}
 
 	$recurence = false;
 	// c'est une reconduction d'abonnement ?
-	if ($response['charge_id'] and $response['abo_uid']){
+	if ($response['payment_id'] and $response['abo_uid']){
 
 		// verifier qu'on a pas deja traite cette recurrence !
-		if ($t = sql_fetsel("*","spip_transactions","autorisation_id LIKE ".sql_quote("%/".$response['charge_id']))){
+		if ($t = sql_fetsel("*","spip_transactions","autorisation_id LIKE ".sql_quote("%/".$response['payment_id']))){
 			$response['id_transaction'] = $t['id_transaction'];
 			$response['transaction_hash'] = $t['transaction_hash'];
 		}
@@ -114,7 +102,6 @@ function presta_stripe_call_response_dist($config, $response=null){
 	// depouillement de la transaction
 	// stripe_traite_reponse_transaction modifie $response
 	list($id_transaction,$success) =  stripe_traite_reponse_transaction($config, $response);
-
 
 	if (($recurence or $response['abo'])
 		and $abo_uid = $response['abo_uid']

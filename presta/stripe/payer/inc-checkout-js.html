@@ -4,9 +4,8 @@ function stripe_button_#ENV{id}_callback() {
 	if (!h.length) return false;
 	h = h[0];
 	while (h.nodeName!=='FORM'){ h = h.parentNode; }
-	h.className += ' stripe_button_#ENV{id}_form';
-	// check the element is matchable when coming back from stripe
-	h = document.getElementsByClassName('stripe_button_#ENV{id}_form');
+	// and take the parent node to be able to display an error message
+	h = h.parentNode;
 
 	var stripe = Stripe('[(#ENV{key}|texte_script)]');
 	stripe.redirectToCheckout({
@@ -18,6 +17,12 @@ function stripe_button_#ENV{id}_callback() {
 	  // If `redirectToCheckout` fails due to a browser or network
 	  // error, display the localized error message to your customer
 	  // using `result.error.message`.
+		var error = '<:bank:erreur_serveur_indisponible|texte_script:> <:bank:erreur_ressayer_plus_tard|texte_script:>';
+		error = error + '<br /><tt>' + result.error.message + '</tt>';
+		var div = document.createElement("div");
+		div.className = "error";
+		div.innerHTML = error;
+		h.appendChild(div)
 	});
 
 	//e.preventDefault();

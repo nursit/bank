@@ -136,13 +136,38 @@ function stripe_retrieve_event($config) {
 	return [$event, $erreur, $erreur_code];
 }
 
-
+/**
+ * Callback called after a checkout payment (paiement simple)
+ * @param $config
+ * @param $event
+ * @return bool
+ */
 function stripe_webhook_checkout_session_completed_dist($config, $event) {
 
 	$response = array();
-	var_dump($event);
-	die('?');
+	$session = $event->data->object;
+	// il faut recuperer $charge, pay_id et abo_uid, creer un id_transaction
+	if ($session->object=="checkout.session"){
+		if ($session->payment_intent){
+			$response['payment_id'] = $session->payment_intent;
+		}
+		if ($session->success_url){
+			$response['id_transaction'] = parametre_url($session->success_url, 'id_transaction');
+			$response['transaction_hash'] = parametre_url($session->success_url, 'transaction_hash');
+		}
+	}
 
+	spip_log($event,"stripe_db");
+
+	if (isset($response['payment_id'])
+	  and isset($response['id_transaction'])
+	  and isset($response['transaction_hash'])) {
+		$call_response = charger_fonction('response', 'presta/stripe/call');
+		$res = $call_response($config, $response);
+		return $res;
+	}
+
+	return false;
 }
 
 /**
@@ -163,14 +188,14 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event) {
 		if ($invoice->customer){
 			$response['pay_uid'] = $invoice->subscription;
 		}
-		if ($invoice->charge){
-			$response['charge_id'] = $invoice->charge;
+		if ($invoice->payment_intent){
+			$response['payment_id'] = $invoice->payment_intent;
 		}
 	}
 
 	spip_log($event,"stripe_db");
 
-	if (isset($response['charge_id'])
+	if (isset($response['payment_id'])
 	  and isset($response['abo_uid'])
 	  and isset($response['pay_uid'])) {
 		$call_response = charger_fonction('response', 'presta/stripe/call');
@@ -199,14 +224,14 @@ function stripe_webhook_invoice_payment_failed_dist($config, $event) {
 		if ($invoice->customer){
 			$response['pay_uid'] = $invoice->subscription;
 		}
-		if ($invoice->charge){
-			$response['charge_id'] = $invoice->charge;
+		if ($invoice->payment_intent){
+			$response['payment_id'] = $invoice->payment_intent;
 		}
 	}
 
 	spip_log($event,"stripe_db");
 
-	if (isset($response['charge_id'])
+	if (isset($response['payment_id'])
 	  and isset($response['abo_uid'])
 	  and isset($response['pay_uid'])) {
 		$call_response = charger_fonction('response', 'presta/stripe/call');

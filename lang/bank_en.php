@@ -41,6 +41,8 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'erreur_transaction_invalide' => 'An error has occured due to unexpected received data.',
 	'explication_page_configurer_paiement' => 'Set up active payment systems',
 	'erreur_transaction_traitement_incomplet' => 'Processing of the payment for this transaction has been interrupted. Manual repair of database is required.',
+	'erreur_serveur_indisponible' => 'An error occured or the payment service is not answering.',
+	'erreur_ressayer_plus_tard' => 'Retry later',
 
 // I
 	'info_aucune_transaction' => 'No transaction',

@@ -56,14 +56,11 @@ function stripe_traite_reponse_transaction($config, &$response) {
 			)
 		);
 	}
-	if ( 
-		    (!isset($response['charge_id']) OR !$response['charge_id'])
-		and (!isset($response['token']) OR !$response['token'])
-	){
+	if ((!isset($response['payment_id']) OR !$response['payment_id'])){
 		return bank_transaction_invalide(0,
 			array(
 				'mode' => $mode,
-				'erreur' => "token/charge_id absent dans la reponse",
+				'erreur' => "payment_id absent dans la reponse",
 				'log' => var_export($response,true),
 			)
 		);
@@ -91,11 +88,6 @@ function stripe_traite_reponse_transaction($config, &$response) {
 		);
 	}
 
-	$montant = intval(round(100*$row['montant'],0));
-	if (strlen($montant)<3)
-		$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
-	$email = bank_porteur_email($row);
-	
 	// ok, on traite le reglement
 	$date = $_SERVER['REQUEST_TIME'];
 	$date_paiement = date('Y-m-d H:i:s', $date);
@@ -106,342 +98,122 @@ function stripe_traite_reponse_transaction($config, &$response) {
 	// charger l'API Stripe avec la cle
 	stripe_init_api($config);
 
-	// preparer le paiement
-	$nom_site = bank_nom_site();
-	$desc_charge = array(
-		'amount' => $montant,
-		"currency" => "eur",
-		"source" => $response['token'],
-		"description" => "Transaction #" . $id_transaction ." [$nom_site]",
-		"receipt_email" => $email,
-		"metadata" => array(
-			'id_transaction' => $id_transaction,
-			'id_auteur' => $row['id_auteur'],
-			'nom_site' => $nom_site,
-			'url_site' => $GLOBALS['meta']['adresse_site'],
-		),
-	);
 
-	// la charge existe deja (autoresponse webhook sur abonnement)
-	if (isset($response['charge_id']) and $response['charge_id']){
-		try {
-			$charge = \Stripe\Charge::retrieve($response['charge_id']);
-			$charge->description = $desc_charge['description'];
-			$charge->metadata = $desc_charge['metadata'];
-			$charge->save();
-
-			if (!$charge->paid) {
-				$erreur_code = 'unpaid';
-				$erreur = 'payment failed';
-			}
-
-		} catch (Exception $e) {
-			if ($body = $e->getJsonBody()) {
-				$err = $body['error'];
-				list($erreur_code, $erreur) = stripe_error_code($err);
-			} else {
-				$erreur = $e->getMessage();
-				$erreur_code = 'error';
-			}
-		}
-
-	}
-
-	else {
-
-		// est-ce un abonnement ?
-		if ($is_abo) {
-			// on decrit l'echeance
-			if (
-				$decrire_echeance = charger_fonction("decrire_echeance", "abos", true)
-				AND $echeance = $decrire_echeance($id_transaction)
-			) {
-
-				if ($echeance['montant'] > 0) {
-
-					$montant_echeance = intval(round(100 * $echeance['montant'], 0));
-					if (strlen($montant_echeance) < 3) {
-						$montant_echeance = str_pad($montant_echeance, 3, '0', STR_PAD_LEFT);
-					}
-
-					$interval = 'month';
-					if (isset($echeance['freq']) AND $echeance['freq'] == 'yearly') {
-						$interval = 'year';
-					}
-
-					$desc_plan = array(
-						'amount' => $montant_echeance,
-						'interval' => $interval,
-						'name' => "#$id_transaction [$nom_site]",
-						'currency' => $desc_charge['currency'],
-						'metadata' => $desc_charge['metadata'],
-					);
-
-					// dans tous les cas on fait preleve la premiere echeance en paiement unique
-					// et en faisant démarrer l'abonnement par "1 periode" en essai sans paiement
-					// ca permet de gerer le cas paiement initial different, et de recuperer les infos de CB dans tous les cas
-					$time_start = strtotime($date_paiement);
-					$time_paiement_1_interval = strtotime("+1 $interval", $time_start);
-					$nb_days = intval(round(($time_paiement_1_interval - $time_start) / 86400));
-					$desc_plan['trial_period_days'] = $nb_days;
-
-					// un id unique (sauf si on rejoue le meme paiement)
-					$desc_plan['id'] = md5(json_encode($desc_plan) . "-$transaction_hash");
-
-					try {
-						$plan = \Stripe\Plan::retrieve($desc_plan['id']);
-					} catch (Exception $e) {
-						// erreur si on ne retrouve pas le plan, on ignore
-						$plan = false;
-					}
-
-					try {
-						if (!$plan) {
-							$plan = \Stripe\Plan::create($desc_plan);
-						}
-						if (!$plan) {
-							$erreur = "Erreur creation plan d'abonnement";
-							$erreur_code = "plan_failed";
-						}
-					} catch (Exception $e) {
-						if ($body = $e->getJsonBody()) {
-							$err = $body['error'];
-							list($erreur_code, $erreur) = stripe_error_code($err);
-						} else {
-							$erreur = $e->getMessage();
-							$erreur_code = 'error';
-						}
-					}
-
-					if ($erreur or $erreur_code) {
-						// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
-						if ($row['reglee'] == 'oui') {
-							return array($id_transaction, true);
-						}
-
-						// sinon enregistrer l'absence de paiement et l'erreur
-						return bank_transaction_echec($id_transaction,
-							array(
-								'mode' => $mode,
-								'config_id' => $config_id,
-								'date_paiement' => $date_paiement,
-								'code_erreur' => $erreur_code,
-								'erreur' => $erreur,
-								'log' => var_export($response, true),
-							)
-						);
-					}
-
-				}
-			}
-		}
-
-		// essayer de retrouver ou creer un customer pour l'id_auteur
-		$customer = null;
-		try {
-			if ($row['id_auteur']) {
-				$customer_id = sql_getfetsel('pay_id', 'spip_transactions',
-					'pay_id!=' . sql_quote('') . ' AND id_auteur=' . intval($row['id_auteur']) . ' AND statut=' . sql_quote('ok') . ' AND mode=' . sql_quote("$mode/$config_id"),
-					'', 'date_paiement DESC', '0,1');
-				if ($customer_id) {
-					$customer = \Stripe\Customer::retrieve($customer_id);
-				}
-			}
-			// si customer retrouve, on ajoute la source et la transaction
-			if ($customer and $customer->email === $email) {
-				$customer->source = $desc_charge['source'];
-				$metadata = $customer->metadata;
-				if (!$metadata) {
-					$metadata = array();
-				}
-				if (isset($metadata['id_transaction'])) {
-					$metadata['id_transaction'] .= ',' . $id_transaction;
-				} else {
-					$metadata['id_transaction'] = $id_transaction;
-				}
-				$metadata['id_auteur'] = $row['id_auteur'];
-				$customer->metadata = $metadata;
-				$customer->description = sql_getfetsel('nom', 'spip_auteurs', 'id_auteur=' . intval($row['id_auteur']));
-				$customer->save();
-			} // sinon on cree le customer
-			else {
-				$d = array(
-					'email' => $email,
-					'source' => $desc_charge['source'],
-					'metadata' => $desc_charge['metadata'],
-				);
-				if ($row['id_auteur']) {
-					$d['description'] = sql_getfetsel('nom', 'spip_auteurs', 'id_auteur=' . intval($row['id_auteur']));
-				}
-				$customer = \Stripe\Customer::create($d);
-			}
-
-			if ($is_abo and !$customer) {
-				$erreur = "Erreur creation customer";
-				$erreur_code = "cust_failed";
-			}
-
-
-		} catch (Exception $e) {
-			if ($body = $e->getJsonBody()) {
-				$err = $body['error'];
-				list($erreur_code, $erreur) = stripe_error_code($err);
-			} else {
-				$erreur = $e->getMessage();
-				$erreur_code = 'error';
-			}
-			spip_log("Echec creation/recherche customer transaction #$id_transaction $erreur", $mode . _LOG_ERREUR);
-		}
-
-		if ($is_abo and ($erreur or $erreur_code)) {
-			// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
-			if ($row['reglee'] == 'oui') {
-				return array($id_transaction, true);
-			}
-
-			// sinon enregistrer l'absence de paiement et l'erreur
-			return bank_transaction_echec($id_transaction,
-				array(
-					'mode' => $mode,
-					'config_id' => $config_id,
-					'date_paiement' => $date_paiement,
-					'code_erreur' => $erreur_code,
-					'erreur' => $erreur,
-					'log' => var_export($response, true),
-				)
-			);
-		}
-
-		// Create a charge if needed: this will charge the user's card
-		try {
-
-			// If we have a Customer
-			if ($customer and $customer->id) {
-				$desc_charge['customer'] = $customer->id;
-				$response['pay_id'] = $customer->id; // permet de faire de nouveau paiement sans saisie CB
-				unset($desc_charge['source']);
-			}
-
-			if ($desc_charge['amount']) {
-				$charge = \Stripe\Charge::create($desc_charge);
-				// pour les logs en cas d'echec
-				$r = $charge->getLastResponse()->json;
-				$response = array_merge($response, $r);
-
-				if (!$charge) {
-					$erreur = "Erreur creation charge";
-					$erreur_code = "charge_failed";
-				} elseif (!$charge['paid']) {
-					$erreur_code = 'not_paid';
-					$erreur = 'echec paiement stripe';
-					if ($charge['failure_code'] or $charge['failure_message']) {
-						$erreur_code = $charge['failure_code'];
-						$erreur = $charge['failure_message'];
-					}
-				}
-
-			}
-
-
-		} catch (\Stripe\Error\Card $e) {
-
-			// Since it's a decline, \Stripe\Error\Card will be caught
-			$body = $e->getJsonBody();
+	try {
+		$payment = \Stripe\PaymentIntent::retrieve($response['payment_id']);
+	} catch (Exception $e) {
+		if ($body = $e->getJsonBody()) {
 			$err = $body['error'];
 			list($erreur_code, $erreur) = stripe_error_code($err);
-
-		} catch (Exception $e) {
-			if ($body = $e->getJsonBody()) {
-				$err = $body['error'];
-				list($erreur_code, $erreur) = stripe_error_code($err);
-			} else {
-				$erreur = $e->getMessage();
-				$erreur_code = 'error';
-			}
+		} else {
+			$erreur = $e->getMessage();
+			$erreur_code = 'error';
 		}
-
-		// si abonnement : on a un customer et un plan, creer la subscription
-		if ($is_abo) {
-
-			if ($plan and $customer) {
-				$desc_sub = array(
-					'customer' => $customer->id,
-					'plan' => $plan->id,
-					'metadata' => array(
-						'id_transaction' => $id_transaction,
-					),
-				);
-
-				try {
-					$sub = \Stripe\Subscription::create($desc_sub);
-					if (!$sub) {
-						$erreur = "Erreur creation subscription";
-						$erreur_code = "sub_failed";
-					} else {
-						$response['abo_uid'] = $sub->id;
-					}
-				} catch (Exception $e) {
-					if ($body = $e->getJsonBody()) {
-						$err = $body['error'];
-						list($erreur_code, $erreur) = stripe_error_code($err);
-					} else {
-						$erreur = $e->getMessage();
-						$erreur_code = 'error';
-					}
-				}
-			} else {
-				$erreur = "Erreur creation subscription (plan or customer missing)";
-				$erreur_code = "sub_failed";
-			}
-		}
-		
 	}
-	if ($erreur or $erreur_code) {
+
+	if (!$payment or !in_array($payment->status, array(/*'processing', */'succeeded'))){
 		// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
 		if ($row['reglee'] == 'oui') {
 			return array($id_transaction, true);
 		}
-
 		// sinon enregistrer l'absence de paiement et l'erreur
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
 				'config_id' => $config_id,
 				'date_paiement' => $date_paiement,
+				'erreur' => ($payment ? "Status PaymentIntent=".$payment->status : "PaymentIntent ".$response['payment_id']." non valide") . ($erreur ? "\n$erreur" : ""),
 				'code_erreur' => $erreur_code,
-				'erreur' => $erreur,
 				'log' => var_export($response, true),
 			)
 		);
 	}
 
+	// update payment informations for Stripe Dashboard
+	try {
+		$nom_site = bank_nom_site();
+		$payment->description = "Transaction #" . $id_transaction ." [$nom_site]";
+		$metadata = $payment->metadata;
+		if (!$metadata){
+			$metadata = array();
+		}
+		$metadata['id_transaction'] = $id_transaction;
+		$metadata['id_auteur'] = $row['id_auteur'];
+		$metadata['nom_site'] = $nom_site;
+		$metadata['url_site'] = $GLOBALS['meta']['adresse_site'];
+		$payment->save();
+	} catch (Exception $e) {
+		if ($body = $e->getJsonBody()){
+			$err = $body['error'];
+			list($erreur_code, $erreur) = stripe_error_code($err);
+		} else {
+			$erreur = $e->getMessage();
+			$erreur_code = 'error';
+		}
+		spip_log("Echec update payment metadata/description transaction #$id_transaction $erreur", $mode . _LOG_ERREUR);
+	}
+
+
+	// essayer de retrouver ou creer un customer pour l'id_auteur
+	if ($customer_id = $payment->customer){
+		try {
+			$customer = \Stripe\Customer::retrieve($customer_id);
+
+			// si customer retrouve, on ajoute la source et la transaction
+			if ($customer){
+				$response['pay_id'] = $customer->id;
+				$metadata = $customer->metadata;
+				if (!$metadata){
+					$metadata = array();
+				}
+				if (isset($metadata['id_transaction'])){
+					$metadata['id_transaction'] .= ',' . $id_transaction;
+				} else {
+					$metadata['id_transaction'] = $id_transaction;
+				}
+				if ($row['id_auteur'] > 0){
+					$metadata['id_auteur'] = $row['id_auteur'];
+					$customer->metadata = $metadata;
+					$customer->description = sql_getfetsel('nom', 'spip_auteurs', 'id_auteur=' . intval($row['id_auteur']));
+				}
+				$customer->save();
+			}
+		} catch (Exception $e) {
+			if ($body = $e->getJsonBody()){
+				$err = $body['error'];
+				list($erreur_code, $erreur) = stripe_error_code($err);
+			} else {
+				$erreur = $e->getMessage();
+			}
+			spip_log("Echec recherche customer transaction #$id_transaction $erreur", $mode . _LOG_ERREUR);
+		}
+	}
+
 	// Ouf, le reglement a ete accepte
 
-
 	// on verifie que le montant est bon !
-	$montant_regle = 0;
-	if ($charge){
-		$montant_regle = $charge['amount']/100;
-	}
-	elseif($sub){
-		$montant_regle = $sub->plan->amount;
-	}
+	$montant_regle = $payment->amount_received/100;
 
 	if ($montant_regle != $row['montant']){
-		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=".$row['montant'].":".var_export($charge, true),$mode);
+		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=".$row['montant'].":".var_export($payment, true),$mode);
 		// on log ca dans un journal dedie
 		spip_log($t,$mode . '_reglements_partiels');
 	}
 
-
-	if ($charge){
+	$authorisation_id = $payment->id;
+	$transaction = "";
+	$charge = null;
+	if ($payment->charges
+		and $payment->charges->data
+	  and $charge = end($payment->charges->data)) {
 		$transaction = $charge['balance_transaction'];
-		$authorisation_id = $charge['id'];
+		$date_paiement = date('Y-m-d H:i:s', $charge['created']);
 	}
-	elseif($sub){
+
+	/*elseif($sub){
 		$transaction = $sub->id;
 		$authorisation_id = $plan->id;
-	}
+	}*/
 
 	$set = array(
 		"autorisation_id" => "$transaction/$authorisation_id",
@@ -460,33 +232,45 @@ function stripe_traite_reponse_transaction($config, &$response) {
 	}
 
 	// type et numero de carte ?
-	if ($charge){
-		if (isset($charge['source']) and $charge['source']['object']=='card'){
-			// par defaut on note carte et BIN6 dans refcb
-			$set['refcb'] = '';
-			if (isset($charge['source']['brand']))
-				$set['refcb'] .= $charge['source']['brand'];
+	$card = null;
+	if ($charge
+	  and isset($charge['payment_method_details'])
+		and $charge['payment_method_details']['type']=='card'){
+		$card = $charge['payment_method_details']['card'];
+	}
+	if (!$card
+	  and $charge
+	  and isset($charge['source'])
+		and $charge['source']['object']=='card'){
+		$card = $charge['source'];
+	}
+	if (!$card){
+		// TODO utiliser $payment->payment_method
+	}
 
-			if (isset($charge['source']['last4']) and $charge['source']['last4'])
-				$set['refcb'] .= ' ****'.$charge['source']['last4'];
+	if ($card){
+		// par defaut on note carte et BIN6 dans refcb
+		$set['refcb'] = '';
+		if (isset($card['brand']))
+			$set['refcb'] .= $card['brand'];
 
-			$set['refcb'] = trim($set['refcb']);
-			// validite de carte ?
-			if (isset($charge['source']['exp_month']) AND $charge['source']['exp_year']){
-				$set['validite'] = $charge['source']['exp_year'] . "-" . str_pad($charge['source']['exp_month'], 2, '0', STR_PAD_LEFT);
-			}
+		if (isset($card['last4']) and $card['last4'])
+			$set['refcb'] .= ' ****'.$charge['source']['last4'];
+
+		$set['refcb'] = trim($set['refcb']);
+		// validite de carte ?
+		if (isset($card['exp_month']) AND isset($card['exp_year'])){
+			$set['validite'] = $card['exp_year'] . "-" . str_pad($card['exp_month'], 2, '0', STR_PAD_LEFT);
 		}
 	}
 
 	$response = array_merge($response, $set);
 
-	// il faudrait stocker le $charge aussi pour d'eventuels retour ?
 	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
 	spip_log("call_response : id_transaction $id_transaction, reglee", $mode);
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
 	$regler_transaction($id_transaction,array('row_prec'=>$row));
-
 
 	return array($id_transaction,true);
 
