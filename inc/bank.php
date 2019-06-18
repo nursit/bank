@@ -505,13 +505,14 @@ function bank_transaction_echec($id_transaction,$args=array()){
 /**
  * Recuperer la reponse postee et verifier sa signature
  * @param string $mode
+ * @param array|null $mode
  * @return array|bool
  */
-function bank_response_simple($mode){
+function bank_response_simple($mode, $c = null){
 	$vars = array('id_transaction','transaction_hash','autorisation_id','abo');
 	$response = array();
 	foreach($vars as $k) {
-		if (!is_null($v = _request($k)))
+		if (!is_null($v = _request($k, $c)))
 		$response[$k] = $v;
 	}
 

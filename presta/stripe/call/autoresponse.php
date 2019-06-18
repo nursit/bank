@@ -151,9 +151,19 @@ function stripe_webhook_checkout_session_completed_dist($config, $event) {
 		if ($session->payment_intent){
 			$response['payment_id'] = $session->payment_intent;
 		}
+
 		if ($session->success_url){
-			$response['id_transaction'] = parametre_url($session->success_url, 'id_transaction');
-			$response['transaction_hash'] = parametre_url($session->success_url, 'transaction_hash');
+			// get id_transaction & transaction_hash from success_url if valid for this website (case of multiples webhooks)
+			$qs = explode('?', $session->success_url);
+			$qs = end($qs);
+			parse_str($qs, $c);
+			$mode = $config['presta'];
+			$r = bank_response_simple($config['presta'], $c);
+			if ($r === false) {
+				return false;
+			}
+
+			$response = array_merge($r, $response);
 		}
 	}
 
