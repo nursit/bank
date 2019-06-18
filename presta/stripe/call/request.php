@@ -83,6 +83,9 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		if (!$echeance){
 			return "";
 		}
+
+		// Nouveaux abonnements non fonctionnels en l'etat
+		return "";
 	}
 
 	
