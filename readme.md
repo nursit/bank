@@ -1,4 +1,4 @@
-# Plugin Bank v3 pour SPIP <small>Paiement bancaire</small>
+# Plugin Bank v4 pour SPIP <small>Paiement bancaire</small>
 
 Ce plugin permet de gérer les interfaces techniques avec les prestataires bancaires.
 
@@ -14,20 +14,27 @@ Il peut aussi être complété par
 * le plugin factures https://github.com/nursit/factures
 
 
-**Nouveautés de la version 3 du plugin **
 
-* Nécessite SPIP 3.0+, compatible SPIP 3.1
-* Refonte de la configuration : 
+
+### Changelog
+
+* Version 4 du plugin
+  * Nécessite SPIP 3.1+, compatible SPIP 3.2
+  * Mise en conformité de l'implémentation de Stripe avec les normes Strong Customer Authentication qui entrent en vigueur en septembre 2019
+    * seul le paiement à l'acte est implémenté, les nouveaux paiements récurrents ne sont plus possibles (TODO)
+  * Suppression du prestataire Internet+ (code non maintenu, non testé en situation réelle depuis trop longtemps)
+  
+* Version 3 du plugin
+  * Nécessite SPIP 3.0+, compatible SPIP 3.1
+  * Refonte de la configuration : 
     * on peut avoir plusieurs modules du même prestataire technique avec des paramètres différents
     * possibilité de configurer l'ordre de présentation des modes de paiement
     * possibilité de configurer les CB proposées pour les prestataires par CB qui le permettent (tous sauf SIPS)
     * conervation de la clé de test et passage en test/production par case a cocher
-* Ajout du prestataire PayZen qui supporte le paiement par SEPA pour les paiements uniques et les paiements récurrents
-* Evolution de l'API abonnements, prise en charge des récurences plus complexes (N1 paiements initiaux, N2 paiements suivants)
-* Ajout d'un statut "attente" sur les transactions pour le paiement par chèque, virement et SEPA, et ajout d'une page de retour bank_retour_attente pour le retour sur ces transactions
-* Prise en charge de PDT pour paypal
-
-
+  * Ajout du prestataire PayZen qui supporte le paiement par SEPA pour les paiements uniques et les paiements récurrents
+  * Evolution de l'API abonnements, prise en charge des récurences plus complexes (N1 paiements initiaux, N2 paiements suivants)
+  * Ajout d'un statut "attente" sur les transactions pour le paiement par chèque, virement et SEPA, et ajout d'une page de retour bank_retour_attente pour le retour sur ces transactions
+  * Prise en charge de PDT pour paypal
 
 
 ## Prestataires pris en charge
