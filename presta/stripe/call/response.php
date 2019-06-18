@@ -62,10 +62,20 @@ function presta_stripe_call_response_dist($config, $response=null){
 
 	$recurence = false;
 	// c'est une reconduction d'abonnement ?
-	if ($response['payment_id'] and $response['abo_uid']){
+	if (isset($response['payment_id']) and $response['payment_id']
+		and isset($response['abo_uid']) and $response['abo_uid']){
 
 		// verifier qu'on a pas deja traite cette recurrence !
-		if ($t = sql_fetsel("*","spip_transactions","autorisation_id LIKE ".sql_quote("%/".$response['payment_id']))){
+		$where_deja = [];
+		if ($response['payment_id']) {
+			$where_deja[] = "autorisation_id LIKE ".sql_quote("%/".$response['payment_id']);
+		}
+		if ($response['charge_id']) {
+			$where_deja[] = "autorisation_id LIKE ".sql_quote("%/".$response['charge_id']);
+		}
+		$where_deja = '(' . implode(' OR ', $where_deja) . ')';
+
+		if ($t = sql_fetsel("*","spip_transactions", $where_deja)){
 			$response['id_transaction'] = $t['id_transaction'];
 			$response['transaction_hash'] = $t['transaction_hash'];
 		}
@@ -83,7 +93,7 @@ function presta_stripe_call_response_dist($config, $response=null){
 			// le webmestre rejouera la transaction
 			else {
 				return bank_transaction_invalide(
-					$response['abo_uid'].'/'.$response['charge_id'],
+					$response['abo_uid'].'/'.$response['payment_id'],
 					array(
 						'mode' => $mode,
 						'sujet' => 'Echec creation transaction echeance',
