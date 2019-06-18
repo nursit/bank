@@ -35,6 +35,62 @@ function stripe_init_api($config){
 }
 
 /**
+ * Creer/updater un webhook pour ce site
+ * @param $config
+ * @throws \Stripe\Error\Api
+ */
+function stripe_set_webhook($config) {
+	stripe_init_api($config);
+	$mode = $config['presta'];
+
+	$url_endpoint = bank_url_api_retour($config,"autoresponse");
+	$event_endpoint = ["checkout_session.completed", "invoice.payment.succeeded", "invoice.payment.failed"];
+
+	$existing_endpoint_id = null;
+	$list = \Stripe\WebhookEndpoint::all(["limit" => 100]);
+	foreach ($list->data as $endpoint) {
+		var_dump($endpoint);
+		if ($endpoint->status == 'enabled') {
+			if (strpos($endpoint->url, $GLOBALS['meta']['adresse_site'] . '/') === 0) {
+				if ($endpoint->url === $url_endpoint
+				  and is_array($endpoint->enabled_events)
+					and !array_diff($endpoint->enabled_events, $event_endpoint)) {
+					// endpoint OK, rien a faire
+					spip_log("stripe_set_webhook: OK endpoint ".$endpoint->id, $mode);
+					return;
+				}
+				else {
+					// Update endpoint
+					$set = ['url' => $url_endpoint, 'enabled_events' => is_array($endpoint->enabled_events) ? array_merge($event_endpoint, $endpoint->enabled_events) : $event_endpoint];
+					try {
+						\Stripe\WebhookEndpoint::update($endpoint->id, $set);
+						spip_log("stripe_set_webhook: UPDATED endpoint " . $endpoint->id . " " . json_encode($set), $mode);
+					}
+					catch (Exception $e) {
+						spip_log("stripe_set_webhook: Impossible de modifier le endpoint "  . $endpoint->id . " " . json_encode($set) . ' :: ' . $e->getMessage(), $mode ._LOG_ERREUR);
+					}
+					return;
+				}
+			}
+		}
+	}
+
+	try {
+		// aucun endpoint valide, on en ajoute un
+		$set = [
+		  "url" => $url_endpoint,
+		  "enabled_events" => ["checkout_session.completed", "invoice.payment.succeeded", "invoice.payment.failed"]
+		];
+		$endpoint = \Stripe\WebhookEndpoint::create($set);
+		spip_log("stripe_set_webhook: ADDED endpoint " . $endpoint->id . " " . json_encode($set), $mode);
+	}
+	catch (Exception $e) {
+		spip_log("stripe_set_webhook: Impossible de creer un endpoint :: " . $e->getMessage(), $mode ._LOG_ERREUR);
+	}
+
+}
+
+/**
  * Gerer la reponse du POST JS sur paiement/abonnement
  * @param array $config
  * @param array $response

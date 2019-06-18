@@ -272,6 +272,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	}
 
 	stripe_init_api($config);
+	stripe_set_webhook($config);
 
 	$session_desc = [
 	  'payment_method_types' => ['card'],
