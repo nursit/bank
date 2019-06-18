@@ -42,6 +42,8 @@ function stripe_init_api($config){
 function stripe_set_webhook($config) {
 	stripe_init_api($config);
 	$mode = $config['presta'];
+	$key_webhook_secret = (($config['mode_test']) ? 'WEBHOOK_SECRET_KEY_test' : 'WEBHOOK_SECRET_KEY');
+	$has_secret = ((isset($config[$key_webhook_secret]) and $config[$key_webhook_secret]) ? true : false);
 
 	$url_endpoint = bank_url_api_retour($config,"autoresponse");
 	$event_endpoint = ["checkout_session.completed", "invoice.payment.succeeded", "invoice.payment.failed"];
@@ -52,7 +54,9 @@ function stripe_set_webhook($config) {
 		var_dump($endpoint);
 		if ($endpoint->status == 'enabled') {
 			if (strpos($endpoint->url, $GLOBALS['meta']['adresse_site'] . '/') === 0) {
-				if ($endpoint->url === $url_endpoint
+				// si on ne connait pas le secret du webhook on le disabled et on en cree un nouveau
+				if ($has_secret
+				  and $endpoint->url === $url_endpoint
 				  and is_array($endpoint->enabled_events)
 					and !array_diff($endpoint->enabled_events, $event_endpoint)) {
 					// endpoint OK, rien a faire
@@ -60,8 +64,13 @@ function stripe_set_webhook($config) {
 					return;
 				}
 				else {
-					// Update endpoint
-					$set = ['url' => $url_endpoint, 'enabled_events' => is_array($endpoint->enabled_events) ? array_merge($event_endpoint, $endpoint->enabled_events) : $event_endpoint];
+					if ($has_secret){
+						// Update endpoint
+						$set = ['url' => $url_endpoint, 'enabled_events' => is_array($endpoint->enabled_events) ? array_merge($event_endpoint, $endpoint->enabled_events) : $event_endpoint];
+					}
+					else {
+						$set = ['disabled' => true];
+					}
 					try {
 						\Stripe\WebhookEndpoint::update($endpoint->id, $set);
 						spip_log("stripe_set_webhook: UPDATED endpoint " . $endpoint->id . " " . json_encode($set), $mode);
@@ -69,7 +78,9 @@ function stripe_set_webhook($config) {
 					catch (Exception $e) {
 						spip_log("stripe_set_webhook: Impossible de modifier le endpoint "  . $endpoint->id . " " . json_encode($set) . ' :: ' . $e->getMessage(), $mode ._LOG_ERREUR);
 					}
-					return;
+					if ($has_secret){
+						return;
+					}
 				}
 			}
 		}
@@ -83,6 +94,22 @@ function stripe_set_webhook($config) {
 		];
 		$endpoint = \Stripe\WebhookEndpoint::create($set);
 		spip_log("stripe_set_webhook: ADDED endpoint " . $endpoint->id . " " . json_encode($set), $mode);
+		$secret = $endpoint->secret;
+
+		$config_meta = lire_config("bank_paiement/",array());
+		$key_ref = (($config['mode_test']) ? 'SECRET_KEY_test' : 'SECRET_KEY');
+		if (is_array($config_meta)){
+			foreach($config_meta as $k=>$v){
+				if (strncmp($k,"config_",7)==0){
+					if ($v['presta'] === 'stripe'
+					and $v['mode_test'] == $config['mode_test']
+					and $v[$key_ref] === $config[$key_ref]) {
+						ecrire_config("bank_paiement/$k/$key_webhook_secret",$secret);
+					}
+				}
+			}
+		}
+
 	}
 	catch (Exception $e) {
 		spip_log("stripe_set_webhook: Impossible de creer un endpoint :: " . $e->getMessage(), $mode ._LOG_ERREUR);

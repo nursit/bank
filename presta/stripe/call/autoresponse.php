@@ -85,8 +85,9 @@ function stripe_retrieve_event($config) {
 
 	// methode securisee par une cle secrete partagee
 	// You can find your endpoint's secret in your webhook settings
-	if (isset($config['WEBHOOK_SECRET_KEY']) and $config['WEBHOOK_SECRET_KEY']) {
-		$endpoint_secret = $config['WEBHOOK_SECRET_KEY'];
+	$key_webhook_secret = (($config['mode_test']) ? 'WEBHOOK_SECRET_KEY_test' : 'WEBHOOK_SECRET_KEY');
+	if (isset($config[$key_webhook_secret]) and $config[$key_webhook_secret]) {
+		$endpoint_secret = $config[$key_webhook_secret];
 		$payload = @file_get_contents('php://input');
 		$sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
 		try {

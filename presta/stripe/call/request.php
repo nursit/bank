@@ -274,15 +274,6 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	stripe_init_api($config);
 	stripe_set_webhook($config);
 
-	$session_desc = [
-	  'payment_method_types' => ['card'],
-	  'line_items' => [[$item]],
-	  // transfer the session id to the success URL
-	  'success_url' => $url_success . '&session_id={CHECKOUT_SESSION_ID}',
-	  'cancel_url' => $url_success,
-		'locale' => $GLOBALS['spip_lang'],
-	];
-
 	$checkout_customer = null;
 	// essayer de retrouver un customer existant pour l'id_auteur
 	// sinon Stripe creera un nouveau customer
@@ -295,7 +286,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			try {
 				$customer = \Stripe\Customer::retrieve($customer_id);
 				if ($customer and $customer->email === $contexte['email']) {
-					$session_desc['customer'] = $customer_id;
+					$checkout_customer = $customer_id;
 				}
 			}
 			catch (Exception $e) {
@@ -303,13 +294,28 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		}
 	}
 
-	if (!isset($session_desc['customer'])) {
-		$session_desc['customer_email'] = $contexte['email'];
+
+	// acte : utiliser une checkout session
+	if ($type === 'acte'){
+		$session_desc = [
+			'payment_method_types' => ['card'],
+			'line_items' => [[$item]],
+			// transfer the session id to the success URL
+			'success_url' => $url_success . '&session_id={CHECKOUT_SESSION_ID}',
+			'cancel_url' => $url_success,
+			'locale' => $GLOBALS['spip_lang'],
+		];
+
+		if (!$checkout_customer){
+			$session_desc['customer_email'] = $contexte['email'];
+		} else {
+			$session_desc['customer'] = $checkout_customer;
+		}
+
+		$session = \Stripe\Checkout\Session::create($session_desc);
+
+		$contexte['checkout_session_id'] = $session->id;
 	}
-
-	$session = \Stripe\Checkout\Session::create($session_desc);
-
-	$contexte['checkout_session_id'] = $session->id;
 
 	return $contexte;
 }
