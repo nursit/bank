@@ -68,6 +68,7 @@ function stripe_dispatch_event($config, $event, $auto = 'auto') {
 	  or function_exists($f = $f . '_dist')) {
 		spip_log("call_{$auto}response : event $type => $f()", $mode.$auto._LOG_DEBUG);
 		$res = $f($config, $event);
+		spip_log("call_{$auto}response : $f() = ".json_encode($res), $mode.$auto._LOG_DEBUG);
 	}
 	else {
 		spip_log("call_{$auto}response : event $type - $f not existing", $mode.$auto._LOG_DEBUG);
