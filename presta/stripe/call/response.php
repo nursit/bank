@@ -41,6 +41,10 @@ function presta_stripe_call_response_dist($config, $response=null){
 	}
 	elseif (isset($_REQUEST['session_id'])){
 		$checkout_session_id = $_REQUEST['session_id'];
+		// CHECKOUT_SESSION_ID non remplace ?
+		if ($checkout_session_id === '{CHECKOUT_SESSION_ID}' or $checkout_session_id === 'CHECKOUT_SESSION_ID') {
+			$checkout_session_id = null;
+		}
 	}
 
 	if (!$response or (!$checkout_session_id and !$response['charge_id'] and !$response['payment_id'])) {
@@ -51,14 +55,33 @@ function presta_stripe_call_response_dist($config, $response=null){
 	// charger l'API Stripe avec la cle
 	stripe_init_api($config);
 
-	if ($checkout_session_id){
+	if (!$response['payment_id'] and $checkout_session_id){
 		$response['checkout_session_id'] = $checkout_session_id;
-		$session = \Stripe\Checkout\Session::retrieve($checkout_session_id);
-		if (isset($session->payment_intent) && $session->payment_intent) {
-			$response['payment_id'] = $session->payment_intent;
-			$payment = \Stripe\PaymentIntent::retrieve($response['payment_id']);
+		try {
+			$session = \Stripe\Checkout\Session::retrieve($checkout_session_id);
+			if (isset($session->payment_intent) && $session->payment_intent) {
+				$response['payment_id'] = $session->payment_intent;
+				//$payment = \Stripe\PaymentIntent::retrieve($response['payment_id']);
+			}
+		}
+		catch (Exception $e) {
+			if ($body = $e->getJsonBody()){
+				$err  = $body['error'];
+				list($erreur_code, $erreur) = stripe_error_code($err);
+			}
+			else {
+				$erreur = $e->getMessage();
+				$erreur_code = 'error';
+			}
+			spip_log("call_response : checkout_session_id $checkout_session_id invalide :: #$erreur_code $erreur",$mode._LOG_ERREUR);
 		}
 	}
+
+	if (!$response['payment_id']) {
+		spip_log("call_response : checkout_session_id invalide / no payment_id",$mode._LOG_ERREUR);
+		return array(0,false);
+	}
+
 
 	$recurence = false;
 	// c'est une reconduction d'abonnement ?
