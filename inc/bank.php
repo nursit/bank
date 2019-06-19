@@ -516,7 +516,7 @@ function bank_response_simple($mode, $c = null){
 		$response[$k] = $v;
 	}
 
-	if (!$s = _request('sign')
+	if (!$s = _request('sign', $c)
 		OR $s !== bank_sign_response_simple($mode,$response)){
 
 		spip_log("bank_response_simple : signature invalide","bank"._LOG_ERREUR);
