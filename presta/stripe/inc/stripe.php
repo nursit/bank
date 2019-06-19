@@ -359,7 +359,7 @@ function stripe_traite_reponse_transaction($config, &$response) {
 			$set['refcb'] .= $card['brand'];
 
 		if (isset($card['last4']) and $card['last4'])
-			$set['refcb'] .= ' ****'.$charge['source']['last4'];
+			$set['refcb'] .= ' ****' . $card['last4'];
 
 		$set['refcb'] = trim($set['refcb']);
 		// validite de carte ?
