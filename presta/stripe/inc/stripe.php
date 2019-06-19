@@ -54,7 +54,18 @@ function stripe_set_webhook($config) {
 
 
 	$existing_endpoint_id = null;
-	$list = \Stripe\WebhookEndpoint::all(["limit" => 100]);
+	try {
+		$list = \Stripe\WebhookEndpoint::all(["limit" => 100]);
+	}
+	catch (Exception $e) {
+		spip_log("stripe_set_webhook: Impossible de lister les endpoints :: " . $e->getMessage(), $mode ._LOG_ERREUR);
+		$list = [];
+		// si secret connu, on presume qu'on a deja un endpoint configure
+		if ($has_secret) {
+			return;
+		}
+	}
+
 	foreach ($list->data as $endpoint) {
 		if ($endpoint->status == 'enabled') {
 			if (strpos($endpoint->url, $GLOBALS['meta']['adresse_site'] . '/') === 0
