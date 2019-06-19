@@ -89,7 +89,7 @@ function stripe_set_webhook($config) {
 		// aucun endpoint valide, on en ajoute un
 		$set = [
 		  "url" => $url_endpoint,
-		  "enabled_events" => ["checkout_session.completed", "invoice.payment.succeeded", "invoice.payment.failed"]
+		  "enabled_events" => $event_endpoint
 		];
 		$endpoint = \Stripe\WebhookEndpoint::create($set);
 		spip_log("stripe_set_webhook: ADDED endpoint " . $endpoint->id . " " . json_encode($set), $mode);
