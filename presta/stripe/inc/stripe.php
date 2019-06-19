@@ -46,19 +46,18 @@ function stripe_set_webhook($config) {
 	$has_secret = ((isset($config[$key_webhook_secret]) and $config[$key_webhook_secret]) ? true : false);
 
 	$url_endpoint = bank_url_api_retour($config,"autoresponse");
-	$event_endpoint = ["checkout_session.completed", "invoice.payment.succeeded", "invoice.payment.failed"];
+	$event_endpoint = [ "*" ];
 
 	$existing_endpoint_id = null;
 	$list = \Stripe\WebhookEndpoint::all(["limit" => 100]);
 	foreach ($list->data as $endpoint) {
-		var_dump($endpoint);
 		if ($endpoint->status == 'enabled') {
 			if (strpos($endpoint->url, $GLOBALS['meta']['adresse_site'] . '/') === 0) {
 				// si on ne connait pas le secret du webhook on le disabled et on en cree un nouveau
 				if ($has_secret
 				  and $endpoint->url === $url_endpoint
 				  and is_array($endpoint->enabled_events)
-					and !array_diff($endpoint->enabled_events, $event_endpoint)) {
+					and (!array_diff($endpoint->enabled_events, $event_endpoint) or in_array('*', $endpoint->enabled_events))) {
 					// endpoint OK, rien a faire
 					spip_log("stripe_set_webhook: OK endpoint ".$endpoint->id, $mode);
 					return;
