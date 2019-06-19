@@ -150,6 +150,7 @@ function stripe_webhook_checkout_session_completed_dist($config, $event) {
 	$session = $event->data->object;
 	// il faut recuperer $charge, pay_id et abo_uid, creer un id_transaction
 	if ($session->object=="checkout.session"){
+		$response['checkout_session_id'] = $session->id;
 		if ($session->payment_intent){
 			$response['payment_id'] = $session->payment_intent;
 		}
