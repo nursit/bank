@@ -307,6 +307,11 @@ function stripe_traite_reponse_transaction($config, &$response) {
 	  and $charge = end($payment->charges->data)) {
 		$transaction = $charge['balance_transaction'];
 		$date_paiement = date('Y-m-d H:i:s', $charge['created']);
+		try {
+			\Stripe\Charge::update($charge->id,['description' => $payment->description,]);
+		} catch (Exception $e) {
+			spip_log('call_response: erreur lors de la modification de la charge '.$charge->id .' :: '.$e->getMessage(), $mode . _LOG_ERREUR);
+		}
 	}
 
 	/*elseif($sub){
