@@ -47,12 +47,18 @@ function stripe_set_webhook($config) {
 
 	$url_endpoint = bank_url_api_retour($config,"autoresponse");
 	$event_endpoint = [ "*" ];
+	$p = strpos($url_endpoint, '.');
+	$p = strpos($url_endpoint, '/', $p);
+	$base_endpoint = substr($url_endpoint, 0, $p + 1);
+	spip_log("stripe_set_webhook: endpoint $url_endpoint base $base_endpoint", $mode);
+
 
 	$existing_endpoint_id = null;
 	$list = \Stripe\WebhookEndpoint::all(["limit" => 100]);
 	foreach ($list->data as $endpoint) {
 		if ($endpoint->status == 'enabled') {
-			if (strpos($endpoint->url, $GLOBALS['meta']['adresse_site'] . '/') === 0) {
+			if (strpos($endpoint->url, $GLOBALS['meta']['adresse_site'] . '/') === 0
+			  OR strpos($endpoint->url, $base_endpoint) === 0) {
 				// si on ne connait pas le secret du webhook on le disabled et on en cree un nouveau
 				if ($has_secret
 				  and $endpoint->url === $url_endpoint
