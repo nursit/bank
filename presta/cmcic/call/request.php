@@ -16,20 +16,24 @@ include_spip('presta/cmcic/inc/cmcic');
 /*
 <form action="<?php echo $oTpe->sUrlPaiement;?>" method="post" id="PaymentRequest">
 <p>
-	<input type="hidden" name="version"             id="version"        value="<?php echo $oTpe->sVersion;?>" />
-	<input type="hidden" name="TPE"                 id="TPE"            value="<?php echo $oTpe->sNumero;?>" />
-	<input type="hidden" name="date"                id="date"           value="<?php echo $sDate;?>" />
-	<input type="hidden" name="montant"             id="montant"        value="<?php echo $sMontant . $sDevise;?>" />
-	<input type="hidden" name="reference"           id="reference"      value="<?php echo $sReference;?>" />
-	<input type="hidden" name="MAC"                 id="MAC"            value="<?php echo $sMAC;?>" />
-	<input type="hidden" name="url_retour"          id="url_retour"     value="<?php echo $oTpe->sUrlKO;?>" />
-	<input type="hidden" name="url_retour_ok"       id="url_retour_ok"  value="<?php echo $oTpe->sUrlOK;?>" />
-	<input type="hidden" name="url_retour_err"      id="url_retour_err" value="<?php echo $oTpe->sUrlKO;?>" />
-	<input type="hidden" name="lgue"                id="lgue"           value="<?php echo $oTpe->sLangue;?>" />
-	<input type="hidden" name="societe"             id="societe"        value="<?php echo $oTpe->sCodeSociete;?>" />
-	<input type="hidden" name="texte-libre"         id="texte-libre"    value="<?php echo HtmlEncode($sTexteLibre);?>" />
-	<input type="hidden" name="mail"                id="mail"           value="<?php echo $sEmail;?>" />
-	<!-- Uniquement pour le Paiement fractionné -->
+	<input type="hidden" name="version"             id="version"           value="<?php echo $oEpt->sVersion;?>" />
+	<input type="hidden" name="TPE"                 id="TPE"               value="<?php echo $oEpt->sNumero;?>" />
+	<input type="hidden" name="date"                id="date"              value="<?php echo $sDate;?>" />
+	<input type="hidden" name="contexte_commande"   id="contexte_commande" value="<?php echo $sContexteCommande;?>" />
+	<input type="hidden" name="montant"             id="montant"           value="<?php echo $sMontant . $sDevise;?>" />
+	<input type="hidden" name="reference"           id="reference"         value="<?php echo $sReference;?>" />
+	<input type="hidden" name="MAC"                 id="MAC"               value="<?php echo $sMAC;?>" />
+	<input type="hidden" name="url_retour_ok"       id="url_retour_ok"     value="<?php echo $oEpt->sUrlOK;?>" />
+	<input type="hidden" name="url_retour_err"      id="url_retour_err"    value="<?php echo $oEpt->sUrlKO;?>" />
+	<input type="hidden" name="lgue"                id="lgue"              value="<?php echo $oEpt->sLangue;?>" />
+	<input type="hidden" name="societe"             id="societe"           value="<?php echo $oEpt->sCodeSociete;?>" />
+	<input type="hidden" name="texte-libre"         id="texte-libre"       value="<?php echo HtmlEncode($sTexteLibre);?>" />
+	<input type="hidden" name="mail"                id="mail"              value="<?php echo $sEmail;?>" />
+	<!-------------------------------------------------------------------------------------------------------------------------------------------------------------
+      SECTION PAIEMENT FRACTIONNE - Section spécifique au paiement fractionné
+
+	  INSTALLMENT PAYMENT SECTION - Section specific to the installment payment
+	-------------------------------------------------------------------------------------------------------------------------------------------------------------->
 	<input type="hidden" name="nbrech"              id="nbrech"         value="<?php echo $sNbrEch;?>" />
 	<input type="hidden" name="dateech1"            id="dateech1"       value="<?php echo $sDateEcheance1;?>" />
 	<input type="hidden" name="montantech1"         id="montantech1"    value="<?php echo $sMontantEcheance1;?>" />
@@ -39,9 +43,12 @@ include_spip('presta/cmcic/inc/cmcic');
 	<input type="hidden" name="montantech3"         id="montantech3"    value="<?php echo $sMontantEcheance3;?>" />
 	<input type="hidden" name="dateech4"            id="dateech4"       value="<?php echo $sDateEcheance4;?>" />
 	<input type="hidden" name="montantech4"         id="montantech4"    value="<?php echo $sMontantEcheance4;?>" />
-	<!-- -->
-	<input type="submit" name="bouton"              id="bouton"         value="Connexion / Connection" />
-</p>
+	<!-------------------------------------------------------------------------------------------------------------------------------------------------------------
+      FIN SECTION PAIEMENT FRACTIONNE
+
+	  END INSTALLMENT PAYMENT SECTION
+	-------------------------------------------------------------------------------------------------------------------------------------------------------------->
+	<input type="submit" name="bouton"              id="bouton"         value="Connexion / Connection" /></p>
 */
 
 /**
@@ -62,16 +69,18 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	include_spip('inc/filtres');
 	$contexte = array();
 
-	$oTpe  = new CMCIC_Tpe($config, strtoupper($GLOBALS['spip_lang']));
+	$oTpe  = new MoneticoPaiement_Ept($config, strtoupper($GLOBALS['spip_lang']));
 	if (!$oTpe->isOK) return false;
 
-	$oHmac = new CMCIC_Hmac($oTpe);
+	$oHmac = new MoneticoPaiement_Hmac($oTpe);
 
 	// Control String for support
-	$CtlHmac = sprintf(_CMCIC_CTLHMAC,
+	$CtlHmac = sprintf(_MONETICOPAIEMENT_CTLHMAC,
+		_MONETICOPAIEMENT_VERSION,
 		$oTpe->sVersion,
 		$oTpe->sNumero,
-		$oHmac->computeHmac(sprintf(_CMCIC_CTLHMACSTR, $oTpe->sVersion, $oTpe->sNumero)));
+		$oHmac->computeHmac(sprintf(_MONETICOPAIEMENT_CTLHMACSTR, $oTpe->sVersion, $oTpe->sNumero)));
+
 
 	// Currency : ISO 4217 compliant
 	$devise = "EUR";
@@ -83,7 +92,7 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	$contexte['date']        = date("d/m/Y:H:i:s");
 	$contexte['montant']     = $montant . $devise;
 	// Reference: unique, alphaNum (A-Z a-z 0-9), 12 characters max
-	$contexte['reference']   = substr($transaction_hash, 0, 12);
+	$contexte['reference']   = "PAY".str_pad($id_transaction, 9,"0", STR_PAD_LEFT); //ubstr($transaction_hash, 0, 12);
 	$contexte['lgue']        = $oTpe->sLangue;
 	$contexte['societe']     = $oTpe->sCodeSociete;
 
@@ -103,34 +112,6 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	$contexte['texte-libre'] = urlencode(serialize($contenu));
 
 	$contexte['mail']        = bank_porteur_email($row);
- 
-
-	// Data to certify
-	$PHP1_FIELDS = sprintf(_CMCIC_CGI1_FIELDS,
-		$contexte['TPE'],
-		$contexte['date'],
-		$montant, # montant
-		$devise,  # devise
-		$contexte['reference'], # reference de transaction 12c
-		$contexte['texte-libre'],
-		$oTpe->sVersion,
-		$oTpe->sLangue,
-		$oTpe->sCodeSociete, 
-		$contexte['mail'],
-		"", // $sNbrEch.
-		"", // $sDateEcheance1,
-		"", // $sMontantEcheance1,
-		"", // $sDateEcheance2,
-		"", // $sMontantEcheance2,
-		"", // $sDateEcheance3,
-		"", // $sMontantEcheance3,
-		"", // $sDateEcheance4,
-		"", // $sMontantEcheance4,
-		"" // $sOptions
-	);
-
-	// MAC computation
-	$contexte['MAC'] = $oHmac->computeHmac($PHP1_FIELDS);
 
 	// Urls de retour.
 	// La banque poste d'abord sur l'URL CGI2 (cf cmcic/config.php) qui doit traiter
@@ -140,8 +121,72 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	$contexte['url_retour_ok']  = bank_url_api_retour($config,"response","id=$id_transaction;$transaction_hash");
 	// - retour err si le paiement a été refusé
 	$contexte['url_retour_err'] = bank_url_api_retour($config,"cancel","id=$id_transaction;$transaction_hash");
-	// - retour (bouton Annuler) si le bonhomme décide d'abandonner le paiement
-	$contexte['url_retour'] = $contexte['url_retour_ok'];
+
+	// contexte_commande DSP2
+	// Contextual information related to the order : JSON, UTF-8, base64 encoded
+	// cart details, shipping and delivery addresses, technical context
+	$contexte_commande = [
+		// obligatoire
+		'billing' => [
+			'addressLine1' => '',
+			// 'stateOrProvince' => '', // obligatoire pour US et CA
+			'city' => '',
+			'postalCode' => '',
+			'country' => '',
+		],
+		// obligatoire mais tous les champs sont optionels (ou obligatoire 'si applicables' -> on laisse tout vide)
+		'shipping' => [],
+		// optionnel, on ne renseigne pas
+		// 'shoppingCart' => [],
+		// optionnel, service minimum
+		'client' => [
+			'email' => $contexte['mail'],
+		],
+	];
+
+	$billing = bank_porteur_infos_facturation($row);
+	var_dump($billing);
+	if ($billing['prenom']) {
+		$contexte_commande['billing']['firstName'] = $billing['prenom'];
+	}
+	if ($billing['nom']) {
+		$contexte_commande['billing']['lastName'] = $billing['nom'];
+	}
+	if ($billing['adresse']) {
+		$lignes = explode("\n", $billing['adresse']);
+		$contexte_commande['billing']['addressLine1'] = array_shift($lignes);
+		if (count($lignes)) {
+			$contexte_commande['billing']['addressLine2'] = array_shift($lignes);
+		}
+		if (count($lignes)) {
+			$contexte_commande['billing']['addressLine3'] = implode(' ', $lignes);
+		}
+	}
+	if ($billing['ville']) {
+		$contexte_commande['billing']['city'] = $billing['ville'];
+	}
+	if ($billing['code_postal']) {
+		$contexte_commande['billing']['postalCode'] = $billing['code_postal'];
+	}
+	if ($billing['etat']) {
+		$contexte_commande['billing']['stateOrProvince'] = $billing['etat'];
+	}
+	if ($billing['pays']) {
+		$contexte_commande['billing']['country'] = $billing['pays'];
+	}
+
+	$contexte_commande = json_encode($contexte_commande);
+	if ($GLOBALS['meta']['charset'] !== 'utf-8') {
+		$contexte_commande = utf8_encode($contexte_commande);
+	}
+	$contexte_commande_base64 = base64_encode($contexte_commande);
+	$contexte['contexte_commande'] = $contexte_commande_base64;
+
+	// recuperer les champs tries en chaine a signer, et complete le contexte au passage si besoin
+	$phase1go_fields = cmcic_concat_fields($contexte);
+	var_dump($phase1go_fields);
+	// MAC computation
+	$contexte['MAC'] = $oHmac->computeHmac($phase1go_fields);
 
 	$hidden = "";
 	foreach($contexte as $k=>$v){

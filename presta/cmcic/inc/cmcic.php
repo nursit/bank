@@ -40,83 +40,134 @@ function cmcic_url_serveur($config){
 	// Par défaut, l'adresse CIC de paiement normal.
 	switch($config['service']){
 		case "CMUT":
-			$host = "https://paiement.creditmutuel.fr";
-			break;
 		case "OBC":
-			$host = "https://ssl.paiement.banque-obc.fr";
-			break;
 		case "CIC":
 		default:
-			$host = "https://ssl.paiement.cic-banques.fr";
+			$host = "https://p.monetico-services.com";
 			break;
 	}
 
 	if (cmcic_is_sandbox($config))
 		$host .= "/test";
-	return $host . "/" . _CMCIC_URLPAIEMENT;
+	return $host . "/" . _MONETICOPAIEMENT_URLPAYMENT;
 
+}
+
+/**
+ * Sort and concat fields for the hmac calcul
+ * complete the context if mandatory fields are missing
+ *
+ * @param array $contexte
+ * @return string
+ */
+function cmcic_concat_fields(&$contexte) {
+	// ASCII alphabetic order
+	$keys = ["TPE",	"contexte_commande", "date", "dateech1", "dateech2", "dateech3", "dateech4", "lgue", "mail",
+	"montant", "montantech1", "montantech2", "montantech3", "montantech4", "nbrech", "reference", "societe",
+	"texte-libre", "url_retour_err", "url_retour_ok", "version"];
+
+	$values = [];
+	foreach ($keys as $key) {
+		if (!isset($contexte[$key])) {
+			$contexte[$key] = '';
+		}
+		$values[] = "$key=" . $contexte[$key];
+	}
+	return implode('*', $values);
+}
+
+/**
+ * Sort and concat response vars for the hmac calcul
+ * @param array $vars
+ * @param $oTpe
+ * @return string
+ */
+function cmcic_concat_response_fields($vars, $oTpe) {
+
+  $anomalies = [];
+  if (array_key_exists('TPE', $vars) and $vars["TPE"] != $oTpe->sNumero) {
+		  $anomalies[] = "TPE";
+  }
+  if (array_key_exists('version', $vars) and $vars["version"] != $oTpe->sVersion) {
+	  $anomalies[] = "version";
+  }
+  // sole field to exclude from the MAC computation
+  if (array_key_exists('MAC', $vars)) {
+    unset($vars['MAC']);
+  }
+  else {
+	  $anomalies[] = "MAC";
+  }
+
+  if(count($anomalies)) {
+	  return "anomaly_detected: " . implode(':', $anomalies);
+  }
+
+  // order by key is mandatory
+  ksort($vars);
+  // map entries to "key=value" to match the target format
+  array_walk($vars, function(&$a, $b) { $a = "$b=$a"; });
+
+  // join all entries using asterisk as separator
+  return implode( '*', $vars);
 }
 
 /*****************************************************************************
  *
- * "open source" kit for CMCIC-P@iement(TM) 
+ * "open source" kit for Monetico paiement(TM)
  *
- * File "CMCIC_Tpe.inc.php":
+ * File "MoneticoPaiement_Ept.inc.php":
  *
- * Author   : Euro-Information/e-Commerce (contact: centrecom@e-i.com)
- * Version  : 1.04
- * Date     : 01/01/2009
+ * Author   : Euro-Information/e-Commerce
+ * Version  : 4.0
+ * Date      : 05/06/2014
  *
- * Copyright: (c) 2009 Euro-Information. All rights reserved.
+ * Copyright: (c) 2014 Euro-Information. All rights reserved.
  * License  : see attached document "License.txt".
  *
  *****************************************************************************/
 
-define("_CMCIC_CTLHMAC","V1.04.sha1.php--[CtlHmac%s%s]-%s");
-define("_CMCIC_CTLHMACSTR", "CtlHmac%s%s");
-define("_CMCIC_CGI2_RECEIPT","version=2\ncdr=%s");
-define("_CMCIC_CGI2_MACOK","0");
-define("_CMCIC_CGI2_MACNOTOK","1\n");
-define("_CMCIC_CGI2_FIELDS", "%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*");
-define("_CMCIC_CGI1_FIELDS", "%s*%s*%s%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s*%s");
-define("_CMCIC_URLPAIEMENT", "paiement.cgi");
-
+define("_MONETICOPAIEMENT_VERSION", "3.0");
+define("_MONETICOPAIEMENT_CTLHMAC", "V%s.sha1.php--[CtlHmac%s%s]-%s");
+define("_MONETICOPAIEMENT_CTLHMACSTR", "CtlHmac%s%s");
+define("_MONETICOPAIEMENT_PHASE2BACK_RECEIPT", "version=2\ncdr=%s");
+define("_MONETICOPAIEMENT_PHASE2BACK_MACOK", "0");
+define("_MONETICOPAIEMENT_PHASE2BACK_MACNOTOK", "1\n");
+define("_MONETICOPAIEMENT_URLPAYMENT", "paiement.cgi");
 
 /*****************************************************************************
-*
-* Classe / Class : CMCIC_Tpe
-*
-*****************************************************************************/
+ *
+ * Classe / Class : MoneticoPaiement_Ept
+ *
+ *****************************************************************************/
+class MoneticoPaiement_Ept {
 
-class CMCIC_Tpe {
 
+	public $sVersion;  // Version du TPE - EPT Version (Ex : 3.0)
+	public $sNumero;  // Numero du TPE - EPT Number (Ex : 1234567)
+	public $sCodeSociete;  // Code Societe - Company code (Ex : companyname)
+	public $sLangue;  // Langue - Language (Ex : FR, DE, EN, ..)
+	public $sUrlOK;    // Url de retour OK - Return URL OK
+	public $sUrlKO;    // Url de retour KO - Return URL KO
+	public $sUrlPaiement;  // Url du serveur de paiement - Payment Server URL (Ex : https://p.monetico-services.com/paiement.cgi)
 
-	public $sVersion;	// Version du TPE - TPE Version (Ex : 3.0)
-	public $sNumero;	// Numero du TPE - TPE Number (Ex : 1234567)
-	public $sCodeSociete;	// Code Societe - Company code (Ex : companyname)
-	public $sLangue;	// Langue - Language (Ex : FR, DE, EN, ..)
-	public $sUrlOK;		// Url de retour OK - Return URL OK
-	public $sUrlKO;		// Url de retour KO - Return URL KO
-	public $sUrlPaiement;	// Url du serveur de paiement - Payment Server URL (Ex : https://paiement.creditmutuel.fr/paiement.cgi)
-
-	private $_sCle;		// La clé - The Key
+	private $_sCle;    // La cle - The Key
 
 	public $isOK; // flag pour signaler que le TPE est OK ou bon
-
 
 	// ----------------------------------------------------------------------------
 	//
 	// Constructeur / Constructor
 	//
 	// ----------------------------------------------------------------------------
-	
-	function __construct($config, $sLangue = "FR") {
 
-		// contrôle de l'existence des constantes de paramétrages.
-		$aRequiredConstants = array('_CMCIC_VERSION');
-		$this->_checkTpeParams($config, $aRequiredConstants);
+	function __construct($config, $sLangue = "FR"){
 
-		$this->sVersion = _CMCIC_VERSION;
+		// controle de l'existence des constantes de parametrages.
+		$aRequiredConstants = array('_MONETICOPAIEMENT_VERSION');
+		$this->_checkEptParams($config, $aRequiredConstants);
+
+		$this->sVersion = _MONETICOPAIEMENT_VERSION;
 		$this->_sCle = $config['CLE'];
 		$this->sNumero = $config['TPE'];
 		$this->sUrlPaiement = cmcic_url_serveur($config);
@@ -124,8 +175,8 @@ class CMCIC_Tpe {
 		$this->sCodeSociete = $config['CODESOCIETE'];
 		$this->sLangue = $sLangue;
 
-		$this->sUrlOK = (defined('_CMCIC_URLOK')?_CMCIC_URLOK:"");
-		$this->sUrlKO = (defined('_CMCIC_URLKO')?_CMCIC_URLKO:"");
+		$this->sUrlOK = '';
+		$this->sUrlKO = '';
 
 	}
 
@@ -133,48 +184,47 @@ class CMCIC_Tpe {
 	//
 	// Fonction / Function : getCle
 	//
-	// Renvoie la clé du TPE / return the TPE Key
+	// Renvoie la cle du TPE / return the EPT Key
 	//
 	// ----------------------------------------------------------------------------
 
-	public function getCle() {
+	public function getCle(){
 
 		return $this->_sCle;
 	}
 
 	// ----------------------------------------------------------------------------
 	//
-	// Fonction / Function : _checkTpeParams
+	// Fonction / Function : _checkEptParams
 	//
-	// Contrôle l'existence des constantes d'initialisation du TPE
-	// Check for the initialising constants of the TPE
+	// Controle l'existence des constantes d'initialisation du TPE
+	// Check for the initialising constants of the EPT
 	//
 	// ----------------------------------------------------------------------------
 
-	private function _checkTpeParams($config, $aConstants) {
+	private function _checkEptParams($config, $aConstants){
 
 		$this->isOK = true;
 
-		for ($i = 0; $i < count($aConstants); $i++){
+		for ($i = 0; $i<count($aConstants); $i++){
 			if (!defined($aConstants[$i])){
-				spip_log("Erreur paramètre " . $aConstants[$i] . " indéfini", $config['presta']._LOG_ERREUR);
+				spip_log("Erreur paramètre " . $aConstants[$i] . " indéfini", $config['presta'] . _LOG_ERREUR);
 				$this->isOK = false;
 			}
 		}
+
 	}
 
 }
 
-
 /*****************************************************************************
-*
-* Classe / Class : CMCIC_Hmac
-*
-*****************************************************************************/
+ *
+ * Classe / Class : MoneticoPaiement_Hmac
+ *
+ *****************************************************************************/
+class MoneticoPaiement_Hmac {
 
-class CMCIC_Hmac {
-
-	private $_sUsableKey;	// La clé du TPE en format opérationnel / The usable TPE key
+	private $_sUsableKey;  // La cle du TPE en format operationnel / The usable TPE key
 
 	// ----------------------------------------------------------------------------
 	//
@@ -182,34 +232,35 @@ class CMCIC_Hmac {
 	//
 	// ----------------------------------------------------------------------------
 
-	function __construct($oTpe) {
-		
-		$this->_sUsableKey = $this->_getUsableKey($oTpe);
+	function __construct($oEpt){
+
+		$this->_sUsableKey = $this->_getUsableKey($oEpt);
 	}
 
 	// ----------------------------------------------------------------------------
 	//
 	// Fonction / Function : _getUsableKey
 	//
-	// Renvoie la clé dans un format utilisable par la certification hmac
+	// Renvoie la cle dans un format utilisable par la certification hmac
 	// Return the key to be used in the hmac function
 	//
 	// ----------------------------------------------------------------------------
 
-	private function _getUsableKey($oTpe){
+	private function _getUsableKey($oEpt){
 
-		$hexStrKey  = substr($oTpe->getCle(), 0, 38);
-		$hexFinal   = "" . substr($oTpe->getCle(), 38, 2) . "00";
-    
-		$cca0=ord($hexFinal); 
+		$hexStrKey = substr($oEpt->getCle(), 0, 38);
+		$hexFinal = "" . substr($oEpt->getCle(), 38, 2) . "00";
 
-		if ($cca0>70 && $cca0<97) 
+		$cca0 = ord($hexFinal);
+
+		if ($cca0>70 && $cca0<97){
 			$hexStrKey .= chr($cca0-23) . substr($hexFinal, 1, 1);
-		else { 
-			if (substr($hexFinal, 1, 1)=="M") 
-				$hexStrKey .= substr($hexFinal, 0, 1) . "0"; 
-			else 
+		} else {
+			if (substr($hexFinal, 1, 1)=="M"){
+				$hexStrKey .= substr($hexFinal, 0, 1) . "0";
+			} else {
 				$hexStrKey .= substr($hexFinal, 0, 2);
+			}
 		}
 
 
@@ -220,16 +271,16 @@ class CMCIC_Hmac {
 	//
 	// Fonction / Function : computeHmac
 	//
-	// Renvoie le sceau HMAC d'une chaine de données
+	// Renvoie le sceau HMAC d'une chaine de donnees
 	// Return the HMAC for a data string
 	//
 	// ----------------------------------------------------------------------------
 
-	public function computeHmac($sData) {
+	public function computeHmac($sData){
 
 		return strtolower(hash_hmac("sha1", $sData, $this->_sUsableKey));
 
-		// If you don't have PHP 5 >= 5.1.2 and PECL hash >= 1.1 
+		// If you don't have PHP 5 >= 5.1.2 and PECL hash >= 1.1
 		// you may use the hmac_sha1 function defined below
 		//return strtolower($this->hmac_sha1($this->_sUsableKey, $sData));
 	}
@@ -242,73 +293,74 @@ class CMCIC_Hmac {
 	// Eliminates the need to install mhash to compute a HMAC
 	// Adjusted from the md5 version by Lance Rushing .
 	//
-	// Implémentation RFC 2104 HMAC pour PHP >= 4.3.0 - Création d'un SHA1 HMAC.
+	// Implementation RFC 2104 HMAC pour PHP >= 4.3.0 - Creation d'un SHA1 HMAC.
 	// Elimine l'installation de mhash pour le calcul d'un HMAC
-	// Adaptée de la version MD5 de Lance Rushing.
+	// Adaptee de la version MD5 de Lance Rushing.
 	//
 	// ----------------------------------------------------------------------------
 
-	public function hmac_sha1 ($key, $data) {
-		
+	public function hmac_sha1($key, $data){
+
 		$length = 64; // block length for SHA1
-		if (strlen($key) > $length) { $key = pack("H*",sha1($key)); }
-		$key  = str_pad($key, $length, chr(0x00));
+		if (strlen($key)>$length){
+			$key = pack("H*", sha1($key));
+		}
+		$key = str_pad($key, $length, chr(0x00));
 		$ipad = str_pad('', $length, chr(0x36));
 		$opad = str_pad('', $length, chr(0x5c));
-		$k_ipad = $key ^ $ipad ;
+		$k_ipad = $key ^ $ipad;
 		$k_opad = $key ^ $opad;
 
-		return sha1($k_opad  . pack("H*",sha1($k_ipad . $data)));
-	}	
+		return sha1($k_opad . pack("H*", sha1($k_ipad . $data)));
+	}
 
 }
 
 // ----------------------------------------------------------------------------
-// function getMethode 
+// function getMethode
 //
-// IN: 
-// OUT: Données soumises par GET ou POST / Data sent by GET or POST
-// description: Renvoie le tableau des données / Send back the data array
+// IN:
+// OUT: Donnees soumises par GET ou POST / Data sent by GET or POST
+// description: Renvoie le tableau des donnees / Send back the data array
 // ----------------------------------------------------------------------------
 
-function getMethode()
-{
-    if ($_SERVER["REQUEST_METHOD"] == "GET")  
-        return $_GET; 
+function getMethode(){
+	if ($_SERVER["REQUEST_METHOD"]=="GET"){
+		return $_GET;
+	}
 
-    if ($_SERVER["REQUEST_METHOD"] == "POST")
-	return $_POST;
+	if ($_SERVER["REQUEST_METHOD"]=="POST"){
+		return $_POST;
+	}
 
-    die ('Invalid REQUEST_METHOD (not GET, not POST).');
+	die ('Invalid REQUEST_METHOD (not GET, not POST).');
 }
 
 // ----------------------------------------------------------------------------
 // function HtmlEncode
 //
 // IN:  chaine a encoder / String to encode
-// OUT: Chaine encodée / Encoded string
+// OUT: Chaine encodee / Encoded string
 //
 // Description: Encode special characters under HTML format
 //                           ********************
-//              Encodage des caractères spéciaux au format HTML
+//              Encodage des caracteres speciaux au format HTML
 // ----------------------------------------------------------------------------
-function HtmlEncode ($data)
-{
-    $SAFE_OUT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._-";
-    $encoded_data = "";
-    $result = "";
-    for ($i=0; $i<strlen($data); $i++)
-    {
-        if (strchr($SAFE_OUT_CHARS, $data{$i})) {
-            $result .= $data{$i};
-        }
-        else if (($var = bin2hex(substr($data,$i,1))) <= "7F"){
-            $result .= "&#x" . $var . ";";
-        }
-        else
-            $result .= $data{$i};
-            
-    }
-    return $result;
+function HtmlEncode($data){
+	$SAFE_OUT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._-";
+	$encoded_data = "";
+	$result = "";
+	for ($i = 0; $i<strlen($data); $i++){
+		if (strchr($SAFE_OUT_CHARS, $data{$i})){
+			$result .= $data{$i};
+		} else {
+			if (($var = bin2hex(substr($data, $i, 1)))<="7F"){
+				$result .= "&#x" . $var . ";";
+			} else {
+				$result .= $data{$i};
+			}
+		}
+
+	}
+	return $result;
 }
-?>

@@ -61,6 +61,7 @@ function presta_cmcic_call_response_dist($config, $response=null){
 
 	if (!$response) {
 		cmcic_notifier_banque_erreur();
+		cmcic_notifier_banque_erreur();
 		return array(0, false);
 	}
 
@@ -235,7 +236,7 @@ function cmcic_notifier_banque_ok() {
 	// Send receipt to CMCIC server
 	header("Pragma: no-cache");
 	header("Content-type: text/plain");
-	printf(_CMCIC_CGI2_RECEIPT, _CMCIC_CGI2_MACOK);
+	printf(_MONETICOPAIEMENT_PHASE2BACK_RECEIPT, _MONETICOPAIEMENT_PHASE2BACK_MACOK);
 	spip_log("call_response : notification pour banque : OK.", "cmcic");
 }
 
@@ -249,7 +250,7 @@ function cmcic_notifier_banque_erreur() {
 	// Send receipt to CMCIC server
 	header("Pragma: no-cache");
 	header("Content-type: text/plain");
-	printf(_CMCIC_CGI2_RECEIPT, _CMCIC_CGI2_MACNOTOK);
+	printf(_MONETICOPAIEMENT_PHASE2BACK_RECEIPT, _MONETICOPAIEMENT_PHASE2BACK_MACNOTOK);
 	spip_log("call_response : notification pour banque : ERREUR.", "cmcic");
 }
 
@@ -267,54 +268,34 @@ function cmcic_response($config) {
 	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
 
 	// Begin Main : Retrieve Variables posted by CMCIC Payment Server 
-	$CMCIC_bruteVars = getMethode();
+	$MoneticoPaiement_bruteVars = getMethode();
 	spip_log("call_response : réception des variables cmcic", $mode);
 
 	// peu de chance d'être en erreur ici, mais sait-on jamais
-	if (!$CMCIC_bruteVars) {
+	if (!$MoneticoPaiement_bruteVars) {
 		spip_log("call_response : variables cmcic introuvables", $mode);
 		#return presta_cmcic_notifier_banque_erreur();
 		return false;
 	}
 
 	// TPE init variables
-	$oTpe  = new CMCIC_Tpe($config);
-	$oHmac = new CMCIC_Hmac($oTpe);
+	$oTpe  = new MoneticoPaiement_Ept();
+	$oHmac = new MoneticoPaiement_Hmac($oTpe);
 
 	// Message Authentication
-	$cgi2_fields = sprintf(_CMCIC_CGI2_FIELDS, $oTpe->sNumero,
-		$CMCIC_bruteVars["date"],
-		$CMCIC_bruteVars['montant'],
-		$CMCIC_bruteVars['reference'],
-		$CMCIC_bruteVars['texte-libre'],
-		$oTpe->sVersion,
-		$CMCIC_bruteVars['code-retour'],
-		$CMCIC_bruteVars['cvx'],
-		$CMCIC_bruteVars['vld'],
-		$CMCIC_bruteVars['brand'],
-		$CMCIC_bruteVars['status3ds'],
-		$CMCIC_bruteVars['numauto'],
-		$CMCIC_bruteVars['motifrefus'],
-		$CMCIC_bruteVars['originecb'],
-		$CMCIC_bruteVars['bincb'],
-		$CMCIC_bruteVars['hpancb'],
-		$CMCIC_bruteVars['ipclient'],
-		$CMCIC_bruteVars['originetr'],
-		$CMCIC_bruteVars['veres'],
-		$CMCIC_bruteVars['pares']
-		);
-
+	$MAC_source = cmcic_concat_response_fields($MoneticoPaiement_bruteVars, $oTpe);
+	$computed_MAC = $oHmac->computeHmac($MAC_source);
 
 	// uniquement si le code de sécurité correspond
-	if ($oHmac->computeHmac($cgi2_fields) != strtolower($CMCIC_bruteVars['MAC']))
-	{
+	if (!array_key_exists('MAC', $MoneticoPaiement_bruteVars)
+	  or strtolower($MoneticoPaiement_bruteVars['MAC']) !== $computed_MAC) {
 		spip_log("call_response : clé de sécurité falsifiée ou erronée", $mode);
 		return false;
 		#return presta_cmcic_notifier_banque_erreur();
 	}
 
 	// clé correcte
-	return $CMCIC_bruteVars;
+	return $MoneticoPaiement_bruteVars;
 }
 
 
@@ -377,8 +358,18 @@ function cmcic_gerer_transaction_payee($config, $id_transaction, $response, $row
 	if ($paiement_test) $mode .= "_test";
 
 	// ok, on traite le reglement
-	$date=time();
-	$date_paiement = date("Y-m-d H:i:s",$date);
+	$now=time();
+	$date_paiement = date("Y-m-d H:i:s",$now);
+
+	// recuperer la date de paiement si possible
+	if (isset($response['date'])) {
+		// 24/05/2019:10:00:25
+		$d = explode(':', $response['date']);
+		list($j, $m, $a) = explode('/', $d[0]);
+		if ($t = mktime($d[1], $d[2], $d[3], $m, $j, $a)) {
+			$date_paiement = date("Y-m-d H:i:s", $t);
+		}
+	}
 
 	// on verifie que le montant est bon !
 	$montant_regle = floatval( substr($response['montant'], 0, -3) ); // enlever la devise
@@ -391,18 +382,46 @@ function cmcic_gerer_transaction_payee($config, $id_transaction, $response, $row
 		// car l'erreur est en general dans le traitement
 	}
 
-
+	// si on a pas mieux
 	$autorisation_id = $response['numauto'];   # numéro d'autorisation de la banque
 	$transaction     = $response['reference']; # référence de transaction
+	if (isset($response['authentification'])
+	  and $authentification_base64 = $response['authentification']
+		and $authentification_json = base64_decode($authentification_base64)
+		and $authentification = json_decode($authentification_json, true)) {
+
+		if (isset($authentification['details']['transactionID']) and $authentification['details']['transactionID']) {
+			$transaction = $authentification['details']['transactionID'];
+		}
+	}
 
 	$set = array(
-		"autorisation_id"=>"$transaction/$autorisation_id",
+		"autorisation_id"=>"$autorisation_id/$transaction",
 		"mode"=>"$mode/$config_id",
 		"montant_regle"=>$montant_regle,
 		"date_paiement"=>$date_paiement,
 		"statut"=>'ok',
 		"reglee"=>'oui'
 	);
+
+	// si on a les infos de validite / card number, on les note ici
+	if (isset($response['vld'])){
+		$set['validite'] = "20".substr($response['vld'],2) . "-" . substr($response['vld'],0,2);
+	}
+	if (isset($response['brand']) OR isset($response['cbmasquee'])){
+		// par defaut on note brand et number dans refcb
+		// qui peut etre reutilise
+		$set['refcb'] = '';
+		if (isset($response['brand']) && $response['brand'] != 'na'){
+			$set['refcb'] = $response['brand'];
+		}
+		if (isset($response['cbmasquee']))
+			$set['refcb'] .= " ".$response['cbmasquee'];
+		$set['refcb'] = trim($set['refcb']);
+		if (!$set['refcb']) {
+			unset($set['refcb']);
+		}
+	}
 
 	sql_updateq("spip_transactions", $set, "id_transaction=".intval($id_transaction));
 	spip_log("call_response : id_transaction $id_transaction, reglee", $mode);

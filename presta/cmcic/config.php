@@ -52,6 +52,6 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 
 # Version du logiciel
-if (!defined('_CMCIC_VERSION'))
-	define("_CMCIC_VERSION", "3.0");
+if (!defined('_MONETICOPAIEMENT_VERSION'))
+	define("_MONETICOPAIEMENT_VERSION", "3.0");
 
