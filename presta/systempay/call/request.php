@@ -109,13 +109,24 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 
 	$parm['vads_language'] = $GLOBALS['spip_lang'];
 
-	// recuperer l'email
-	$parm['vads_cust_email'] = bank_porteur_email($row);
-
 	// si il y a du SEPA, il faut si possible nom et prenom
-	if (in_array('SDD',$cartes) AND isset($cartes_possibles['SDD'])){
-		$parm['vads_cust_first_name'] = bank_porteur_prenom($row);
-		$parm['vads_cust_last_name'] = bank_porteur_nom($row);
+	// demande repetee pour avoir le country egalement, pour securiser le paiement
+	// et tout ca devient tres fortement recommande avec DSP2
+	$billing = bank_porteur_infos_facturation($row);
+	foreach([
+		'email' => 'vads_cust_email',
+		'prenom' => 'vads_cust_first_name',
+		'nom' => 'vads_cust_last_name',
+		'adresse' => 'vads_cust_address',
+		'ville' => 'vads_cust_city',
+		'code_postal' => 'vads_cust_zip',
+		'pays' => 'vads_cust_country',
+		]
+		as $billing_key => $vads_key
+	) {
+		if( isset($billing[$billing_key]) and strlen($billing[$billing_key])) {
+			$parm[$vads_key] = str_replace("\n", " ", $billing[$billing_key]);
+		}
 	}
 
 	// nom et url de la boutique

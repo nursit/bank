@@ -88,8 +88,8 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		return "";
 	}
 
-	
-	$email = bank_porteur_email($row);
+	$billing = bank_porteur_infos_facturation($row);
+	$email = $billing['email'];
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
 	$montant = intval(round(100*$row['montant'],0));
@@ -169,6 +169,9 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			catch (Exception $e) {
 			}
 		}
+	}
+	if (!$checkout_customer){
+		// TODO : creer un customer avec les billing infos
 	}
 
 
