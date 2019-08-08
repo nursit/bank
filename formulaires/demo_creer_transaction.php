@@ -32,10 +32,16 @@ function formulaires_demo_creer_transaction_verifier_dist(){
 
 function formulaires_demo_creer_transaction_traiter_dist(){
 	$inserer_transaction = charger_fonction('inserer_transaction','bank');
+	$id_auteur = _request('id_auteur');
+	if (!strlen($id_auteur)
+		and !_request('auteur_id')
+	  and isset($GLOBALS['visiteur_session']['id_auteur'])) {
+		$id_auteur = $GLOBALS['visiteur_session']['id_auteur'];
+	}
 	$id_transaction = $inserer_transaction(
 		_request('montant'),
 		_request('montant_ht'),
-		_request('id_auteur'),
+		$id_auteur,
 		_request('auteur_id'),
 		_request('auteur'),
 		_request('parrain'),
