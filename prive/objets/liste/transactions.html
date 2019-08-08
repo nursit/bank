@@ -36,7 +36,7 @@
 			{where?}
 			{recherche?}
 			{statut==#ENV{statut,'.'}}
-			{tri #ENV{par,id_transaction},#GET{defaut_tri}}{pagination #ENV{nb,10}}>
+			{tri #ENV{par,id_transaction},#GET{defaut_tri}}{pagination #ENV{nb,10}}{0,200000}>
 			<tr class="[(#COMPTEUR_BOUCLE|alterner{row_odd,row_even})][(#ENV{id_transaction}|is_array|non)[ (#EXPOSE)]]">
 				<td class="id"><a href="#URL_ECRIRE{transaction,id_transaction=#ID_TRANSACTION}" class="popin">#ID_TRANSACTION</a></td>
 				<td class="id_auteur">[(#ID_AUTEUR|?{[<a href='[(#ID_AUTEUR|generer_url_entite{auteur})]' title="#INFO_NOM{auteur,#ID_AUTEUR}[ - (#INFO_EMAIL{auteur,#ID_AUTEUR})]">(#ID_AUTEUR)</a>],[<abbr title="(#AUTEUR|attribut_html)">@</abbr>]})]</td>
