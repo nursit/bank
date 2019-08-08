@@ -372,6 +372,54 @@ function bank_porteur_prenom($transaction){
 
 
 /**
+ * Recuperer les informations de facturation liees a la transaction
+ * pour alimenter les infos DSP2 de demande de paiement
+ * @param array $transaction
+ * @return array
+ */
+function bank_porteur_infos_facturation($transaction) {
+
+	$infos = [
+		'nom' => '',
+		'prenom' => '',
+		'email' => '',
+		'adresse' => '',
+		'code_postal' => '',
+		'ville' => '',
+		'etat' => '',
+		'pays' => '',
+	];
+
+	$flux = [
+		'args' => $transaction,
+		'data' => $infos,
+	];
+
+	$infos = pipeline('bank_dsp2_renseigner_facturation', $flux);
+	if (!$infos['email'] and $email = bank_porteur_email($transaction)) {
+		$infos['email'] = $email;
+	}
+	if (!$infos['prenom'] and $prenom = bank_porteur_prenom($transaction)) {
+		$infos['prenom'] = $prenom;
+	}
+	if (!$infos['nom'] and $nom = bank_porteur_nom($transaction)) {
+		$infos['nom'] = $nom;
+	}
+
+	// un peu de (re)mise en forme
+	$infos = array_map('trim', $infos);
+
+	$infos['adresse'] =
+	$lignes = explode("\n", $infos['adresse']);
+	$lignes = array_map('trim', $lignes);
+	$lignes = array_filter($lignes);
+	$infos['adresse'] = implode("\n", $lignes);
+
+	return $infos;
+}
+
+
+/**
  * Calculer la date de fin de validite d'un moyen de paiement avec son annee/mois de validite
  * @param string $annee
  * @param string $mois
