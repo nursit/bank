@@ -279,7 +279,7 @@ function cmcic_response($config) {
 	}
 
 	// TPE init variables
-	$oTpe  = new MoneticoPaiement_Ept();
+	$oTpe  = new MoneticoPaiement_Ept($config);
 	$oHmac = new MoneticoPaiement_Hmac($oTpe);
 
 	// Message Authentication
