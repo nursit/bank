@@ -145,7 +145,6 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	];
 
 	$billing = bank_porteur_infos_facturation($row);
-	var_dump($billing);
 	if ($billing['prenom']) {
 		$contexte_commande['billing']['firstName'] = $billing['prenom'];
 	}
@@ -184,7 +183,6 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 
 	// recuperer les champs tries en chaine a signer, et complete le contexte au passage si besoin
 	$phase1go_fields = cmcic_concat_fields($contexte);
-	var_dump($phase1go_fields);
 	// MAC computation
 	$contexte['MAC'] = $oHmac->computeHmac($phase1go_fields);
 
