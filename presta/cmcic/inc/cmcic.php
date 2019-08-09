@@ -36,8 +36,8 @@ function cmcic_is_sandbox($config){
  */
 function cmcic_url_serveur($config){
 
-	// URL d'accès à la banque.
-	// Par défaut, l'adresse CIC de paiement normal.
+	// URL d'acces a la banque.
+	// Par defaut, l'adresse Monetico de paiement normal.
 	switch($config['service']){
 		case "CMUT":
 		case "OBC":
@@ -91,12 +91,15 @@ function cmcic_concat_response_fields($vars, $oTpe) {
   if (array_key_exists('version', $vars) and $vars["version"] != $oTpe->sVersion) {
 	  $anomalies[] = "version";
   }
-  // sole field to exclude from the MAC computation
-  if (array_key_exists('MAC', $vars)) {
-    unset($vars['MAC']);
-  }
-  else {
+  if (!array_key_exists('MAC', $vars)) {
 	  $anomalies[] = "MAC";
+  }
+  // fields to exclude from the MAC computation
+  $excludes = ['MAC', 'action'];
+  foreach ($excludes as $exclude) {
+    if (array_key_exists($exclude, $vars)) {
+      unset($vars[$exclude]);
+    }
   }
 
   if(count($anomalies)) {
@@ -208,7 +211,7 @@ class MoneticoPaiement_Ept {
 
 		for ($i = 0; $i<count($aConstants); $i++){
 			if (!defined($aConstants[$i])){
-				spip_log("Erreur paramètre " . $aConstants[$i] . " indéfini", $config['presta'] . _LOG_ERREUR);
+				spip_log("Erreur parametre " . $aConstants[$i] . " indefini", $config['presta'] . _LOG_ERREUR);
 				$this->isOK = false;
 			}
 		}
