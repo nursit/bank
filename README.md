@@ -23,9 +23,10 @@ Il peut aussi être complété par
   * Mise en conformité de l'implémentation de Stripe avec les normes Strong Customer Authentication qui entrent en vigueur en septembre 2019
     * seul le paiement à l'acte est implémenté, les nouveaux paiements récurrents ne sont plus possibles (TODO)
   * Suppression du prestataire Internet+ (code non maintenu, non testé en situation réelle depuis trop longtemps)
+  * Passage a la plateforme Monetico au lieu de CMCIC (rien a reconfigurer, c'est un switch transparent)
   
 * Version 3 du plugin
-  * Nécessite SPIP 3.0+, compatible SPIP 3.1
+  * Nécessite SPIP 3.0+, compatible SPIP 3.1 et SPIP 3.2
   * Refonte de la configuration : 
     * on peut avoir plusieurs modules du même prestataire technique avec des paramètres différents
     * possibilité de configurer l'ordre de présentation des modes de paiement
@@ -48,11 +49,12 @@ Le paiement par SEPA est pris en charge via PayZen.
 
 Le plugin permet le paiement à l'acte via les plateformes techniques suivantes :
 
-* CMCIC (C.I.C, Crédit Mutuel, O.B.C.)
+* Monetico (C.I.C, Crédit Mutuel)
 * Ogone
 * Paybox
 * Paypal (par formulaire simple ou Paypal Express)
-* SIPS (Elysnet, Mercanet, Scellius Sogenactif)
+* SIPS (Elysnet, Mercanet, Scellius, Sogenactif)
+* SIPSv2 (Mercanet, Scellius, Sogenactif)
 * Stripe
 * SystemPay (Banque Populaire CyberPlus, O.S.B., SystemPay et SP Plus)
 * PayZen
