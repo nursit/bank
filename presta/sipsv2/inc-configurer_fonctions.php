@@ -11,5 +11,5 @@
  */
 if (!defined('_ECRIRE_INC_VERSION')) return;
 
-if (!function_exists('systempay_lister_cartes_config'))
-	include_spip('presta/systempay/config');
+if (!function_exists('sipsv2_lister_cartes_config'))
+	include_spip('presta/sipsv2/config');
