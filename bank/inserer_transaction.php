@@ -57,8 +57,8 @@ function bank_inserer_transaction_dist($montant,$options=array()){
 	$montant_ht=round($montant_ht,2);
 
 	$set = array(
-		'montant'=>round($montant,2),
-		'montant_ht'=>round($montant_ht,2),
+		'montant'=>str_replace(',','.', round($montant,2)),
+		'montant_ht'=>str_replace(',','.', round($montant_ht,2)),
 		'id_auteur'=>isset($options['id_auteur'])?intval($options['id_auteur']):0,
 		'auteur_id'=>isset($options['auteur_id'])?$options['auteur_id']:"",
 		'auteur'=>isset($options['auteur'])?$options['auteur']:"",
