@@ -1,7 +1,7 @@
 <paquet
 	prefix="bank"
 	categorie="outil"
-	version="4.0.3"
+	version="4.0.4"
 	etat="stable"
 	compatibilite="[3.1.0;3.2.*]"
 	logo="prive/themes/spip/images/credit-card-32.png"
@@ -28,6 +28,7 @@
 	<pipeline nom="bank_abos_renouveler_abonnement" action="" />
 	<pipeline nom="bank_abos_resilier" action="" />
 	<pipeline nom="bank_afficher_reglement_en_attente" action="" />
+	<pipeline nom="bank_description_transaction" action="" />
 	<pipeline nom="bank_facturer_reglement" action="" />
 	<pipeline nom="bank_traiter_reglement" action="" />
 	<pipeline nom="bank_traiter_remboursement" action="" />

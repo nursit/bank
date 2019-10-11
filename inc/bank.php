@@ -422,6 +422,56 @@ function bank_porteur_infos_facturation($transaction) {
 
 
 /**
+ * Libeller une transaction :
+ * utile en amont pour la demande de paiement pour certains prestas (stripe)
+ * et en aval pour libelle le paiement dans le releve (stripe)
+ * @param int $id_transaction
+ * @param array|null $transaction
+ * @return array
+ */
+function bank_description_transaction($id_transaction, $transaction=null) {
+	$description = [
+		'libelle' => '',
+		'description' => _T('bank:titre_transaction') . " #$id_transaction",
+	];
+
+	if (is_null($transaction)) {
+		$transaction = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction));
+	}
+	if ($transaction){
+
+		/**
+		 * Devrait etre dans les plugins concernes, compat anciennes versions
+		 */
+		if ($id_facture = $transaction['id_facture']
+			and test_plugin_actif('factures')
+			and $ref = sql_getfetsel('no_comptable', 'spip_factures', 'id_facture=' . intval($id_facture))){
+			$description['libelle'] = _T('factures:titre_facture') . " $ref";
+		} elseif ($id_commande = $transaction['id_commande']
+			and test_plugin_actif('commande')
+			and $ref = sql_getfetsel('reference', 'spip_commandes', 'id_commande=' . intval($id_commande))) {
+			$description['libelle'] = _T('commande:commande_reference_numero') . " $ref";
+		}
+
+		$flux = [
+			'args' => $transaction,
+			'data' => $description,
+		];
+
+		$description = pipeline('bank_description_transaction', $flux);
+
+	}
+
+	if (!$description['libelle'] and $description['description']) {
+		$description['libelle'] = $description['description'];
+		$description['description'] = '';
+	}
+
+	return $description;
+}
+
+
+/**
  * Calculer la date de fin de validite d'un moyen de paiement avec son annee/mois de validite
  * @param string $annee
  * @param string $mois

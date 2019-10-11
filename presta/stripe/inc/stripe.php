@@ -228,31 +228,6 @@ function stripe_traite_reponse_transaction($config, &$response) {
 		);
 	}
 
-	// update payment informations for Stripe Dashboard
-	try {
-		$nom_site = bank_nom_site();
-		$payment->description = "Transaction #" . $id_transaction ." [$nom_site]";
-		$metadata = $payment->metadata;
-		if (!$metadata){
-			$metadata = array();
-		}
-		$metadata['id_transaction'] = $id_transaction;
-		$metadata['id_auteur'] = $row['id_auteur'];
-		$metadata['nom_site'] = $nom_site;
-		$metadata['url_site'] = $GLOBALS['meta']['adresse_site'];
-		$payment->save();
-	} catch (Exception $e) {
-		if ($body = $e->getJsonBody()){
-			$err = $body['error'];
-			list($erreur_code, $erreur) = stripe_error_code($err);
-		} else {
-			$erreur = $e->getMessage();
-			$erreur_code = 'error';
-		}
-		spip_log("Echec update payment metadata/description transaction #$id_transaction $erreur", $mode . _LOG_ERREUR);
-	}
-
-
 	// essayer de retrouver ou creer un customer pour l'id_auteur
 	if ($customer_id = $payment->customer){
 		try {
@@ -375,6 +350,37 @@ function stripe_traite_reponse_transaction($config, &$response) {
 
 	$regler_transaction = charger_fonction('regler_transaction','bank');
 	$regler_transaction($id_transaction,array('row_prec'=>$row));
+
+	// update payment informations for Stripe Dashboard
+	// after billing
+	try {
+		$description = bank_description_transaction($id_transaction);
+		$description = array_filter([$description['libelle'], $description['description']]);
+		$description = implode(" | ", $description);
+		$description = str_replace( "\n", " ", $description);
+		$description = str_replace( "\r", " ", $description);
+		$nom_site = bank_nom_site();
+		$description .= " [$nom_site]";
+		$payment->description = $description;
+		$metadata = $payment->metadata;
+		if (!$metadata){
+			$metadata = array();
+		}
+		$metadata['id_transaction'] = $id_transaction;
+		$metadata['id_auteur'] = $row['id_auteur'];
+		$metadata['nom_site'] = $nom_site;
+		$metadata['url_site'] = $GLOBALS['meta']['adresse_site'];
+		$payment->save();
+	} catch (Exception $e) {
+		if ($body = $e->getJsonBody()){
+			$err = $body['error'];
+			list($erreur_code, $erreur) = stripe_error_code($err);
+		} else {
+			$erreur = $e->getMessage();
+			$erreur_code = 'error';
+		}
+		spip_log("Echec update payment metadata/description transaction #$id_transaction $erreur", $mode . _LOG_ERREUR);
+	}
 
 	return array($id_transaction,true);
 

@@ -123,25 +123,15 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	$contexte['description'] = _T('bank:titre_transaction') . '#'.$id_transaction;
 	$contexte['image'] = find_in_path('img/logo-paiement-stripe.png');
 
+	$description = bank_description_transaction($id_transaction, $row);
 	$item = [
-		'name' => _T('bank:titre_transaction') . " #$id_transaction",
+		'name' => $description['libelle'],
+		'description' => $description['description'],
 		'amount' => $contexte['amount'],
 		'currency' => $contexte['currency'],
     'quantity' => 1,
 	];
 
-	if ($id_facture = $row['id_facture']
-	  and test_plugin_actif('factures')
-	  and $ref = sql_getfetsel('no_comptable', 'spip_factures', 'id_facture='.intval($id_facture))) {
-		$item['description'] = $item['name'];
-		$item['name'] = _T('factures:titre_facture') . " $ref";
-	}
-	elseif ($id_commande = $row['id_commande']
-		and test_plugin_actif('commande')
-	  and $ref = sql_getfetsel('reference', 'spip_commandes', 'id_commande='.intval($id_commande))) {
-		$item['name'] = _T('commande:commande_numero') . " #$id_commande";
-		$item['description'] = _T('commande:commande_reference_numero') . " $ref";
-	}
 	if (!$contexte['image']) {
 		$chercher_logo = charger_fonction('chercher_logo','inc');
 		if ($logo = $chercher_logo(0,'site')){
