@@ -30,8 +30,14 @@ function inc_bank_editer_ticket_admin_dist($id_transaction, $sujet="Transaction 
 	$ticket = "";
 
 	if ($row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
+
+		include_spip('inc/bank');
+		$description = bank_description_transaction($id_transaction, $row);
+		$description_html = "<strong>".$description['libelle']."</strong>" . "\n" . $description['description'];
+		$description_html = nl2br($description_html);
+
 		$montant = $row['montant_regle'];
-		$ticket .= "<h2>Transaction $id_transaction</h2>\n<table border='1'>";
+		$ticket .= "<h2>Transaction $id_transaction</h2>\n<p>$description_html</p>\n<table border='1'>";
 		foreach($row as $k=>$v)
 			$ticket .= "<tr><td>$k</td><td>$v</td></tr>";
 		$ticket .="</table>";
@@ -48,6 +54,9 @@ function inc_bank_editer_ticket_admin_dist($id_transaction, $sujet="Transaction 
 		"Content-Type: text/html; charset=".$GLOBALS['meta']['charset']."\n".
 		"Content-Transfer-Encoding: 8bit\n";
 	$sujet = "$sujet #$id_transaction [".affiche_monnaie($montant)."]";
+	if (strlen($description['libelle'])) {
+		$sujet .= " | "  . $description['libelle'];
+	}
 
 	if (!isset($c['email_from_ticket_admin']) OR !strlen($email_from = $c['email_from_ticket_admin'])){
 		$url = parse_url($GLOBALS['meta']['adresse_site']);
@@ -57,5 +66,3 @@ function inc_bank_editer_ticket_admin_dist($id_transaction, $sujet="Transaction 
 	$envoyer_mail = charger_fonction('envoyer_mail','inc');
 	$envoyer_mail($email,$sujet,$ticket,$email_from,$header);
 }
-
-?>
