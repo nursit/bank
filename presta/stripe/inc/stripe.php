@@ -82,7 +82,12 @@ function stripe_set_webhook($config) {
 				else {
 					if ($has_secret){
 						// Update endpoint
-						$set = ['url' => $url_endpoint, 'enabled_events' => is_array($endpoint->enabled_events) ? array_merge($event_endpoint, $endpoint->enabled_events) : $event_endpoint];
+						$new_events = (is_array($endpoint->enabled_events) ? array_merge($event_endpoint, $endpoint->enabled_events) : $event_endpoint);
+						// Stripe: * should be alone in the array
+						if (in_array("*", $new_events)) {
+							$new_events = [ "*" ];
+						}
+						$set = ['url' => $url_endpoint, 'enabled_events' => $new_events];
 					}
 					else {
 						$set = ['disabled' => true];
