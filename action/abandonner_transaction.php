@@ -24,9 +24,13 @@ function action_abandonner_transaction_dist($id_transaction=null){
 
 		sql_updateq('spip_transactions',array('statut'=>'abandon'),"id_transaction=".intval($id_transaction));
 
-		if ($row['id_panier']
-		  AND $abandonner_panier = charger_fonction('abandonner_panier','action',true)) {
-			$abandonner_panier($row['id_panier']);
+		if ($row['id_panier']){
+			if ($abandonner_panier = charger_fonction('abandonner_panier', 'action', true)){
+				$abandonner_panier($row['id_panier']);
+			}
+			elseif ($supprimer_panier = charger_fonction('supprimer_panier', 'action', true)){
+				$supprimer_panier($row['id_panier']);
+			}
 		}
 		if ($row['id_commande']
 		  AND $abandonner_commande = charger_fonction('abandonner_commande','action',true)) {
