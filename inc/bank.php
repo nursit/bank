@@ -321,7 +321,7 @@ function bank_porteur_email($transaction){
 	if (!$mail)
 		$mail = $GLOBALS['meta']['email_webmaster'];
 
-	return $mail;
+	return trim($mail);
 }
 
 /**
