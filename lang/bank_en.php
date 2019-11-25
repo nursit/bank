@@ -37,12 +37,14 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 // E
 	'erreur_aucun_moyen_paiement' => 'No payment method available',
+	'erreur_confirmer_montant_reglement_different' => 'Confirm that the amount is different from expected',
 	'erreur_transaction_echec' => 'No payment has been achieved. (Transaction Ref. @ref@)',
 	'erreur_transaction_invalide' => 'An error has occured due to unexpected received data.',
-	'explication_page_configurer_paiement' => 'Set up active payment systems',
 	'erreur_transaction_traitement_incomplet' => 'Processing of the payment for this transaction has been interrupted. Manual repair of database is required.',
 	'erreur_serveur_indisponible' => 'An error occured or the payment service is not answering.',
 	'erreur_ressayer_plus_tard' => 'Retry later',
+	'explication_enregistrer_reglement_montant' => 'Correct if not matching the effective paid amount',
+	'explication_page_configurer_paiement' => 'Set up active payment systems',
 
 // I
 	'info_aucune_transaction' => 'No transaction',
@@ -120,6 +122,7 @@ _ Bank account:
 	'label_email_reporting' => 'Send a daily report of payments to email',
 	'label_email_ticket_admin' => 'Target email for transaction tickets',
 	'label_enregistrer_reglement_reference' => 'Reference',
+	'label_enregistrer_reglement_montant' => 'Paid amount',
 	'label_filtre_statut_' => 'All',
 	'label_filtre_statut_ok' => 'OK',
 	'label_filtre_statut_commande' => 'Order',

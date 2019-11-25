@@ -16,16 +16,23 @@
 
 	<form method="post" action="#ENV{action}"><div>
 		#ACTION_FORMULAIRE{#ENV{action}}
-		<ul class="editer-groupe">
+		<div class="editer-groupe">
 			#SET{name,autorisation_id}#SET{obli,'obligatoire'}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
-	   <li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
-	     <label for="#GET{name}"><:bank:label_enregistrer_reglement_reference:></label>[
-	     <span class='erreur_message'>(#GET{erreurs})</span>
-	     ]<input type="text" name="#GET{name}" class="text email" value="#ENV*{#GET{name},#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']
-		   style="width:50%;"/>
-		   [<b>(#ENV{_autorisation_id_suffixe})</b>]
-	   </li>
-		</ul>
+			<div class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+				<label for="#GET{name}"><:bank:label_enregistrer_reglement_reference:></label>[
+				<span class='erreur_message'>(#GET{erreurs})</span>
+				]<input type="text" name="#GET{name}" class="text email" value="#ENV*{#GET{name},#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']
+				style="width:50%;"/>
+				[<b>(#ENV{_autorisation_id_suffixe})</b>]
+			</div>
+			#SET{name,montant}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+			<div class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+				<label for="#GET{name}"><:bank:label_enregistrer_reglement_montant:></label>[
+				<span class='erreur_message'>(#GET{erreurs})</span>
+				]<input type="text" name="#GET{name}" class="text email" value="#ENV*{#GET{name},#GET{defaut}}" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required'] />
+				<p class="explication"><:bank:explication_enregistrer_reglement_montant:></p>
+			</div>
+		</div>
 		<p class="boutons">
 			<input type="submit" name="enregistrer" class="submit" value="<:bank:bouton_enregistrer_reglement_ok|attribut_html:>" />
 		</p>

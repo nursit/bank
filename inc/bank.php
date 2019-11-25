@@ -614,7 +614,7 @@ function bank_transaction_echec($id_transaction,$args=array()){
  * @return array|bool
  */
 function bank_response_simple($mode, $c = null){
-	$vars = array('id_transaction','transaction_hash','autorisation_id','abo');
+	$vars = array('id_transaction','transaction_hash','autorisation_id','abo','montant');
 	$response = array();
 	foreach($vars as $k) {
 		if (!is_null($v = _request($k, $c)))
@@ -755,10 +755,20 @@ function bank_simple_call_response($config, $response=null){
 		}
 
 		// OK, on peut accepter le reglement
+		$montant_regle = $row['montant'];
+		if (isset($response['montant'])) {
+			$montant_regle = $response['montant'];
+		}
+		if ($montant_regle!=$row['montant']){
+			spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=".$row['montant'].":" . bank_shell_args($response), $mode);
+			// on log ca dans un journal dedie
+			spip_log($t,$mode . '_reglements_partiels');
+		}
+
 		$set = array(
 			"mode"=>"$mode/$config_id",
 			"autorisation_id"=>$autorisation,
-			"montant_regle"=>$row['montant'],
+			"montant_regle"=>$montant_regle,
 			"date_paiement"=>date('Y-m-d H:i:s'),
 			"statut"=>'ok',
 			"reglee"=>'oui'

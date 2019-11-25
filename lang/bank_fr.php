@@ -37,12 +37,14 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 
 // E
 	'erreur_aucun_moyen_paiement' => 'Aucun moyen de paiement n\'est disponible',
+	'erreur_confirmer_montant_reglement_different' => 'Confirmer que le règlement ne correspond pas au montant attendu',
 	'erreur_transaction_echec' => 'Aucun règlement n\'a été réalisé. (Transaction Ref. @ref@)',
 	'erreur_transaction_invalide' => 'Une erreur est survenue, les données reçues ne sont pas conformes.',
-	'explication_page_configurer_paiement' => 'Configurez les systèmes de paiement actifs',
 	'erreur_transaction_traitement_incomplet' => 'La prise en compte du paiement de cette transaction a été interrompue en cours de traitement. Une réparation manuelle de la base de données est nécessaire.',
 	'erreur_serveur_indisponible' => 'Une erreur est survenue ou le service de paiement ne réponds pas.',
 	'erreur_ressayer_plus_tard' => 'Ré-essayez dans quelques minutes',
+	'explication_enregistrer_reglement_montant' => 'Corriger si ne correspond pas au montant effectivement payé',
+	'explication_page_configurer_paiement' => 'Configurez les systèmes de paiement actifs',
 
 // I
 	'info_aucune_transaction' => 'Aucune transaction',
@@ -120,6 +122,7 @@ _ Compte bancaire :
 	'label_email_reporting' => 'Envoyer un reporting quotidien à l\'adresse mail',
 	'label_email_ticket_admin' => 'Email destinataire des tickets d\'achat',
 	'label_enregistrer_reglement_reference' => 'Reference',
+	'label_enregistrer_reglement_montant' => 'Montant réglé',
 	'label_filtre_statut_' => 'Toutes',
 	'label_filtre_statut_ok' => 'OK',
 	'label_filtre_statut_commande' => 'Cde',
