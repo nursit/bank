@@ -43,6 +43,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *   string cadeau_message : achat a l'attention d'une tierce personne
  *   string url_retour_ok : url de retour en cas de succes (par defaut spip.php?page=bank_retour_ok)
  *   string url_retour_echec : url de retour en cas d'echec (par defaut spip.php?page=bank_retour_echec)
+ *   string url_retour_attente : url de retour en de paiement async en attente (type virement/cheque) ave(par defaut spip.php?page=bank_retour_attente)
  *   string titre : titre eventuel du formulaire de paiement
  *
  * @return array|string
