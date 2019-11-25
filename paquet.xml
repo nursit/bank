@@ -1,10 +1,10 @@
 <paquet
 	prefix="bank"
 	categorie="outil"
-	version="4.1.5"
+	version="4.1.6"
 	etat="stable"
 	compatibilite="[3.1.0;3.3.*]"
-	logo="prive/themes/spip/images/credit-card-32.png"
+	logo="prive/themes/spip/images/bank-32.png"
 	documentation="http://contrib.spip.net/4627"
 	schema="1.6.5"
 >
@@ -13,6 +13,8 @@
 	<!-- Un module de paiement bancaire multi prestataires -->
 
 	<auteur lien="http://nursit.com">Nursit.com</auteur>
+	<credit lien="https://www.flaticon.com/authors/dinosoftlabs">Icon made by DinosoftLabs</credit>
+	<credit lien="https://www.flaticon.com/authors/smashicons">Icon made by Smashicons</credit>
 
 	<pipeline nom="autoriser" inclure="bank_autorisations.php" />
 	<pipeline nom="declarer_tables_interfaces" inclure="base/bank.php" />
@@ -39,6 +41,6 @@
 	<pipeline nom="trig_bank_reglement_en_attente" action="" />
 	<pipeline nom="trig_bank_reglement_en_echec" action="" />
 
-	<menu nom="configurer_bank" titre="bank:titre_menu_configurer" parent="menu_configuration" icone="images/credit-card-16.png" action="configurer_bank" />
-	<menu nom="transactions" titre="bank:titre_menu_transactions" parent="menu_activite" icone="images/credit-card-16.png" />
+	<menu nom="configurer_bank" titre="bank:titre_menu_configurer" parent="menu_configuration" icone="images/bank-16.png" action="configurer_bank" />
+	<menu nom="transactions" titre="bank:titre_menu_transactions" parent="menu_activite" icone="images/transactions-16.png" />
 </paquet>
