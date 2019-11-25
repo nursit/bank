@@ -34,16 +34,69 @@ function paybox_is_sandbox($config){
  * @return string
  */
 function paybox_url_host($config){
+	$mode = $config['presta'];
+	static $check_load_ok;
 	// mode sandbox ? possibilite de le forcer par define
 	if (paybox_is_sandbox($config)) {
 		return "https://preprod-tpeweb.paybox.com/";
 	}
 
-	$host = "https://tpeweb.paybox.com/";
-
-	// TODO : tester la dispo de https://tpeweb.paybox.com/load.html avec timeout faible
+	// tester la dispo de https://tpeweb.paybox.com/load.html avec timeout faible
 	// cf https://github.com/nursit/bank/issues/7
 	// else $host = "https://tpeweb1.paybox.com/";
+
+	if (is_null($check_load_ok)) {
+		// dans le doute on dit que c'est tpeweb
+		$check_load_ok = "https://tpeweb.paybox.com/";
+		// si on a curl_init, on test tpeweb puis tpeweb1, pour choisir celui qui est fonctionnel
+		if (function_exists('curl_init')) {
+			foreach (["https://tpeweb.paybox.com/", "https://tpeweb1.paybox.com/"] as $h){
+				$url = $h . "load.html";
+				//setting the curl parameters.
+				$ch = curl_init();
+				curl_setopt($ch, CURLOPT_URL, $url);
+				//curl_setopt($ch, CURLOPT_VERBOSE, 1);
+				curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
+
+				// un timeout court de 2s, car on veut pas attendre longtemps apres le serveur si jamais il est en indispo
+				curl_setopt($ch, CURLOPT_TIMEOUT_MS, 2000);
+
+				//turning off the server and peer verification(TrustManager Concept).
+				curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+				curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+				if (!defined('CURL_SSLVERSION_TLSv1_2')){
+					define('CURL_SSLVERSION_TLSv1_2', 6);
+				}
+				curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+
+				curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+				curl_setopt($ch, CURLOPT_HEADER, false);
+				curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
+				curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
+
+				$user_agent = "SPIP/Bank";
+				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: Close', "User-Agent: $user_agent"));
+
+				//getting response from server
+				$response = curl_exec($ch);
+				$erreur = curl_errno($ch);
+				// si pas d'erreur et si OK dans la reponse on retient ce host comme serveur de paiement
+				// si aucun serveur ne repond correctement sur /load.html c'est probablement notre connexion sortante qui est pas fonctionnelle
+				// dans ce cas on reste sur le serveur par defaut
+				if (!$erreur){
+					//closing the curl
+					curl_close($ch);
+					if ($response and strpos($response, "OK")!==false){
+						spip_log("Reponse OK pour $url, on choisit $h", $mode . _LOG_INFO_IMPORTANTE);
+						$check_load_ok = $h;
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	$host = $check_load_ok;
 
 	return $host;
 
