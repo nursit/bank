@@ -69,9 +69,9 @@
 					<span class='erreur_message'>(#GET{erreurs})</span>
 					]
 					<span class="action">
-						<button type="submit" name="action_up[#GET{casier}]" title="<:bank:bouton_monter|attribut_html:>" value="X">[(#CHEMIN_IMAGE{up-12.png}|balise_img{<:bank:bouton_monter:>})]</button>
-						<button type="submit" name="action_down[#GET{casier}]" title="<:bank:bouton_descendre|attribut_html:>" value="X">[(#CHEMIN_IMAGE{down-12.png}|balise_img{<:bank:bouton_descendre:>})]</button>
-						<button type="submit" name="action_del[#GET{casier}]" title="<:lien_supprimer|attribut_html:>" value="X"
+						<button type="submit" class="noscroll" name="action_up[#GET{casier}]" title="<:bank:bouton_monter|attribut_html:>" value="X">[(#CHEMIN_IMAGE{up-12.png}|balise_img{<:bank:bouton_monter:>})]</button>
+						<button type="submit" class="noscroll" name="action_down[#GET{casier}]" title="<:bank:bouton_descendre|attribut_html:>" value="X">[(#CHEMIN_IMAGE{down-12.png}|balise_img{<:bank:bouton_descendre:>})]</button>
+						<button type="submit" class="noscroll" name="action_del[#GET{casier}]" title="<:lien_supprimer|attribut_html:>" value="X"
 							onclick="return confirm('<:bank:texte_confirmer_suppression_presta|attribut_html|texte_script:>');"
 							>[(#CHEMIN_IMAGE{supprimer-12.png}|balise_img{<:lien_supprimer:>})]</button>
 					</span>
