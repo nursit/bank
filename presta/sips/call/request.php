@@ -97,6 +97,25 @@ function presta_sips_call_request_dist($id_transaction, $transaction_hash, $conf
 
 	include_spip("presta/sips/inc/sips");
 	$res = sips_request($service,$parm,$certif);
+
+	// intercepter les vieux logo.gif de SIPS et leur donner une occasion d'etre remplace par les .svg commun a tous
+	$logos = array();
+	foreach ($res as $k => $s) {
+		if (is_string($s)
+		  and preg_match_all(",src=\"[^\"]*/presta/sips/logo/(\w+)\.gif\",Uims", $s, $matches, PREG_SET_ORDER)) {
+
+			foreach ($matches as $m) {
+				$what = $m[1];
+				if (!isset($logos[$what])) {
+					$logos[$what] = bank_trouver_logo('sips', "{$what}.gif");
+				}
+				if ($logos[$what]) {
+					$res[$k] = str_replace($m[0],'src="' . $logos[$what] . '"', $res[$k]);
+				}
+			}
+		}
+	}
+
 	$res['service'] = $service;
 
 	return $res;
