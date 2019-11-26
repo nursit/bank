@@ -13,7 +13,7 @@
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 <B_cb>
 <div class='payer_mode payer_payzen payer_acte'>
-	<p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
+	<h4 class="titre h4"><:bank:payer_par_carte_bancaire:></h4>
 	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 	<BOUCLE_cb(POUR){tableau #ENV{hidden}}{cle !IN SDD,E_CV}>
@@ -25,7 +25,7 @@
 </B_cb>
 <B_sepa>
 <div class='payer_mode payer_payzen payer_sepa payer_acte'>
-	<p class="titre h4"><:bank:payer_par_prelevement_sepa:></p>
+	<h4 class="titre h4"><:bank:payer_par_prelevement_sepa:></h4>
 	[<p class="explication">(#ENV{config/presta}|concat{_sepa}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 	<BOUCLE_sepa(POUR){tableau #ENV{hidden}}{cle=SDD}>
@@ -37,7 +37,7 @@
 </B_sepa>
 <B_ecv>
 <div class='payer_mode payer_payzen payer_ecv payer_acte'>
-	<p class="titre h4"><:bank:payer_par_e_cheque_vacances:></p>
+	<h4 class="titre h4"><:bank:payer_par_e_cheque_vacances:></h4>
 	[<p class="explication">(#ENV{config/presta}|concat{_ecv}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 	<BOUCLE_ecv(POUR){tableau #ENV{hidden}}{cle=E_CVxx}>

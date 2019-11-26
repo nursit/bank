@@ -12,7 +12,7 @@
 ]#CACHE{0}
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 	<div class='payer_mode payer_[(#ENV{config/presta})] payer_acte' id='paiement_#ENV{config/presta}'>
-		<p class="titre h4"><:bank:payer_par_carte_bancaire:></p>
+		<h4 class="titre h4"><:bank:payer_par_carte_bancaire:></h4>
 		[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 		<div class='boutons'>
 		<form action="#ENV{action}" method="post" class="noajax">
