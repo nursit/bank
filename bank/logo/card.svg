@@ -1,0 +1,33 @@
+<svg
+	width="58"
+	height="35"
+	viewBox="8 5.5 58 35"
+	xmlns="http://www.w3.org/2000/svg">
+	<g transform="scale(1.1 1.075) translate(-3.5 -1.5)">
+		<g transform="translate(2.45 -0.35)">
+			<rect fill="#f7941d" height="26" rx="4" width="42" x="19" y="7"/>
+			<path d="m39 33h18a4 4 0 0 0 4-4v-18c0 15.477-6.523 22-22 22z" fill="#d88219"/>
+			<path d="m21 15h40v4h-40z" fill="#58595b"/>
+		</g>
+		<g transform="translate(-2.25 0.15)">
+			<rect fill="#d1d3d4" height="26" rx="4" width="42" x="13" y="13"/>
+			<circle cx="46" cy="32" fill="#f7941d" r="3"/>
+			<path d="m23 23h2a2 2 0 0 0 2-2v-1h-4z" fill="#ee8700"/>
+			<path d="m27 20v-1a2 2 0 0 0 -2-2h-2v3z" fill="#ffb655"/>
+			<path d="m21 23h2v-6h-2a2 2 0 0 0 -2 2v2a2 2 0 0 0 2 2z" fill="#ff9811"/>
+			<path d="m33 39h18a4 4 0 0 0 4-4v-18c0 15.477-6.523 22-22 22z" fill="#bcbec0"/>
+			<circle cx="41" cy="32" fill="#f15a29" r="3"/>
+			<g fill="#a7a9ac">
+				<path d="m40 18h2v4h-2z"/>
+				<path d="m44 18h2v4h-2z"/>
+				<path d="m36 18h2v4h-2z"/>
+				<path d="m48 18h2v4h-2z"/>
+				<path d="m18 34h14v2h-14z"/>
+				<path d="m18 31h2v2h-2z"/>
+				<path d="m22 31h2v2h-2z"/>
+				<path d="m26 31h2v2h-2z"/>
+				<path d="m30 31h2v2h-2z"/>
+			</g>
+		</g>
+	</g>
+</svg>
