@@ -30,6 +30,7 @@ function presta_stripe_payer_acte_dist($config, $id_transaction, $transaction_ha
 
 	$contexte['sandbox'] = ($config['mode_test']?' ':'');
 	$contexte['config'] = $config;
+	$contexte['logo'] = bank_trouver_logo("stripe","CARD.gif");
 
 	$contexte = array_merge($options, $contexte);
 

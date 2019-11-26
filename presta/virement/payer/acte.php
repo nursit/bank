@@ -38,7 +38,7 @@ function presta_virement_payer_acte_dist($config, $id_transaction, $transaction_
 	}
 	$contexte['action'] = $action;
 	$contexte['config'] = $config;
-	$contexte['logo'] = bank_trouver_logo("virement","virement.png");
+	$contexte['logo'] = bank_trouver_logo("virement","VIREMENT.gif");
 
 	$contexte = array_merge($options, $contexte);
 

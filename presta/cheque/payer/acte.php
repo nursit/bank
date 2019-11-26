@@ -36,7 +36,7 @@ function presta_cheque_payer_acte_dist($config,$id_transaction,$transaction_hash
 	}
 	$contexte['action'] = $action;
 	$contexte['config'] = $config;
-	$contexte['logo'] = bank_trouver_logo("cheque","cheque.png");
+	$contexte['logo'] = bank_trouver_logo("cheque","CHEQUE.gif");
 
 	$contexte = array_merge($options, $contexte);
 
