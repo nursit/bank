@@ -18,7 +18,7 @@
 		<form action="#ENV{action}" method="post" class="noajax">
 		[(#ENV**{hidden})]
 		[(#SET{prestaup,[(#ENV{config/presta}|strtoupper)]})]
-		[(#SET{texte,#VAL{bank:payer_avec}|_T{#ARRAY{nom,#GET{prestaup}}}})]
+		[(#SET{texte,#VAL{bank:payer_par_carte_bancaire}|_T{#ARRAY{nom,#GET{prestaup}}}})]
 		<button class="submit" type="submit" title="[(#GET{texte}|attribut_html)]">
 			[(#ENV{logo}
 				|balise_img{#GET{texte}}
