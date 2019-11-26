@@ -1,0 +1,31 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+		 xmlns:xlink="http://www.w3.org/1999/xlink"
+		 width="58"
+		 height="35"
+		 viewBox="-5 0 63 38.01">
+	<defs>
+		<style>.cls-1{fill:url(#linear-gradient);}</style>
+		<linearGradient id="linear-gradient"
+										x1="58" y1="0" x2="0" y2="55"
+										gradientTransform="rotate(-17)"
+										gradientUnits="userSpaceOnUse">
+			<stop offset="0" stop-color="#001549"/>
+			<stop offset="0.15" stop-color="#023e78"/>
+			<stop offset="0.30" stop-color="#00538b"/>
+			<stop offset="0.45" stop-color="#026396"/>
+			<stop offset="0.60" stop-color="#007195"/>
+			<stop offset="0.70" stop-color="#009499"/>
+			<stop offset="0.80" stop-color="#00988e"/>
+			<stop offset="0.90" stop-color="#009973"/>
+			<stop offset="1" stop-color="#009440"/>
+		</linearGradient>
+	</defs>
+	<rect class="cls-1" x="-5" width="63" height="39.29"/>
+	<path fill="#ffffff"
+				d="M17.94,28.54H29.37c-.1-2.26-.68-4.59-2.43-6.08C24.87,20.68,21.22,20,18,20s-7.14.73-9.23,2.64C6.93,24.3,6.54,27,6.54,29.33s.76,5.39,2.72,7.07,5.45,2.25,8.71,2.25,6.58-.53,8.65-2.22,2.78-4.53,2.78-7.09H17.94Z"
+				transform="translate(-1.56 -9.77)"/>
+	<path fill="#ffffff" d="M30.14,29.32v8.91H46.05a4.4,4.4,0,0,0,4.18-4.39,4.51,4.51,0,0,0-4.18-4.51H30.14Z"
+				transform="translate(-1.56 -9.77)"/>
+	<path fill="#ffffff" d="M49.94,24.46a4,4,0,0,0-4.07-4.07c-.16,0-.35,0-.5,0H30.14v8.17h16A4.1,4.1,0,0,0,49.94,24.46Z"
+				transform="translate(-1.56 -9.77)"/>
+</svg>
