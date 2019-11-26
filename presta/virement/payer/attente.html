@@ -12,7 +12,7 @@
 ]#CACHE{0}
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
   <div class="payer_mode payer_virement payer_acte">
-    <p class="titre h4"><:bank:payer_par_virement:></p>
+    <h4 class="titre h4"><:bank:payer_par_virement:></h4>
 	    #SET{ordre,#ENV{config/ordre,#NOM_SITE_SPIP}|wrap{'<b>'}}
 			#SET{montant,#MONTANT|affiche_monnaie|wrap{'<b>'}}
 			#SET{transaction,#ID_TRANSACTION|wrap{'<b>'}}

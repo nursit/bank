@@ -15,8 +15,7 @@
 	  <h4 class="titre h4"><:bank:payer_par_carte_bancaire:></h4>
 	  [<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	  <div class='boutons'>
-		  [(#SET{id,[acte(#ID_TRANSACTION)]})]
-		  [(#SET{texte,<:bank:payer_par_carte_bancaire:>})]
+		  [(#SET{id,[acte(#ID_TRANSACTION)]})][(#SET{texte,<:bank:payer_par_carte_bancaire:>})]
 		  [(#BOUTON_ACTION{[(#ENV{logo}|bank_label_bouton_img_ou_texte{#GET{texte}})],#ENV*{action},stripe_button_#GET{id},'','',[stripe_button_(#GET{id})_callback\(\)]})]
 		  [<script src="https://js.stripe.com/v3/"></script>
 		  <script type="text/javascript">(#INCLURE{fond=presta/stripe/payer/inc-checkout-js,env,id=#GET{id}}|compacte{js})</script>]
