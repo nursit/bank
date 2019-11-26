@@ -107,7 +107,8 @@ function bank_titre_type_paiement($mode, $id_transaction=0){
  * @return string
  */
 function bank_label_payer_par_carte($code_carte){
-	$carte = _T('bank:label_carte_'.$code_carte,array(),array('force'=>false));
+	$id = str_replace(" ", "_", strtoupper($code_carte));
+	$carte = _T('bank:label_carte_'.$id,array(),array('force'=>false));
 	if (!$carte){
 		#var_dump($code_carte);
 		$carte = $code_carte;
