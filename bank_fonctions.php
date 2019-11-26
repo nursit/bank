@@ -75,6 +75,24 @@ function balise_GERER_ABONNEMENT_dist($p){
 	return $p;
 }
 
+
+/**
+ * Markup HTML pour le contenu des boutons qui peuvent afficher soit un logo, soit du texte
+ * 
+ * @param $logo
+ * @param $texte
+ * @return string
+ */
+function bank_label_bouton_img_ou_texte($logo, $texte) {
+	if (!$logo) {
+		return $texte;
+	}
+	$balise_img = chercher_filtre('balise_img');
+	$img = $balise_img($logo, $texte, 'logo');
+	$img = inserer_attribut($img, 'title', $texte);
+	return $img . " <span class='texte'>$texte</span>";
+}
+
 /**
  * Une fonction pour expliciter le mode de paiement en fonction du prestataire bancaire
  * par defaut c'est Carte Bancaire

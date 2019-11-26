@@ -19,12 +19,7 @@
 		[(#ENV**{hidden})]
 		[(#SET{prestaup,[(#ENV{config/presta}|strtoupper)]})]
 		[(#SET{texte,#VAL{bank:payer_par_carte_bancaire}|_T{#ARRAY{nom,#GET{prestaup}}}})]
-		<button class="submit" type="submit" title="[(#GET{texte}|attribut_html)]">
-			[(#ENV{logo}
-				|balise_img{#GET{texte}}
-				|inserer_attribut{title,#GET{texte}}
-				|sinon{#GET{texte}})]
-		</button>
+		<button class="submit" type="submit" title="[(#GET{texte}|attribut_html)]">[(#ENV{logo}|bank_label_bouton_img_ou_texte{#GET{texte}})]</button>
 		</form></div>
 		[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=#GET{prestaup}}:></div>]
 	</div>

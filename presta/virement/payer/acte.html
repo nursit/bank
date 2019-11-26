@@ -34,10 +34,7 @@
 		  ]
 		  [(#SET{texte,<:bank:bouton_enregistrer_reglement_virement:>})]
 			<div class='boutons'>
-			[(#BOUTON_ACTION{[(#ENV{logo}
-								|balise_img{#GET{texte}}
-								|inserer_attribut{title,#GET{texte}}
-								|sinon{#GET{texte}})],#ENV*{action}})]
+			[(#BOUTON_ACTION{[(#ENV{logo}|bank_label_bouton_img_ou_texte{#GET{texte}})],#ENV*{action}})]
 			</div>
 
     ]
