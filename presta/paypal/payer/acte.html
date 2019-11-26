@@ -16,7 +16,7 @@
 	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 		<form action="#ENV{action}" method="post" class="noajax">
-			<button type="submit" title="<:bank:payer_avec{nom=Paypal}|attribut_html:>">[(#ENV{logo}|balise_img{<:bank:payer_avec{nom=Paypal}:>})]</button>
+			<button type="submit" class="submit" title="<:bank:payer_avec{nom=Paypal}|attribut_html:>">[(#ENV{logo}|balise_img{<:bank:payer_avec{nom=Paypal}:>})]</button>
 			<div>
 				<input type="hidden" name="charset" value="#CHARSET" />
 				<input type="hidden" name="cmd" value="_xclick" />
