@@ -66,7 +66,6 @@ function systempay_available_cards($config){
 		'CB'=>"CB.gif",
 		'VISA'=>"VISA.gif",
 		'MASTERCARD'=>"MASTERCARD.gif",
-		'E-CARTEBLEUE' => "E-CB.gif",
 		'AMEX' => "AMEX.gif",
 	);
 

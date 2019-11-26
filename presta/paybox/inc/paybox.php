@@ -115,7 +115,6 @@ function paybox_available_cards($config){
 		'EUROCARD_MASTERCARD'=>'MASTERCARD.gif',
 	);
 	if ($config['type']!=='abo'){
-		$cartes_possibles['E_CARD']='E-CB.gif';
 		$cartes_possibles['AMEX']='AMEX.gif';
 		$cartes_possibles['AURORE']='AURORE.gif';
 	}
