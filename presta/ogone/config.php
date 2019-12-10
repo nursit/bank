@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 /* Ogone ------------------------------------------------------------------ */
 
@@ -41,6 +43,6 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 function ogone_lister_cartes_config($c){
 	include_spip('inc/bank');
 	include_spip("presta/ogone/inc/ogone");
-	$config = array('presta'=>'ogone');
+	$config = array('presta' => 'ogone');
 	return ogone_available_cards($config);
 }

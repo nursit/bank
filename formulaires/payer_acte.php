@@ -7,10 +7,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 /**
  * @param string $montant
@@ -18,16 +20,16 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *
  * Exemple d'utilisation dans une boucle commande :
  * ```
- * 		<BOUCLE_commande(COMMANDES){id_commande}>
- *	      <h1>Commande ##ID_COMMANDE  - Ref #REFERENCE</h1>
- *	      [(#FORMULAIRE_PAYER_ACTE{#PRIX*,
- *		      #ARRAY{
- *			      montant_ht,PRIX_HT*,
- *			      id_commande,#ID_COMMANDE,
- *			      id_auteur,#ID_AUTEUR,
- *		      }
- *	      })]
- *		</BOUCLE_commande>
+ *    <BOUCLE_commande(COMMANDES){id_commande}>
+ *        <h1>Commande ##ID_COMMANDE  - Ref #REFERENCE</h1>
+ *        [(#FORMULAIRE_PAYER_ACTE{#PRIX*,
+ *          #ARRAY{
+ *            montant_ht,PRIX_HT*,
+ *            id_commande,#ID_COMMANDE,
+ *            id_auteur,#ID_AUTEUR,
+ *          }
+ *        })]
+ *    </BOUCLE_commande>
  * ```
  *
  * @param array $options
@@ -48,7 +50,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *
  * @return array|string
  */
-function formulaires_payer_acte_charger_dist($montant,$options = array()){
+function formulaires_payer_acte_charger_dist($montant, $options = array()){
 
 	// securite antibot : on ne veut pas que les bots generent des transactions
 	// ni ne provoquent d'acces en base pour rien
@@ -68,19 +70,19 @@ function formulaires_payer_acte_charger_dist($montant,$options = array()){
 		'champs' => array(),
 	);
 	// a-t-on un champ identifiant pour recyler une transaction en attente ?
-	foreach (array('id_auteur','auteur_id','auteur','id_panier','id_commande') as $var){
+	foreach (array('id_auteur', 'auteur_id', 'auteur', 'id_panier', 'id_commande') as $var){
 		if (isset($options[$var])){
 			$opts['force'] = false;
 		}
 	}
 	// les champs attendus par defaut
-	foreach (array('montant_ht','id_auteur','auteur_id','auteur','parrain','tracking_id') as $var){
+	foreach (array('montant_ht', 'id_auteur', 'auteur_id', 'auteur', 'parrain', 'tracking_id') as $var){
 		if (isset($options[$var])){
 			$opts[$var] = $options[$var];
 		}
 	}
 	// les champs optionnels supplementaires
-	foreach (array('id_panier','id_commande','cadeau_email','cadeau_message') as $var){
+	foreach (array('id_panier', 'id_commande', 'cadeau_email', 'cadeau_message') as $var){
 		if (isset($options[$var])){
 			$opts['champs'][$var] = $options[$var];
 		}
@@ -88,7 +90,7 @@ function formulaires_payer_acte_charger_dist($montant,$options = array()){
 
 	// url de retour ok, echec ?
 	$url_retour = array();
-	foreach (array('url_retour_ok','url_retour_echec','url_retour_attente') as $var){
+	foreach (array('url_retour_ok', 'url_retour_echec', 'url_retour_attente') as $var){
 		if (isset($options[$var])){
 			$url_retour[$var] = $options[$var];
 		}
@@ -98,8 +100,8 @@ function formulaires_payer_acte_charger_dist($montant,$options = array()){
 	}
 
 	// ok on recupere la transaction
-	$inserer_transaction = charger_fonction("inserer_transaction","bank");
-	$id_transaction = $inserer_transaction($montant,$opts);
+	$inserer_transaction = charger_fonction("inserer_transaction", "bank");
+	$id_transaction = $inserer_transaction($montant, $opts);
 
 	// si pas de transaction cree, on retourne une erreur
 	if (!$id_transaction){
@@ -110,8 +112,9 @@ function formulaires_payer_acte_charger_dist($montant,$options = array()){
 	$valeurs = array(
 		'id_transaction' => $id_transaction,
 	);
-	if (isset($options['titre']))
+	if (isset($options['titre'])){
 		$valeurs['title'] = $options['titre'];
+	}
 
 	return $valeurs;
 }

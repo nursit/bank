@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2014 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 /**
  * Retour de la demande de paiement chez PaypalExpress
@@ -37,12 +39,12 @@ function presta_paypalexpress_call_response($config, $response = null){
 	$token = urlencode(_request('token'));
 	$id_transaction = intval($_SESSION['id_transaction']);
 
-	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
+	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction))){
 
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => $mode,
-				'log' => var_export($_REQUEST,true).var_export($_SESSION,true),
+				'log' => var_export($_REQUEST, true) . var_export($_SESSION, true),
 				'erreur' => 'donnees Paypal non conformes',
 			)
 		);
@@ -56,8 +58,8 @@ function presta_paypalexpress_call_response($config, $response = null){
 
 	// pas la peine de faire un call Paypal si Cancel
 	if ($token
-	  AND _request('action')!=='bank_cancel'
-	  AND !defined('_BANK_CANCEL_TRANSACTION')){
+		AND _request('action')!=='bank_cancel'
+		AND !defined('_BANK_CANCEL_TRANSACTION')){
 		/* Make the API call and store the results in an array.  If the
 		call was a success, show the authorization details, and provide
 		an action to complete the payment.  If failed, show the error
@@ -72,10 +74,10 @@ function presta_paypalexpress_call_response($config, $response = null){
 	if ($ack=="SUCCESS"
 		AND isset($resArray["PAYERID"])
 		AND isset($resArray["EMAIL"])
-	  AND $resArray["PAYERID"]==_request('PayerID')){
+		AND $resArray["PAYERID"]==_request('PayerID')){
 
 		$url = $_SESSION['paypalexpress_url_confirm'];
-		$url_checkout = generer_action_auteur('paypalexpress_checkoutpayment', $resArray["PAYERID"]."-".$mode."-".bank_config_id($config));
+		$url_checkout = generer_action_auteur('paypalexpress_checkoutpayment', $resArray["PAYERID"] . "-" . $mode . "-" . bank_config_id($config));
 		$url = parametre_url($url, 'checkout', $url_checkout, '&');
 
 		$resume = "Paiement par compte Paypal : <br/>" . $resArray['FIRSTNAME'] . ' ' . $resArray['LASTNAME'] . "," . $resArray['EMAIL'];
@@ -88,16 +90,17 @@ function presta_paypalexpress_call_response($config, $response = null){
 		// et va rafficher la commande avec un bouton de validation de paiement
 		include_spip("inc/headers");
 		redirige_par_entete($url);
-	}
-	else {
-	 	// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
-	 	if ($row['reglee']=='oui') return array($id_transaction,true);
+	} else {
+		// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
+		if ($row['reglee']=='oui'){
+			return array($id_transaction, true);
+		}
 
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
 				'config_id' => bank_config_id($config),
-				'log' => var_export($_REQUEST,true).var_export($_SESSION['reshash'],true),
+				'log' => var_export($_REQUEST, true) . var_export($_SESSION['reshash'], true),
 				'erreur' => $ack,
 				'where' => 'GetExpressCheckoutDetails'
 			)

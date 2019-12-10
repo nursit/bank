@@ -5,7 +5,7 @@
  *
  * Auteurs :
  * Cedric Morin, Yterium.com
- * (c) 2007-2009 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
 
@@ -19,7 +19,7 @@ include_spip('inc/date');
  * @param null|array $response
  * @return array
  */
-function presta_sips_call_response_dist($config, $response=null){
+function presta_sips_call_response_dist($config, $response = null){
 
 	include_spip('inc/bank');
 	$mode = $config['presta'];
@@ -34,7 +34,7 @@ function presta_sips_call_response_dist($config, $response=null){
 		$response = sips_response($service, $merchant_id, $certif);
 	}
 
-	if ($response['merchant_id']!==$merchant_id) {
+	if ($response['merchant_id']!==$merchant_id){
 		return bank_transaction_invalide(0,
 			array(
 				'mode' => $mode,

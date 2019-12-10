@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('inc/bank');
 
@@ -21,8 +23,8 @@ include_spip('inc/bank');
 function paybox_is_sandbox($config){
 	$test = false;
 	// _PAYBOX_SANDBOX force a TRUE pour utiliser l'adresse de test de CMCIC
-	if ( (defined('_PAYBOX_SANDBOX') AND _PAYBOX_SANDBOX)
-	  OR (isset($config['mode_test']) AND $config['mode_test']) ){
+	if ((defined('_PAYBOX_SANDBOX') AND _PAYBOX_SANDBOX)
+		OR (isset($config['mode_test']) AND $config['mode_test'])){
 		$test = true;
 	}
 	return $test;
@@ -37,7 +39,7 @@ function paybox_url_host($config){
 	$mode = $config['presta'];
 	static $check_load_ok;
 	// mode sandbox ? possibilite de le forcer par define
-	if (paybox_is_sandbox($config)) {
+	if (paybox_is_sandbox($config)){
 		return "https://preprod-tpeweb.paybox.com/";
 	}
 
@@ -45,11 +47,11 @@ function paybox_url_host($config){
 	// cf https://github.com/nursit/bank/issues/7
 	// else $host = "https://tpeweb1.paybox.com/";
 
-	if (is_null($check_load_ok)) {
+	if (is_null($check_load_ok)){
 		// dans le doute on dit que c'est tpeweb
 		$check_load_ok = "https://tpeweb.paybox.com/";
 		// si on a curl_init, on test tpeweb puis tpeweb1, pour choisir celui qui est fonctionnel
-		if (function_exists('curl_init')) {
+		if (function_exists('curl_init')){
 			foreach (["https://tpeweb.paybox.com/", "https://tpeweb1.paybox.com/"] as $h){
 				$url = $h . "load.html";
 				//setting the curl parameters.
@@ -110,13 +112,13 @@ function paybox_url_host($config){
 function paybox_available_cards($config){
 
 	$cartes_possibles = array(
-		'CB'=>'CB.gif',
-		'VISA'=>'VISA.gif',
-		'EUROCARD_MASTERCARD'=>'MASTERCARD.gif',
+		'CB' => 'CB.gif',
+		'VISA' => 'VISA.gif',
+		'EUROCARD_MASTERCARD' => 'MASTERCARD.gif',
 	);
 	if ($config['type']!=='abo'){
-		$cartes_possibles['AMEX']='AMEX.gif';
-		$cartes_possibles['AURORE']='AURORE.gif';
+		$cartes_possibles['AMEX'] = 'AMEX.gif';
+		$cartes_possibles['AURORE'] = 'AURORE.gif';
 	}
 
 	return $cartes_possibles;
@@ -128,7 +130,7 @@ function paybox_available_cards($config){
  * @return string
  */
 function paybox_url_paiment($config){
-	return paybox_url_host($config)."cgi/MYchoix_pagepaiement.cgi";
+	return paybox_url_host($config) . "cgi/MYchoix_pagepaiement.cgi";
 }
 
 /**
@@ -137,7 +139,7 @@ function paybox_url_paiment($config){
  * @return string
  */
 function paybox_url_resil($config){
-	return paybox_url_host($config)."cgi-bin/ResAbon.cgi";
+	return paybox_url_host($config) . "cgi-bin/ResAbon.cgi";
 }
 
 /**
@@ -164,8 +166,9 @@ function paybox_shell_args($params){
  */
 function paybox_form_hidden($params){
 
-	if (isset($params['PBX_HMAC_KEY']) AND !trim($params['PBX_HMAC_KEY']))
+	if (isset($params['PBX_HMAC_KEY']) AND !trim($params['PBX_HMAC_KEY'])){
 		unset($params['PBX_HMAC_KEY']);
+	}
 
 	if (paybox_is_sandbox($params) AND isset($params['PBX_HMAC_KEY_test'])){
 		$params['PBX_HMAC_KEY'] = $params['PBX_HMAC_KEY_test'];
@@ -180,11 +183,13 @@ function paybox_form_hidden($params){
 		$key = trim($params['PBX_HMAC_KEY']);
 		unset($params['PBX_HMAC_KEY']);
 
-		if (isset($params['DIRECT_PLUS_CLE']))
+		if (isset($params['DIRECT_PLUS_CLE'])){
 			unset($params['DIRECT_PLUS_CLE']);
+		}
 
-		if (!isset($params['PBX_TIME']))
+		if (!isset($params['PBX_TIME'])){
 			$params['PBX_TIME'] = date("c");
+		}
 
 		// On calcule l?empreinte (a renseigner dans le parametre PBX_HMAC) grace a la fonction hash_hmac et
 		// la cle binaire
@@ -195,8 +200,8 @@ function paybox_form_hidden($params){
 		$hash_method = "sha512";
 		if (function_exists("hash_algos")){
 			$algos = hash_algos();
-			foreach(array("sha512","sha256","sha1","md5") as $method){
-				if (in_array($method,$algos)){
+			foreach (array("sha512", "sha256", "sha1", "md5") as $method){
+				if (in_array($method, $algos)){
 					$hash_method = $method;
 					break;
 				}
@@ -208,13 +213,13 @@ function paybox_form_hidden($params){
 		// On cree la chaine a hacher sans URLencodage
 		$message = array();
 		$params_att = array();
-		foreach($params as $k=>$v){
-			if (strncmp($k,"PBX_",4)==0){
-				$params_att[$k] = str_replace('"','&#034;', $v);
-				$message[] = "$k=".$params_att[$k];
+		foreach ($params as $k => $v){
+			if (strncmp($k, "PBX_", 4)==0){
+				$params_att[$k] = str_replace('"', '&#034;', $v);
+				$message[] = "$k=" . $params_att[$k];
 			}
 		}
-		$message = implode("&",$message);
+		$message = implode("&", $message);
 
 		// la cle secrete HMAC
 		// Si la cle est en ASCII, On la transforme en binaire
@@ -229,19 +234,19 @@ function paybox_form_hidden($params){
 		// ATTENTION : l'ordre des champs est extremement important, il doit
 		// correspondre exactement a l'ordre des champs dans la chaine hachee
 		$hidden = array();
-		foreach($params_att as $k=>$v){
+		foreach ($params_att as $k => $v){
 			$hidden[] = "<input type=\"hidden\" name=\"$k\" value=\"$v\" />";
 		}
-		$hidden = implode("\n",$hidden);
+		$hidden = implode("\n", $hidden);
 		return $hidden;
 	}
 
 	// sinon methode encodage par binaire
 	// depreciee mais permet transition en douceur et iso-fonctionnelle
-	$paybox_exec_request = charger_fonction("exec_request","presta/paybox");
+	$paybox_exec_request = charger_fonction("exec_request", "presta/paybox");
 	$hidden = $paybox_exec_request($params);
 	// modulev2.cgi injecte une balise Form dont on ne veut pas ici
-	$hidden = preg_replace(",<form[^>]*>,Uims","",$hidden);
+	$hidden = preg_replace(",<form[^>]*>,Uims", "", $hidden);
 	return $hidden;
 }
 
@@ -260,47 +265,46 @@ function paybox_response($response = 'response'){
 		// on peut y ajouter un &var_replay_date=2016-03-25 pour prendre en compte cette date
 		// de transaction/paiement
 		if (_request('var_replay_date')){
-			$vars = preg_replace(',&var_replay_date=.*$,','',$vars);
+			$vars = preg_replace(',&var_replay_date=.*$,', '', $vars);
 			// $_SERVER['REQUEST_TIME'] sera modifie plus bas, une fois que la signature aura ete verifiee
 		}
 
 		// enlever la signature des data
-		$vars = preg_replace(',&sign=.*$,','',$vars);
+		$vars = preg_replace(',&sign=.*$,', '', $vars);
 
 		// une variante sans &action=...
 		// car l'autoresponse ne la prend pas en compte, mais la response directe la prend en compte
 		// $vars1 = preg_replace(',^[^?]*?page=[^&]*&,','',$vars);
-		$vars1 = preg_replace(',^[^?]*?action=[^&]*&,','',$vars);
-		$vars1 = preg_replace(',^[^?]*?bankp=[^&]*&,','',$vars1);
+		$vars1 = preg_replace(',^[^?]*?action=[^&]*&,', '', $vars);
+		$vars1 = preg_replace(',^[^?]*?bankp=[^&]*&,', '', $vars1);
 
 		// recuperer la cle publique Paybox
 		// on utilise find_in_path pour permettre surcharge au cas ou la cle changerait
 		$pubkey = "";
 		if ($keyfile = find_in_path("presta/paybox/inc/pubkey.pem")){
-			lire_fichier($keyfile,$pubkey);
+			lire_fichier($keyfile, $pubkey);
 		}
 		// verifier la signature avec $vars ou $vars1
 		if (!$pubkey
-		  OR !$cle = openssl_pkey_get_public($pubkey)
-			OR !(openssl_verify( $vars, $sign, $cle ) OR openssl_verify($vars1, $sign, $cle))
+			OR !$cle = openssl_pkey_get_public($pubkey)
+			OR !(openssl_verify($vars, $sign, $cle) OR openssl_verify($vars1, $sign, $cle))
 		){
 			bank_transaction_invalide(0,
 				array(
-					'mode'=>"paybox",
+					'mode' => "paybox",
 					'erreur' => "signature invalide",
-					'log' => var_export($url,true)
+					'log' => var_export($url, true)
 				)
 			);
 			return false;
 		}
-	}
-	else {
+	} else {
 		if (!_request('sign')){
 			bank_transaction_invalide(0,
 				array(
-					'mode'=>"paybox",
+					'mode' => "paybox",
 					'erreur' => "reponse sans signature",
-					'log' => var_export($url,true)
+					'log' => var_export($url, true)
 				)
 			);
 			return false;
@@ -308,15 +312,15 @@ function paybox_response($response = 'response'){
 		// on ne sait pas verifier la signature, on laisse passer mais on mail le webmestre
 		bank_transaction_invalide(0,
 			array(
-				'mode'=>"paybox",
+				'mode' => "paybox",
 				'erreur' => "Impossible de verifier la signature, fonction openssl_pkey_get_public inconnue",
-				'log' => var_export($url,true),
+				'log' => var_export($url, true),
 				'sujet' => 'Paiement non securise',
 			)
 		);
 	}
 
-	parse_str($url['query'],$response);
+	parse_str($url['query'], $response);
 	unset($response['page']);
 	unset($response['sign']);
 
@@ -335,17 +339,19 @@ function paybox_response($response = 'response'){
  * @param array $response
  * @return array
  */
-function paybox_traite_reponse_transaction($config, $response) {
+function paybox_traite_reponse_transaction($config, $response){
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
 	$config_id = bank_config_id($config);
 
 	// $response['id_transaction'] Peut contenir /email ou IBSxx... en cas d'abo
 	$id_transaction = intval($response['id_transaction']);
-	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
+	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction))){
 		return bank_transaction_invalide($id_transaction,
 			array(
-				'mode'=>$mode,
+				'mode' => $mode,
 				'erreur' => "transaction inconnue",
 				'log' => paybox_shell_args($response)
 			)
@@ -353,14 +359,14 @@ function paybox_traite_reponse_transaction($config, $response) {
 	}
 
 	// ok, on traite le reglement
-	$date=$_SERVER['REQUEST_TIME'];
+	$date = $_SERVER['REQUEST_TIME'];
 	$date_paiement = sql_format_date(
-	date('Y',$date), //annee
-	date('m',$date), //mois
-	date('d',$date), //jour
-	date('H',$date), //Heures
-	date('i',$date), //min
-	date('s',$date) //sec
+		date('Y', $date), //annee
+		date('m', $date), //mois
+		date('d', $date), //jour
+		date('H', $date), //Heures
+		date('i', $date), //min
+		date('s', $date) //sec
 	);
 
 	$erreur = paybox_response_code($response['erreur']);
@@ -368,12 +374,14 @@ function paybox_traite_reponse_transaction($config, $response) {
 	$transaction = $response['trans'];
 
 	if (!$transaction
-	 OR !$authorisation_id
+		OR !$authorisation_id
 //	 OR $authorisation_id=='XXXXXX'
-	 OR $erreur!==true){
-	 	// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
-	 	if ($row['reglee']=='oui') return array($id_transaction,true);
-	 	// sinon enregistrer l'absence de paiement et l'erreur
+		OR $erreur!==true){
+		// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
+		if ($row['reglee']=='oui'){
+			return array($id_transaction, true);
+		}
+		// sinon enregistrer l'absence de paiement et l'erreur
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
@@ -382,7 +390,7 @@ function paybox_traite_reponse_transaction($config, $response) {
 				'code_erreur' => $response['erreur'],
 				'erreur' => $erreur,
 				'log' => paybox_shell_args($response),
-				'send_mail' => in_array($response['erreur'],array(3,6))?true:false,
+				'send_mail' => in_array($response['erreur'], array(3, 6)) ? true : false,
 			)
 		);
 	}
@@ -392,33 +400,35 @@ function paybox_traite_reponse_transaction($config, $response) {
 	// on verifie que le montant est bon !
 	$montant_regle = $response['montant']/100;
 	if ($montant_regle!=$row['montant']){
-		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=".$row['montant'].":".paybox_shell_args($response),$mode);
+		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=" . $row['montant'] . ":" . paybox_shell_args($response), $mode);
 		// on log ca dans un journal dedie
-		spip_log($t,$mode . '_reglements_partiels');
+		spip_log($t, $mode . '_reglements_partiels');
 	}
 
 	$set = array(
-			"autorisation_id"=>"$transaction/$authorisation_id",
-			"mode"=>"$mode/$config_id",
-			"montant_regle"=>$montant_regle,
-			"date_paiement"=>$date_paiement,
-			"statut"=>'ok',
-			"reglee"=>'oui');
+		"autorisation_id" => "$transaction/$authorisation_id",
+		"mode" => "$mode/$config_id",
+		"montant_regle" => $montant_regle,
+		"date_paiement" => $date_paiement,
+		"statut" => 'ok',
+		"reglee" => 'oui');
 
 
 	// type et numero de carte ?
 	if (isset($response['carte']) OR isset($response['BIN6'])){
 		// par defaut on note carte et BIN6 dans refcb
 		$set['refcb'] = '';
-		if (isset($response['carte']))
+		if (isset($response['carte'])){
 			$set['refcb'] .= $response['carte'];
-		if (isset($response['BIN6']))
-			$set['refcb'] .= " ".$response['BIN6'];
+		}
+		if (isset($response['BIN6'])){
+			$set['refcb'] .= " " . $response['BIN6'];
+		}
 		$set['refcb'] = trim($set['refcb']);
 	}
 	// validite de carte ?
 	if (isset($response['valid']) AND $response['valid']){
-		$set['validite'] = "20" . substr($response['valid'],0,2) . "-" . substr($response['valid'],2,2);
+		$set['validite'] = "20" . substr($response['valid'], 0, 2) . "-" . substr($response['valid'], 2, 2);
 	}
 
 	// si on a envoye un U il faut recuperer les donnees CB et les stocker sur le compte client
@@ -432,19 +442,22 @@ function paybox_traite_reponse_transaction($config, $response) {
 	}
 
 	// il faudrait stocker le $transaction aussi pour d'eventuels retour vers paybox ?
-	sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
-	spip_log("call_response : id_transaction $id_transaction, reglee",$mode);
+	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
+	spip_log("call_response : id_transaction $id_transaction, reglee", $mode);
 
-	$regler_transaction = charger_fonction('regler_transaction','bank');
-	$regler_transaction($id_transaction,array('row_prec'=>$row));
-	return array($id_transaction,true);
+	$regler_transaction = charger_fonction('regler_transaction', 'bank');
+	$regler_transaction($id_transaction, array('row_prec' => $row));
+	return array($id_transaction, true);
 }
 
 function paybox_response_code($code){
-	if ($code==0) return true;
+	if ($code==0){
+		return true;
+	}
 	$pre = "";
-	if ($code > 100 AND $code <199)
+	if ($code>100 AND $code<199){
 		$pre = 'Autorisation refusee : ';
+	}
 	$codes = array(
 		1 => 'La connexion au centre d\'autorisation a echoue',
 		3 => 'Erreur Paybox',
@@ -506,9 +519,8 @@ function paybox_response_code($code){
 		198 => 'Serveur inacessible (positionne par le serveur)',
 		199 => 'Incident domaine initiateur',
 	);
-	if (isset($codes[intval($code)]))
-		return $pre.$codes[intval($code)];
+	if (isset($codes[intval($code)])){
+		return $pre . $codes[intval($code)];
+	}
 	return $pre ? $pre : false;
 }
-
-?>

@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('inc/bank');
 
@@ -21,8 +23,8 @@ include_spip('inc/bank');
 function cmcic_is_sandbox($config){
 	$test = false;
 	// _CMCIC_TEST force a TRUE pour utiliser l'adresse de test de CMCIC
-	if ( (defined('_CMCIC_TEST') AND _CMCIC_TEST)
-	  OR (isset($config['mode_test']) AND $config['mode_test']) ){
+	if ((defined('_CMCIC_TEST') AND _CMCIC_TEST)
+		OR (isset($config['mode_test']) AND $config['mode_test'])){
 		$test = true;
 	}
 	return $test;
@@ -38,7 +40,7 @@ function cmcic_url_serveur($config){
 
 	// URL d'acces a la banque.
 	// Par defaut, l'adresse Monetico de paiement normal.
-	switch($config['service']){
+	switch ($config['service']) {
 		case "CMUT":
 		case "OBC":
 		case "CIC":
@@ -47,8 +49,9 @@ function cmcic_url_serveur($config){
 			break;
 	}
 
-	if (cmcic_is_sandbox($config))
+	if (cmcic_is_sandbox($config)){
 		$host .= "/test";
+	}
 	return $host . "/" . _MONETICOPAIEMENT_URLPAYMENT;
 
 }
@@ -60,15 +63,15 @@ function cmcic_url_serveur($config){
  * @param array $contexte
  * @return string
  */
-function cmcic_concat_fields(&$contexte) {
+function cmcic_concat_fields(&$contexte){
 	// ASCII alphabetic order
-	$keys = ["TPE",	"contexte_commande", "date", "dateech1", "dateech2", "dateech3", "dateech4", "lgue", "mail",
-	"montant", "montantech1", "montantech2", "montantech3", "montantech4", "nbrech", "reference", "societe",
-	"texte-libre", "url_retour_err", "url_retour_ok", "version"];
+	$keys = ["TPE", "contexte_commande", "date", "dateech1", "dateech2", "dateech3", "dateech4", "lgue", "mail",
+		"montant", "montantech1", "montantech2", "montantech3", "montantech4", "nbrech", "reference", "societe",
+		"texte-libre", "url_retour_err", "url_retour_ok", "version"];
 
 	$values = [];
-	foreach ($keys as $key) {
-		if (!isset($contexte[$key])) {
+	foreach ($keys as $key){
+		if (!isset($contexte[$key])){
 			$contexte[$key] = '';
 		}
 		$values[] = "$key=" . $contexte[$key];
@@ -82,37 +85,39 @@ function cmcic_concat_fields(&$contexte) {
  * @param $oTpe
  * @return string
  */
-function cmcic_concat_response_fields($vars, $oTpe) {
+function cmcic_concat_response_fields($vars, $oTpe){
 
-  $anomalies = [];
-  if (array_key_exists('TPE', $vars) and $vars["TPE"] != $oTpe->sNumero) {
-		  $anomalies[] = "TPE";
-  }
-  if (array_key_exists('version', $vars) and $vars["version"] != $oTpe->sVersion) {
-	  $anomalies[] = "version";
-  }
-  if (!array_key_exists('MAC', $vars)) {
-	  $anomalies[] = "MAC";
-  }
-  // fields to exclude from the MAC computation
-  $excludes = ['MAC', 'action'];
-  foreach ($excludes as $exclude) {
-    if (array_key_exists($exclude, $vars)) {
-      unset($vars[$exclude]);
-    }
-  }
+	$anomalies = [];
+	if (array_key_exists('TPE', $vars) and $vars["TPE"]!=$oTpe->sNumero){
+		$anomalies[] = "TPE";
+	}
+	if (array_key_exists('version', $vars) and $vars["version"]!=$oTpe->sVersion){
+		$anomalies[] = "version";
+	}
+	if (!array_key_exists('MAC', $vars)){
+		$anomalies[] = "MAC";
+	}
+	// fields to exclude from the MAC computation
+	$excludes = ['MAC', 'action'];
+	foreach ($excludes as $exclude){
+		if (array_key_exists($exclude, $vars)){
+			unset($vars[$exclude]);
+		}
+	}
 
-  if(count($anomalies)) {
-	  return "anomaly_detected: " . implode(':', $anomalies);
-  }
+	if (count($anomalies)){
+		return "anomaly_detected: " . implode(':', $anomalies);
+	}
 
-  // order by key is mandatory
-  ksort($vars);
-  // map entries to "key=value" to match the target format
-  array_walk($vars, function(&$a, $b) { $a = "$b=$a"; });
+	// order by key is mandatory
+	ksort($vars);
+	// map entries to "key=value" to match the target format
+	array_walk($vars, function (&$a, $b){
+		$a = "$b=$a";
+	});
 
-  // join all entries using asterisk as separator
-  return implode( '*', $vars);
+	// join all entries using asterisk as separator
+	return implode('*', $vars);
 }
 
 /*****************************************************************************

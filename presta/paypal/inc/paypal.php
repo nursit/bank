@@ -6,11 +6,13 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
 
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 
 /**
@@ -21,8 +23,8 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 function paypal_is_sandbox($config){
 	$test = false;
 	// _PAYPAL_SANDBOX force a TRUE pour utiliser l'adresse de test de CMCIC
-	if ( (defined('_PAYPAL_SANDBOX') AND _PAYPAL_SANDBOX)
-	  OR (isset($config['mode_test']) AND $config['mode_test']) ){
+	if ((defined('_PAYPAL_SANDBOX') AND _PAYPAL_SANDBOX)
+		OR (isset($config['mode_test']) AND $config['mode_test'])){
 		$test = true;
 	}
 	return $test;
@@ -38,8 +40,7 @@ function paypal_url_serveur($config){
 
 	if (paypal_is_sandbox($config)){
 		return "https://www.sandbox.paypal.com:443/fr/cgi-bin/webscr";
-	}
-	else {
+	} else {
 		return "https://www.paypal.com:443/fr/cgi-bin/webscr";
 	}
 }
@@ -56,13 +57,15 @@ function paypal_url_serveur($config){
 function paypal_traite_response($config, $response){
 
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
 	$config_id = bank_config_id($config);
 
 	// on a pas recu de reponse de Paypal, rien a faire
 	if (!$response){
-		spip_log("Pas de reponse Paypal, rien a faire",$mode);
-		return array(0,false);
+		spip_log("Pas de reponse Paypal, rien a faire", $mode);
+		return array(0, false);
 	}
 
 
@@ -86,13 +89,12 @@ function paypal_traite_response($config, $response){
 		);
 	}
 
-	if (strpos($response['invoice'],"|")!==false){
-		list($id_transaction,$transaction_hash) = explode('|',$response['invoice']);
+	if (strpos($response['invoice'], "|")!==false){
+		list($id_transaction, $transaction_hash) = explode('|', $response['invoice']);
+	} else {
+		list($id_transaction, $transaction_hash) = explode('-', $response['invoice']);
 	}
-	else {
-		list($id_transaction,$transaction_hash) = explode('-',$response['invoice']);
-	}
-	if (!$row = sql_fetsel("*","spip_transactions", "id_transaction=".intval($id_transaction) ." AND transaction_hash=".sql_quote($transaction_hash))){
+	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		return bank_transaction_invalide(0,
 			array(
 				'mode' => $mode,
@@ -102,8 +104,9 @@ function paypal_traite_response($config, $response){
 		);
 	}
 
-	if ($row['reglee']=='oui')
-		return array($id_transaction,true); // cette transaction a deja ete reglee. double entree, on ne fait rien
+	if ($row['reglee']=='oui'){
+		return array($id_transaction, true);
+	} // cette transaction a deja ete reglee. double entree, on ne fait rien
 
 	// verifier que le status est bien ok
 	if (!isset($response['payment_status']) OR ($response['payment_status']!='Completed')){
@@ -111,12 +114,12 @@ function paypal_traite_response($config, $response){
 			array(
 				'mode' => $mode,
 				'config_id' => $config_id,
-				'erreur' => "payment_status=".$response['payment_status'],
+				'erreur' => "payment_status=" . $response['payment_status'],
 				'log' => var_export($response, true),
 			)
 		);
 	}
-	
+
 	// verifier que le numero de transaction au sens paypal
 	// (=numero d'autorisation ici) est bien fourni
 	if (!isset($response['txn_id']) OR (!$response['txn_id'])){
@@ -129,11 +132,11 @@ function paypal_traite_response($config, $response){
 			)
 		);
 	}
-	
+
 	// verifier que le numero de transaction au sens paypal
 	// (=numero d'autorisation ici) n'a pas deja ete utilise
 	$autorisation_id = $response['txn_id'];
-	if ($id = sql_getfetsel("id_transaction","spip_transactions","autorisation_id=".sql_quote($autorisation_id)." AND mode='paypal' AND id_transaction<>".intval($id_transaction))){
+	if ($id = sql_getfetsel("id_transaction", "spip_transactions", "autorisation_id=" . sql_quote($autorisation_id) . " AND mode='paypal' AND id_transaction<>" . intval($id_transaction))){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
@@ -146,10 +149,10 @@ function paypal_traite_response($config, $response){
 
 	// enregistrer immediatement le present numero d'autorisation pour ne pas risquer des requetes simultanees sur le meme id
 	$set = array(
-		"autorisation_id"=>$autorisation_id,
-		"mode"=>$mode
+		"autorisation_id" => $autorisation_id,
+		"mode" => $mode
 	);
-	sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
+	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
 
 	// une monnaie est-elle bien indique (et en EUR) ?
 	if (!isset($response['mc_currency']) OR ($response['mc_currency']!='EUR')){
@@ -164,7 +167,7 @@ function paypal_traite_response($config, $response){
 	}
 
 	// un montant est il bien renvoye et correct ?
-	if (!isset($response['mc_gross']) OR (($montant_regle=$response['mc_gross'])!=$row['montant'])){
+	if (!isset($response['mc_gross']) OR (($montant_regle = $response['mc_gross'])!=$row['montant'])){
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
@@ -176,30 +179,32 @@ function paypal_traite_response($config, $response){
 	}
 
 	$set = array(
-		"autorisation_id"=>$autorisation_id,
-		"mode"=>"$mode/$config_id",
-		"montant_regle"=>$montant_regle,
-		"date_paiement"=>date('Y-m-d H:i:s'),
-		"statut"=>'ok',
-		"reglee"=>'oui'
+		"autorisation_id" => $autorisation_id,
+		"mode" => "$mode/$config_id",
+		"montant_regle" => $montant_regle,
+		"date_paiement" => date('Y-m-d H:i:s'),
+		"statut" => 'ok',
+		"reglee" => 'oui'
 	);
 
-	sql_updateq("spip_transactions", $set, "id_transaction=".intval($id_transaction));
-	spip_log("simple_reponse : id_transaction $id_transaction, reglee",$mode);
+	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
+	spip_log("simple_reponse : id_transaction $id_transaction, reglee", $mode);
 
 	// si on dispose des informations utilisateurs, les utiliser pour peupler la gloable bank_session
 	// qui peut etre utilisee pour creer le compte client a la volee
 	$var_users = array('payer_email' => 'email', 'address_name' => 'nom', 'address_street' => 'adresse', 'address_zip' => 'code_postal', 'address_city' => 'ville', 'address_country_code' => 'pays');
 	foreach ($var_users as $kr => $ks){
 		if (isset($response[$kr]) AND $response[$kr]){
-			if (!isset($GLOBALS['bank_session'])) $GLOBALS['bank_session'] = array();
+			if (!isset($GLOBALS['bank_session'])){
+				$GLOBALS['bank_session'] = array();
+			}
 			$GLOBALS['bank_session'][$ks] = $response[$kr];
 		}
 	}
 
-	$regler_transaction = charger_fonction('regler_transaction','bank');
-	$regler_transaction($id_transaction,array('row_prec'=>$row));
-	return array($id_transaction,true);
+	$regler_transaction = charger_fonction('regler_transaction', 'bank');
+	$regler_transaction($id_transaction, array('row_prec' => $row));
+	return array($id_transaction, true);
 }
 
 /**
@@ -209,12 +214,12 @@ function paypal_traite_response($config, $response){
  * @param string $message
  * @return array
  */
-function paypal_echec_transaction($id_transaction,$message){
+function paypal_echec_transaction($id_transaction, $message){
 	sql_updateq("spip_transactions",
-	  array('message'=>$message,'statut'=>'echec'),
-	  "id_transaction=".intval($id_transaction)
+		array('message' => $message, 'statut' => 'echec'),
+		"id_transaction=" . intval($id_transaction)
 	);
-	return array($id_transaction,false); // erreur sur la transaction
+	return array($id_transaction, false); // erreur sur la transaction
 }
 
 /**
@@ -223,11 +228,13 @@ function paypal_echec_transaction($id_transaction,$message){
  * @param bool $is_ipn
  * @return bool
  */
-function paypal_get_response($config, $is_ipn=false){
+function paypal_get_response($config, $is_ipn = false){
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
 
-	$bank_recuperer_post_https = charger_fonction("bank_recuperer_post_https","inc");
+	$bank_recuperer_post_https = charger_fonction("bank_recuperer_post_https", "inc");
 
 	// recuperer le POST
 	$response = array();
@@ -237,15 +244,13 @@ function paypal_get_response($config, $is_ipn=false){
 
 	if (isset($response['tx']) AND $response['tx']){
 		$tx = $response['tx'];
-	}
-	elseif (isset($response['txn_id']) AND $response['txn_id']){
+	} elseif (isset($response['txn_id']) AND $response['txn_id']) {
 		$tx = $response['txn_id'];
-	}
-	else {
+	} else {
 		$tx = _request('tx');
 	}
 
-	if (!$tx) {
+	if (!$tx){
 		bank_transaction_invalide(0,
 			array(
 				'mode' => $mode,
@@ -258,7 +263,7 @@ function paypal_get_response($config, $is_ipn=false){
 
 	// si on a un $tx et un identity token dans la config on l'utilise de preference (PDT)
 	if ($tx
-	  AND isset($config['IDENTITY_TOKEN'])
+		AND isset($config['IDENTITY_TOKEN'])
 		AND $config['IDENTITY_TOKEN']){
 
 		$post_check = array(
@@ -270,14 +275,14 @@ function paypal_get_response($config, $is_ipn=false){
 		// envoyer la demande de verif en post
 		// attention, c'est une demande en ssl, il faut avoir un php qui le supporte
 		$url = paypal_url_serveur($config);
-		list($resultat,$erreur,$erreur_msg) = $bank_recuperer_post_https($url,$post_check,isset($response['payer_id'])?$response['payer_id']:'');
+		list($resultat, $erreur, $erreur_msg) = $bank_recuperer_post_https($url, $post_check, isset($response['payer_id']) ? $response['payer_id'] : '');
 		$resultat = trim($resultat);
-		if (strncmp($resultat,"SUCCESS",7)==0){
-			$resultat = trim(substr($resultat,7));
-			$resultat = explode("\n",$resultat);
-			$resultat = array_map("trim",$resultat);
-			$resultat = implode("&",$resultat);
-			parse_str($resultat,$response);
+		if (strncmp($resultat, "SUCCESS", 7)==0){
+			$resultat = trim(substr($resultat, 7));
+			$resultat = explode("\n", $resultat);
+			$resultat = array_map("trim", $resultat);
+			$resultat = implode("&", $resultat);
+			parse_str($resultat, $response);
 			return paypal_charset_reponse($response);
 		}
 
@@ -368,7 +373,7 @@ function paypal_get_response($config, $is_ipn=false){
 
 	// lire la publication du systeme PayPal et ajouter 'cmd' en tete
 	$post_check = array('cmd' => '_notify-validate');
-	foreach($response as $k=>$v){
+	foreach ($response as $k => $v){
 		$post_check[$k] = $v;
 	}
 
@@ -377,14 +382,13 @@ function paypal_get_response($config, $is_ipn=false){
 	$c = $config;
 	if (isset($response['test_ipn']) AND $response['test_ipn']){
 		$c['mode_test'] = true;
-	}
-	else {
+	} else {
 		$c['mode_test'] = false;
 	}
 	$url = paypal_url_serveur($c);
-	list($resultat,$erreur,$erreur_msg) = $bank_recuperer_post_https($url,$post_check,isset($post_check['payer_id'])?$post_check['payer_id']:'');
+	list($resultat, $erreur, $erreur_msg) = $bank_recuperer_post_https($url, $post_check, isset($post_check['payer_id']) ? $post_check['payer_id'] : '');
 
-	if (strncmp(trim($resultat),'VERIFIE',7)==0){
+	if (strncmp(trim($resultat), 'VERIFIE', 7)==0){
 		return paypal_charset_reponse($response);
 	}
 
@@ -407,8 +411,8 @@ function paypal_get_response($config, $is_ipn=false){
 function paypal_charset_reponse($response){
 	if (isset($response['charset']) AND $response['charset']!==$GLOBALS['meta']['charset']){
 		include_spip('inc/charsets');
-		foreach($response as $k=>$v){
-			$response[$k] = importer_charset($v,$response['charset']);
+		foreach ($response as $k => $v){
+			$response[$k] = importer_charset($v, $response['charset']);
 		}
 	}
 	return $response;

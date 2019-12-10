@@ -7,10 +7,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 /**
  * @param string $montant
@@ -18,16 +20,16 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *
  * Exemple d'utilisation dans une boucle commande :
  * ```
- * 		<BOUCLE_commande(COMMANDES){id_commande}>
- *	      <h1>Commande ##ID_COMMANDE  - Ref #REFERENCE</h1>
- *	      [(#FORMULAIRE_PAYER_ABONNEMENT{#PRIX*,
- *		      #ARRAY{
- *			      montant_ht,PRIX_HT*,
- *			      id_commande,#ID_COMMANDE,
- *			      id_auteur,#ID_AUTEUR,
- *		      }
- *	      })]
- *		</BOUCLE_commande>
+ *    <BOUCLE_commande(COMMANDES){id_commande}>
+ *        <h1>Commande ##ID_COMMANDE  - Ref #REFERENCE</h1>
+ *        [(#FORMULAIRE_PAYER_ABONNEMENT{#PRIX*,
+ *          #ARRAY{
+ *            montant_ht,PRIX_HT*,
+ *            id_commande,#ID_COMMANDE,
+ *            id_auteur,#ID_AUTEUR,
+ *          }
+ *        })]
+ *    </BOUCLE_commande>
  * ```
  *
  * @param array $options
@@ -48,10 +50,10 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *
  * @return array|string
  */
-function formulaires_payer_abonnement_charger_dist($montant,$options = array()){
+function formulaires_payer_abonnement_charger_dist($montant, $options = array()){
 
 	// meme preparation que pour le paiement a l'acte
-	$charger = charger_fonction("charger","formulaires/payer_acte");
+	$charger = charger_fonction("charger", "formulaires/payer_acte");
 	$valeurs = $charger($montant, $options);
 
 	return $valeurs;

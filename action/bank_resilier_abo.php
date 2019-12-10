@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 /**
  * Resiliation d'un abo quand c'est le site qui est maitre :
@@ -18,13 +20,13 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  *
  * @param null|string $uid
  */
-function action_bank_resilier_abo_dist($uid=null){
+function action_bank_resilier_abo_dist($uid = null){
 	if (is_null($uid)){
-		$securiser_action = charger_fonction('securiser_action','inc');
+		$securiser_action = charger_fonction('securiser_action', 'inc');
 		$uid = $securiser_action();
 	}
 
-	if ($resilier = charger_fonction('resilier','abos',true)){
+	if ($resilier = charger_fonction('resilier', 'abos', true)){
 		$resilier("uid:$uid");
 	}
 }

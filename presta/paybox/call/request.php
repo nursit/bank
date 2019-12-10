@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 
 include_spip('presta/paybox/inc/paybox');
@@ -27,27 +29,28 @@ include_spip('presta/paybox/inc/paybox');
  *   type de paiement : acte ou abo
  * @return array
  */
-function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $config, $type="acte"){
+function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $config, $type = "acte"){
 
 	$mode = 'paybox';
 	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
-		spip_log("call_request : config invalide ".var_export($config,true),$mode._LOG_ERREUR);
+		spip_log("call_request : config invalide " . var_export($config, true), $mode . _LOG_ERREUR);
 		return "";
 	}
 	$mode = $config['presta'];
 
-	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash))){
-		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable",$mode._LOG_ERREUR);
+	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
+		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable", $mode . _LOG_ERREUR);
 		return "";
 	}
 
-	$cartes = array('CB','VISA','EUROCARD_MASTERCARD','E_CARD');
-	if (isset($config['cartes']) AND is_array($config['cartes']) AND $config['cartes'])
+	$cartes = array('CB', 'VISA', 'EUROCARD_MASTERCARD', 'E_CARD');
+	if (isset($config['cartes']) AND is_array($config['cartes']) AND $config['cartes']){
 		$cartes = $config['cartes'];
+	}
 
 	if (!$row['id_auteur']
-	  AND isset($GLOBALS['visiteur_session']['id_auteur'])
-	  AND $GLOBALS['visiteur_session']['id_auteur']) {
+		AND isset($GLOBALS['visiteur_session']['id_auteur'])
+		AND $GLOBALS['visiteur_session']['id_auteur']){
 		sql_updateq("spip_transactions",
 			array("id_auteur" => intval($row['id_auteur'] = $GLOBALS['visiteur_session']['id_auteur'])),
 			"id_transaction=" . intval($id_transaction)
@@ -57,51 +60,54 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	$mail = bank_porteur_email($row);
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$montant = intval(round(100*$row['montant'],0));
-	if (strlen($montant)<3)
-		$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
+	$montant = intval(round(100*$row['montant'], 0));
+	if (strlen($montant)<3){
+		$montant = str_pad($montant, 3, '0', STR_PAD_LEFT);
+	}
 
 	// Affectation des parametres obligatoires
 	// seuls les PBX_ sont envoyees dans le formulaire
 	$parm = $config;
 
 	// cas de PBX_RANG : paybox fournit 001 mais il faut envoyer 01 au serveur
-	$parm['PBX_RANG'] = str_pad(intval($parm['PBX_RANG']),2,'0',STR_PAD_LEFT);
+	$parm['PBX_RANG'] = str_pad(intval($parm['PBX_RANG']), 2, '0', STR_PAD_LEFT);
 
-	$parm['PBX_OUTPUT']="C"; // recuperer uniquement les hidden
-	$parm['PBX_LANGUE']="FRA";
-	$parm['PBX_DEVISE']="978";
-	$parm['PBX_TOTAL']=$montant;
-	$parm['PBX_PORTEUR']=defined('_PBX_PORTEUR')?_PBX_PORTEUR:$mail;
-	$parm['PBX_CMD']=intval($id_transaction);
+	$parm['PBX_OUTPUT'] = "C"; // recuperer uniquement les hidden
+	$parm['PBX_LANGUE'] = "FRA";
+	$parm['PBX_DEVISE'] = "978";
+	$parm['PBX_TOTAL'] = $montant;
+	$parm['PBX_PORTEUR'] = defined('_PBX_PORTEUR') ? _PBX_PORTEUR : $mail;
+	$parm['PBX_CMD'] = intval($id_transaction);
 
 	// si le porteur est generique, on ajoute l'email au numero de commande
 	// pour la tracabilite dans l'admin paybox
-	if (defined('_PBX_PORTEUR'))
-		$parm['PBX_CMD'] .= "/".$mail;
+	if (defined('_PBX_PORTEUR')){
+		$parm['PBX_CMD'] .= "/" . $mail;
+	}
 
 	// temps de validite de la page de paiement paybox (par defaut 900s)
-	if (defined('_PBX_DISPLAY'))
+	if (defined('_PBX_DISPLAY')){
 		$parm['PBX_DISPLAY'] = _PBX_DISPLAY;
+	}
 
-	$parm['PBX_EFFECTUE'] = bank_url_api_retour($config,"response");
-	$parm['PBX_REFUSE'] = bank_url_api_retour($config,"cancel");
-	$parm['PBX_ANNULE'] = bank_url_api_retour($config,"cancel");
- 	$parm['PBX_REPONDRE_A'] = bank_url_api_retour($config,"autoresponse");
+	$parm['PBX_EFFECTUE'] = bank_url_api_retour($config, "response");
+	$parm['PBX_REFUSE'] = bank_url_api_retour($config, "cancel");
+	$parm['PBX_ANNULE'] = bank_url_api_retour($config, "cancel");
+	$parm['PBX_REPONDRE_A'] = bank_url_api_retour($config, "autoresponse");
 
 	$parm['PBX_RETOUR'] = 'montant:M;id_transaction:R;auth:A;trans:S;abo:B;erreur:E;carte:C;BIN6:N;valid:D;';
 
 	if ($type=='abo' AND $config['type']!=='acte'){
 		// on decrit l'echeance, en indiquant qu'on peut la gerer manuellement grace a PayBoxDirectPlus
 		if (
-			$decrire_echeance = charger_fonction("decrire_echeance","abos",true)
-		  AND $echeance = $decrire_echeance($id_transaction, false)){
+			$decrire_echeance = charger_fonction("decrire_echeance", "abos", true)
+			AND $echeance = $decrire_echeance($id_transaction, false)){
 			if ($echeance['montant']>0){
 				$montant_echeance = str_pad(intval(round(100*$echeance['montant'])), 10, "0", STR_PAD_LEFT);
 
 				// si plus d'une echeance initiale prevue on ne sait pas faire avec Paybox
 				if (isset($echeance['count_init']) AND $echeance['count_init']>1){
-					spip_log("Transaction #$id_transaction : nombre d'echeances init ".$echeance['count_init'].">1 non supporte",$mode._LOG_ERREUR);
+					spip_log("Transaction #$id_transaction : nombre d'echeances init " . $echeance['count_init'] . ">1 non supporte", $mode . _LOG_ERREUR);
 					return "";
 				}
 
@@ -122,15 +128,14 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 					}
 				}
 				$parm['PBX_CMD'] .=
-				"IBS_2MONT$montant_echeance"
-				. "IBS_NBPAIE$nbpaie"
-				. "IBS_FREQ$freq"
-				. "IBS_QUAND00"
-				//. "IBS_DELAIS000"
+					"IBS_2MONT$montant_echeance"
+					. "IBS_NBPAIE$nbpaie"
+					. "IBS_FREQ$freq"
+					. "IBS_QUAND00"//. "IBS_DELAIS000"
 				;
-			}
-			else
+			} else {
 				$parm['PBX_RETOUR'] .= 'ppps:U;';
+			}
 		}
 	}
 
@@ -141,16 +146,16 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 
 	include_spip('inc/filtres_mini'); // url_absolue
 	$contexte = array(
-		'hidden'=>array(),
-		'action'=>paybox_url_paiment($config),
-		'backurl'=>url_absolue(self()),
-		'id_transaction'=>$id_transaction
+		'hidden' => array(),
+		'action' => paybox_url_paiment($config),
+		'backurl' => url_absolue(self()),
+		'id_transaction' => $id_transaction
 	);
 
 	// forcer le type de config pour n'avoir que les cartes possibles en cas d'abonnement
 	$config['type'] = $type;
 	$cartes_possibles = paybox_available_cards($config);
-	foreach($cartes as $carte){
+	foreach ($cartes as $carte){
 		if (isset($cartes_possibles[$carte])){
 			$parm['PBX_TYPEPAIEMENT'] = 'CARTE';
 			$parm['PBX_TYPECARTE'] = $carte;

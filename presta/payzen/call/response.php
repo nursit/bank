@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 /**
  * il faut avoir un id_transaction et un transaction_hash coherents
@@ -22,8 +24,8 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @param null|array $response
  * @return array
  */
-function presta_payzen_call_response_dist($config, $response=null){
+function presta_payzen_call_response_dist($config, $response = null){
 
-	$call_response = charger_fonction("response","presta/systempay/call");
+	$call_response = charger_fonction("response", "presta/systempay/call");
 	return $call_response($config, $response);
 }

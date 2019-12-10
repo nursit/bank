@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('presta/payzen/inc/payzen');
 
@@ -25,7 +27,7 @@ function presta_stripe_call_resilier_abonnement_dist($uid, $config = 'stripe'){
 
 	include_spip('inc/bank');
 
-	$trans = sql_fetsel("mode, pay_id", "spip_transactions", "abo_uid=" . sql_quote($uid) . " AND mode LIKE " . sql_quote($config . '%'),'','id_transaction','0,1');
+	$trans = sql_fetsel("mode, pay_id", "spip_transactions", "abo_uid=" . sql_quote($uid) . " AND mode LIKE " . sql_quote($config . '%'), '', 'id_transaction', '0,1');
 
 	if (!is_array($config)){
 		$config = bank_config($trans['mode']);
@@ -37,30 +39,27 @@ function presta_stripe_call_resilier_abonnement_dist($uid, $config = 'stripe'){
 
 	$erreur = $erreur_code = '';
 	try {
-		if ($sub = \Stripe\Subscription::retrieve($uid)) {
+		if ($sub = \Stripe\Subscription::retrieve($uid)){
 			$res = $sub->cancel();
-			if ($res->status != 'canceled'){
+			if ($res->status!='canceled'){
 				$erreur = 'cancel failed' . var_export((array)$res, true);
 			}
-		}
-		else {
+		} else {
 			$erreur = "unknown subscription";
 		}
-	}
-	catch (Exception $e) {
+	} catch (Exception $e) {
 		if ($body = $e->getJsonBody()){
-			$err  = $body['error'];
+			$err = $body['error'];
 			list($erreur_code, $erreur) = stripe_error_code($err);
-		}
-		else {
+		} else {
 			$erreur = $e->getMessage();
 			$erreur_code = 'error';
 		}
 	}
 
 
-	if ($erreur or $erreur_code) {
-		spip_log($s="call_resilier_abonnement $uid : erreur $erreur_code - $erreur",$mode._LOG_ERREUR);
+	if ($erreur or $erreur_code){
+		spip_log($s = "call_resilier_abonnement $uid : erreur $erreur_code - $erreur", $mode . _LOG_ERREUR);
 		return false;
 	}
 

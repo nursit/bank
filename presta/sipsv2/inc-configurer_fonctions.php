@@ -6,10 +6,13 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
-if (!function_exists('sipsv2_lister_cartes_config'))
+if (!function_exists('sipsv2_lister_cartes_config')){
 	include_spip('presta/sipsv2/config');
+}

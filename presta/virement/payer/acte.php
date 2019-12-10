@@ -7,10 +7,12 @@
  * Auteurs :
  * Cedric Morin, Nursit.com
  * Olivier Tétard
- * (c) 2014 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 
 /**
@@ -20,7 +22,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @param array $options
  * @return array|string
  */
-function presta_virement_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
+function presta_virement_payer_acte_dist($config, $id_transaction, $transaction_hash, $options = array()){
 
 	include_spip("inc/bank");
 
@@ -32,13 +34,13 @@ function presta_virement_payer_acte_dist($config, $id_transaction, $transaction_
 	$contexte['sign'] = bank_sign_response_simple($config['presta'], $contexte);
 
 	// url action
-	$action = bank_url_api_retour($config,'response');
-	foreach($contexte as $k=>$v){
-		$action = parametre_url($action,$k,$v);
+	$action = bank_url_api_retour($config, 'response');
+	foreach ($contexte as $k => $v){
+		$action = parametre_url($action, $k, $v);
 	}
 	$contexte['action'] = $action;
 	$contexte['config'] = $config;
-	$contexte['logo'] = bank_trouver_logo("virement","VIREMENT.gif");
+	$contexte['logo'] = bank_trouver_logo("virement", "VIREMENT.gif");
 
 	$contexte = array_merge($options, $contexte);
 

@@ -8,7 +8,9 @@
  * @licence    GNU/GPL
  * @package    SPIP\Abos\API
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('base/abstract_sql');
 
@@ -37,21 +39,21 @@ include_spip('base/abstract_sql');
  * @return bool|int
  *   false si pas reussi
  */
-function abos_activer_abonnement_dist($id_transaction,$abo_uid,$mode_paiement,$validite="",$id_auteur=0){
+function abos_activer_abonnement_dist($id_transaction, $abo_uid, $mode_paiement, $validite = "", $id_auteur = 0){
 
 	$id_abonnement = 0;
 
-	spip_log("abos/activer_abonnement id_transaction=$id_transaction abo_uid=$abo_uid mode=$mode_paiement validite=$validite","bank");
+	spip_log("abos/activer_abonnement id_transaction=$id_transaction abo_uid=$abo_uid mode=$mode_paiement validite=$validite", "bank");
 
 	$id_abonnement = pipeline(
 		'bank_abos_activer_abonnement',
 		array(
-			'args'=>array(
-				'id_transaction'=>$id_transaction,
-				'abo_uid'=>$abo_uid,
-				'mode_paiement'=>$mode_paiement,
-				'validite'=>$validite,
-				'id_auteur'=>$id_auteur,
+			'args' => array(
+				'id_transaction' => $id_transaction,
+				'abo_uid' => $abo_uid,
+				'mode_paiement' => $mode_paiement,
+				'validite' => $validite,
+				'id_auteur' => $id_auteur,
 			),
 			'data' => $id_abonnement,
 		)

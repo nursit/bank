@@ -6,12 +6,14 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
-function presta_gratuit_payer_acte_dist($config, $id_transaction,$transaction_hash, $options=array()){
+function presta_gratuit_payer_acte_dist($config, $id_transaction, $transaction_hash, $options = array()){
 
 	include_spip('inc/bank');
 
@@ -19,13 +21,12 @@ function presta_gratuit_payer_acte_dist($config, $id_transaction,$transaction_ha
 		'id_transaction' => $id_transaction,
 		'transaction_hash' => $transaction_hash,
 	);
-	$contexte['sign'] = bank_sign_response_simple("gratuit",$contexte);
-	$contexte['action'] = bank_url_api_retour($config,"response");
+	$contexte['sign'] = bank_sign_response_simple("gratuit", $contexte);
+	$contexte['action'] = bank_url_api_retour($config, "response");
 	$contexte['config'] = $config;
 
-	$contexte = array_merge($options,$contexte);
+	$contexte = array_merge($options, $contexte);
 
-	return recuperer_fond('presta/gratuit/payer/acte',$contexte);
+	return recuperer_fond('presta/gratuit/payer/acte', $contexte);
 }
 
-?>

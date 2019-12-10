@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 /* PayZen  ----------------------------------------------------------- */
 
@@ -21,23 +23,24 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  */
 
 # Version du logiciel
-if (!defined('_SYSTEMPAY_VERSION'))
+if (!defined('_SYSTEMPAY_VERSION')){
 	define("_SYSTEMPAY_VERSION", "V2");
+}
 
 
-function payzen_lister_cartes_config($c,$cartes = true){
+function payzen_lister_cartes_config($c, $cartes = true){
 	include_spip('inc/bank');
-	$config = array('presta'=>'payzen','type'=>isset($c['type'])?$c['type']:'acte','service'=>'payzen');
+	$config = array('presta' => 'payzen', 'type' => isset($c['type']) ? $c['type'] : 'acte', 'service' => 'payzen');
 
 	include_spip("presta/systempay/inc/systempay");
 	$liste = systempay_available_cards($config);
 
-	$others = array('SDD','E_CV');
-	foreach($liste as $k=>$v){
-		if ($cartes AND in_array($k,$others)){
+	$others = array('SDD', 'E_CV');
+	foreach ($liste as $k => $v){
+		if ($cartes AND in_array($k, $others)){
 			unset($liste[$k]);
 		}
-		if (!$cartes AND !in_array($k,$others)){
+		if (!$cartes AND !in_array($k, $others)){
 			unset($liste[$k]);
 		}
 	}
@@ -51,12 +54,12 @@ function payzen_lister_cartes_config($c,$cartes = true){
  * @param $id_transaction
  * @return mixed|string
  */
-function presta_payzen_titre_type_paiement_dist($mode, $id_transaction) {
+function presta_payzen_titre_type_paiement_dist($mode, $id_transaction){
 
 	if ($id_transaction
-	  AND $trans = sql_fetsel("refcb","spip_transactions","id_transaction=".intval($id_transaction))
-	  AND strncmp($trans['refcb'],"SEPA",4)==0){
-		return _T("bank:label_type_paiement_sepa",array('presta'=>"Payzen"));
+		AND $trans = sql_fetsel("refcb", "spip_transactions", "id_transaction=" . intval($id_transaction))
+		AND strncmp($trans['refcb'], "SEPA", 4)==0){
+		return _T("bank:label_type_paiement_sepa", array('presta' => "Payzen"));
 	}
 
 	return "";

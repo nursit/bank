@@ -8,7 +8,9 @@
  * @licence    GNU/GPL
  * @package    SPIP\Abos\API
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('base/abstract_sql');
 
@@ -29,7 +31,7 @@ include_spip('base/abstract_sql');
  *
  *   false si pas d'abonnement qui correspond a cette transaction
  */
-function abos_decrire_echeance_dist($id_transaction,$force_auto = true){
+function abos_decrire_echeance_dist($id_transaction, $force_auto = true){
 
 	$desc = array(
 		'montant' => 0,
@@ -45,9 +47,9 @@ function abos_decrire_echeance_dist($id_transaction,$force_auto = true){
 	$desc = pipeline(
 		'bank_abos_decrire_echeance',
 		array(
-			'args'=>array(
-				'id_transaction'=>$id_transaction,
-				'force_auto'=>$force_auto
+			'args' => array(
+				'id_transaction' => $id_transaction,
+				'force_auto' => $force_auto
 			),
 			'data' => $desc,
 		)

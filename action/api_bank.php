@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 function action_api_bank_dist(){
 	$arg = _request('arg');
@@ -20,15 +22,16 @@ function action_api_bank_dist(){
 	unset($_POST['arg']);
 	unset($_GET['arg']);
 
-	$arg = explode('/',$arg);
+	$arg = explode('/', $arg);
 	$presta = array_shift($arg);
 	$action = array_shift($arg);
-	if (!in_array($action,array('response','cancel','autoresponse')))
+	if (!in_array($action, array('response', 'cancel', 'autoresponse'))){
 		$action = 'response';
+	}
 
-	$auto = ($action=='autoresponse'?true:false);
-	$cancel = ($action=='cancel'?true:false);
+	$auto = ($action=='autoresponse' ? true : false);
+	$cancel = ($action=='cancel' ? true : false);
 
-	$bank_response = charger_fonction('bank_response','action');
+	$bank_response = charger_fonction('bank_response', 'action');
 	$bank_response($cancel, $auto, $presta);
 }

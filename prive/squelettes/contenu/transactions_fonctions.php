@@ -6,25 +6,26 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
 
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 function bank_transactions_statuts(){
-	$statuts = sql_allfetsel("statut, count(id_transaction) as n","spip_transactions","","statut");
+	$statuts = sql_allfetsel("statut, count(id_transaction) as n", "spip_transactions", "", "statut");
 	if ($statuts){
-		$statuts = array_combine(array_map('reset',$statuts),array_map('end',$statuts));
+		$statuts = array_combine(array_map('reset', $statuts), array_map('end', $statuts));
 		ksort($statuts);
-	}
-	else {
-		$statuts = array('ok'=>0);
+	} else {
+		$statuts = array('ok' => 0);
 	}
 
-	$all = array(''=>array_sum($statuts));
-	foreach(array('ok','commande','attente') as $s){
-		if (isset($statuts[$s])) {
+	$all = array('' => array_sum($statuts));
+	foreach (array('ok', 'commande', 'attente') as $s){
+		if (isset($statuts[$s])){
 			$all[$s] = $statuts[$s];
 			unset($statuts[$s]);
 		}
@@ -32,12 +33,13 @@ function bank_transactions_statuts(){
 	$all['echec'] = 0;
 	$all['abandon'] = 0;
 	$all['rembourse'] = 0;
-	foreach($statuts as $k=>$v){
-		if (strncmp($k,"echec",5)==0){
-			if (!isset($all['echec'])) $all['echec'] = 0;
-			$all['echec']+=$v;
-		}
-		else {
+	foreach ($statuts as $k => $v){
+		if (strncmp($k, "echec", 5)==0){
+			if (!isset($all['echec'])){
+				$all['echec'] = 0;
+			}
+			$all['echec'] += $v;
+		} else {
 			$all[$k] = $v;
 		}
 	}

@@ -8,7 +8,9 @@
  * @licence    GNU/GPL
  * @package    SPIP\Abos\API
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('base/abstract_sql');
 
@@ -20,9 +22,9 @@ include_spip('base/abstract_sql');
  *   bool notify_bank : lancer un appel au presta bancaire pour resilier aupres de lui les paiements auto
  * @return bool
  */
-function abos_resilier_dist($id,$options=array()){
+function abos_resilier_dist($id, $options = array()){
 
-	spip_log("abos/resilier id=$id","abos_resil");
+	spip_log("abos/resilier id=$id", "abos_resil");
 
 	/*
 	if (strncmp($id,"uid:",4)==0){
@@ -33,14 +35,18 @@ function abos_resilier_dist($id,$options=array()){
 	}
 	*/
 
-	if (!isset($options['message']))
+	if (!isset($options['message'])){
 		$options['message'] = '';
-	if (!isset($options['immediat']))
+	}
+	if (!isset($options['immediat'])){
 		$options['immediat'] = false;
-	if (!isset($options['notify_bank']))
+	}
+	if (!isset($options['notify_bank'])){
 		$options['notify_bank'] = true;
-	if (!isset($options['erreur']))
+	}
+	if (!isset($options['erreur'])){
 		$options['erreur'] = false;
+	}
 
 	$args = array(
 		'id' => $id,
@@ -53,8 +59,7 @@ function abos_resilier_dist($id,$options=array()){
 		$args['statut'] = 'resilie';
 		$args['date_fin'] = $now;
 		$args['date_echeance'] = $now;
-	}
-	else{
+	} else {
 		$args['date_fin'] = "date_echeance";
 	}
 
@@ -64,7 +69,7 @@ function abos_resilier_dist($id,$options=array()){
 	$ok = pipeline(
 		'bank_abos_resilier',
 		array(
-			'args'=>$args,
+			'args' => $args,
 			'data' => true,
 		)
 	);
@@ -79,36 +84,35 @@ function abos_resilier_dist($id,$options=array()){
  * @return bool
  *   renvoie false si le presta bancaire indique un echec, true dans tous les autres cas
  */
-function abos_resilier_notify_bank($abonne_uid,$mode_paiement=null){
+function abos_resilier_notify_bank($abonne_uid, $mode_paiement = null){
 
 	if (!$mode_paiement){
-		$mode_paiement = sql_getfetsel("mode","spip_transactions","abo_uid=".sql_quote($abonne_uid,'','text'),"","id_transaction DESC");
+		$mode_paiement = sql_getfetsel("mode", "spip_transactions", "abo_uid=" . sql_quote($abonne_uid, '', 'text'), "", "id_transaction DESC");
 	}
-	spip_log("abos/resilier_notify_bank abonne_uid=$abonne_uid mode=$mode_paiement","abos_resil");
+	spip_log("abos/resilier_notify_bank abonne_uid=$abonne_uid mode=$mode_paiement", "abos_resil");
 
 	$ok = true;
 	// notifier au presta bancaire si besoin
 	if ($mode_paiement AND $abonne_uid){
 
 		include_spip("inc/bank");
-		if (!$config = bank_config($mode_paiement,true)
-		  OR !isset($config['presta'])
+		if (!$config = bank_config($mode_paiement, true)
+			OR !isset($config['presta'])
 			OR !$presta = $config['presta']){
-			spip_log("abos/resilier_notify_bank presta inconnu pour mode=$mode_paiement","abos_resil"._LOG_ERREUR);
+			spip_log("abos/resilier_notify_bank presta inconnu pour mode=$mode_paiement", "abos_resil" . _LOG_ERREUR);
 		}
 
-		if ($presta AND $presta_resilier = charger_fonction('resilier_abonnement',"presta/$presta/call",true)){
+		if ($presta AND $presta_resilier = charger_fonction('resilier_abonnement', "presta/$presta/call", true)){
 			$ok = $presta_resilier($abonne_uid);
 			if (!$ok){
 				spip_log("Resiliation abo " . $abonne_uid . " refuse par le prestataire", 'abos_resil' . _LOG_ERREUR);
 			}
-		}
-		else {
-			spip_log("abos/resilier_notify_bank : pas de methode resilier_abonnement pour le presta $presta","abos_resil"._LOG_INFO_IMPORTANTE);
+		} else {
+			spip_log("abos/resilier_notify_bank : pas de methode resilier_abonnement pour le presta $presta", "abos_resil" . _LOG_INFO_IMPORTANTE);
 		}
 
 		if (!$ok){
-			bank_simple_call_resilier_abonnement($abonne_uid,$mode_paiement);
+			bank_simple_call_resilier_abonnement($abonne_uid, $mode_paiement);
 			// TODO ajouter un message a l'abonnement pour le feedback user
 			spip_log("Envoi email de desabo " . $abonne_uid . " au webmestre", 'abos_resil' . _LOG_INFO_IMPORTANTE);
 

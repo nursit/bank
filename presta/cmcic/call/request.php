@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('presta/cmcic/inc/cmcic');
 
@@ -62,15 +64,18 @@ include_spip('presta/cmcic/inc/cmcic');
  *   configuration du module
  * @return array
  */
-function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $config) {
-	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash)))
+function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $config){
+	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		return array();
+	}
 
 	include_spip('inc/filtres');
 	$contexte = array();
 
-	$oTpe  = new MoneticoPaiement_Ept($config, strtoupper($GLOBALS['spip_lang']));
-	if (!$oTpe->isOK) return false;
+	$oTpe = new MoneticoPaiement_Ept($config, strtoupper($GLOBALS['spip_lang']));
+	if (!$oTpe->isOK){
+		return false;
+	}
 
 	$oHmac = new MoneticoPaiement_Hmac($oTpe);
 
@@ -86,15 +91,15 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	$devise = "EUR";
 	// Amount : format  "xxxxx.yy" (no spaces)
 	$montant = $row['montant'];
-	$contexte['version']     = $oTpe->sVersion;
-	$contexte['TPE']         = $oTpe->sNumero;
+	$contexte['version'] = $oTpe->sVersion;
+	$contexte['TPE'] = $oTpe->sNumero;
 	// transaction date : format d/m/y:h:m:s
-	$contexte['date']        = date("d/m/Y:H:i:s");
-	$contexte['montant']     = $montant . $devise;
+	$contexte['date'] = date("d/m/Y:H:i:s");
+	$contexte['montant'] = $montant . $devise;
 	// Reference: unique, alphaNum (A-Z a-z 0-9), 12 characters max
-	$contexte['reference']   = "PAY".str_pad($id_transaction, 9,"0", STR_PAD_LEFT); //ubstr($transaction_hash, 0, 12);
-	$contexte['lgue']        = $oTpe->sLangue;
-	$contexte['societe']     = $oTpe->sCodeSociete;
+	$contexte['reference'] = "PAY" . str_pad($id_transaction, 9, "0", STR_PAD_LEFT); //ubstr($transaction_hash, 0, 12);
+	$contexte['lgue'] = $oTpe->sLangue;
+	$contexte['societe'] = $oTpe->sCodeSociete;
 
 	// on transmet dans le texte libre les données id_transaction & hash
 	// pour les avoir dans le retour URL CGI2 qui est une url à donner à la banque
@@ -111,16 +116,16 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	// dans une page de redirection pour les mobiles
 	$contexte['texte-libre'] = urlencode(serialize($contenu));
 
-	$contexte['mail']        = bank_porteur_email($row);
+	$contexte['mail'] = bank_porteur_email($row);
 
 	// Urls de retour.
 	// La banque poste d'abord sur l'URL CGI2 (cf cmcic/config.php) qui doit traiter
 	// le paiement positif et en attend une réponse (texte).
 	// Puis, elle présente sur la banque au choix ces urls pour revenir sur le site
 	// - retour OK si le paiement s'est bien déroulé
-	$contexte['url_retour_ok']  = bank_url_api_retour($config,"response","id=$id_transaction;$transaction_hash");
+	$contexte['url_retour_ok'] = bank_url_api_retour($config, "response", "id=$id_transaction;$transaction_hash");
 	// - retour err si le paiement a été refusé
-	$contexte['url_retour_err'] = bank_url_api_retour($config,"cancel","id=$id_transaction;$transaction_hash");
+	$contexte['url_retour_err'] = bank_url_api_retour($config, "cancel", "id=$id_transaction;$transaction_hash");
 
 	// contexte_commande DSP2
 	// Contextual information related to the order : JSON, UTF-8, base64 encoded
@@ -145,37 +150,37 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	];
 
 	$billing = bank_porteur_infos_facturation($row);
-	if ($billing['prenom']) {
+	if ($billing['prenom']){
 		$contexte_commande['billing']['firstName'] = $billing['prenom'];
 	}
-	if ($billing['nom']) {
+	if ($billing['nom']){
 		$contexte_commande['billing']['lastName'] = $billing['nom'];
 	}
-	if ($billing['adresse']) {
+	if ($billing['adresse']){
 		$lignes = explode("\n", $billing['adresse']);
 		$contexte_commande['billing']['addressLine1'] = array_shift($lignes);
-		if (count($lignes)) {
+		if (count($lignes)){
 			$contexte_commande['billing']['addressLine2'] = array_shift($lignes);
 		}
-		if (count($lignes)) {
+		if (count($lignes)){
 			$contexte_commande['billing']['addressLine3'] = implode(' ', $lignes);
 		}
 	}
-	if ($billing['ville']) {
+	if ($billing['ville']){
 		$contexte_commande['billing']['city'] = $billing['ville'];
 	}
-	if ($billing['code_postal']) {
+	if ($billing['code_postal']){
 		$contexte_commande['billing']['postalCode'] = $billing['code_postal'];
 	}
-	if ($billing['etat']) {
+	if ($billing['etat']){
 		$contexte_commande['billing']['stateOrProvince'] = $billing['etat'];
 	}
-	if ($billing['pays']) {
+	if ($billing['pays']){
 		$contexte_commande['billing']['country'] = $billing['pays'];
 	}
 
 	$contexte_commande = json_encode($contexte_commande);
-	if ($GLOBALS['meta']['charset'] !== 'utf-8') {
+	if ($GLOBALS['meta']['charset']!=='utf-8'){
 		$contexte_commande = utf8_encode($contexte_commande);
 	}
 	$contexte_commande_base64 = base64_encode($contexte_commande);
@@ -187,8 +192,8 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	$contexte['MAC'] = $oHmac->computeHmac($phase1go_fields);
 
 	$hidden = "";
-	foreach($contexte as $k=>$v){
-		$hidden .= "<input type='hidden' name='$k' value='".str_replace("'", "&#39;", $v)."' />";
+	foreach ($contexte as $k => $v){
+		$hidden .= "<input type='hidden' name='$k' value='" . str_replace("'", "&#39;", $v) . "' />";
 	}
 
 	include_spip('inc/filtres_mini');

@@ -7,10 +7,12 @@
  * Auteurs :
  * Cedric Morin, Nursit.com
  * Olivier Tétard
- * (c) 2014 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 
 /**
@@ -22,7 +24,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @param null|array $response
  * @return array
  */
-function presta_virement_call_response_dist($config, $response=null){
+function presta_virement_call_response_dist($config, $response = null){
 
 	include_spip('inc/bank');
 

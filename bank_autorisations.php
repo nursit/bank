@@ -6,42 +6,46 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
 
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 // pipeline de chargement
-function bank_autoriser($flux) {return $flux;}
+function bank_autoriser($flux){
+	return $flux;
+}
 
-function autoriser_bank_configurer($faire, $mode='', $id=0, $qui = NULL, $opt = NULL){
+function autoriser_bank_configurer($faire, $mode = '', $id = 0, $qui = NULL, $opt = NULL){
 	return autoriser('webmestre');
 }
 
-function autoriser_utilisermodepaiement_dist($faire, $mode='', $id=0, $qui = NULL, $opt = NULL){
+function autoriser_utilisermodepaiement_dist($faire, $mode = '', $id = 0, $qui = NULL, $opt = NULL){
 	include_spip("presta/$mode/config");
-	$fonctions = array('autoriser_'.$mode.'_'.$faire,'autoriser_'.$mode.'_'.$faire.'_dist','autoriser_'.$mode,'autoriser_'.$mode.'_dist');
-	foreach ($fonctions as $f) {
-		if (function_exists($f)) {
-			return $f($faire,$mode,$id,$qui,$opt);
+	$fonctions = array('autoriser_' . $mode . '_' . $faire, 'autoriser_' . $mode . '_' . $faire . '_dist', 'autoriser_' . $mode, 'autoriser_' . $mode . '_dist');
+	foreach ($fonctions as $f){
+		if (function_exists($f)){
+			return $f($faire, $mode, $id, $qui, $opt);
 		}
 	}
 	return true;
 }
 
-function autoriser_utilisermodepaiementabo_dist($faire, $mode='', $id=0, $qui = NULL, $opt = NULL){
+function autoriser_utilisermodepaiementabo_dist($faire, $mode = '', $id = 0, $qui = NULL, $opt = NULL){
 	include_spip("presta/$mode/config");
-	$fonctions = array('autoriser_'.$mode.'_'.$faire,'autoriser_'.$mode.'_'.$faire.'_dist','autoriser_'.$mode,'autoriser_'.$mode.'_dist');
-	foreach ($fonctions as $f) {
-		if (function_exists($f)) {
-			return $f($faire,$mode,$id,$qui,$opt);
+	$fonctions = array('autoriser_' . $mode . '_' . $faire, 'autoriser_' . $mode . '_' . $faire . '_dist', 'autoriser_' . $mode, 'autoriser_' . $mode . '_dist');
+	foreach ($fonctions as $f){
+		if (function_exists($f)){
+			return $f($faire, $mode, $id, $qui, $opt);
 		}
 	}
 	return true;
 }
 
-function autoriser_transaction_iconifier_dist($faire, $mode='', $id=0, $qui = NULL, $opt = NULL){
+function autoriser_transaction_iconifier_dist($faire, $mode = '', $id = 0, $qui = NULL, $opt = NULL){
 	return false;
 }
 
@@ -55,7 +59,7 @@ function autoriser_transaction_iconifier_dist($faire, $mode='', $id=0, $qui = NU
  * @param $opt
  * @return bool
  */
-function autoriser_transaction_encaissercheque_dist($faire, $type, $id_transaction, $qui, $opt) {
+function autoriser_transaction_encaissercheque_dist($faire, $type, $id_transaction, $qui, $opt){
 	return autoriser('webmestre');
 }
 
@@ -69,7 +73,7 @@ function autoriser_transaction_encaissercheque_dist($faire, $type, $id_transacti
  * @param $opt
  * @return bool
  */
-function autoriser_transaction_encaisservirement_dist($faire, $type, $id_transaction, $qui, $opt) {
+function autoriser_transaction_encaisservirement_dist($faire, $type, $id_transaction, $qui, $opt){
 	return autoriser('webmestre');
 }
 
@@ -83,7 +87,7 @@ function autoriser_transaction_encaisservirement_dist($faire, $type, $id_transac
  * @param $opt
  * @return bool
  */
-function autoriser_transaction_encaissersimu_dist($faire, $type, $id_transaction, $qui, $opt) {
+function autoriser_transaction_encaissersimu_dist($faire, $type, $id_transaction, $qui, $opt){
 	return true;
 }
 
@@ -97,6 +101,6 @@ function autoriser_transaction_encaissersimu_dist($faire, $type, $id_transaction
  * @param $opt
  * @return bool
  */
-function autoriser_transaction_rembourser_dist($faire, $type, $id_transaction, $qui, $opt) {
+function autoriser_transaction_rembourser_dist($faire, $type, $id_transaction, $qui, $opt){
 	return autoriser('webmestre');
 }

@@ -8,28 +8,32 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 function formulaires_rembourser_transaction_charger_dist($id_transaction){
 
-	$transaction = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
-	if ($transaction['statut']!=='ok')
+	$transaction = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction));
+	if ($transaction['statut']!=='ok'){
 		return false;
+	}
 
 	include_spip('inc/autoriser');
-	if (!autoriser('rembourser','transaction',$id_transaction))
+	if (!autoriser('rembourser', 'transaction', $id_transaction)){
 		return false;
+	}
 
 	$valeurs = array(
 		'_id_transaction' => $id_transaction,
 		'_mode' => $transaction['mode'],
-		'raison'=>'',
+		'raison' => '',
 		'_autorisation_id_prefixe' => remboursement_prefixe(),
 	);
-	
+
 	return $valeurs;
 }
 
@@ -45,15 +49,14 @@ function formulaires_rembourser_transaction_verifier_dist($id_transaction){
 function formulaires_rembourser_transaction_traiter_dist($id_transaction){
 
 	$raison = _request('raison');
-	$raison = "<hr />\n".date('Y-m-d H:i:s').' REMBOURSEMENT '.remboursement_prefixe()." : ".$raison;
+	$raison = "<hr />\n" . date('Y-m-d H:i:s') . ' REMBOURSEMENT ' . remboursement_prefixe() . " : " . $raison;
 
 	$res = array();
-	$rembourser_transaction = charger_fonction('rembourser_transaction','bank');
+	$rembourser_transaction = charger_fonction('rembourser_transaction', 'bank');
 
-	if ($rembourser_transaction($id_transaction,array('message'=>$raison))){
+	if ($rembourser_transaction($id_transaction, array('message' => $raison))){
 		$res['message_ok'] = _L('Transaction remboursée');
-	}
-	else {
+	} else {
 		$res['message_erreur'] = _L('Erreur Technique, remboursement impossible');
 	}
 
@@ -61,5 +64,5 @@ function formulaires_rembourser_transaction_traiter_dist($id_transaction){
 }
 
 function remboursement_prefixe(){
-	return "#".$GLOBALS['visiteur_session']['id_auteur']."-".$GLOBALS['visiteur_session']['nom'];
+	return "#" . $GLOBALS['visiteur_session']['id_auteur'] . "-" . $GLOBALS['visiteur_session']['nom'];
 }

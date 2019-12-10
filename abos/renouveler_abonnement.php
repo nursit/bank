@@ -14,7 +14,9 @@
  * @licence    GNU/GPL
  * @package    SPIP\Abos\API
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('base/abstract_sql');
 
@@ -31,20 +33,20 @@ include_spip('base/abstract_sql');
  * @return bool|int
  *   false si pas reussi
  */
-function abos_renouveler_abonnement_dist($id_transaction,$abo_uid,$mode_paiement,$validite=""){
+function abos_renouveler_abonnement_dist($id_transaction, $abo_uid, $mode_paiement, $validite = ""){
 
-	spip_log("abos/renouveler_abonnement id_transaction=$id_transaction abo_uid=$abo_uid mode=$mode_paiement","bank");
+	spip_log("abos/renouveler_abonnement id_transaction=$id_transaction abo_uid=$abo_uid mode=$mode_paiement", "bank");
 
 	$id_abonnement = 0;
 
 	$id_abonnement = pipeline(
 		'bank_abos_renouveler_abonnement',
 		array(
-			'args'=>array(
-				'id_transaction'=>$id_transaction,
-				'abo_uid'=>$abo_uid,
-				'mode_paiement'=>$mode_paiement,
-				'validite'=>$validite,
+			'args' => array(
+				'id_transaction' => $id_transaction,
+				'abo_uid' => $abo_uid,
+				'mode_paiement' => $mode_paiement,
+				'validite' => $validite,
 			),
 			'data' => $id_abonnement,
 		)

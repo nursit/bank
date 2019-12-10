@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 /**
  * Verifier le statut d'une transaction lors du retour de l'internaute
@@ -18,7 +20,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @param null|array $response
  * @return array
  */
-function presta_paypal_call_response($config, $response=null){
+function presta_paypal_call_response($config, $response = null){
 
 	include_spip('inc/bank');
 	include_spip('presta/paypal/inc/paypal');

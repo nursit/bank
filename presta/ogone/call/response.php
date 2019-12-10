@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('presta/ogone/inc/ogone');
 
@@ -22,21 +24,22 @@ include_spip('presta/ogone/inc/ogone');
  * @param null|array $response
  * @return array
  */
-function presta_ogone_call_response_dist($config, $response=null){
+function presta_ogone_call_response_dist($config, $response = null){
 
 	include_spip('inc/bank');
 	$mode = $config['presta'];
 
-	if (!$response)
-		// recuperer la reponse en post et la decoder
+	if (!$response)// recuperer la reponse en post et la decoder
+	{
 		$response = ogone_get_response($config);
+	}
 	#var_dump($response);
-	if (!$response) {
-		return array(0,false);
+	if (!$response){
+		return array(0, false);
 	}
 
 	// depouillement de la transaction
-	list($id_transaction,$success) =  ogone_traite_reponse_transaction($config, $response);
+	list($id_transaction, $success) = ogone_traite_reponse_transaction($config, $response);
 
-	return array($id_transaction,$success);	
+	return array($id_transaction, $success);
 }

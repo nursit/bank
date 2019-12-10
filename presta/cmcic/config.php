@@ -6,17 +6,19 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 /* CMCIC  ----------------------------------------------------------- */
 
 
 /**
  * Constantes pour CMCIC
- * 
+ *
  * Vous pouvez définir ces constantes dans votre fichier mes_options.php
  *
  * Il vous faudra obtenir 3 informations de CMCIC et les définir dans
@@ -52,6 +54,7 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
 
 
 # Version du logiciel
-if (!defined('_MONETICOPAIEMENT_VERSION'))
+if (!defined('_MONETICOPAIEMENT_VERSION')){
 	define("_MONETICOPAIEMENT_VERSION", "3.0");
+}
 

@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 /**
  * il faut avoir un id_transaction et un transaction_hash coherents
@@ -19,12 +21,13 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @param null|array $response
  * @return array
  */
-function presta_gratuit_call_response_dist($config, $response=null){
+function presta_gratuit_call_response_dist($config, $response = null){
 
 	$mode = $config['presta'];
 	// recuperer la reponse en post et la decoder, en verifiant la signature
-	if (!$response)
+	if (!$response){
 		$response = bank_response_simple($mode);
+	}
 
 	if (!isset($response['id_transaction']) OR !isset($response['transaction_hash'])){
 		return bank_transaction_invalide(0,
@@ -39,7 +42,7 @@ function presta_gratuit_call_response_dist($config, $response=null){
 	$id_transaction = $response['id_transaction'];
 	$transaction_hash = $response['transaction_hash'];
 
-	if (!$row = sql_fetsel('*','spip_transactions','id_transaction='.intval($id_transaction))){
+	if (!$row = sql_fetsel('*', 'spip_transactions', 'id_transaction=' . intval($id_transaction))){
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => $mode,
@@ -60,11 +63,11 @@ function presta_gratuit_call_response_dist($config, $response=null){
 
 	// verifier que la commande a bien un total nul, sinon ce mode de paiement n'est pas autorise
 	if (intval($row['montant'])>0
-	  OR floatval($row['montant'])>0.00){
+		OR floatval($row['montant'])>0.00){
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => $mode,
-				'erreur' => "id_transaction $id_transaction, montant ".$row['montant'].">0 interdit",
+				'erreur' => "id_transaction $id_transaction, montant " . $row['montant'] . ">0 interdit",
 				'log' => bank_shell_args($response)
 			)
 		);
@@ -72,18 +75,18 @@ function presta_gratuit_call_response_dist($config, $response=null){
 
 	// OK, on peut accepter le reglement
 	$set = array(
-		"mode"=>$mode,
-		"montant_regle"=>$row['montant'],
-		"date_paiement"=>date('Y-m-d H:i:s'),
-		"statut"=>'ok',
-		"reglee"=>'oui'
+		"mode" => $mode,
+		"montant_regle" => $row['montant'],
+		"date_paiement" => date('Y-m-d H:i:s'),
+		"statut" => 'ok',
+		"reglee" => 'oui'
 	);
-	sql_updateq("spip_transactions", $set,	"id_transaction=".intval($id_transaction));
-	spip_log("call_resonse : id_transaction $id_transaction, reglee",$mode);
+	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
+	spip_log("call_resonse : id_transaction $id_transaction, reglee", $mode);
 
-	$regler_transaction = charger_fonction('regler_transaction','bank');
-	$regler_transaction($id_transaction,array('row_prec'=>$row));
+	$regler_transaction = charger_fonction('regler_transaction', 'bank');
+	$regler_transaction($id_transaction, array('row_prec' => $row));
 
-	return array($id_transaction,true);
+	return array($id_transaction, true);
 }
 

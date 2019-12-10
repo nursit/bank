@@ -8,7 +8,9 @@
  * @licence    GNU/GPL
  * @package    SPIP\Abos\API
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('base/abstract_sql');
 
@@ -25,7 +27,7 @@ include_spip('base/abstract_sql');
  */
 function abos_preparer_echeance_dist($id){
 
-	spip_log("abos/preparer_echeance id=$id","bank");
+	spip_log("abos/preparer_echeance id=$id", "bank");
 
 	/*
 	if (strncmp($id,"uid:",4)==0){
@@ -40,13 +42,14 @@ function abos_preparer_echeance_dist($id){
 	$id_transaction = pipeline(
 		'bank_abos_preparer_echeance',
 		array(
-			'args'=>array('id'=>$id),
+			'args' => array('id' => $id),
 			'data' => false,
 		)
 	);
 
-	if ($id_transaction)
+	if ($id_transaction){
 		return $id_transaction;
+	}
 
 	// DEPRECIE, pour compat ascendante
 
@@ -55,16 +58,17 @@ function abos_preparer_echeance_dist($id){
 	$id_transaction = pipeline(
 		'bank_abos_renouveler',
 		array(
-			'args'=>array('id'=>$id),
+			'args' => array('id' => $id),
 			'data' => false,
 		)
 	);
 
-	if ($id_transaction)
+	if ($id_transaction){
 		return $id_transaction;
+	}
 
 	// sinon on essaye d'appeler l'ancien abos/renouveler
-	if ($renouveler = charger_fonction('renouveler','abos',true)){
+	if ($renouveler = charger_fonction('renouveler', 'abos', true)){
 		return $renouveler($id);
 	}
 

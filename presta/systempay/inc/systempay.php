@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('inc/bank');
 
@@ -22,7 +24,7 @@ include_spip('inc/bank');
 function systempay_url_serveur($config){
 
 	$host = "";
-	switch($config['service']){
+	switch ($config['service']) {
 		case "osb":
 			$host = "https://secure.osb.pf";
 			break;
@@ -46,7 +48,7 @@ function systempay_url_serveur($config){
  * @return string
  */
 function systempay_key($config){
-	if ($config['mode_test']) {
+	if ($config['mode_test']){
 		return $config['CLE_test'];
 	}
 
@@ -63,9 +65,9 @@ function systempay_available_cards($config){
 
 	$mode = $config['presta'];
 	$cartes_possibles = array(
-		'CB'=>"CB.gif",
-		'VISA'=>"VISA.gif",
-		'MASTERCARD'=>"MASTERCARD.gif",
+		'CB' => "CB.gif",
+		'VISA' => "VISA.gif",
+		'MASTERCARD' => "MASTERCARD.gif",
 		'AMEX' => "AMEX.gif",
 	);
 
@@ -73,8 +75,7 @@ function systempay_available_cards($config){
 		// pas de CB et e-CB avec OSB
 		unset($cartes_possibles['CB']);
 		unset($cartes_possibles['E-CARTEBLEUE']);
-	}
-	else {
+	} else {
 		if ($config['type']!=='abo'){
 			$cartes_possibles['MAESTRO'] = "MAESTRO.gif";
 			$cartes_possibles['VISA_ELECTRON'] = "VISAELECTRON.gif";
@@ -114,11 +115,11 @@ function systempay_available_cards($config){
  *   parametres du form
  * @return string
  */
-function systempay_form_hidden($config,$parms){
-	$parms['signature'] = systempay_signe_contexte($parms,systempay_key($config));
+function systempay_form_hidden($config, $parms){
+	$parms['signature'] = systempay_signe_contexte($parms, systempay_key($config));
 	$hidden = "";
-	foreach($parms as $k=>$v){
-		$hidden .= "<input type='hidden' name='$k' value='".str_replace("'", "&#39;", $v)."' />";
+	foreach ($parms as $k => $v){
+		$hidden .= "<input type='hidden' name='$k' value='" . str_replace("'", "&#39;", $v) . "' />";
 	}
 
 	return $hidden;
@@ -131,18 +132,19 @@ function systempay_form_hidden($config,$parms){
  * @param string $key
  * @return string
  */
-function systempay_signe_contexte($contexte,$key) {
+function systempay_signe_contexte($contexte, $key){
 
 	// on ne prend que les infos vads_*
 	// a signer
 	$sign = array();
-	foreach($contexte as $k=>$v) {
-		if (strncmp($k,'vads_',5)==0)
+	foreach ($contexte as $k => $v){
+		if (strncmp($k, 'vads_', 5)==0){
 			$sign[$k] = $v;
+		}
 	}
 	// tri des parametres par ordre alphabétique
 	ksort($sign);
-	$contenu_signature = implode("+",$sign);
+	$contenu_signature = implode("+", $sign);
 	$contenu_signature .= "+$key";
 
 	$s = sha1($contenu_signature);
@@ -156,11 +158,11 @@ function systempay_signe_contexte($contexte,$key) {
  * @param $key
  * @return bool
  */
-function systempay_verifie_signature($values,$key) {
-	$signature = systempay_signe_contexte($values,$key);
+function systempay_verifie_signature($values, $key){
+	$signature = systempay_signe_contexte($values, $key);
 
-	if(isset($values['signature'])
-		AND ($values['signature'] == $signature))	{
+	if (isset($values['signature'])
+		AND ($values['signature']==$signature)){
 
 		return true;
 	}
@@ -177,27 +179,27 @@ function systempay_verifie_signature($values,$key) {
  */
 function systempay_recupere_reponse($config){
 	$reponse = array();
-	foreach($_REQUEST as $k=>$v){
-		if (strncmp($k,'vads_',5)==0){
+	foreach ($_REQUEST as $k => $v){
+		if (strncmp($k, 'vads_', 5)==0){
 			$reponse[$k] = $v;
 		}
 	}
-	$reponse['signature'] = (isset($_REQUEST['signature'])?$_REQUEST['signature']:'');
+	$reponse['signature'] = (isset($_REQUEST['signature']) ? $_REQUEST['signature'] : '');
 
-	$ok = systempay_verifie_signature($reponse,systempay_key($config));
+	$ok = systempay_verifie_signature($reponse, systempay_key($config));
 	// si signature invalide, verifier si
 	// on rejoue manuellement un call vads_url_check_src=RETRY incomplet
 	// en lui ajoutant le vads_subscription
 	if (!$ok
 		AND isset($reponse['vads_url_check_src'])
 		AND $reponse['vads_url_check_src']==='RETRY'
-	  AND isset($reponse['vads_subscription'])){
+		AND isset($reponse['vads_subscription'])){
 		$response_part = $reponse;
 		unset($response_part['vads_subscription']);
-		$ok = systempay_verifie_signature($response_part,systempay_key($config));
+		$ok = systempay_verifie_signature($response_part, systempay_key($config));
 	}
 	if (!$ok){
-		spip_log("recupere_reponse : signature invalide ".var_export($reponse,true),$config['presta']._LOG_ERREUR);
+		spip_log("recupere_reponse : signature invalide " . var_export($reponse, true), $config['presta'] . _LOG_ERREUR);
 		return false;
 	}
 
@@ -213,11 +215,13 @@ function systempay_recupere_reponse($config){
 function systempay_traite_reponse_transaction($config, $response){
 	#var_dump($response);
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
 	$config_id = bank_config_id($config);
 
 	$id_transaction = $response['vads_order_id'];
-	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction))){
+	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction))){
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => $mode,
@@ -235,7 +239,7 @@ function systempay_traite_reponse_transaction($config, $response){
 	// si c'est une souscription ou un register, lever les bons flags
 	// si pas de paiement on veut enregistrer les donnees et sortir de la sans generer d'erreur (le paiement arrivera plus tard)
 	if ($response['vads_page_action']
-	  AND in_array($response['vads_page_action'],array('REGISTER','REGISTER_SUBSCRIBE','REGISTER_PAY_SUBSCRIBE','SUBSCRIBE'))){
+		AND in_array($response['vads_page_action'], array('REGISTER', 'REGISTER_SUBSCRIBE', 'REGISTER_PAY_SUBSCRIBE', 'SUBSCRIBE'))){
 		$is_registering = true;
 		if ($response['vads_page_action']!=='REGISTER_PAY_SUBSCRIBE'){
 			$is_payment = false;
@@ -243,9 +247,8 @@ function systempay_traite_reponse_transaction($config, $response){
 		if ($response['vads_page_action']!=='REGISTER'){
 			$is_subscribing = true;
 		}
-	}
-	// cas appel depuis BO
-	elseif(in_array($response['vads_url_check_src'],array('BO','REC','RETRY'))) {
+	} // cas appel depuis BO
+	elseif (in_array($response['vads_url_check_src'], array('BO', 'REC', 'RETRY'))) {
 		if (isset($response['vads_identifier']) AND $response['vads_identifier']){
 			$is_registering = true;
 		}
@@ -258,24 +261,28 @@ function systempay_traite_reponse_transaction($config, $response){
 		// car c'est un bug chez PayZen qui oublie d'envoyer l'info vads_subscription dans ce cas
 		elseif ($is_registering
 			AND !isset($response['vads_subscription'])
-			AND isset($response['vads_recurrence_number']) AND $response['vads_recurrence_number']){
+			AND isset($response['vads_recurrence_number']) AND $response['vads_recurrence_number']) {
 			$is_subscribing = true;
-			if (!$response['vads_card_number']) $response['vads_card_number']='X_X';
+			if (!$response['vads_card_number']){
+				$response['vads_card_number'] = 'X_X';
+			}
 		}
 	}
 
 
 	// si c'est un debit, a-t-on bien l'operation attendue ?
 	if ($is_payment
-	  AND $response['vads_operation_type']!=="DEBIT"
-	  // et pas un Abandon ou Refus
-	  AND !in_array($response['vads_trans_status'],array('ABANDONED','NOT_CREATED','REFUSED'))){
+		AND $response['vads_operation_type']!=="DEBIT"
+		// et pas un Abandon ou Refus
+		AND !in_array($response['vads_trans_status'], array('ABANDONED', 'NOT_CREATED', 'REFUSED'))){
 		// si la transaction est deja reglee, ne pas la modifier, c'est OK
-		if ($row['statut']=='ok') return array($id_transaction,true);
+		if ($row['statut']=='ok'){
+			return array($id_transaction, true);
+		}
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => $mode,
-				'erreur' => "vads_operation_type=".$response['vads_operation_type']." non prise en charge",
+				'erreur' => "vads_operation_type=" . $response['vads_operation_type'] . " non prise en charge",
 				'log' => bank_shell_args($response),
 				'sujet' => "Operation invalide",
 				'update' => true,
@@ -295,26 +302,26 @@ function systempay_traite_reponse_transaction($config, $response){
 
 	// date paiement et date transaction
 	$t = gmmktime(
-		substr($date,8,2), //Heures
-		substr($date,10,2), //min
-		substr($date,12,2), //sec
-		substr($date,4,2), //mois
-		substr($date,6,2), //jour
-		substr($date,0,4) //annee
+		substr($date, 8, 2), //Heures
+		substr($date, 10, 2), //min
+		substr($date, 12, 2), //sec
+		substr($date, 4, 2), //mois
+		substr($date, 6, 2), //jour
+		substr($date, 0, 4) //annee
 	);
-	$date_paiement = date('Y-m-d H:i:s',$t);
+	$date_paiement = date('Y-m-d H:i:s', $t);
 	$date_transaction = $date_paiement;
 	if (isset($response['vads_presentation_date'])){
 		$date = $response['vads_trans_date'];
 		$t = gmmktime(
-			substr($date,8,2), //Heures
-			substr($date,10,2), //min
-			substr($date,12,2), //sec
-			substr($date,4,2), //mois
-			substr($date,6,2), //jour
-			substr($date,0,4) //annee
+			substr($date, 8, 2), //Heures
+			substr($date, 10, 2), //min
+			substr($date, 12, 2), //sec
+			substr($date, 4, 2), //mois
+			substr($date, 6, 2), //jour
+			substr($date, 0, 4) //annee
 		);
-		$date_transaction = date('Y-m-d H:i:s',$t);
+		$date_transaction = date('Y-m-d H:i:s', $t);
 	}
 
 	$erreur = array(
@@ -323,7 +330,7 @@ function systempay_traite_reponse_transaction($config, $response){
 	);
 
 	$erreur = array_filter($erreur);
-	$erreur = trim(implode(' ',$erreur));
+	$erreur = trim(implode(' ', $erreur));
 
 	$authorisation_id = $response['vads_auth_number'];
 	$transaction = $response['vads_payment_certificate'];
@@ -331,22 +338,28 @@ function systempay_traite_reponse_transaction($config, $response){
 	// si c'est un SEPA, on a pas encore la transaction et le numero d'autorisation car il y a un delai avant presentation
 	// (paiement dans le futur)
 	if ($is_sepa AND !$transaction){
-		list($transaction,$authorisation_id) = explode("_",$response['vads_card_number']);
+		list($transaction, $authorisation_id) = explode("_", $response['vads_card_number']);
 	}
 
-	if ($is_payment AND !$erreur AND !in_array($response['vads_trans_status'],array('AUTHORISED','CAPTURED','WAITING_AUTHORISATION'))) {
-		$erreur = "vads_trans_status ".$response['vads_trans_status']." (!IN AUTHORISED,CAPTURED,WAITING_AUTHORISATION)";
+	if ($is_payment AND !$erreur AND !in_array($response['vads_trans_status'], array('AUTHORISED', 'CAPTURED', 'WAITING_AUTHORISATION'))){
+		$erreur = "vads_trans_status " . $response['vads_trans_status'] . " (!IN AUTHORISED,CAPTURED,WAITING_AUTHORISATION)";
 	}
-	if (!$erreur AND $is_payment AND !$transaction) {$erreur = "pas de vads_payment_certificate";}
-	if (!$erreur AND !$authorisation_id) {$erreur = "pas de vads_auth_number";}
+	if (!$erreur AND $is_payment AND !$transaction){
+		$erreur = "pas de vads_payment_certificate";
+	}
+	if (!$erreur AND !$authorisation_id){
+		$erreur = "pas de vads_auth_number";
+	}
 
 	if ($erreur){
-	 	// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
-	 	if ($row['reglee']=='oui') return array($id_transaction,true);
-	 	// sinon enregistrer l'absence de paiement et l'erreur
+		// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
+		if ($row['reglee']=='oui'){
+			return array($id_transaction, true);
+		}
+		// sinon enregistrer l'absence de paiement et l'erreur
 		return bank_transaction_echec($id_transaction,
 			array(
-				'mode'=>$mode,
+				'mode' => $mode,
 				'config_id' => $config_id,
 				'date_paiement' => $date_paiement,
 				'code_erreur' => $response['vads_result'],
@@ -367,23 +380,22 @@ function systempay_traite_reponse_transaction($config, $response){
 		// on verifie que le montant est bon !
 		$montant_regle = $response['vads_effective_amount']/100;
 		if ($montant_regle!=$row['montant']){
-			spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=".$row['montant'].":".bank_shell_args($response),$mode);
+			spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=" . $row['montant'] . ":" . bank_shell_args($response), $mode);
 			// on log ca dans un journal dedie
-			spip_log($t,$mode . '_reglements_partiels');
+			spip_log($t, $mode . '_reglements_partiels');
 		}
 		$set['montant_regle'] = $montant_regle;
 		$set['date_paiement'] = $date_paiement;
 		$set['statut'] = 'ok';
 		$set['reglee'] = 'oui';
-	}
-	else {
+	} else {
 		$set['statut'] = 'attente';
 	}
 
 	// si la date de transaction Systempay est anterieure a celle du site - 1h, on la met a jour
 	// (cas ou l'on rejoue a posteriori une notification qui n'a pas marche)
 	if ($date_transaction<$row['date_transaction']
-	  OR $date_paiement<$row['date_transaction']){
+		OR $date_paiement<$row['date_transaction']){
 		$set['date_transaction'] = $date_transaction;
 	}
 
@@ -398,10 +410,13 @@ function systempay_traite_reponse_transaction($config, $response){
 		$set['refcb'] = '';
 		if (isset($response['vads_card_brand'])){
 			$set['refcb'] = $response['vads_card_brand'];
-			if ($set['refcb'] === "SDD") $set['refcb'] = "SEPA"; // more user friendly
+			if ($set['refcb']==="SDD"){
+				$set['refcb'] = "SEPA";
+			} // more user friendly
 		}
-		if (isset($response['vads_card_number']))
-			$set['refcb'] .= " ".$response['vads_card_number'];
+		if (isset($response['vads_card_number'])){
+			$set['refcb'] .= " " . $response['vads_card_number'];
+		}
 		$set['refcb'] = trim($set['refcb']);
 	}
 
@@ -409,9 +424,8 @@ function systempay_traite_reponse_transaction($config, $response){
 	// si vads_identifier fourni on le note dans refcb : c'est un identifiant de paiement
 	if (isset($response['vads_identifier']) AND $response['vads_identifier']){
 		$set['pay_id'] = $response['vads_identifier'];
-	}
-	// si c'est un enregistrement on a une erreur si pas d'identifier
-	elseif($is_registering){
+	} // si c'est un enregistrement on a une erreur si pas d'identifier
+	elseif ($is_registering) {
 		// si pas de paiement, on genere un echec
 		if (!$is_payment){
 			return bank_transaction_echec($id_transaction,
@@ -423,13 +437,12 @@ function systempay_traite_reponse_transaction($config, $response){
 					'log' => bank_shell_args($response),
 				)
 			);
-		}
-		else {
+		} else {
 			// sinon on enregistre l'erreur et on log+mail mais on fini le paiement en OK quand meme
-			$set['erreur'] = "Pas de vads_identifier sur operation ".$response['vads_operation_type'];
+			$set['erreur'] = "Pas de vads_identifier sur operation " . $response['vads_operation_type'];
 			bank_transaction_invalide($id_transaction,
 				array(
-					'mode'=>$mode,
+					'mode' => $mode,
 					'sujet' => 'Echec REGISTER',
 					'erreur' => $set['erreur'],
 					'log' => bank_shell_args($response),
@@ -441,9 +454,8 @@ function systempay_traite_reponse_transaction($config, $response){
 	// si on a un numero d'abonnement on le note dans abo_uid
 	if (isset($response['vads_subscription']) AND $response['vads_subscription']){
 		$set['abo_uid'] = $response['vads_subscription'];
-	}
-	// si c'est un abonnement on a une erreur si pas de vads_subscription
-	elseif($is_subscribing){
+	} // si c'est un abonnement on a une erreur si pas de vads_subscription
+	elseif ($is_subscribing) {
 		// si pas de paiement, on genere un echec
 		if (!$is_payment){
 			return bank_transaction_echec($id_transaction,
@@ -455,13 +467,12 @@ function systempay_traite_reponse_transaction($config, $response){
 					'log' => bank_shell_args($response),
 				)
 			);
-		}
-		else {
+		} else {
 			// sinon on enregistre l'erreur et on log+mail mais on fini le paiement en OK quand meme
-			$set['erreur'] = "Pas de vads_subscription sur operation ".$response['vads_operation_type'];
+			$set['erreur'] = "Pas de vads_subscription sur operation " . $response['vads_operation_type'];
 			bank_transaction_invalide($id_transaction,
 				array(
-					'mode'=>$mode,
+					'mode' => $mode,
 					'sujet' => 'Echec SUBSCRIBE',
 					'erreur' => $set['erreur'],
 					'log' => bank_shell_args($response),
@@ -471,8 +482,8 @@ function systempay_traite_reponse_transaction($config, $response){
 	}
 
 	// OK on met a jour la transaction en base
-	sql_updateq("spip_transactions",$set,"id_transaction=".intval($id_transaction));
-	spip_log("call_response : id_transaction $id_transaction, reglee",$mode);
+	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
+	spip_log("call_response : id_transaction $id_transaction, reglee", $mode);
 
 
 	// si on dispose des informations utilisateurs, les utiliser pour peupler la gloable bank_session
@@ -480,39 +491,42 @@ function systempay_traite_reponse_transaction($config, $response){
 	$var_users = array('vads_cust_email' => 'email', 'vads_cust_name' => 'nom', 'vads_cust_title' => 'civilite');
 	foreach ($var_users as $kr => $ks){
 		if (isset($response[$kr]) AND $response[$kr]){
-			if (!isset($GLOBALS['bank_session'])) $GLOBALS['bank_session'] = array();
+			if (!isset($GLOBALS['bank_session'])){
+				$GLOBALS['bank_session'] = array();
+			}
 			$GLOBALS['bank_session'][$ks] = $response[$kr];
 		}
 	}
 
 	// si transaction reglee, on poursuit le processus
 	if (isset($set['reglee']) AND $set['reglee']=='oui'){
-		$regler_transaction = charger_fonction('regler_transaction','bank');
-		$regler_transaction($id_transaction,array('row_prec'=>$row));
+		$regler_transaction = charger_fonction('regler_transaction', 'bank');
+		$regler_transaction($id_transaction, array('row_prec' => $row));
 		$res = true;
-	}
-	else {
-		$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction));
-		pipeline('trig_bank_reglement_en_attente',array(
-			'args' => array(
-				'statut'=>'attente',
-				'mode'=>$row['mode'],
-				'type'=>$row['abo_uid']?'abo':'acte',
-				'id_transaction'=>$id_transaction,
-				'row'=>$row,
-			),
-			'data' => '')
+	} else {
+		$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction));
+		pipeline('trig_bank_reglement_en_attente', array(
+				'args' => array(
+					'statut' => 'attente',
+					'mode' => $row['mode'],
+					'type' => $row['abo_uid'] ? 'abo' : 'acte',
+					'id_transaction' => $id_transaction,
+					'row' => $row,
+				),
+				'data' => '')
 		);
 		$res = 'wait';
 	}
 
 	// c'est un succes
-	return array($id_transaction,$res);
+	return array($id_transaction, $res);
 }
 
 
 function systempay_response_code($code){
-	if ($code==0) return '';
+	if ($code==0){
+		return '';
+	}
 	$pre = 'Erreur : ';
 	$codes = array(
 		2 => 'Le commerçant doit contacter la banque du porteur.',
@@ -522,13 +536,16 @@ function systempay_response_code($code){
 		96 => 'Erreur technique lors du paiement.',
 	);
 
-	if (isset($codes[intval($code)]))
-		return $pre.$codes[intval($code)];
+	if (isset($codes[intval($code)])){
+		return $pre . $codes[intval($code)];
+	}
 	return $pre ? $pre : 'Erreur inconnue';
 }
 
 function systempay_auth_response_code($code){
-	if ($code==0) return '';
+	if ($code==0){
+		return '';
+	}
 	$pre = 'Autorisation refusee : ';
 	$codes = array(
 		2 => 'contacter l’emetteur de carte',
@@ -579,7 +596,8 @@ function systempay_auth_response_code($code){
 		99 => 'incident domaine initiateur'
 	);
 
-	if (isset($codes[intval($code)]))
-		return $pre.$codes[intval($code)];
+	if (isset($codes[intval($code)])){
+		return $pre . $codes[intval($code)];
+	}
 	return $pre ? $pre : 'Erreur inconnue';
 }

@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('presta/systempay/inc/systempay');
 
@@ -35,16 +37,19 @@ include_spip('presta/systempay/inc/systempay');
  *   int $delay_subscribe : nb jours avant effet de l'abonnement (vads_sub_effect_date)
  * @return array
  */
-function presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config = array(), $action="PAYMENT", $options= array()){
+function presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config = array(), $action = "PAYMENT", $options = array()){
 
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
 
-	$cartes = array('CB','VISA','MASTERCARD','E-CARTEBLEUE');
-	if (isset($config['cartes']) AND $config['cartes'])
+	$cartes = array('CB', 'VISA', 'MASTERCARD', 'E-CARTEBLEUE');
+	if (isset($config['cartes']) AND $config['cartes']){
 		$cartes = $config['cartes'];
+	}
 	$c = $config;
-	$c['type'] = (strpos($action,"SUBSCRIBE")!==false?'abo':'acte');
+	$c['type'] = (strpos($action, "SUBSCRIBE")!==false ? 'abo' : 'acte');
 	$cartes_possibles = systempay_available_cards($c);
 
 	$options = array_merge(
@@ -53,25 +58,26 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 			'delay' => 0,
 			'delay_subscribe' => 0,
 		)
-		,$options
+		, $options
 	);
 	$abo_uid = $options['abo_uid'];
 
-	if (!in_array($action,array('REGISTER', 'REGISTER_UPDATE', 'REGISTER_PAY', 'REGISTER_SUBSCRIBE', 'REGISTER_PAY_SUBSCRIBE', 'PAYMENT', 'SUBSCRIBE'))){
-		spip_log("Action $action inconnue",$mode._LOG_ERREUR);
+	if (!in_array($action, array('REGISTER', 'REGISTER_UPDATE', 'REGISTER_PAY', 'REGISTER_SUBSCRIBE', 'REGISTER_PAY_SUBSCRIBE', 'PAYMENT', 'SUBSCRIBE'))){
+		spip_log("Action $action inconnue", $mode . _LOG_ERREUR);
 		return false;
 	}
-	if (in_array($action,array('REGISTER_UPDATE', 'SUBSCRIBE')) AND !$abo_uid){
-		spip_log("Action $action : abo_uid manquant pour generer le formulaire",$mode._LOG_ERREUR);
+	if (in_array($action, array('REGISTER_UPDATE', 'SUBSCRIBE')) AND !$abo_uid){
+		spip_log("Action $action : abo_uid manquant pour generer le formulaire", $mode . _LOG_ERREUR);
 		return false;
 	}
 
-	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash)))
+	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		return array();
+	}
 
 	if (!$row['id_auteur']
-	  AND isset($GLOBALS['visiteur_session']['id_auteur'])
-	  AND $GLOBALS['visiteur_session']['id_auteur']) {
+		AND isset($GLOBALS['visiteur_session']['id_auteur'])
+		AND $GLOBALS['visiteur_session']['id_auteur']){
 		sql_updateq("spip_transactions",
 			array("id_auteur" => intval($row['id_auteur'] = $GLOBALS['visiteur_session']['id_auteur'])),
 			"id_transaction=" . intval($id_transaction)
@@ -83,7 +89,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	$parm = array();
 
 	$parm['vads_site_id'] = $config['SITE_ID'];
-	$parm['vads_ctx_mode'] = ($config['mode_test']?"TEST":"PRODUCTION");
+	$parm['vads_ctx_mode'] = ($config['mode_test'] ? "TEST" : "PRODUCTION");
 	$parm['vads_version'] = _SYSTEMPAY_VERSION;
 
 	$parm['vads_trans_id'] = bank_transaction_id($row);
@@ -92,7 +98,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	// il ne faut pas utiliser la date de la transaction qui peut dater de plusieurs heures/jour
 	// mais la date de generation du formulaire de paiement, car il y a une verif de coherence chez payzen
 	// la demande doit arriver entre -30min et +2h30 par rapport a cette date
-	$parm['vads_trans_date'] = gmdate ("YmdHis");
+	$parm['vads_trans_date'] = gmdate("YmdHis");
 
 	$parm['vads_page_action'] = $action;
 	if ($abo_uid){
@@ -105,7 +111,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
 	$parm['vads_currency'] = 978;
-	$parm['vads_amount'] = intval(round(100*$row['montant'],0));
+	$parm['vads_amount'] = intval(round(100*$row['montant'], 0));
 
 	$parm['vads_language'] = $GLOBALS['spip_lang'];
 
@@ -113,18 +119,18 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	// demande repetee pour avoir le country egalement, pour securiser le paiement
 	// et tout ca devient tres fortement recommande avec DSP2
 	$billing = bank_porteur_infos_facturation($row);
-	foreach([
-		'email' => 'vads_cust_email',
-		'prenom' => 'vads_cust_first_name',
-		'nom' => 'vads_cust_last_name',
-		'adresse' => 'vads_cust_address',
-		'ville' => 'vads_cust_city',
-		'code_postal' => 'vads_cust_zip',
-		'pays' => 'vads_cust_country',
-		]
-		as $billing_key => $vads_key
-	) {
-		if( isset($billing[$billing_key]) and strlen($billing[$billing_key])) {
+	foreach ([
+		         'email' => 'vads_cust_email',
+		         'prenom' => 'vads_cust_first_name',
+		         'nom' => 'vads_cust_last_name',
+		         'adresse' => 'vads_cust_address',
+		         'ville' => 'vads_cust_city',
+		         'code_postal' => 'vads_cust_zip',
+		         'pays' => 'vads_cust_country',
+	         ]
+	         as $billing_key => $vads_key
+	){
+		if (isset($billing[$billing_key]) and strlen($billing[$billing_key])){
 			$parm[$vads_key] = str_replace("\n", " ", $billing[$billing_key]);
 		}
 	}
@@ -135,22 +141,22 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 
 	// Urls de retour
 	$parm['vads_return_mode'] = "GET"; // POST pour privacy et ne pas loger par Apache, mais GET pour ne pas avoir un message d'avertissement au retour utilisateur
-	$parm['vads_url_return'] = bank_url_api_retour($config,"response");
-	$parm['vads_url_cancel'] = bank_url_api_retour($config,"cancel");
+	$parm['vads_url_return'] = bank_url_api_retour($config, "response");
+	$parm['vads_url_cancel'] = bank_url_api_retour($config, "cancel");
 
-	$url_check = bank_url_api_retour($config,"autoresponse");
-	if (strpos($url_check,"localhost")===false){
-		$parm['vads_url_check'] = bank_url_api_retour($config,"autoresponse");
+	$url_check = bank_url_api_retour($config, "autoresponse");
+	if (strpos($url_check, "localhost")===false){
+		$parm['vads_url_check'] = bank_url_api_retour($config, "autoresponse");
 	}
 
 
 	$now = time();
 	// c'est un abonnement
-	if (in_array($action,array('REGISTER_PAY_SUBSCRIBE', 'REGISTER_SUBSCRIBE', 'SUBSCRIBE'))){
+	if (in_array($action, array('REGISTER_PAY_SUBSCRIBE', 'REGISTER_SUBSCRIBE', 'SUBSCRIBE'))){
 		// on decrit l'echeance
 		if (
-			$decrire_echeance = charger_fonction("decrire_echeance","abos",true)
-		  AND $echeance = $decrire_echeance($id_transaction)){
+			$decrire_echeance = charger_fonction("decrire_echeance", "abos", true)
+			AND $echeance = $decrire_echeance($id_transaction)){
 			if ($echeance['montant']>0){
 
 				// on commence maintenant
@@ -159,9 +165,9 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 					$date_effet = strtotime($echeance['date_start']);
 				}
 				if (isset($options['delay_subscribe']) AND $options['delay_subscribe']){
-					$date_effet = strtotime("+".$options['delay_subscribe']." DAY",$date_effet);
+					$date_effet = strtotime("+" . $options['delay_subscribe'] . " DAY", $date_effet);
 				}
-				$parm['vads_sub_effect_date'] = gmdate ("Ymd",$date_effet);
+				$parm['vads_sub_effect_date'] = gmdate("Ymd", $date_effet);
 				$nb = 0;
 				$nb_init = 0;
 				if (isset($echeance['count'])){
@@ -182,14 +188,18 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 				// si on fait le premier paiement maintenant, il ne faut pas le compter dans l'abonnement
 				if ($action==="REGISTER_PAY_SUBSCRIBE"){
 					// on decale l'effet a +1mois ou +1an
-					$parm['vads_sub_effect_date'] = gmdate ("Ymd",strtotime("+1 ".substr($freq,0,-2),$date_effet));
+					$parm['vads_sub_effect_date'] = gmdate("Ymd", strtotime("+1 " . substr($freq, 0, -2), $date_effet));
 					// on le decompte du nombre d'echeance
-					if ($nb_init>0) $nb_init--;
-					if ($nb>0) $nb--;
+					if ($nb_init>0){
+						$nb_init--;
+					}
+					if ($nb>0){
+						$nb--;
+					}
 				}
 
 				// montant de l'echeance
-				$parm['vads_sub_amount'] = intval(round(100*$echeance['montant'],0));
+				$parm['vads_sub_amount'] = intval(round(100*$echeance['montant'], 0));
 				// meme devise que le paiement initial
 				$parm['vads_sub_currency'] = $parm['vads_currency'];
 
@@ -198,8 +208,8 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 				$rule .= "FREQ=$freq;";
 
 				if ($freq=="MONTHLY"){
-					$monthday = intval(substr($parm['vads_sub_effect_date'],-2));
-					switch($monthday){
+					$monthday = intval(substr($parm['vads_sub_effect_date'], -2));
+					switch ($monthday) {
 						case 31:
 							$rule .= "BYMONTHDAY=28,29,30,31;BYSETPOS=-1;";
 							break;
@@ -224,14 +234,14 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 				if ($nb_init>0){
 					$parm['vads_sub_init_amount_number'] = $nb_init;
 					$parm['vads_sub_init_amount'] = $parm['vads_amount'];
-					if (isset($echeance['montant_init']) AND ($m=intval(round(100*$echeance['montant_init'],0)))>0){
+					if (isset($echeance['montant_init']) AND ($m = intval(round(100*$echeance['montant_init'], 0)))>0){
 						$parm['vads_sub_init_amount'] = $m;
 					}
 				}
 			}
 		}
 	}
-	if (in_array($action,array('REGISTER_PAY', 'REGISTER_PAY_SUBSCRIBE', 'PAYMENT'))){
+	if (in_array($action, array('REGISTER_PAY', 'REGISTER_PAY_SUBSCRIBE', 'PAYMENT'))){
 		if ($options['delay']){
 			$parm['vads_capture_delay'] = $options['delay'];
 		}
@@ -249,34 +259,33 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	// si on fait un REGISTER_SUBSCRIBE ou un SUBSCRIBE il faut un delai minimum de 13j sur le subscribe
 	// pas de probleme avec le REGISTER_PAY_SUBSCRIBE car le subscribe est decale d'une echeance dans ce cas
 	if (isset($cartes_possibles['SDD'])
-	  AND in_array('SDD',$cartes)
-	  AND (
-	       (in_array($action,array('REGISTER_SUBSCRIBE', 'SUBSCRIBE')) AND intval($options['delay_subscribe'])<13)
-		    )
-	  ){
+		AND in_array('SDD', $cartes)
+		AND (
+		(in_array($action, array('REGISTER_SUBSCRIBE', 'SUBSCRIBE')) AND intval($options['delay_subscribe'])<13)
+		)
+	){
 		$action_sdd = $action;
 		$config_sdd = $config;
 		$config_sdd['cartes'] = array('SDD');
 		$options_sdd = $options;
-		$options_sdd['delay_subscribe'] = max($options_sdd['delay_subscribe'],13); // minimum 13 jours pour un SEPA
+		$options_sdd['delay_subscribe'] = max($options_sdd['delay_subscribe'], 13); // minimum 13 jours pour un SEPA
 		$contexte = presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config_sdd, $action_sdd, $options_sdd);
 		unset($cartes_possibles['SDD']);
-	}
-	else {
+	} else {
 		$contexte = array(
-			'hidden'=>array(),
-			'action'=>systempay_url_serveur($config),
-			'backurl'=>url_absolue(self()),
-			'id_transaction'=>$id_transaction,
+			'hidden' => array(),
+			'action' => systempay_url_serveur($config),
+			'backurl' => url_absolue(self()),
+			'id_transaction' => $id_transaction,
 			'transaction_hash' => $transaction_hash
 		);
 	}
 
 
-	foreach($cartes as $carte){
+	foreach ($cartes as $carte){
 		if (isset($cartes_possibles[$carte])){
 			$parm['vads_payment_cards'] = $carte;
-			$contexte['hidden'][$carte] = systempay_form_hidden($config,$parm);
+			$contexte['hidden'][$carte] = systempay_form_hidden($config, $parm);
 			$contexte['logo'][$carte] = $cartes_possibles[$carte];
 		}
 	}

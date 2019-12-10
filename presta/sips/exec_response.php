@@ -6,16 +6,18 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 
-function presta_sips_exec_response_dist($service,$params,$certificat,$dir_logo,$response = 'response'){
+function presta_sips_exec_response_dist($service, $params, $certificat, $dir_logo, $response = 'response'){
 	$path_bin = find_in_path("presta/sips/bin/$response");
 	if (!file_exists($path_bin)){
-		spip_log("Binaire $path_bin non trouve","sips."._LOG_ERREUR);
+		spip_log("Binaire $path_bin non trouve", "sips." . _LOG_ERREUR);
 		return false;
 	}
 	$path_bin = realpath($path_bin);
@@ -26,14 +28,14 @@ function presta_sips_exec_response_dist($service,$params,$certificat,$dir_logo,$
 		$merchant_id = $params['merchant_id'];
 		unset($params['merchant_id']);
 	}
-	$realdir = sips_ecrire_config_merchant($service,$merchant_id,$certificat,$dir_logo);
-	$params['pathfile'] = $realdir."/pathfile";
+	$realdir = sips_ecrire_config_merchant($service, $merchant_id, $certificat, $dir_logo);
+	$params['pathfile'] = $realdir . "/pathfile";
 
 	// transformer la table d'arguments en commande shell
 	$params = sips_shell_args($params);
 
 	//	Appel du binaire response
-	spip_log("sips_exec_response $response : $path_bin $params",'sips');
-	$result=exec("$path_bin $params");
+	spip_log("sips_exec_response $response : $path_bin $params", 'sips');
+	$result = exec("$path_bin $params");
 	return $result;
 }

@@ -6,11 +6,13 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2014 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
 
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 session_start();
 
@@ -35,8 +37,8 @@ include_spip('inc/bank');
 function paypalexpress_is_sandbox($config){
 	$test = false;
 	// _PAYPAL_API_SANDBOX force a TRUE pour utiliser l'adresse de test de CMCIC
-	if ( (defined('_PAYPAL_API_SANDBOX') AND _PAYPAL_API_SANDBOX)
-	  OR (isset($config['mode_test']) AND $config['mode_test']) ){
+	if ((defined('_PAYPAL_API_SANDBOX') AND _PAYPAL_API_SANDBOX)
+		OR (isset($config['mode_test']) AND $config['mode_test'])){
 		$test = true;
 	}
 	return $test;
@@ -61,8 +63,7 @@ function paypal_api_url($config){
 
 	if (paypalexpress_is_sandbox($config)){
 		return 'https://www.sandbox.paypal.com/webscr&cmd=_express-checkout';
-	}
-	else {
+	} else {
 		return 'https://www.paypal.com/webscr&cmd=_express-checkout';
 	}
 }
@@ -78,8 +79,7 @@ function paypal_api_endpoint($config){
 
 	if (paypalexpress_is_sandbox($config)){
 		return 'https://api-3t.sandbox.paypal.com:443/nvp';
-	}
-	else {
+	} else {
 		return 'https://api-3t.paypal.com:443/nvp';
 	}
 }
@@ -92,7 +92,7 @@ function paypal_api_endpoint($config){
  * @param null $url_confirm
  * @return bool
  */
-function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=null){
+function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm = null){
 	$mode = $config['presta'];
 
 	if (!$row = sql_fetsel('*', 'spip_transactions', 'id_transaction=' . intval($id_transaction))){
@@ -117,7 +117,7 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=nu
 
 	// pour le retour
 	$_SESSION['id_transaction'] = $id_transaction;
-	$_SESSION['paypalexpress_url_confirm'] = ($url_confirm?$url_confirm:self());
+	$_SESSION['paypalexpress_url_confirm'] = ($url_confirm ? $url_confirm : self());
 
 
 	/* The servername and serverport tells PayPal where the buyer
@@ -137,8 +137,8 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=nu
 	cancel button during authorization of payment during the PayPal flow
 	*/
 
-	$returnURL = bank_url_api_retour($config,'response');
-	$cancelURL = bank_url_api_retour($config,'cancel');
+	$returnURL = bank_url_api_retour($config, 'response');
+	$cancelURL = bank_url_api_retour($config, 'cancel');
 
 	/* Construct the parameter string that describes the PayPal payment
 	the varialbes were set in the web form, and the resulting string
@@ -163,8 +163,7 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=nu
 		$payPalURL = parametre_url(paypal_api_url($config), 'token', $token, '&');
 
 		return $payPalURL;
-	}
-	else {
+	} else {
 		$erreur = "erreur lors de la demande du jeton";
 		if (isset($resArray['L_ERRORCODE0']) AND $resArray['L_ERRORCODE0']=='10002'){
 			$erreur .= " - Verifiez les parametres de signature de l'API";
@@ -183,10 +182,12 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm=nu
 }
 
 
-function bank_paypalexpress_checkoutpayment($payerid,$config){
+function bank_paypalexpress_checkoutpayment($payerid, $config){
 
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
 	$config_id = bank_config_id($config);
 
 
@@ -197,17 +198,17 @@ function bank_paypalexpress_checkoutpayment($payerid,$config){
 			array(
 				'mode' => $mode,
 				'erreur' => "id_transaction absent de la session",
-				'log' => var_export($_SESSION,true)
+				'log' => var_export($_SESSION, true)
 			)
 		);
 	}
 
-	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=" . intval($id_transaction))){
+	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction))){
 		return bank_transaction_invalide($id_transaction,
 			array(
 				'mode' => $mode,
 				'erreur' => "transaction inconnue",
-				'log' => var_export($_SESSION,true)
+				'log' => var_export($_SESSION, true)
 			)
 		);
 	}
@@ -215,16 +216,16 @@ function bank_paypalexpress_checkoutpayment($payerid,$config){
 	// hmm bizare, double hit ? On fait comme si c'etait OK
 	if ($row['reglee']=='oui'){
 		spip_log("Erreur transaction $id_transaction deja reglee", $mode . _LOG_INFO_IMPORTANTE);
-		return array($id_transaction,true);
+		return array($id_transaction, true);
 	}
 
 	// verifier que le payerid est conforme
 	if ($payerid!==$_SESSION['payer_id']){
-		$trace = "Payerid:$payerid\n".var_export($_SESSION,true);
-	 	// sinon enregistrer l'absence de paiement et l'erreur
+		$trace = "Payerid:$payerid\n" . var_export($_SESSION, true);
+		// sinon enregistrer l'absence de paiement et l'erreur
 		return bank_transaction_echec($id_transaction,
 			array(
-				'mode'=>$mode,
+				'mode' => $mode,
 				'config_id' => $config_id,
 				'code_erreur' => '',
 				'erreur' => "Annulation",
@@ -264,7 +265,7 @@ function bank_paypalexpress_checkoutpayment($payerid,$config){
 		$_SESSION['reshash'] = $resArray;
 		return bank_transaction_echec($id_transaction,
 			array(
-				'mode'=>$mode,
+				'mode' => $mode,
 				'config_id' => $config_id,
 				"date_paiement" => $date_paiement,
 				'code_erreur' => '',
@@ -279,15 +280,15 @@ function bank_paypalexpress_checkoutpayment($payerid,$config){
 	$montant_regle = $resArray['AMT'];
 
 	$set = array(
-		"autorisation_id"=>$authorisation_id,
-		"mode"=>"$mode/$config_id",
-		"montant_regle"=>$montant_regle,
-		"date_paiement"=>$date_paiement,
-		"statut"=>'ok',
-		"reglee"=>'oui'
+		"autorisation_id" => $authorisation_id,
+		"mode" => "$mode/$config_id",
+		"montant_regle" => $montant_regle,
+		"date_paiement" => $date_paiement,
+		"statut" => 'ok',
+		"reglee" => 'oui'
 	);
 
-	sql_updateq("spip_transactions",$set,
+	sql_updateq("spip_transactions", $set,
 		"id_transaction=" . intval($id_transaction)
 	);
 	spip_log("DoExpressCheckoutPayment : id_transaction $id_transaction, reglee", $mode . _LOG_INFO_IMPORTANTE);
@@ -299,15 +300,17 @@ function bank_paypalexpress_checkoutpayment($payerid,$config){
 			'EMAIL' => 'email',
 			'LASTNAME' => 'nom',
 			'FIRSTNAME' => 'prenom',
-			'SHIPTONAME'=>'nom',
-			'SHIPTOSTREET'=>'adresse',
-			'SHIPTOCITY'=>'ville',
-			'SHIPTOZIP'=>'code_postal',
-			'SHIPTOCOUNTRYCODE'=>'pays'
+			'SHIPTONAME' => 'nom',
+			'SHIPTOSTREET' => 'adresse',
+			'SHIPTOCITY' => 'ville',
+			'SHIPTOZIP' => 'code_postal',
+			'SHIPTOCOUNTRYCODE' => 'pays'
 		);
 		foreach ($var_users as $kr => $ks){
 			if (isset($response[$kr]) AND $response[$kr]){
-				if (!isset($GLOBALS['bank_session'])) $GLOBALS['bank_session'] = array();
+				if (!isset($GLOBALS['bank_session'])){
+					$GLOBALS['bank_session'] = array();
+				}
 				$GLOBALS['bank_session'][$ks] = $response[$kr];
 			}
 		}
@@ -316,9 +319,9 @@ function bank_paypalexpress_checkoutpayment($payerid,$config){
 	// a faire avant le reglement qui va poser d'autres variables de session
 	session_unset();
 
-	$regler_transaction = charger_fonction('regler_transaction','bank');
-	$regler_transaction($id_transaction,array('row_prec'=>$row));
-	return array($id_transaction,true);
+	$regler_transaction = charger_fonction('regler_transaction', 'bank');
+	$regler_transaction($id_transaction, array('row_prec' => $row));
+	return array($id_transaction, true);
 
 }
 
@@ -362,10 +365,10 @@ function bank_paypalexpress_hash_call($config, $methodName, $nvpStr){
 		//turning off the server and peer verification(TrustManager Concept).
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-		if (!defined('CURL_SSLVERSION_TLSv1_2')) {
+		if (!defined('CURL_SSLVERSION_TLSv1_2')){
 			define('CURL_SSLVERSION_TLSv1_2', 6);
 		}
-		curl_setopt ($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
+		curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
 
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 		curl_setopt($ch, CURLOPT_HEADER, false);
@@ -374,8 +377,9 @@ function bank_paypalexpress_hash_call($config, $methodName, $nvpStr){
 		curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
 		//if USE_PROXY constant set to TRUE in Constants.php, then only proxy will be enabled.
 		//Set proxy name to PROXY_HOST and port number to PROXY_PORT in constants.php
-		if (_PAYPAL_API_USE_PROXY)
+		if (_PAYPAL_API_USE_PROXY){
 			curl_setopt($ch, CURLOPT_PROXY, _PAYPAL_API_PROXY_HOST . ":" . _PAYPAL_API_PROXY_PORT);
+		}
 
 		//setting the nvpreq as POST FIELD to curl
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $nvpreq);
@@ -416,8 +420,9 @@ function bank_paypalexpress_deformatNVP($nvpstr){
 
 	$intial = 0;
 	$nvpArray = array();
-	if (substr($nvpstr, 0, 1)=='&')
+	if (substr($nvpstr, 0, 1)=='&'){
 		$nvpstr = substr($nvpstr, 1);
+	}
 
 
 	while (strlen($nvpstr)){
@@ -435,5 +440,3 @@ function bank_paypalexpress_deformatNVP($nvpstr){
 	}
 	return $nvpArray;
 }
-
-?>

@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('presta/ogone/inc/ogone');
 
@@ -62,38 +64,40 @@ include_spip('presta/ogone/inc/ogone');
  * @return array
  */
 function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $config){
-	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash)))
+	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		return array();
+	}
 
 	if (!$row['id_auteur']
-	  AND isset($GLOBALS['visiteur_session']['id_auteur'])
-	  AND $GLOBALS['visiteur_session']['id_auteur']) {
+		AND isset($GLOBALS['visiteur_session']['id_auteur'])
+		AND $GLOBALS['visiteur_session']['id_auteur']){
 		sql_updateq("spip_transactions",
 			array("id_auteur" => intval($row['id_auteur'] = $GLOBALS['visiteur_session']['id_auteur'])),
 			"id_transaction=" . intval($id_transaction)
 		);
 	}
 
-	$cartes = array('VISA','MasterCard','American Express');
-	if (isset($config['cartes']) AND is_array($config['cartes']) AND $config['cartes'])
+	$cartes = array('VISA', 'MasterCard', 'American Express');
+	if (isset($config['cartes']) AND is_array($config['cartes']) AND $config['cartes']){
 		$cartes = $config['cartes'];
+	}
 
 	include_spip('inc/filtres');
 	$contexte = array();
 
 	$contexte['PSPID'] = $config['PSPID'];
-	$contexte['orderID'] = $id_transaction."/".modulo($row['transaction_hash'],999999);
+	$contexte['orderID'] = $id_transaction . "/" . modulo($row['transaction_hash'], 999999);
 	$contexte['operation'] = "SAL"; // c'est un paiement a l'acte immediat
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
 	$contexte['currency'] = "EUR";
-	$contexte['amount'] = intval(round(100*$row['montant'],0));
+	$contexte['amount'] = intval(round(100*$row['montant'], 0));
 
 	#if (strlen($montant)<3)
 	#	$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
 
 	$contexte['language'] = ogone_language_code($GLOBALS['spip_lang']);
-	
+
 	// recuperer l'email
 	$contexte['EMAIL'] = bank_porteur_email($row);
 	$contexte['CN'] = "";
@@ -106,28 +110,28 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $con
 
 	// Urls de retour
 	include_spip("inc/bank");
-	$contexte['accepturl'] = bank_url_api_retour($config,'response',"id=$id_transaction;$transaction_hash");
-	$contexte['declineurl'] = bank_url_api_retour($config,'cancel',"id=$id_transaction;$transaction_hash");
-	$contexte['cancelurl'] = bank_url_api_retour($config,'cancel',"id=$id_transaction;$transaction_hash");
-	$contexte['exceptionurl'] = bank_url_api_retour($config,'response',"id=$id_transaction;$transaction_hash");
+	$contexte['accepturl'] = bank_url_api_retour($config, 'response', "id=$id_transaction;$transaction_hash");
+	$contexte['declineurl'] = bank_url_api_retour($config, 'cancel', "id=$id_transaction;$transaction_hash");
+	$contexte['cancelurl'] = bank_url_api_retour($config, 'cancel', "id=$id_transaction;$transaction_hash");
+	$contexte['exceptionurl'] = bank_url_api_retour($config, 'response', "id=$id_transaction;$transaction_hash");
 
 	$hidden = "";
-	foreach($contexte as $k=>$v){
-		$hidden .= "<input type='hidden' name='$k' value='".str_replace("'", "&#39;", $v)."' />";
+	foreach ($contexte as $k => $v){
+		$hidden .= "<input type='hidden' name='$k' value='" . str_replace("'", "&#39;", $v) . "' />";
 	}
 
 	include_spip('inc/filtres_mini');
 	$contexte = array(
-		'hidden'=>$hidden,
-		'action'=>ogone_url_serveur($config),
-		'backurl'=>url_absolue(self()),
-		'id_transaction'=>$id_transaction,
+		'hidden' => $hidden,
+		'action' => ogone_url_serveur($config),
+		'backurl' => url_absolue(self()),
+		'id_transaction' => $id_transaction,
 		'transaction_hash' => $transaction_hash
 	);
 
 	$cartes_possibles = ogone_available_cards($config);
 	$contexte['cards'] = array();
-	foreach($cartes as $carte){
+	foreach ($cartes as $carte){
 		if (isset($cartes_possibles[$carte])){
 			$contexte['cards'][$carte] = $cartes_possibles[$carte];
 		}

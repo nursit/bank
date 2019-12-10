@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 
 include_spip('presta/stripe/inc/stripe');
@@ -27,24 +29,26 @@ include_spip('presta/stripe/inc/stripe');
  *   type de paiement : acte ou abo
  * @return array
  */
-function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $config, $type="acte"){
+function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $config, $type = "acte"){
 
 	$mode = 'stripe';
 	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
-		spip_log("call_request : config invalide ".var_export($config,true),$mode._LOG_ERREUR);
+		spip_log("call_request : config invalide " . var_export($config, true), $mode . _LOG_ERREUR);
 		return "";
 	}
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']) $mode .= "_test";
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
 
-	if (!$row = sql_fetsel("*","spip_transactions","id_transaction=".intval($id_transaction)." AND transaction_hash=".sql_quote($transaction_hash))){
-		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable",$mode._LOG_ERREUR);
+	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
+		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable", $mode . _LOG_ERREUR);
 		return "";
 	}
 
 	if (!$row['id_auteur']
-	  AND isset($GLOBALS['visiteur_session']['id_auteur'])
-	  AND $GLOBALS['visiteur_session']['id_auteur']) {
+		AND isset($GLOBALS['visiteur_session']['id_auteur'])
+		AND $GLOBALS['visiteur_session']['id_auteur']){
 		sql_updateq("spip_transactions",
 			array("id_auteur" => intval($row['id_auteur'] = $GLOBALS['visiteur_session']['id_auteur'])),
 			"id_transaction=" . intval($id_transaction)
@@ -54,7 +58,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	// si c'est un abonnement, verifier qu'on saura le traiter vu les limitations de Stripe
 	// c'est un abonnement
 	$echeance = null;
-	if ($type === 'abo'){
+	if ($type==='abo'){
 		// on decrit l'echeance
 		if (
 			$decrire_echeance = charger_fonction("decrire_echeance", "abos", true)
@@ -92,9 +96,10 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	$email = $billing['email'];
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$montant = intval(round(100*$row['montant'],0));
-	if (strlen($montant)<3)
-		$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
+	$montant = intval(round(100*$row['montant'], 0));
+	if (strlen($montant)<3){
+		$montant = str_pad($montant, 3, '0', STR_PAD_LEFT);
+	}
 
 	include_spip('inc/filtres_mini'); // url_absolue
 
@@ -102,14 +107,14 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		'id_transaction' => $id_transaction,
 		'transaction_hash' => $transaction_hash,
 	);
-	if ($type === 'abo'){
+	if ($type==='abo'){
 		$contexte['abo'] = 1;
 	}
 	$contexte['sign'] = bank_sign_response_simple($mode, $contexte);
 
-	$url_success = bank_url_api_retour($config,"response");
-	$url_cancel = bank_url_api_retour($config,"cancel");
-	foreach($contexte as $k=>$v){
+	$url_success = bank_url_api_retour($config, "response");
+	$url_cancel = bank_url_api_retour($config, "cancel");
+	foreach ($contexte as $k => $v){
 		$url_success = parametre_url($url_success, $k, $v, '&');
 		$url_cancel = parametre_url($url_cancel, $k, $v, '&');
 	}
@@ -118,9 +123,9 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	$contexte['email'] = $email;
 	$contexte['amount'] = $montant;
 	$contexte['currency'] = 'eur';
-	$contexte['key'] = ($config['mode_test']?$config['PUBLISHABLE_KEY_test']:$config['PUBLISHABLE_KEY']);
+	$contexte['key'] = ($config['mode_test'] ? $config['PUBLISHABLE_KEY_test'] : $config['PUBLISHABLE_KEY']);
 	$contexte['name'] = bank_nom_site();
-	$contexte['description'] = _T('bank:titre_transaction') . '#'.$id_transaction;
+	$contexte['description'] = _T('bank:titre_transaction') . '#' . $id_transaction;
 	$contexte['image'] = find_in_path('img/logo-paiement-stripe.png');
 
 	$description = bank_description_transaction($id_transaction, $row);
@@ -129,17 +134,17 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		'description' => $description['description'],
 		'amount' => $contexte['amount'],
 		'currency' => $contexte['currency'],
-    'quantity' => 1,
+		'quantity' => 1,
 	];
 
-	if (!$contexte['image']) {
-		$chercher_logo = charger_fonction('chercher_logo','inc');
-		if ($logo = $chercher_logo(0,'site')){
+	if (!$contexte['image']){
+		$chercher_logo = charger_fonction('chercher_logo', 'inc');
+		if ($logo = $chercher_logo(0, 'site')){
 			$logo = reset($logo);
 			$contexte['image'] = $logo;
 		}
 	}
-	if ($contexte['image']) {
+	if ($contexte['image']){
 		$contexte['image'] = url_absolue($contexte['image']);
 		$item['images'] = [$contexte['image']];
 	}
@@ -150,19 +155,18 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	$checkout_customer = null;
 	// essayer de retrouver un customer existant pour l'id_auteur
 	// sinon Stripe creera un nouveau customer
-	if ($row['id_auteur']) {
+	if ($row['id_auteur']){
 		$config_id = bank_config_id($config);
 		$customer_id = sql_getfetsel('pay_id', 'spip_transactions',
 			'pay_id!=' . sql_quote('') . ' AND id_auteur=' . intval($row['id_auteur']) . ' AND statut=' . sql_quote('ok') . ' AND mode=' . sql_quote("$mode/$config_id"),
 			'', 'date_paiement DESC', '0,1');
-		if ($customer_id) {
+		if ($customer_id){
 			try {
 				$customer = \Stripe\Customer::retrieve($customer_id);
-				if ($customer and $customer->email === $contexte['email']) {
+				if ($customer and $customer->email===$contexte['email']){
 					$checkout_customer = $customer_id;
 				}
-			}
-			catch (Exception $e) {
+			} catch (Exception $e) {
 			}
 		}
 	}
@@ -172,7 +176,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 
 
 	// acte : utiliser une checkout session
-	if ($type === 'acte'){
+	if ($type==='acte'){
 		$session_desc = [
 			'payment_method_types' => ['card'],
 			'line_items' => [[$item]],

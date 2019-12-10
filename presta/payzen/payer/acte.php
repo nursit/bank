@@ -6,10 +6,12 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 
 /**
@@ -19,16 +21,16 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  * @param array $options
  * @return array|string
  */
-function presta_payzen_payer_acte_dist($config, $id_transaction, $transaction_hash, $options=array()){
+function presta_payzen_payer_acte_dist($config, $id_transaction, $transaction_hash, $options = array()){
 
-	$call_request = charger_fonction('request','presta/systempay/call');
-	$contexte = $call_request($id_transaction,$transaction_hash,$config);
+	$call_request = charger_fonction('request', 'presta/systempay/call');
+	$contexte = $call_request($id_transaction, $transaction_hash, $config);
 
-	$contexte['sandbox'] = ($config['mode_test']?' ':'');
+	$contexte['sandbox'] = ($config['mode_test'] ? ' ' : '');
 	$contexte['config'] = $config;
 
 	$contexte = array_merge($options, $contexte);
 
-	return recuperer_fond('presta/payzen/payer/acte',$contexte);
+	return recuperer_fond('presta/payzen/payer/acte', $contexte);
 }
 

@@ -5,10 +5,12 @@
  *
  * Auteurs :
  * Cedric Morin, Yterium.com
- * (c) 2007-2009 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 include_spip('presta/sipsv2/inc/sipsv2');
 include_spip('inc/date');
@@ -20,7 +22,7 @@ include_spip('inc/date');
  * @param null|array $response
  * @return array
  */
-function presta_sipsv2_call_response_dist($config, $response=null){
+function presta_sipsv2_call_response_dist($config, $response = null){
 
 	include_spip('inc/bank');
 	$mode = $config['presta'];
@@ -32,7 +34,7 @@ function presta_sipsv2_call_response_dist($config, $response=null){
 
 	list($merchant_id, $key_version, $secret_key) = sipsv2_key($config);
 	if (!isset($response['merchantId'])
-		or $response['merchantId']!==$merchant_id) {
+		or $response['merchantId']!==$merchant_id){
 		return bank_transaction_invalide(0,
 			array(
 				'mode' => $mode,

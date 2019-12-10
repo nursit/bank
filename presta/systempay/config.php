@@ -6,17 +6,19 @@
  *
  * Auteurs :
  * Cedric Morin, Nursit.com
- * (c) 2012-2018 - Distribue sous licence GNU/GPL
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
-if (!defined('_ECRIRE_INC_VERSION')) return;
+if (!defined('_ECRIRE_INC_VERSION')){
+	return;
+}
 
 /* Systempay  ----------------------------------------------------------- */
 
 
 /**
  * Constantes pour Systempay
- * 
+ *
  * Vous pouvez définir ces constantes dans votre fichier mes_options.php
  *
  * Il vous faudra obtenir 3 informations de Systempay et les définir dans
@@ -41,14 +43,15 @@ if (!defined('_ECRIRE_INC_VERSION')) return;
  */
 
 # Version du logiciel
-if (!defined('_SYSTEMPAY_VERSION'))
+if (!defined('_SYSTEMPAY_VERSION')){
 	define("_SYSTEMPAY_VERSION", "V2");
+}
 
 function systempay_lister_cartes_config($c){
 	$config = array(
-		'presta'=>'systempay',
-		'type'=>isset($c['type'])?$c['type']:'acte',
-		'service'=>isset($c['service'])?$c['service']:'cyberplus'
+		'presta' => 'systempay',
+		'type' => isset($c['type']) ? $c['type'] : 'acte',
+		'service' => isset($c['service']) ? $c['service'] : 'cyberplus'
 	);
 	include_spip("presta/systempay/inc/systempay");
 	return systempay_available_cards($config);
