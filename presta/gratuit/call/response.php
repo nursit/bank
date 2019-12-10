@@ -85,7 +85,7 @@ function presta_gratuit_call_response_dist($config, $response = null){
 	spip_log("call_resonse : id_transaction $id_transaction, reglee", $mode);
 
 	$regler_transaction = charger_fonction('regler_transaction', 'bank');
-	$regler_transaction($id_transaction, array('row_prec' => $row));
+	$regler_transaction($id_transaction, array('row_prec' => $row, 'lang' => $GLOBALS['spip_lang']));
 
 	return array($id_transaction, true);
 }

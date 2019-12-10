@@ -796,8 +796,17 @@ function bank_simple_call_response($config, $response = null){
 	if ($set['statut']==='ok'){
 		spip_log("call_resonse : id_transaction $id_transaction, reglee", $mode);
 
+		$options = array('row_prec' => $row);
+		// si l'auteur connecte est celui de la transaction, on garde la langue courante
+		// (sinon ca prendra automatiquement celle de l'auteur)
+		if (intval($row['id_auteur'])
+			and isset($GLOBALS['visiteur_session']['id_auteur'])
+			and intval($GLOBALS['visiteur_session']['id_auteur']) === intval($row['id_auteur']) ) {
+			$options['lang'] = $GLOBALS['spip_lang'];
+		}
+
 		$regler_transaction = charger_fonction('regler_transaction', 'bank');
-		$regler_transaction($id_transaction, array('row_prec' => $row));
+		$regler_transaction($id_transaction, $options);
 
 		$res = true;
 	} // sinon on trig les reglements en attente

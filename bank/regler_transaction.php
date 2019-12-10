@@ -43,18 +43,39 @@ function bank_regler_transaction_dist($id_transaction, $options = array()){
 		}
 	}
 
+	// si un message est fourni le prendre en compte, mais a charge pour l'appelant de gerer proprement le changement de langue d'abord
 	$message = (isset($options['message']) ? $options['message'] : "");
 	$notifier = (isset($options['notifier']) ? $options['notifier'] : true);
+
+	if (!isset($options['row_prec'])){
+		$options['row_prec'] = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction));
+	}
+	$row_prec = $options['row_prec'];
+
+	$lang = null;
+	if (!empty($options['lang'])) {
+		$lang = $options['lang'];
+	}
+	else {
+		// regler la langue si on connait le id_auteur
+		if ($id_auteur = intval($row_prec['id_auteur'])) {
+			$auteur = sql_fetsel('*', 'spip_auteurs', 'id_auteur='.intval($id_auteur));
+			if (!empty($auteur['lang'])) {
+				$lang = $auteur['lang'];
+			}
+		}
+	}
+	if ($lang) {
+		// changer la langue
+		lang_select($lang);
+	}
+
 
 	if (!strlen($message)){
 		$bank_messager_reglement_enregistre = charger_fonction('bank_messager_reglement_enregistre', 'inc');
 		$message = $bank_messager_reglement_enregistre($id_transaction);
 	}
 
-	if (!isset($options['row_prec'])){
-		$options['row_prec'] = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction));
-	}
-	$row_prec = $options['row_prec'];
 
 	// on pose un flag dans la session pour permettre la pose eventuelle de tag
 	// sur la prochaine page
@@ -135,6 +156,11 @@ function bank_regler_transaction_dist($id_transaction, $options = array()){
 	// on vide aussi l'erreur (cas d'un double hit IPN echec puis succes cf https://github.com/nursit/bank/issues/14)
 	// dans une requete separee au cas ou la maj de base n'a pas encore ete faite
 	sql_updateq("spip_transactions", array('erreur' => ''), "id_transaction=" . intval($id_transaction));
+
+	// on retablit la langue courante
+	if ($lang) {
+		lang_select();
+	}
 
 	// notifier aux admins avec un ticket caisse
 	if ($notifier){

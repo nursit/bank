@@ -162,7 +162,7 @@ function cmcic_traite_reponse_transaction($config, $response){
 	// remettre la langue de l'utilisateur qui a demandé la transaction
 	// puisque ici c'est le serveur cmcic qui fait le hit
 	include_spip('inc/lang');
-	changer_langue($lang);
+	lang_select($lang);
 
 
 	// cette ligne id/hash doit exister !
@@ -224,6 +224,8 @@ function cmcic_traite_reponse_transaction($config, $response){
 			break;
 
 	}
+
+	lang_select();
 
 	cmcic_notifier_banque_ok();
 	return $retour;
@@ -437,7 +439,7 @@ function cmcic_gerer_transaction_payee($config, $id_transaction, $response, $row
 	spip_log("call_response : id_transaction $id_transaction, reglee", $mode);
 
 	$regler_transaction = charger_fonction('regler_transaction', 'bank');
-	$regler_transaction($id_transaction, array('row_prec' => $row));
+	$regler_transaction($id_transaction, array('row_prec' => $row, 'lang' => $GLOBALS['spip_lang']));
 	return array($id_transaction, true);
 }
 

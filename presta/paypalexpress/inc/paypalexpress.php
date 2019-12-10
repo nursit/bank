@@ -320,7 +320,7 @@ function bank_paypalexpress_checkoutpayment($payerid, $config){
 	session_unset();
 
 	$regler_transaction = charger_fonction('regler_transaction', 'bank');
-	$regler_transaction($id_transaction, array('row_prec' => $row));
+	$regler_transaction($id_transaction, array('row_prec' => $row, 'lang' => $GLOBALS['spip_lang']));
 	return array($id_transaction, true);
 
 }
