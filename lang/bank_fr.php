@@ -50,13 +50,11 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'info_aucune_transaction' => 'Aucune transaction',
 	'info_1_transaction' => '1 transaction',
 	'info_cheque_envoyer' => 'Envoyez votre chèque libellé en euros
--* à l\'ordre de « @ordre@ » ;
--* du montant exact ;
+-* à l\'ordre de « <mark>@ordre@</mark> » ;
+-* du montant exact <mark>@montant@</mark> ;
 -* compensable dans une agence bancaire située en France ;
--* accompagné du numéro de transaction à noter au dos du chèque (pas sur la partie détachable).
-
-Transaction : #@transaction@
-_ Montant : @montant@',
+-* accompagné du numéro de transaction <mark>#@transaction@</mark> à noter au dos du chèque (pas sur la partie détachable).
+',
 	'info_cheque_envoyer_adresse' => 'Merci d\'envoyer votre chèque à l\'adresse :',
 	'info_cheque_etablir_ordre' => 'Chèque établi à l\'ordre de « <i>@ordre@</i> »',
 	'info_cheque_imprimer' => 'Les instructions concernant l\'établissement du chèque seront fournies après avoir cliqué sur ’Régler par chèque’.

@@ -19,7 +19,8 @@
 	[(#PIPELINE{bank_afficher_reglement_en_attente,
 			#ARRAY{
 			args,#ARRAY{id_transaction,#ID_TRANSACTION},
-			data,<p><:bank:info_mode_reglement_enregistre:> <:bank:confirme_reglement_attente:></p>}}
+			data,<p><:bank:info_mode_reglement_enregistre:><br />
+				<:bank:confirme_reglement_attente:></p>}}
 	)]
 	<:bank:info_cheque_envoyer{montant=#GET{montant},transaction=#GET{transaction},ordre=#GET{ordre}}|propre:>
 	<:bank:info_cheque_envoyer_adresse|propre:>

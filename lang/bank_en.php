@@ -50,13 +50,11 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'info_aucune_transaction' => 'No transaction',
 	'info_1_transaction' => '1 transaction',
 	'info_cheque_envoyer' => 'Send your check made out in Euros
--* to the order of “@ordre@”
--* for the exact amount
+-* to the order of “<mark>@ordre@</mark>”
+-* for the exact amount <mark>@montant@</mark>
 -* drawn from a bank located in France
--* accompanied by the transaction number, written on the back of the check.
-
-Transaction: #@transaction@
-_ Amount: @montant@',
+-* accompanied by the transaction number <mark>#@transaction@</mark>, written on the back of the check.
+',
 	'info_cheque_envoyer_adresse' => 'Thanks to send your check to the following address:',
 	'info_cheque_etablir_ordre' => 'Check to the order of "<i>@ordre@</i>"',
 	'info_cheque_imprimer' => 'Instructions about your check data will be provided after you click on ’Pay by check’.
