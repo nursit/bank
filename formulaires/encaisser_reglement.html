@@ -14,6 +14,7 @@
 	[<p class="reponse_formulaire reponse_formulaire_ok">(#ENV**{message_ok})</p>]
 	[<p class="reponse_formulaire reponse_formulaire_erreur">(#ENV**{message_erreur})</p>]
 
+	[(#ENV{editable}|oui)
 	<form method="post" action="#ENV{action}"><div>
 		#ACTION_FORMULAIRE{#ENV{action}}
 		<div class="editer-groupe">
@@ -36,5 +37,5 @@
 		<p class="boutons">
 			<input type="submit" name="enregistrer" class="submit" value="<:bank:bouton_enregistrer_reglement_ok|attribut_html:>" />
 		</p>
-	</div></form>
+	</div></form>]
 </div>

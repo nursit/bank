@@ -34,10 +34,6 @@ function formulaires_encaisser_reglement_charger_dist($id_transaction, $config){
 		return false;
 	}
 
-	if ($transaction['reglee']==='oui'){
-		return false;
-	}
-
 	$valeurs = array(
 		'_id_transaction' => $id_transaction,
 		'_mode' => $mode,
@@ -45,6 +41,16 @@ function formulaires_encaisser_reglement_charger_dist($id_transaction, $config){
 		'montant' => affiche_monnaie($transaction['montant'], 2, false),
 		'_autorisation_id_suffixe' => "/" . autorisation_suffixe(),
 	);
+
+	if ($transaction['reglee']==='oui'){
+		// si c'est un POST on met juste editable=false pour afficher le message ok et la redirection si besoin
+		if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+			$valeurs['editable'] = false;
+		}
+		else {
+			return false;
+		}
+	}
 
 	return $valeurs;
 }

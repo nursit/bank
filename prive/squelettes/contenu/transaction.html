@@ -29,7 +29,7 @@
 
 	[<div class="notice">(#ERREUR)</div>]
 
-	[<div class="message">(#MESSAGE)</div>]
+	[<div class="message info">(#MESSAGE)</div>]
 
 	[(#STATUT|in_array{#LISTE{commande,attente}}|et{#AUTORISER{regler,transaction,#ID_TRANSACTION}})
 		[(#URL_ECRIRE{payer,id_transaction=#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH}|icone_verticale{<:bank:paiement:>,credit-card,'',right})]
