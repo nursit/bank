@@ -42,5 +42,5 @@
 	<pipeline nom="trig_bank_reglement_en_echec" action="" />
 
 	<menu nom="configurer_bank" titre="bank:titre_menu_configurer" parent="menu_configuration" icone="images/bank-16.png" action="configurer_bank" />
-	<menu nom="transactions" titre="bank:titre_menu_transactions" parent="menu_activite" icone="images/transactions-16.png" />
+	<menu nom="transactions" titre="bank:titre_menu_transactions" parent="menu_activite" icone="images/transaction-16.png" />
 </paquet>

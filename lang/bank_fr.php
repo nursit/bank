@@ -171,6 +171,7 @@ _ Compte bancaire :
 
 // P
 	'payer' => 'Payer',
+	'paiement' => 'Paiement',
 	'payer_avec' => 'Payer par <span>@nom@</span>',
 	'payer_par_carte' => 'Payer par @carte@',
 	'payer_par_carte_bancaire' => 'Payer par carte bancaire',

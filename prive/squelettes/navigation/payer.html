@@ -1,0 +1,17 @@
+<BOUCLE_nav(transactions){id_transaction}>
+#BOITE_OUVRIR{'','info'}
+[(#PIPELINE{boite_infos,#ARRAY{data,'',args,#ARRAY{'type','transaction','id',#ENV{id_transaction}}}})]
+
+	#SET{url_retour,#VAL{transactions}|generer_url_ecrire{id_transaction=#ID_TRANSACTION,0,#EVAL{true}}}
+
+	[(#URL_ACTION_AUTEUR{abandonner_transaction,#ID_TRANSACTION,#GET{url_retour}}|icone_horizontale{<:bank:bouton_abondonner_transaction:>,transaction,del})]
+
+#BOITE_FERMER
+
+#PIPELINE{afficher_config_objet,#ARRAY{args,#ARRAY{type,transaction,id,#ID_TRANSACTION},data,''}}
+
+#BOITE_OUVRIR{'','raccourcis'}
+[(#URL_ECRIRE{transaction,id_transaction=#ID_TRANSACTION}|icone_horizontale{<:retour:>,transaction})]
+#BOITE_FERMER
+
+</BOUCLE_nav>

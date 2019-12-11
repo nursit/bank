@@ -169,6 +169,7 @@ _ Bank account:
 
 // P
 	'payer' => 'Pay',
+	'paiement' => 'Payment',
 	'payer_avec' => 'Pay by <span>@nom@</span>',
 	'payer_par_carte' => 'Pay by @carte@',
 	'payer_par_carte_bancaire' => 'Pay by credit card',
