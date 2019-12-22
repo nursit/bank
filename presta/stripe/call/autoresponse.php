@@ -101,12 +101,14 @@ function stripe_retrieve_event($config){
 			$erreur = $e->getMessage();
 			$erreur_code = 'error';
 			// Invalid payload
+			spip_log("erreur Webhook stripe_retrieve_event: \UnexpectedValueException: $erreur", $mode . $auto . _LOG_ERREUR);
 			http_response_code(400); // PHP 5.4 or greater
 			exit();
 		} catch (\Stripe\Error\SignatureVerification $e) {
 			$erreur = $e->getMessage();
 			$erreur_code = 'error';
 			// Invalid signature
+			spip_log("erreur Webhook stripe_retrieve_event: \Stripe\Error\SignatureVerification: $erreur", $mode . $auto . _LOG_ERREUR);
 			http_response_code(400); // PHP 5.4 or greater
 			exit();
 		}
