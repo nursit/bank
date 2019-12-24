@@ -80,11 +80,16 @@ function stripe_dispatch_event($config, $event, $auto = 'auto'){
 	return $res;
 }
 
-function stripe_retrieve_event($config){
+function stripe_retrieve_event($config, $auto = 'auto'){
 	// charger l'API Stripe avec la cle
 	stripe_init_api($config);
 
 	$event = null;
+
+	$mode = $config['presta'].$auto;
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
 
 	// methode securisee par une cle secrete partagee
 	// You can find your endpoint's secret in your webhook settings
@@ -101,14 +106,14 @@ function stripe_retrieve_event($config){
 			$erreur = $e->getMessage();
 			$erreur_code = 'error';
 			// Invalid payload
-			spip_log("erreur Webhook stripe_retrieve_event: \UnexpectedValueException: $erreur", $mode . $auto . _LOG_ERREUR);
+			spip_log("erreur Webhook stripe_retrieve_event \UnexpectedValueException: $erreur", $mode . _LOG_ERREUR);
 			http_response_code(400); // PHP 5.4 or greater
 			exit();
 		} catch (\Stripe\Error\SignatureVerification $e) {
 			$erreur = $e->getMessage();
 			$erreur_code = 'error';
 			// Invalid signature
-			spip_log("erreur Webhook stripe_retrieve_event: \Stripe\Error\SignatureVerification: $erreur", $mode . $auto . _LOG_ERREUR);
+			spip_log("erreur Webhook stripe_retrieve_event \Stripe\Error\SignatureVerification: $erreur", $mode . _LOG_ERREUR);
 			http_response_code(400); // PHP 5.4 or greater
 			exit();
 		}
@@ -134,6 +139,7 @@ function stripe_retrieve_event($config){
 				$erreur = $e->getMessage();
 				$erreur_code = 'error';
 			}
+			spip_log("erreur \Stripe\Event::retrieve($event_id): $erreur", $mode . _LOG_ERREUR);
 		}
 	}
 
