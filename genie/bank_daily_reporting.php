@@ -84,7 +84,7 @@ $lignes
 	}
 
 	// une alerte mail sur les transactions dont le traitement du paiement a ete interrompu
-	if ($transactions = sql_allfetsel('*', 'spip_transactions', 'finie=' . intval(-1))){
+	if ($transactions = sql_allfetsel('*', 'spip_transactions', 'finie<0')){
 		include_spip('inc/filtres');
 		$c = unserialize($GLOBALS['meta']['bank_paiement']);
 		$email = $GLOBALS['meta']['email_webmaster'];
