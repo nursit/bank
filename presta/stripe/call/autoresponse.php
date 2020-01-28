@@ -162,6 +162,9 @@ function stripe_webhook_checkout_session_completed_dist($config, $event){
 		if ($session->payment_intent){
 			$response['payment_id'] = $session->payment_intent;
 		}
+		if ($session->locale) {
+			$response['lang'] = $session->locale;
+		}
 
 		if ($session->success_url){
 			// get id_transaction & transaction_hash from success_url if valid for this website (case of multiples webhooks)

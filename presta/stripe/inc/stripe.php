@@ -354,8 +354,12 @@ function stripe_traite_reponse_transaction($config, &$response){
 	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
 	spip_log("call_response : id_transaction $id_transaction, reglee", $mode);
 
+	$options = array('row_prec' => $row);
+	if (!empty($response['lang'])) {
+		$options['lang'] = $response['lang'];
+	}
 	$regler_transaction = charger_fonction('regler_transaction', 'bank');
-	$regler_transaction($id_transaction, array('row_prec' => $row));
+	$regler_transaction($id_transaction, $options);
 
 	// update payment informations for Stripe Dashboard
 	// after billing
