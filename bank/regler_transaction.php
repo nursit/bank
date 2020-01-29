@@ -126,7 +126,7 @@ function bank_regler_transaction_dist($id_transaction, $options = array()){
 			'data' => $message)
 	);
 	// incrementer finie pour savoir ou le traitement a ete interrompu, si jamais il faut reparer
-	sql_updateq('spip_transactions', array('finie' => -2), "id_transaction=" . intval($id_transaction));
+	sql_updateq('spip_transactions', array('finie' => -2, 'message' => $message), "id_transaction=" . intval($id_transaction));
 
 	// d'abord un pipeline de facturation
 	$message = pipeline('bank_facturer_reglement', array(
@@ -141,7 +141,7 @@ function bank_regler_transaction_dist($id_transaction, $options = array()){
 			'data' => $message)
 	);
 	// incrementer finie pour savoir ou le traitement a ete interrompu, si jamais il faut reparer
-	sql_updateq('spip_transactions', array('finie' => -3), "id_transaction=" . intval($id_transaction));
+	sql_updateq('spip_transactions', array('finie' => -3, 'message' => $message), "id_transaction=" . intval($id_transaction));
 
 	// ensuite un pipeline de traitement, notification etc...
 	$message = pipeline('bank_traiter_reglement', array(
