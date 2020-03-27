@@ -244,11 +244,11 @@ function bank_vider_tables($nom_meta_base_version){
  * @return bool
  */
 function bank_install($action, $prefix, $version_cible){
-	$version_base = $GLOBALS[$prefix . "_base_version"];
+	$nom_meta_base_version = $prefix . "_base_version";
 	switch ($action) {
 		case 'test':
-			$ok = (isset($GLOBALS['meta'][$prefix . "_base_version"])
-				AND spip_version_compare($GLOBALS['meta'][$prefix . "_base_version"], $version_cible, ">="));
+			$ok = (isset($GLOBALS['meta'][$nom_meta_base_version])
+				AND spip_version_compare($GLOBALS['meta'][$nom_meta_base_version], $version_cible, ">="));
 			if ($ok){
 				// verifier/maj des fichiers de config
 				bank_presta_install();
@@ -256,10 +256,10 @@ function bank_install($action, $prefix, $version_cible){
 			return $ok;
 			break;
 		case 'install':
-			bank_upgrade($prefix . "_base_version", $version_cible);
+			bank_upgrade($nom_meta_base_version, $version_cible);
 			break;
 		case 'uninstall':
-			bank_vider_tables($prefix . "_base_version");
+			bank_vider_tables($nom_meta_base_version);
 			break;
 	}
 }
