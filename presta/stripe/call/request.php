@@ -30,7 +30,7 @@ include_spip('presta/stripe/inc/stripe');
  * @return array
  */
 function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $config, $type = "acte"){
-
+	$devise_defaut = bank_devise_defaut();
 	$mode = 'stripe';
 	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
 		spip_log("call_request : config invalide " . var_export($config, true), $mode . _LOG_ERREUR);
@@ -96,7 +96,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	$email = $billing['email'];
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$montant = intval(round(100*$row['montant'], 0));
+	$montant = intval(round((10**$devise_defaut['fraction']) * $row['montant'], 0));
 	if (strlen($montant)<3){
 		$montant = str_pad($montant, 3, '0', STR_PAD_LEFT);
 	}
@@ -122,7 +122,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	$contexte['action'] = str_replace('&', '&amp;', $url_success);
 	$contexte['email'] = $email;
 	$contexte['amount'] = $montant;
-	$contexte['currency'] = 'eur';
+	$contexte['currency'] = strtolower($devise_defaut['code']);
 	$contexte['key'] = ($config['mode_test'] ? $config['PUBLISHABLE_KEY_test'] : $config['PUBLISHABLE_KEY']);
 	$contexte['name'] = bank_nom_site();
 	$contexte['description'] = _T('bank:titre_transaction') . '#' . $id_transaction;
