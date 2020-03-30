@@ -88,7 +88,8 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 
 
 	// Currency : ISO 4217 compliant
-	$devise = "EUR";
+	$devise_defaut = bank_devise_defaut();
+	$devise = strtoupper($devise_defaut['code']);
 	// Amount : format  "xxxxx.yy" (no spaces)
 	$montant = $row['montant'];
 	$contexte['version'] = $oTpe->sVersion;
