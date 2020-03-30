@@ -179,3 +179,18 @@ function bank_annonce_version_plugin($format = 'string'){
 
 	return $infos;
 }
+
+/**
+ * Renvoie la devise par défaut utilisée par Bank, modifiable par pipeline
+ * 
+ * @pipeline_appel bank_devise_defaut
+ * @return string
+ *     Identifiant ISO 4217 alpha d'une devise
+ */
+function bank_devise_defaut() {
+	$devise = 'EUR';
+	
+	$devise = pipeline('bank_devise_defaut', $devise);
+	
+	return $devise;
+}
