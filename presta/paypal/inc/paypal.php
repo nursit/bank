@@ -155,7 +155,8 @@ function paypal_traite_response($config, $response){
 	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
 
 	// une monnaie est-elle bien indique (et en EUR) ?
-	if (!isset($response['mc_currency']) OR ($response['mc_currency']!='EUR')){
+	$devise_defaut = bank_devise_defaut();
+	if (!isset($response['mc_currency']) OR ($response['mc_currency'] != strtoupper($devise_defaut['code']))) {
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
