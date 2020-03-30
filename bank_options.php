@@ -188,7 +188,11 @@ function bank_annonce_version_plugin($format = 'string'){
  *     Identifiant ISO 4217 alpha d'une devise
  */
 function bank_devise_defaut() {
-	$devise = 'EUR';
+	$devise = array(
+		'code' => 'EUR',
+		'code_num' => 978,
+		'fraction' => 2,
+	);
 	
 	$devise = pipeline('bank_devise_defaut', $devise);
 	
