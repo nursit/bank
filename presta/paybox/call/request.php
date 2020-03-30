@@ -60,7 +60,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	$mail = bank_porteur_email($row);
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$montant = intval(round(100*$row['montant'], 0));
+	$montant = intval(round((10**$devise_defaut['fraction']) * $row['montant'], 0));
 	if (strlen($montant)<3){
 		$montant = str_pad($montant, 3, '0', STR_PAD_LEFT);
 	}
@@ -74,7 +74,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 
 	$parm['PBX_OUTPUT'] = "C"; // recuperer uniquement les hidden
 	$parm['PBX_LANGUE'] = "FRA";
-	$parm['PBX_DEVISE'] = "978";
+	$parm['PBX_DEVISE'] = (string)$devise_defaut['code_num'];
 	$parm['PBX_TOTAL'] = $montant;
 	$parm['PBX_PORTEUR'] = defined('_PBX_PORTEUR') ? _PBX_PORTEUR : $mail;
 	$parm['PBX_CMD'] = intval($id_transaction);
@@ -103,7 +103,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 			$decrire_echeance = charger_fonction("decrire_echeance", "abos", true)
 			AND $echeance = $decrire_echeance($id_transaction, false)){
 			if ($echeance['montant']>0){
-				$montant_echeance = str_pad(intval(round(100*$echeance['montant'])), 10, "0", STR_PAD_LEFT);
+				$montant_echeance = str_pad(intval(round((10**$devise_defaut['fraction']) * $echeance['montant'])), 10, "0", STR_PAD_LEFT);
 
 				// si plus d'une echeance initiale prevue on ne sait pas faire avec Paybox
 				if (isset($echeance['count_init']) AND $echeance['count_init']>1){

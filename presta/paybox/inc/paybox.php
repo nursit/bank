@@ -398,7 +398,8 @@ function paybox_traite_reponse_transaction($config, $response){
 	// Ouf, le reglement a ete accepte
 
 	// on verifie que le montant est bon !
-	$montant_regle = $response['montant']/100;
+	$devise_defaut = bank_devise_defaut();
+	$montant_regle = $response['montant'] / (10**$devise_defaut['fraction']);
 	if ($montant_regle!=$row['montant']){
 		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=" . $row['montant'] . ":" . paybox_shell_args($response), $mode);
 		// on log ca dans un journal dedie

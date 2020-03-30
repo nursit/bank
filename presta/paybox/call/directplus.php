@@ -40,6 +40,7 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	}
 	$config['mode'] .= "_dplus"; // pour les logs
 	$mode = $config['mode'];
+	$devise_defaut = bank_devise_defaut();
 
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		spip_log("Transaction inconnue $id_transaction/$transaction_hash", $mode . _LOG_ERREUR);
@@ -62,7 +63,7 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	$mail = sql_getfetsel('email', "spip_auteurs", 'id_auteur=' . intval($row['id_auteur']));
 
 	// passage en centimes d'euros
-	$montant = intval(round(100*$row['montant']));
+	$montant = intval(round((10**$devise_defaut['fraction']) * $row['montant']));
 	if (strlen($montant)<10){
 		$montant = str_pad($montant, 10, '0', STR_PAD_LEFT);
 	}
@@ -76,7 +77,7 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	$parm['CLE'] = $config['DIRECT_PLUS_CLE'];
 	$parm['DATEQ'] = date('dmYHis');
 	$parm['TYPE'] = _PAYBOX_DIRECTPLUS_AUTHDEBIT_ABONNE;
-	$parm['DEVISE'] = "978";
+	$parm['DEVISE'] = (string)$devise_defaut['code_num'];
 	$parm['REFERENCE'] = intval($id_transaction);
 	$parm['ARCHIVAGE'] = intval($id_transaction);
 	$parm['DIFFERE'] = '000';
