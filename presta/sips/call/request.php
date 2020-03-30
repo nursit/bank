@@ -26,6 +26,7 @@ if (!defined('_ECRIRE_INC_VERSION')){
  */
 function presta_sips_call_request_dist($id_transaction, $transaction_hash, $config){
 
+	$devise_defaut = bank_devise_defaut();
 	$mode = 'sips';
 	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
 		spip_log("call_request : config invalide " . var_export($config, true), $mode . _LOG_ERREUR);
@@ -49,7 +50,7 @@ function presta_sips_call_request_dist($id_transaction, $transaction_hash, $conf
 	$mail = bank_porteur_email($row);
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$montant = intval(round(100*$row['montant'], 0));
+	$montant = intval(round((10**$devise_defaut['fraction']) * $row['montant'], 0));
 
 	$merchant_id = $config['merchant_id'];
 	$service = $config['service'];
@@ -59,7 +60,7 @@ function presta_sips_call_request_dist($id_transaction, $transaction_hash, $conf
 	$parm = array();
 	$parm['merchant_id'] = $merchant_id;
 	$parm['merchant_country'] = "fr";
-	$parm['currency_code'] = "978";
+	$parm['currency_code'] = (string)$devise_defaut['code_num'];
 	$parm['amount'] = $montant;
 	$parm['customer_id'] = intval($row['id_auteur']) ? $row['id_auteur'] : $row['auteur_id'];
 	$parm['order_id'] = intval($id_transaction);
