@@ -90,8 +90,9 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $con
 	$contexte['operation'] = "SAL"; // c'est un paiement a l'acte immediat
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$contexte['currency'] = "EUR";
-	$contexte['amount'] = intval(round(100*$row['montant'], 0));
+	$devise_defaut = bank_devise_defaut();
+	$contexte['currency'] = $devise_defaut['code'];
+	$contexte['amount'] = intval(round((10**$devise_defaut['fraction']) * $row['montant'], 0));
 
 	#if (strlen($montant)<3)
 	#	$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
