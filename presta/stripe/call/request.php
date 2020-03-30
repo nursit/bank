@@ -202,7 +202,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	if ($type === 'abo' and $echeance){
 		if ($echeance['montant'] > 0) {
 
-			$montant_echeance = intval(round(100 * $echeance['montant'], 0));
+			$montant_echeance = intval(round((10**$devise_defaut['fraction']) * $echeance['montant'], 0));
 			if (strlen($montant_echeance) < 3) {
 				$montant_echeance = str_pad($montant_echeance, 3, '0', STR_PAD_LEFT);
 			}
