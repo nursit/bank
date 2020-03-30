@@ -127,7 +127,8 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm = 
 	portion of the URL that buyers will return to after authorizing payment
 	*/
 	$paymentAmount = $row['montant'];
-	$currencyCodeType = "EUR";
+	$devise_defaut = bank_devise_defaut();
+	$currencyCodeType = strtoupper($devise_defaut['code']);
 	$paymentType = "Sale";
 
 
@@ -241,7 +242,8 @@ function bank_paypalexpress_checkoutpayment($payerid, $config){
 	*/
 	$token = urlencode($_SESSION['token']);
 	$paymentAmount = $row['montant'];
-	$currencyCodeType = "EUR";
+	$devise_defaut = bank_devise_defaut();
+	$currencyCodeType = strtoupper($devise_defaut['code']);
 	$paymentType = "Sale";
 	$payerID = urlencode($_SESSION['payer_id']);
 	$serverName = urlencode($_SERVER['SERVER_NAME']);
