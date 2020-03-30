@@ -270,7 +270,8 @@ function stripe_traite_reponse_transaction($config, &$response){
 	// Ouf, le reglement a ete accepte
 
 	// on verifie que le montant est bon !
-	$montant_regle = $payment->amount_received/100;
+	$devise_defaut = bank_devise_defaut();
+	$montant_regle = $payment->amount_received / (10**$devise_defaut['fraction']);
 
 	if ($montant_regle!=$row['montant']){
 		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=" . $row['montant'] . ":" . var_export($payment, true), $mode);
