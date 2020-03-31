@@ -80,16 +80,17 @@ function bank_affiche_payer($config, $type, $id_transaction, $transaction_hash, 
 	
 	$devise_defaut = bank_devise_defaut();
 	
-	if (
-		bank_tester_devise_presta($config['presta'], $devise_defaut['code'])
-		and $payer = charger_fonction($quoi, 'presta/' . $config['presta'] . '/payer', true)
-	) {
-		return $payer($config, $id_transaction, $transaction_hash, $options);
+	if (!bank_tester_devise_presta($config['presta'], $devise_defaut['code'])) {
+		spip_log('La devise ' . $devise_defaut['code'] . 'n’est pas supportée pour presta=' . $config['presta'], 'bank' . _LOG_ERREUR);
+		return '';
+	}
+	
+	if (!$payer = charger_fonction($quoi, 'presta/' . $config['presta'] . '/payer', true)) {
+		spip_log("Pas de payer/$quoi pour presta=" . $config['presta'], "bank" . _LOG_ERREUR);
+		return '';
 	}
 
-	spip_log("Pas de payer/$quoi pour presta=" . $config['presta'], "bank" . _LOG_ERREUR);
-	
-	return "";
+	return $payer($config, $id_transaction, $transaction_hash, $options);
 }
 
 /**
