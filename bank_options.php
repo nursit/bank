@@ -59,7 +59,6 @@ if (!function_exists('affiche_monnaie')){
  * @return string
  */
 function bank_affiche_payer($config, $type, $id_transaction, $transaction_hash, $options = null){
-
 	// compatibilite ancienne syntaxe, titre en 4e argument de #PAYER_XXX
 	if (is_string($options)){
 		$options = array(
@@ -78,14 +77,19 @@ function bank_affiche_payer($config, $type, $id_transaction, $transaction_hash, 
 	}
 
 	$quoi = ($type=='abo' ? 'abonnement' : 'acte');
-
-	if ($payer = charger_fonction($quoi, 'presta/' . $config['presta'] . '/payer', true)){
+	
+	$devise_defaut = bank_devise_defaut();
+	
+	if (
+		bank_tester_devise_presta($config['presta'], $devise_defaut['code'])
+		and $payer = charger_fonction($quoi, 'presta/' . $config['presta'] . '/payer', true)
+	) {
 		return $payer($config, $id_transaction, $transaction_hash, $options);
 	}
 
 	spip_log("Pas de payer/$quoi pour presta=" . $config['presta'], "bank" . _LOG_ERREUR);
+	
 	return "";
-
 }
 
 /**
@@ -197,4 +201,44 @@ function bank_devise_defaut() {
 	$devise = pipeline('bank_devise_defaut', $devise);
 	
 	return $devise;
+}
+
+/**
+ * Tester si une devise est supportée par un prestataire
+ * 
+ * @param $devise 
+ * 		Devise à tester en code ISO 4217 alphabétique
+ * @param $presta
+ * 		Type du prestataire à tester
+ * @return bool
+ * 		Renvoie true si la devise est ok, false sinon
+ * 
+ */
+function bank_tester_devise_presta($presta, $devise=null) {
+	$ok = false;
+	
+	// Si pas de devise, on prend celle générale par défaut
+	if (!$devise) {
+		$devise_defaut = bank_devise_defaut();
+		$devise = $devise_defaut['code'];
+	}
+	
+	// Par défaut on accepte l'euro comme avant, ce qui évite d'implémenter partout
+	$devises_ok = array('EUR');
+	
+	// Si le presta a une fonction qui définit les devises supportées, on l'utilise
+	if ($lister_devises = charger_fonction('lister_devises', 'presta/' . $config['presta'], true)) {
+		$devises_ok = $lister_devises();
+	}
+	
+	// On normalise
+	$devise = strtoupper($devise);
+	$devises_ok = array_map('strtoupper', $devises_ok);
+	
+	// Et enfin on teste
+	if (in_array($devise, $devises_ok)) {
+		$ok = true;
+	}
+	
+	return $ok;
 }
