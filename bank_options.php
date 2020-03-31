@@ -228,7 +228,7 @@ function bank_tester_devise_presta($presta, $devise=null) {
 	$devises_ok = array('EUR');
 	
 	// Si le presta a une fonction qui définit les devises supportées, on l'utilise
-	if ($lister_devises = charger_fonction('lister_devises', 'presta/' . $config['presta'], true)) {
+	if ($lister_devises = charger_fonction('lister_devises', 'presta/' . $presta, true)) {
 		$devises_ok = $lister_devises();
 	}
 	
