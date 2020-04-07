@@ -1,4 +1,4 @@
-|<?php
+<?php
 /*
  * Paiement Bancaire
  * module de paiement bancaire multi prestataires
