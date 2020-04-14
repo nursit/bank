@@ -215,7 +215,7 @@ function bank_devise_defaut() {
  * 		Renvoie true si la devise est ok, false sinon
  * 
  */
-function bank_tester_devise_presta($presta, $devise=null) {
+function bank_tester_devise_presta($presta, $devise = null) {
 	$ok = false;
 	
 	// Si pas de devise, on prend celle générale par défaut
@@ -223,23 +223,25 @@ function bank_tester_devise_presta($presta, $devise=null) {
 		$devise_defaut = bank_devise_defaut();
 		$devise = $devise_defaut['code'];
 	}
-	
+
 	// Par défaut on accepte l'euro comme avant, ce qui évite d'implémenter partout
 	$devises_ok = array('EUR');
-	
-	// Si le presta a une fonction qui définit les devises supportées, on l'utilise
+
+	// Si le presta a une fonction qui définit les devises supportées, on l'utilise.
+	// Elle retourne soit un tableau, soit un booléen pour les accepter toutes.
 	if ($lister_devises = charger_fonction('lister_devises', 'presta/' . $presta, true)) {
 		$devises_ok = $lister_devises();
 	}
-	
-	// On normalise
-	$devise = strtoupper($devise);
-	$devises_ok = array_map('strtoupper', $devises_ok);
-	
+
 	// Et enfin on teste
-	if (in_array($devise, $devises_ok)) {
-		$ok = true;
+	if (is_array($devises_ok)) {
+		// On normalise
+		$devise = strtoupper($devise);
+		$devises_ok = array_map('strtoupper', $devises_ok);
+		$ok = in_array($devise, $devises_ok);
+	} elseif (is_bool($devises_ok)) {
+		$ok = $devises_ok;
 	}
-	
+
 	return $ok;
 }
