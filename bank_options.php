@@ -36,7 +36,8 @@ if (isset($GLOBALS['meta']['bank_paiement'])
 if (!function_exists('affiche_monnaie')){
 	function affiche_monnaie($valeur, $decimales = 2, $unite = true){
 		if ($unite===true){
-			$unite = "&nbsp;EUR";
+			$devise_defaut = bank_devise_defaut();
+			$unite = '&nbsp;'.$devise_defaut['code'];
 			if (substr(trim($valeur), -1)=="%"){
 				$unite = "&nbsp;%";
 			}
