@@ -1,8 +1,8 @@
 <paquet
 	prefix="bank"
 	categorie="outil"
-	version="4.3.4"
-	etat="stable"
+	version="5.0.0"
+	etat="dev"
 	compatibilite="[3.1.0;3.3.*]"
 	logo="prive/themes/spip/images/bank-32.png"
 	documentation="http://contrib.spip.net/4627"
