@@ -72,7 +72,9 @@ function presta_sipsv2_call_request_dist($id_transaction, $transaction_hash, $co
 
 	$parm['customerId'] = intval($row['id_auteur']) ? $row['id_auteur'] : $row['auteur_id'];
 	$parm['orderId'] = intval($id_transaction);
-	$parm['transactionReference'] = bank_transaction_id($row);
+	if (!$config['mode_test']) {
+        	$parm['transactionReference'] = bank_transaction_id($row);
+    	}
 	//$parm['customerContact.email']=substr($mail,0,128);
 
 	$parm['normalReturnUrl'] = bank_url_api_retour($config, 'response');
