@@ -66,7 +66,7 @@ function presta_sipsv2_call_request_dist($id_transaction, $transaction_hash, $co
 
 	//		Affectation des parametres obligatoires
 	$parm = array();
-	$parm['merchantID'] = $merchant_id;
+	$parm['merchantId'] = $merchant_id;
 	$parm['amount'] = $montant;
 	$parm['currencyCode'] = "978";
 
