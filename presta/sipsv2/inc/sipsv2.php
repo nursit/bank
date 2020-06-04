@@ -41,7 +41,7 @@ function sipsv2_url_serveur($config){
 			break;
 		case "scellius":
 			if ($config['mode_test']){
-				$host = "https://payment-webinit.simu.scellius.labanquepostale.fr";
+				$host = "https://payment-webinit-simu.scellius.labanquepostale.fr";
 			} else {
 				$host = "https://payment-webinit.scellius.labanquepostale.fr";
 			}
