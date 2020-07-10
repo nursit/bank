@@ -24,6 +24,7 @@ Il peut aussi être complété par
     * seul le paiement à l'acte est implémenté, les nouveaux paiements récurrents ne sont plus possibles (TODO)
   * Suppression du prestataire Internet+ (code non maintenu, non testé en situation réelle depuis trop longtemps)
   * Passage a la plateforme Monetico au lieu de CMCIC (rien a reconfigurer, c'est un switch transparent)
+  * Ajout du prestataire Clic&Pay pour les commerçants du groupe Crédit du Nord qui supporte le paiement par SEPA pour les paiements uniques et les paiements récurrents, copie de Payzen
   
 * Version 3 du plugin
   * Nécessite SPIP 3.0+, compatible SPIP 3.1 et SPIP 3.2
