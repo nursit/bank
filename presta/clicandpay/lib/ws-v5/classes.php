@@ -18,7 +18,7 @@ class ClicandpayWSv5 extends SoapClient {
 
 	public function ClicandpayWSv5(
 		$config,
-		$wsdl = "https://secure.payzen.eu/vads-ws/v5?wsdl",
+		$wsdl = "https://clicandpay.groupecdn.fr/vads-ws/v5?wsdl",
 		$options = array('trace' => 1, 'encoding' => 'UTF-8')){
 
 		$this->config = $config;
@@ -89,10 +89,10 @@ class ClicandpayWSv5 extends SoapClient {
 		$response = $this->__soapCall($method, $args);
 
 		/* logs XML*/
-		spip_log("[Request Header]\n".htmlspecialchars($this->__getLastRequestHeaders()),"payzen_ws"._LOG_DEBUG);
-		spip_log("[Request]\n".htmlspecialchars($this->__getLastRequest()),"payzen_ws"._LOG_DEBUG);
-		spip_log("[Response Header]\n".htmlspecialchars($this->__getLastResponseHeaders()),"payzen_ws"._LOG_DEBUG);
-		spip_log("[Response]\n".htmlspecialchars($this->__getLastResponse()),"payzen_ws"._LOG_DEBUG);
+		spip_log("[Request Header]\n".htmlspecialchars($this->__getLastRequestHeaders()),"clicandpay_ws"._LOG_DEBUG);
+		spip_log("[Request]\n".htmlspecialchars($this->__getLastRequest()),"clicandpay_ws"._LOG_DEBUG);
+		spip_log("[Response Header]\n".htmlspecialchars($this->__getLastResponseHeaders()),"clicandpay_ws"._LOG_DEBUG);
+		spip_log("[Response]\n".htmlspecialchars($this->__getLastResponse()),"clicandpay_ws"._LOG_DEBUG);
 
 
 		//Analyse de la réponse
@@ -115,7 +115,7 @@ class ClicandpayWSv5 extends SoapClient {
 		$authTokenResponse = base64_encode(hash_hmac('sha256', $responseHeader['timestamp'] . $responseHeader['requestId'], systempay_key($this->config), true));
 		if ($authTokenResponse!==$responseHeader['authToken']){
 			//Erreur de calcul ou tentative de fraude
-			spip_log("call_ws:$method: Erreur signature reponse","payzen_ws"._LOG_ERREUR);
+			spip_log("call_ws:$method: Erreur signature reponse","clicandpay_ws"._LOG_ERREUR);
 			return false;
 		}
 
