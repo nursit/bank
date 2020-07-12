@@ -36,7 +36,10 @@ function systempay_url_serveur($config){
 			break;		
 		case "sogecommerce":
 			$host = "https://sogecommerce.societegenerale.eu/vads-payment/";
-			break;			
+			break;	
+		case "scelliuspaiement":
+			$host = "https://scelliuspaiement.labanquepostale.fr/vads-payment/";
+			break;				
 		case "systempay":
 		case "cyberplus":
 		case "spplus":
