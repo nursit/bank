@@ -29,7 +29,7 @@ if (!defined('_SYSTEMPAY_VERSION')){
 }
 
 
-function payzen_lister_cartes_config($c, $cartes = true){
+function clicandpay_lister_cartes_config($c, $cartes = true){
 	include_spip('inc/bank');
 	$config = array('presta' => 'clicandpay', 'type' => isset($c['type']) ? $c['type'] : 'acte', 'service' => 'clicandpay');
 
@@ -55,7 +55,7 @@ function payzen_lister_cartes_config($c, $cartes = true){
  * @param $id_transaction
  * @return mixed|string
  */
-function presta_payzen_titre_type_paiement_dist($mode, $id_transaction){
+function presta_clicandpay_titre_type_paiement_dist($mode, $id_transaction){
 
 	if ($id_transaction
 		AND $trans = sql_fetsel("refcb", "spip_transactions", "id_transaction=" . intval($id_transaction))
