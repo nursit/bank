@@ -33,6 +33,9 @@ function systempay_url_serveur($config){
 			break;
 		case "clicandpay":
 			$host = "https://clicandpay.groupecdn.fr/vads-payment/";
+			break;		
+		case "sogecommerce":
+			$host = "https://sogecommerce.societegenerale.eu/vads-payment/";
 			break;			
 		case "systempay":
 		case "cyberplus":
