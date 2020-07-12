@@ -31,6 +31,9 @@ function systempay_url_serveur($config){
 		case "payzen":
 			$host = "https://secure.payzen.eu";
 			break;
+		case "clicandpay":
+			$host = "https://clicandpay.groupecdn.fr/vads-payment/";
+			break;			
 		case "systempay":
 		case "cyberplus":
 		case "spplus":
