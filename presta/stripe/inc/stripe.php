@@ -15,6 +15,33 @@ if (!defined('_ECRIRE_INC_VERSION')){
 
 include_spip('inc/bank');
 
+
+/**
+ * Liste des cartes moyens de paiement possibles selon la config
+ * @param $config
+ * @return array
+ */
+function stripe_available_cards($config){
+
+	$mode = $config['presta'];
+	// https://stripe.com/docs/api/payment_methods/object#payment_method_object-type
+
+	$cartes_possibles = array(
+		'card' => "CARD.gif",
+		'bancontact' => "BANCONTACT.gif",
+		'ideal' => "IDEAL.gif",
+		// a tester
+		//'sepa_debit' => "SEPA_SDD.gif",
+	);
+
+	#if ($config['type']=='abo'){
+	#	unset($cartes_possibles['E-CARTEBLEUE']);
+	#}
+
+	return $cartes_possibles;
+}
+
+
 /**
  * Initialiser l'API Stripe : chargement de la lib et inits des static
  * @param $config

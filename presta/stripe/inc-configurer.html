@@ -18,6 +18,8 @@
 		]<input type="text" name="#ENV{casier,''}[WEBHOOK_SECRET_KEY]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{WEBHOOK_SECRET_KEY,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
 	<INCLURE{fond=formulaires/inc-bank-config-type,env} />
+	<INCLURE{fond=formulaires/inc-bank-config-cartes,env,label=<:bank:label_configuration_moyen_paiement:>,cartes=#ENV{#ENV{casier,''}}|stripe_lister_cartes_config} />
+
 	<INCLURE{fond=formulaires/inc-bank-config-mode_test,env} />
 	#SET{name,#ENV{casier,''}_SECRET_KEY_test}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
