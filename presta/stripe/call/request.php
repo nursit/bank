@@ -41,6 +41,14 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		$mode .= "_test";
 	}
 
+	$cartes = array('card');
+	if (isset($config['cartes']) AND $config['cartes']){
+		$cartes = $config['cartes'];
+	}
+	$c = $config;
+	$c['type'] = ($type !== 'abo' ? 'acte' : 'abo');
+	$cartes_possibles = stripe_available_cards($c);
+
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable", $mode . _LOG_ERREUR);
 		return "";
@@ -175,10 +183,15 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	}
 
 
+	$payment_types = array_intersect($cartes, array_keys($cartes_possibles));
+	if (!$payment_types) {
+		$payment_types = ['card'];
+	}
+
 	// acte : utiliser une checkout session
 	if ($type==='acte'){
 		$session_desc = [
-			'payment_method_types' => ['card'],
+			'payment_method_types' => $payment_types,
 			'line_items' => [[$item]],
 			// transfer the session id to the success URL
 			'success_url' => $url_success . '&session_id={CHECKOUT_SESSION_ID}',

@@ -32,7 +32,29 @@ function presta_stripe_payer_acte_dist($config, $id_transaction, $transaction_ha
 
 	$contexte['sandbox'] = ($config['mode_test'] ? ' ' : '');
 	$contexte['config'] = $config;
-	$contexte['logo'] = bank_trouver_logo("stripe", "CARD.gif");
+
+	// logo multi moyen de paiements
+	$cartes = array('card');
+	if (isset($config['cartes']) AND $config['cartes']){
+		$cartes = $config['cartes'];
+	}
+	$c = $config;
+	$c['type'] = 'acte';
+	$cartes_possibles = stripe_available_cards($c);
+
+	$logo = [];
+	foreach ($cartes_possibles as $card => $logo_this_card) {
+		if (in_array($card, $cartes)) {
+			$img = bank_trouver_logo("stripe", $logo_this_card);
+			$logo[] = bank_label_bouton_img_ou_texte($img, bank_label_payer_par_carte($card));
+			if ($card !== 'card') {
+				$contexte['payer_par_title'] = _T('bank:payer_par_moyen_securise');
+			}
+		}
+	}
+
+	$contexte['logo'] = bank_trouver_logo("stripe", 'CARD.gif'); // compat si ancien modele surcharge
+	$contexte['logos'] = implode('<span class="sep"> </span>', $logo);
 
 	$contexte = array_merge($options, $contexte);
 
