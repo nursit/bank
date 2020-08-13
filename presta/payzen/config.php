@@ -23,8 +23,8 @@ if (!defined('_ECRIRE_INC_VERSION')){
  */
 
 # Version du logiciel
-if (!defined('_SYSTEMPAY_VERSION')){
-	define("_SYSTEMPAY_VERSION", "V2");
+if (!defined('_PAYZEN_VADS_VERSION')){
+	define("_PAYZEN_VADS_VERSION", "V2");
 }
 
 
