@@ -22,4 +22,4 @@ On reçoit donc une notification de paiement reussi avec les identifiants client
 C'est le mode qu'on utilise pour les abonnements par CB, mais il n'est pas possible de l'utiliser pour les paiements par SEPA, on se rabat donc en REGISTER_SUBSCRIBE à +13j pour l'abonnement par SEPA
 
 
-TIP : on peut simuler la sequence de paiement decomposee pour les abonnements avec les CB en modifiant l'appel dans presta/systempay/payer/abonnement.php L29 en remplaçant REGISTER_PAY_SUBSCRIBE par REGISTER_SUBSCRIBE. On se retrouve ainsi dans le meme scenario que SEPA mais avec une sequence qui suit dans l'heure au lieu d'attendre 13j entre les 2 notifications.
+TIP : on peut simuler la sequence de paiement decomposee pour les abonnements avec les CB en modifiant l'appel dans presta/payzen/payer/abonnement.php L29 en remplaçant REGISTER_PAY_SUBSCRIBE par REGISTER_SUBSCRIBE. On se retrouve ainsi dans le meme scenario que SEPA mais avec une sequence qui suit dans l'heure au lieu d'attendre 13j entre les 2 notifications.

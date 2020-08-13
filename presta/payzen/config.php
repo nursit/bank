@@ -32,8 +32,8 @@ function payzen_lister_cartes_config($c, $cartes = true){
 	include_spip('inc/bank');
 	$config = array('presta' => 'payzen', 'type' => isset($c['type']) ? $c['type'] : 'acte', 'service' => 'payzen');
 
-	include_spip("presta/systempay/inc/systempay");
-	$liste = systempay_available_cards($config);
+	include_spip("presta/payzen/inc/payzen");
+	$liste = payzen_available_cards($config);
 
 	$others = array('SDD', 'E_CV');
 	foreach ($liste as $k => $v){

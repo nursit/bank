@@ -76,7 +76,7 @@ function payzen_url_api($config){
 /**
  * Appel d'une methode GET de l'API REST PayZen
  * https://payzen.io/fr-FR/rest/V4.0/api/
- * 
+ *
  * @param array $config
  * @param string $method
  * @param array $params
@@ -247,7 +247,7 @@ function payzen_signe_contexte($contexte, $key){
 
 
 /**
- * Verifier la signature de la reponse systempay
+ * Verifier la signature de la reponse PayZen
  * @param $values
  * @param $key
  * @return bool
