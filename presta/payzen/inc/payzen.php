@@ -45,6 +45,17 @@ function payzen_url_serveur($config){
 			$host = "https://clicandpay.groupecdn.fr/vads-payment/";
 			break;
 
+		/*
+		Provision. A voir si ce sont des presta ou des services...
+		case "sogecommerce":
+			$host = "https://sogecommerce.societegenerale.eu/vads-payment/";
+			break;
+
+		case "scelliuspaiement":
+			$host = "https://scelliuspaiement.labanquepostale.fr/vads-payment/";
+			break;
+		*/
+
 		case "payzen":
 		default:
 			$host = "https://secure.payzen.eu";
@@ -190,7 +201,7 @@ function payzen_available_cards($config){
 		}
 	}
 
-	if ($config['presta']=='payzen'){
+	if (in_array($config['presta'], ['payzen', 'clicandpay'])){
 		// les SEPA, abo ou non
 		$cartes_possibles['SDD'] = "SEPA_SDD.gif";
 		if ($config['type']!=='abo'){
