@@ -18,6 +18,9 @@ Il peut aussi être complété par
 
 ### Changelog
 
+* Version 4.5
+  * Support de l'API REST de Payzen/Lyra Networks
+  * Prise en charge de 3DS2 sur Monetico
 * Version 4 du plugin
   * Nécessite SPIP 3.1+, compatible SPIP 3.2
   * Mise en conformité de l'implémentation de Stripe avec les normes Strong Customer Authentication qui entrent en vigueur en septembre 2019
