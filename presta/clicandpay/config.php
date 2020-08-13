@@ -19,22 +19,17 @@ if (!defined('_ECRIRE_INC_VERSION')){
 
 /**
  *
- * Clic&Pay est fourni par LyraNetworks comme SystemPay dont il partage une grande partie du code
+ * Clic&Pay est fourni par LyraNetworks comme PayZen dont il partage une grande partie du code
  *
  */
-
-# Version du logiciel
-if (!defined('_SYSTEMPAY_VERSION')){
-	define("_SYSTEMPAY_VERSION", "V2");
-}
 
 
 function clicandpay_lister_cartes_config($c, $cartes = true){
 	include_spip('inc/bank');
 	$config = array('presta' => 'clicandpay', 'type' => isset($c['type']) ? $c['type'] : 'acte', 'service' => 'clicandpay');
 
-	include_spip("presta/systempay/inc/systempay");
-	$liste = systempay_available_cards($config);
+	include_spip("presta/payzen/inc/payzen");
+	$liste = payzen_available_cards($config);
 
 	$others = array('SDD', 'E_CV');
 	foreach ($liste as $k => $v){
