@@ -296,14 +296,22 @@ function bank_transaction_id($row){
 
 
 /**
- * Nom du site nettoye : pas de balises html ni de retour ligne
+ * Nom du site nettoye : pas de balises html ni de retour ligne ni d'entites html
+ * et en utf8
+ *
  * @return mixed
  */
 function bank_nom_site(){
 	if (!function_exists('textebrut')){
 		include_spip('inc/filtres');
 	}
-	return str_replace(array("\r\n", "\r", "\n"), ' ', textebrut($GLOBALS['meta']['nom_site']));
+	if (!function_exists('html2unicode')){
+		include_spip('inc/charsets');
+	}
+	$nom_site = textebrut($GLOBALS['meta']['nom_site']);
+	$nom_site = html2unicode($nom_site);
+	$nom_site = unicode2charset($nom_site, 'utf-8');
+	return str_replace(array("\r\n", "\r", "\n"), ' ', $nom_site);
 }
 
 /**
