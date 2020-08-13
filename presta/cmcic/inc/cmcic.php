@@ -65,7 +65,7 @@ function cmcic_url_serveur($config){
  */
 function cmcic_concat_fields(&$contexte){
 	// ASCII alphabetic order
-	$keys = ["TPE", "contexte_commande", "date", "dateech1", "dateech2", "dateech3", "dateech4", "lgue", "mail",
+	$keys = ["TPE", "ThreeDSecureChallenge", "contexte_commande", "date", "dateech1", "dateech2", "dateech3", "dateech4", "lgue", "mail",
 		"montant", "montantech1", "montantech2", "montantech3", "montantech4", "nbrech", "reference", "societe",
 		"texte-libre", "url_retour_err", "url_retour_ok", "version"];
 

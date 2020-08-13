@@ -81,6 +81,11 @@ _ Bank account:
 -* BIC: @bic@',
 
 // L
+	'label_3ds2_no_preference' => 'No preference for 3DS2 use (default)',
+	'label_3ds2_desactive' => '3DS2 Unactive',
+	'label_3ds2_souhaite' => '3DS2 Preferred',
+	'label_3ds2_requis' => '3DS2 Mandatory',
+	'label_3ds2_policy' => 'Payments safety',
 	'label_actif' => 'Activate',
 	'label_action_append_presta' => 'Add a payment provider',
 	'label_carte_AMEX' => 'American Express',
