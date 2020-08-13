@@ -41,6 +41,10 @@ function payzen_url_serveur($config){
 			}
 			break;
 
+		case "clicandpay":
+			$host = "https://clicandpay.groupecdn.fr/vads-payment/";
+			break;
+
 		case "payzen":
 		default:
 			$host = "https://secure.payzen.eu";
@@ -65,8 +69,14 @@ function payzen_url_api($config){
 	$url_serveur = explode($host, $url_serveur);
 
 	$host = explode('.', $host);
-	array_shift($host);
-	array_unshift($host, 'api');
+	$subhost = array_shift($host);
+
+	if (in_array($subhost, [ 'clicandpay' ])) {
+		array_unshift($host, 'api-' . $subhost);
+	}
+	else {
+		array_unshift($host, 'api');
+	}
 	$host = implode('.', $host);
 
 	return reset($url_serveur) . $host;
