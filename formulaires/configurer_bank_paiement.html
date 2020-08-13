@@ -80,7 +80,7 @@
 					#SET{val,1}
 					<div class="choix[(#GET{disabled}|oui)muted]">
 						<input type="checkbox" name="#GET{casier}[actif]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#ENV{#GET{casier}}|table_valeur{actif, #GET{defaut}}|=={#GET{val}}|oui)checked="checked"][(#GET{disabled}|oui)disabled="disabled"] />
-						<label for="#GET{name}_#GET{val}">Activer</label>
+						<label for="#GET{name}_#GET{val}"><:bank:label_actif:></label>
 						#SET{val,#ENV{#GET{casier}}|table_valeur{label}}
 						[(#GET{val}|ou{#VALEUR{presta}|bank_configure_label_presta})
 						<input type="text" name="#GET{casier}\[label\]" value="#GET{val}" class="text presta_label"/>
