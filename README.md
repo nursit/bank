@@ -17,6 +17,8 @@ Il peut aussi être complété par
 
 
 ### Changelog
+* Version 4.6
+  * Ajout du prestataire Clic&Pay pour les commerçants du groupe Crédit du Nord qui supporte le paiement par SEPA pour les paiements uniques et les paiements récurrents, déclinaison de Payzen
 
 * Version 4.5
   * Support de l'API REST de Payzen/Lyra Networks
