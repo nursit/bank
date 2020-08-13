@@ -81,6 +81,11 @@ _ Compte bancaire :
 -* BIC : @bic@',
 
 // L
+	'label_3ds2_no_preference' => 'Pas de préférence pour 3DS2 (défaut)',
+	'label_3ds2_desactive' => '3DS2 Désactivé',
+	'label_3ds2_souhaite' => '3DS2 Souhaité',
+	'label_3ds2_requis' => '3DS2 Obligatoire',
+	'label_3ds2_policy' => 'Sécurisation',
 	'label_actif' => 'Activer',
 	'label_action_append_presta' => 'Ajouter un prestataire',
 	'label_carte_AMEX' => 'Carte American Express',

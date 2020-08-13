@@ -15,6 +15,37 @@ if (!defined('_ECRIRE_INC_VERSION')){
 
 include_spip('presta/cmcic/inc/cmcic');
 
+/**
+ * Determiner la strategie 3DS2 : non/souhaitable/requis via config
+ * mais on peut faire quelque chose de plus fin en fonction de la transaction via une fonction perso presta_cmcic_3ds_policy()
+ *
+ * @param $id_transaction
+ * @param $config
+ * @return mixed|string
+ */
+function presta_cmcic_3ds_policy_dist($id_transaction, $config) {
+	$default = 'no_preference';
+	$allowed = [
+		'no_preference',
+		'challenge_preferred',
+		'challenge_mandated',
+		'no_challenge_requested',
+		'no_challenge_requested_strong_authentication',
+		'no_challenge_requested_trusted_third_party',
+		'no_challenge_requested_risk_analysis'
+	];
+	if (function_exists($f = 'presta_cmcic_3ds_policy')) {
+		$policy = $f($id_transaction, $config);
+	}
+	else {
+		$policy = (empty($config['3DS2_POLICY']) ? $default  : $config['3DS2_POLICY']);
+	}
+	if (!in_array($policy, $allowed)) {
+		$policy = $default;
+	}
+	return $policy;
+}
+
 /*
 <form action="<?php echo $oTpe->sUrlPaiement;?>" method="post" id="PaymentRequest">
 <p>
@@ -118,6 +149,8 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	$contexte['texte-libre'] = urlencode(serialize($contenu));
 
 	$contexte['mail'] = bank_porteur_email($row);
+
+	$contexte['ThreeDSecureChallenge'] = presta_cmcic_3ds_policy_dist($id_transaction, $config);
 
 	// Urls de retour.
 	// La banque poste d'abord sur l'URL CGI2 (cf cmcic/config.php) qui doit traiter
