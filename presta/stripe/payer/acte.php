@@ -54,7 +54,7 @@ function presta_stripe_payer_acte_dist($config, $id_transaction, $transaction_ha
 	}
 
 	$contexte['logo'] = bank_trouver_logo("stripe", 'CARD.gif'); // compat si ancien modele surcharge
-	$contexte['logos'] = implode('<span class="sep"> </span>', $logo);
+	$contexte['logos'] = implode('<span class="sep"> | </span>', $logo);
 
 	$contexte = array_merge($options, $contexte);
 
