@@ -1,4 +1,6 @@
-Workflow des paiements Payzen/SystemPay
+Workflow des paiements Payzen/SystemPay&Co
+
+PayZen est l'implementation de reference pour les solutions Lyra
 
 PAYMENT :
 cas simple, paiement direct et immediat, on reçoit une notification serveur autoresponse en temps reel du paiement, puis l'utilisateur revient sur response avec donnees du paiement
