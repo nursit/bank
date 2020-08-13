@@ -1,0 +1,16 @@
+[(#REM)
+/*
+ * Paiement Bancaire
+ * module de paiement bancaire multi prestataires
+ * stockage des transactions
+ *
+ * Auteurs :
+ * Cedric Morin, Nursit.com
+ * (c) 2012-2019 - Distribue sous licence GNU/GPL
+ *
+ */
+]#CACHE{0}
+<form action='#ENV{action}' method='post'[ id="(#ENV{id,''})"] class="noajax"><div>
+	[(#ENV**{hidden})]
+	<button class="submit" type="submit"[ title="(#ENV*{logobrand,'Payer'}|extraire_attribut{title}|attribut_html)"]>#ENV*{logobrand,'Payer'}</button>
+</div></form>

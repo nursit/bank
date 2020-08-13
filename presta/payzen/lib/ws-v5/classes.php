@@ -67,7 +67,7 @@ class PayzenWSv5 extends SoapClient {
 
 		$uuid = $this->gen_uuid();
 		$timestamp = gmdate("Y-m-d\TH:i:s\Z");
-		$key = systempay_key($this->config);
+		$key = payzen_key($this->config);
 		$authToken = $this->getAuthToken($uuid, $timestamp, $key);
 
 		$headers[] = new SoapHeader($this->header_namespace,"shopId",$this->config['SITE_ID']);
@@ -95,8 +95,8 @@ class PayzenWSv5 extends SoapClient {
 		spip_log("[Response]\n".htmlspecialchars($this->__getLastResponse()),"payzen_ws"._LOG_DEBUG);
 
 
-		//Analyse de la réponse
-		//Récupération du SOAP Header de la réponse afin de stocker les en-têtes dans un tableau
+		//Analyse de la rÃ©ponse
+		//RÃ©cupÃ©ration du SOAP Header de la rÃ©ponse afin de stocker les en-tÃªtes dans un tableau
 		// (ici $responseHeader)
 		$dom = new DOMDocument;
 		$dom->loadXML($this->__getLastResponse(), LIBXML_NOWARNING);
@@ -111,8 +111,8 @@ class PayzenWSv5 extends SoapClient {
 		#var_dump($response);
 		#var_dump($response[$method."Result"]);
 
-		//Calcul du jeton d'authentification de la réponse
-		$authTokenResponse = base64_encode(hash_hmac('sha256', $responseHeader['timestamp'] . $responseHeader['requestId'], systempay_key($this->config), true));
+		//Calcul du jeton d'authentification de la rÃ©ponse
+		$authTokenResponse = base64_encode(hash_hmac('sha256', $responseHeader['timestamp'] . $responseHeader['requestId'], payzen_key($this->config), true));
 		if ($authTokenResponse!==$responseHeader['authToken']){
 			//Erreur de calcul ou tentative de fraude
 			spip_log("call_ws:$method: Erreur signature reponse","payzen_ws"._LOG_ERREUR);
@@ -129,7 +129,7 @@ class PayzenWSv5 extends SoapClient {
 	 */
 	public function cancelSubscription($paymentToken, $subscriptionId){
 
-		//Génération du body
+		//GÃ©nÃ©ration du body
 		$commonRequest = new commonRequest();
 		$commonRequest->submissionDate = new DateTime('now', new DateTimeZone('UTC'));
 
