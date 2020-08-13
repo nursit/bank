@@ -45,16 +45,99 @@ function payzen_url_serveur($config){
 
 
 /**
+ * Determiner l'URL d'appel API REST en fonction de la config
+ *
+ * @param array $config
+ * @return string
+ */
+function payzen_url_api($config){
+
+	$url_serveur = payzen_url_serveur($config);
+	$host = parse_url($url_serveur, PHP_URL_HOST);
+	$url_serveur = explode($host, $url_serveur);
+
+	$host = explode('.', $host);
+	array_shift($host);
+	array_unshift($host, 'api');
+	$host = implode('.', $host);
+
+	return reset($url_serveur) . $host;
+
+}
+
+/**
+ * Appel d'une methode GET de l'API PayZen
+ * @param array $config
+ * @param string $method
+ * @param array $params
+ * @return array|bool|float|int|mixed|stdClass|string
+ * @throws \Lyra\Exceptions\LyraException
+ */
+function payzen_api_call($config, $method, $params) {
+	static $client;
+	if (!$client) {
+		/**
+		 * Get the client
+		 */
+		include_spip("presta/payzen/lib/lyracom/rest-php-sdk/src/autoload");
+
+		$client = new Lyra\Client();
+	}
+
+	/**
+	 * Define configuration
+	 */
+
+	/* Username, password and endpoint used for server to server web-service calls */
+	$client->setUsername($config['SITE_ID']);
+	$client->setPassword(payzen_api_password($config));
+	$client->setEndpoint(payzen_url_api($config));
+
+	$path = "V4/" . trim($method,'/');
+
+	$mode = $config['presta'];
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
+	$mode .= '_api';
+	spip_log("Request API $method ".json_encode($params), $mode . _LOG_DEBUG);
+	try {
+		$response = $client->post($path, $params);
+	}
+	catch (Exception $e) {
+		spip_log("ECHEC appel API $method ".json_encode($params) . " :" . $e->getMessage(), $mode . _LOG_ERREUR);
+		return false;
+	}
+
+	spip_log("Response API $method ".json_encode($response), $mode . _LOG_DEBUG);
+
+	return $response;
+}
+
+/**
  * Determiner la cle de signature en fonction de la config
  * @param array $config
  * @return string
  */
 function payzen_key($config){
 	if ($config['mode_test']){
-		return $config['CLE_test'];
+		return (empty($config['CLE_test']) ? '' : $config['CLE_test']);
 	}
 
-	return $config['CLE'];
+	return (empty($config['CLE']) ? '' : $config['CLE']);
+}
+
+/**
+ * Determiner la cle de signature en fonction de la config
+ * @param array $config
+ * @return string
+ */
+function payzen_api_password($config){
+	if ($config['mode_test']){
+		return (empty($config['API_PASSWORD_test']) ? '' : $config['API_PASSWORD_test']);
+	}
+
+	return (empty($config['API_PASSWORD']) ? '' : $config['API_PASSWORD']);
 }
 
 
