@@ -146,6 +146,7 @@ _ Compte bancaire :
 	'label_presta_abo_paybox' => 'Paybox <a href="http://www.paybox.com/">paybox.com</a>',
 	'label_presta_abo_simu' => 'Simulation (necessite une autorisation par define)',
 	'label_presta_cheque' => 'Chèques (encaissement manuel)',
+	'label_presta_clicandpay' => 'ClicAndPay <a href="https://clicandpay.groupecdn.fr/doc/fr-FR/">clicandpay.groupecdn.fr</a>',
 	'label_presta_cmcic' => 'Monetico <a href="https://www.monetico-paiement.fr/">monetico-paiement.fr</a>',
 	'label_presta_cmcic_banque' => 'Banque',
 	'label_presta_ogone' => 'Ogone <a href="https://ingenico.fr/payments">ingenico.fr</a>',
