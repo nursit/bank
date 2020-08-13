@@ -22,5 +22,5 @@ if (!defined('_ECRIRE_INC_VERSION')){
  */
 function presta_systempay_call_request_dist($id_transaction, $transaction_hash, $config = array(), $action = "PAYMENT", $options = array()){
 	$call_request = charger_fonction('request', 'presta/payzen/call');
-	return $call_request($id_transaction, $transaction_hash, $config = array(), $action = "PAYMENT", $options = array());
+	return $call_request($id_transaction, $transaction_hash, $config, $action, $options);
 }
