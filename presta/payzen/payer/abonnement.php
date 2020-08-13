@@ -23,7 +23,7 @@ if (!defined('_ECRIRE_INC_VERSION')){
  */
 function presta_payzen_payer_abonnement_dist($config, $id_transaction, $transaction_hash, $options = array()){
 
-	$call_request = charger_fonction('request', 'presta/systempay/call');
+	$call_request = charger_fonction('request', 'presta/payzen/call');
 
 	// Tip : pour tester les workflow de paiement abonnement decomposes avec les CB
 	// utiliser ici REGISTER_SUBSCRIBE au lieu de REGISTER_PAY_SUBSCRIBE
