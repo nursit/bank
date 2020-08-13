@@ -25,20 +25,28 @@ include_spip('inc/bank');
 function payzen_url_serveur($config){
 
 	$host = "";
-	switch ($config['service']) {
-		case "osb":
-			$host = "https://secure.osb.pf";
+	switch ($config['presta']) {
+		case "systempay":
+
+			switch ($config['service']) {
+				case "osb":
+					$host = "https://secure.osb.pf";
+					break;
+				case "systempay":
+				case "cyberplus":
+				case "spplus":
+				default:
+					$host = "https://paiement.systempay.fr";
+					break;
+			}
 			break;
+
 		case "payzen":
+		default:
 			$host = "https://secure.payzen.eu";
 			break;
-		case "systempay":
-		case "cyberplus":
-		case "spplus":
-		default:
-			$host = "https://paiement.systempay.fr";
-			break;
 	}
+
 
 	return "$host/vads-payment/";
 }
@@ -66,7 +74,9 @@ function payzen_url_api($config){
 }
 
 /**
- * Appel d'une methode GET de l'API PayZen
+ * Appel d'une methode GET de l'API REST PayZen
+ * https://payzen.io/fr-FR/rest/V4.0/api/
+ * 
  * @param array $config
  * @param string $method
  * @param array $params
@@ -156,19 +166,21 @@ function payzen_available_cards($config){
 		'AMEX' => "AMEX.gif",
 	);
 
-	if ($config['service']=="osb"){
-		// pas de CB et e-CB avec OSB
-		unset($cartes_possibles['CB']);
-		unset($cartes_possibles['E-CARTEBLEUE']);
-	} else {
-		if ($config['type']!=='abo'){
-			$cartes_possibles['MAESTRO'] = "MAESTRO.gif";
-			$cartes_possibles['VISA_ELECTRON'] = "VISAELECTRON.gif";
-			//$cartes_possibles['PAYPAL']="PAYPAL.gif";
-			//$cartes_possibles['V_ME']="VME.gif";
+	if ($config['presta']=='systempay') {
+		if ($config['service']=="osb"){
+			// pas de CB et e-CB avec OSB
+			unset($cartes_possibles['CB']);
+		} else {
+			if ($config['type']!=='abo'){
+				$cartes_possibles['MAESTRO'] = "MAESTRO.gif";
+				$cartes_possibles['VISA_ELECTRON'] = "VISAELECTRON.gif";
+				//$cartes_possibles['PAYPAL']="PAYPAL.gif";
+				//$cartes_possibles['V_ME']="VME.gif";
+			}
 		}
 	}
-	if ($config['service']=='payzen'){
+
+	if ($config['presta']=='payzen'){
 		// les SEPA, abo ou non
 		$cartes_possibles['SDD'] = "SEPA_SDD.gif";
 		if ($config['type']!=='abo'){
@@ -182,10 +194,6 @@ function payzen_available_cards($config){
 			// et les e-cheques vacances
 			// $cartes_possibles['E_CV'] = "E_CV.gif";
 		}
-	}
-
-	if ($config['type']=='abo'){
-		unset($cartes_possibles['E-CARTEBLEUE']);
 	}
 
 	return $cartes_possibles;
