@@ -15,9 +15,8 @@ if (!defined('_ECRIRE_INC_VERSION')){
 
 
 /*
- * Generer le contexte pour le formulaire de requete de paiement
- * il faut avoir un id_transaction et un transaction_hash coherents
- * pour se premunir d'une tentative d'appel exterieur
+ * SystemPay est une variante de PayZen et repose sur l'implementation de Payzen
+ * il est presente comme un prestataire separe pour une meilleure lisibilite
  *
  * @deprecated
  */
