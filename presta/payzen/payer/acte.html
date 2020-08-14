@@ -12,7 +12,7 @@
 ]#CACHE{0}#SET{presta_label,#ENV{presta_label,PayZen}}
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 <B_cb>
-<div class='payer_mode payer_#ENV{presta,payzen} payer_acte'>
+<div class='payer_mode payer_[(#ENV{presta,payzen}) ]payer_acte'>
 	<h4 class="titre h4"><:bank:payer_par_carte_bancaire:></h4>
 	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
@@ -24,7 +24,7 @@
 </div>
 </B_cb>
 <B_sepa>
-<div class='payer_mode payer_#ENV{presta,payzen} payer_sepa payer_acte'>
+<div class='payer_mode payer_[(#ENV{presta,payzen}) ]payer_sepa payer_acte'>
 	<h4 class="titre h4"><:bank:payer_par_prelevement_sepa:></h4>
 	[<p class="explication">(#ENV{config/presta}|concat{_sepa}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
@@ -36,7 +36,7 @@
 </div>
 </B_sepa>
 <B_ecv>
-<div class='payer_mode payer_#ENV{presta,payzen} payer_ecv payer_acte'>
+<div class='payer_mode payer_[(#ENV{presta,payzen}) ]payer_ecv payer_acte'>
 	<h4 class="titre h4"><:bank:payer_par_e_cheque_vacances:></h4>
 	[<p class="explication">(#ENV{config/presta}|concat{_ecv}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
