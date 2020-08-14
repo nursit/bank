@@ -25,7 +25,7 @@
 <hr />
 <B_transactions>
 <h3>Transactions</h3>
-<p class='pagination' >#PAGINATION</p>
+<div class='pagination' >#PAGINATION</div>
 <table class="spip">
 <thead>
 	<tr>
@@ -65,10 +65,47 @@
 		<td>#ID_PANIER</td>
 		<td>#ID_FACTURE</td>
 		<td>#PARRAIN</td>
-		<th><a href="[(#SELF|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]">Payer</a></th>
+		<td><a href="[(#SELF|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]">Payer</a></td>
 	</tr>
 </BOUCLE_transactions>
 </tbody>
 </table>
 </div>
 </B_transactions>
+<style type="text/css">
+	.pagination ul,.pagination li {list-style: none;padding: 0;margin: 0;display: inline-block;}
+	.pagination span,.pagination strong,.pagination a {display: inline-block;padding: 0.25em 0.5em; background: #f4f4f4; margin-right: 0.25em;}
+	.pagination a:empty {display: none}
+	table.spip {}
+	table.spip td,table.spip th{padding: 0.25em 0.5em;border-bottom: 1px solid #ddd;}
+	table.spip thead td,table.spip thead th{background: #ddd;font-weight: bold}
+	table.spip tbody tr:nth-child(2n) td, table.spip tbody tr:nth-child(2n) th {background: #f4f4f4}
+	#formulaire_mode_paiement {
+		background: #f4f4f4;
+		padding: 1em;
+	}
+	.payer_modes {
+		max-width: 50em;
+	}
+	.payer_mode {
+		border-bottom: 1px solid #ddd;
+		padding-bottom: 1em;
+		margin-bottom: 1em;
+		position: relative;
+	}
+	.payer_mode .boutons,
+	.payer_mode .info {
+		text-align: right;
+	}
+	.payer_mode:before {
+		content: attr(class);
+		display: inline-block;
+		position: absolute;
+		bottom:100%;
+		right: 0;
+		font-size: 0.8em;
+		font-family: monospace;
+		line-height: 1;
+		color:#888;
+	}
+</style>
