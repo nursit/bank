@@ -42,17 +42,17 @@ function payzen_url_serveur($config){
 			break;
 
 		case "clicandpay":
-			$host = "https://clicandpay.groupecdn.fr/vads-payment/";
+			$host = "https://clicandpay.groupecdn.fr";
 			break;
 
 		/*
 		Provision. A voir si ce sont des presta ou des services...
 		case "sogecommerce":
-			$host = "https://sogecommerce.societegenerale.eu/vads-payment/";
+			$host = "https://sogecommerce.societegenerale.eu";
 			break;
 
 		case "scelliuspaiement":
-			$host = "https://scelliuspaiement.labanquepostale.fr/vads-payment/";
+			$host = "https://scelliuspaiement.labanquepostale.fr";
 			break;
 		*/
 
