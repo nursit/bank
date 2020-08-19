@@ -159,6 +159,20 @@ function payzen_key($config){
 }
 
 /**
+ * Determiner la methode de signature en fonction de la config
+ * @param array $config
+ * @return string
+ */
+function payzen_sign_algorithm($config){
+	// historique : assurer la continuite sur les boutiques en prod
+	if (empty($config['SIGNATURE_ALGO'])
+	  or !in_array($config['SIGNATURE_ALGO'], ['sha1', 'sha256'])) {
+		return 'sha1';
+	}
+	return $config['SIGNATURE_ALGO'];
+}
+
+/**
  * Determiner la cle de signature en fonction de la config
  * @param array $config
  * @return string
@@ -231,7 +245,7 @@ function payzen_available_cards($config){
  * @return string
  */
 function payzen_form_hidden($config, $parms){
-	$parms['signature'] = payzen_signe_contexte($parms, payzen_key($config));
+	$parms['signature'] = payzen_signe_contexte($parms, payzen_key($config), payzen_sign_algorithm($config));
 	$hidden = "";
 	foreach ($parms as $k => $v){
 		$hidden .= "<input type='hidden' name='$k' value='" . str_replace("'", "&#39;", $v) . "' />";
@@ -245,9 +259,10 @@ function payzen_form_hidden($config, $parms){
  * Signer le contexte en SHA, avec une cle secrete $key
  * @param array $contexte
  * @param string $key
+ * @param string $algorithm
  * @return string
  */
-function payzen_signe_contexte($contexte, $key){
+function payzen_signe_contexte($contexte, $key, $algorithm = 'sha1'){
 
 	// on ne prend que les infos vads_*
 	// a signer
@@ -262,19 +277,30 @@ function payzen_signe_contexte($contexte, $key){
 	$contenu_signature = implode("+", $sign);
 	$contenu_signature .= "+$key";
 
-	$s = sha1($contenu_signature);
+	switch ($algorithm) {
+		case 'sha1':
+			$s = sha1($contenu_signature);
+			break;
+
+		case 'sha256':
+		default:
+			$s = base64_encode(hash_hmac('sha256',$contenu_signature, $key, true));
+			break;
+	}
+
 	return $s;
 }
 
 
 /**
  * Verifier la signature de la reponse PayZen
- * @param $values
- * @param $key
+ * @param array $values
+ * @param string $key
+ * @param string $algorithm
  * @return bool
  */
-function payzen_verifie_signature($values, $key){
-	$signature = payzen_signe_contexte($values, $key);
+function payzen_verifie_signature($values, $key, $algorithm = 'sha1'){
+	$signature = payzen_signe_contexte($values, $key, $algorithm);
 
 	if (isset($values['signature'])
 		AND ($values['signature']==$signature)){
@@ -302,7 +328,7 @@ function payzen_recupere_reponse($config){
 	}
 	$reponse['signature'] = (isset($_REQUEST['signature']) ? $_REQUEST['signature'] : '');
 
-	$ok = payzen_verifie_signature($reponse, payzen_key($config));
+	$ok = payzen_verifie_signature($reponse, payzen_key($config), payzen_sign_algorithm($config));
 	// si signature invalide, verifier si
 	// on rejoue manuellement un call vads_url_check_src=RETRY incomplet
 	// en lui ajoutant le vads_subscription
@@ -312,7 +338,7 @@ function payzen_recupere_reponse($config){
 		AND isset($reponse['vads_subscription'])){
 		$response_part = $reponse;
 		unset($response_part['vads_subscription']);
-		$ok = payzen_verifie_signature($response_part, payzen_key($config));
+		$ok = payzen_verifie_signature($response_part, payzen_key($config), payzen_sign_algorithm($config));
 	}
 	if (!$ok){
 		spip_log("recupere_reponse : signature invalide " . var_export($reponse, true), $config['presta'] . _LOG_ERREUR);

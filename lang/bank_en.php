@@ -161,6 +161,7 @@ _ Bank account:
 	'label_prestataires' => 'Payment Providers',
 	'label_remboursement_raison' => 'Reason of refunding',
 	'label_resilier_abonnement' => 'Cancel subscription',
+	'label_signature_algo' => 'Sign Method',
 	'label_tri_mode' => 'Method',
 	'label_tri_autorisation' => 'Authorization',
 	'label_tri_montant_ht' => 'Net',
