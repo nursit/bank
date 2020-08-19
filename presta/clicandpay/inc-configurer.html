@@ -1,4 +1,5 @@
 <input type="hidden" name="#ENV{casier,''}[service]" value="clicandpay" />
+<input type="hidden" name="#ENV{casier,''}[SIGNATURE_ALGO]" value="sha256" />
 <ul class="editer-groupe">
 	#SET{name,#ENV{casier,''}_SITE_ID}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">

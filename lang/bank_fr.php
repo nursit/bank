@@ -164,6 +164,7 @@ _ Compte bancaire :
 	'label_prestataires' => 'Prestataires',
 	'label_remboursement_raison' => 'Raison du remboursement',
 	'label_resilier_abonnement' => 'Résilier',
+	'label_signature_algo' => 'Méthode Signature',
 	'label_tri_mode' => 'Mode',
 	'label_tri_autorisation' => 'Autorisation',
 	'label_tri_montant_ht' => 'HT',

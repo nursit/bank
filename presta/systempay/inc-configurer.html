@@ -36,5 +36,16 @@
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[CLE_test]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{CLE_test,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
+	#SET{name,#ENV{casier,''}_SIGNATURE_ALGO}#SET{obli,''}#SET{defaut,#ENV*{#ENV{casier,''}}|table_valeur{SITE_ID}|?{sha1,sha256}}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}"><:bank:label_signature_algo:></label>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<select name="#ENV{casier,''}[SIGNATURE_ALGO]" class="select" id="#GET{name}">
+			#SET{val,sha1}
+			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/SIGNATURE_ALGO,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>SHA-1</option>
+			#SET{val,sha256}
+			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/SIGNATURE_ALGO,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>SHA-256</option>
+		</select>
+	</li>
 </ul>
 <p class="explication">URL Serveur&nbsp;: <br /><input type="text" class="text" readonly="readonly" value="[(#ENV{#ENV{casier,''}}|bank_url_autoresponse)]" /></p>
