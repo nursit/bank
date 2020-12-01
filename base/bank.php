@@ -42,6 +42,7 @@ function bank_declarer_tables_objets_sql($tables){
 			"contenu" => "TEXT NOT NULL DEFAULT ''", // contenu sous forme texte serializee, a toute fin utile
 			"montant_ht" => "varchar(25) NOT NULL DEFAULT ''", // montant ht en euros
 			"montant" => "varchar(25) NOT NULL DEFAULT ''", // montant ttc en euros
+			"devise" => "char(3) NOT NULL DEFAULT 'EUR'", // code alpha d'une devise, normalement en majuscule
 
 			"mode" => "varchar(25) NOT NULL DEFAULT ''", // mode de paiement (prestataire)
 			"autorisation_id" => "varchar(255) NOT NULL DEFAULT ''", // numero d'autorisation de debit envoye par le presta bancaire
