@@ -124,6 +124,11 @@ function bank_upgrade($nom_meta_base_version, $version_cible){
 	$maj['1.6.5'] = array(
 		array("sql_alter", "table spip_transactions CHANGE autorisation_id autorisation_id varchar(255) NOT NULL DEFAULT ''"),
 	);
+	
+	// Ajout du champ "devise"
+	$maj['1.7.0'] = array(
+		array('maj_tables', array('spip_transactions')),
+	);
 
 	include_spip('base/upgrade');
 	maj_plugin($nom_meta_base_version, $version_cible, $maj);
