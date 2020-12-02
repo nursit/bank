@@ -25,11 +25,9 @@ if (!defined('_ECRIRE_INC_VERSION')){
  * @return array
  */
 function presta_sipsv2_call_request_dist($id_transaction, $transaction_hash, $config){
-
 	include_spip('presta/sipsv2/inc/sipsv2');
 	$mode = 'sipsv2';
 	$logname = 'spipsvdeux';
-	$devise_defaut = bank_devise_defaut();
 	
 	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
 		spip_log("call_request : config invalide " . var_export($config, true), $logname . _LOG_ERREUR);
@@ -47,7 +45,11 @@ function presta_sipsv2_call_request_dist($id_transaction, $transaction_hash, $co
 		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable", $logname . _LOG_ERREUR);
 		return "";
 	}
-
+	
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	
 	if (!$row['id_auteur']
 		AND isset($GLOBALS['visiteur_session']['id_auteur'])
 		AND $GLOBALS['visiteur_session']['id_auteur']){
@@ -60,7 +62,7 @@ function presta_sipsv2_call_request_dist($id_transaction, $transaction_hash, $co
 	$mail = bank_porteur_email($row);
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$montant = intval(round((10**$devise_defaut['fraction']) * $row['montant'], 0));
+	$montant = intval(round((10**$devise_info['fraction']) * $row['montant'], 0));
 
 	list($merchant_id, $key_version, $secret_key) = sipsv2_key($config);
 	$service = $config['service'];
@@ -69,7 +71,7 @@ function presta_sipsv2_call_request_dist($id_transaction, $transaction_hash, $co
 	$parm = array();
 	$parm['merchantID'] = $merchant_id;
 	$parm['amount'] = $montant;
-	$parm['currencyCode'] = (string)$devise_defaut['code_num'];
+	$parm['currencyCode'] = (string)$devise_info['code_num'];
 
 	$parm['customerId'] = intval($row['id_auteur']) ? $row['id_auteur'] : $row['auteur_id'];
 	$parm['orderId'] = intval($id_transaction);
