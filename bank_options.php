@@ -79,10 +79,17 @@ function bank_affiche_payer($config, $type, $id_transaction, $transaction_hash, 
 
 	$quoi = ($type=='abo' ? 'abonnement' : 'acte');
 	
-	$devise_defaut = bank_devise_defaut();
+	// On va chercher la devise de la transaction
+	if ($devise = sql_getfetsel('devise', 'spip_transactions', 'id_transaction = '.intval($id_transaction))) {
+		$devise_info = bank_devise_info($devise);
+	}
+	// Sinon celle par défaut
+	else {
+		$devise_info = bank_devise_defaut();
+	}
 	
-	if (!bank_tester_devise_presta($config['presta'], $devise_defaut['code'])) {
-		spip_log('La devise ' . $devise_defaut['code'] . 'n’est pas supportée pour presta=' . $config['presta'], 'bank' . _LOG_ERREUR);
+	if (!bank_tester_devise_presta($config['presta'], $devise_info['code'])) {
+		spip_log('La devise ' . $devise_info['code'] . 'n’est pas supportée pour presta=' . $config['presta'], 'bank' . _LOG_ERREUR);
 		return '';
 	}
 	
