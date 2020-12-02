@@ -22,6 +22,7 @@
 	<pipeline nom="affiche_auteurs_interventions" inclure="bank_fonctions.php" />
 	<pipeline nom="taches_generales_cron" inclure="bank_fonctions.php" />
 
+	<pipeline nom="bank_lister_devises" action="" />
 	<pipeline nom="bank_devise_defaut" action="" />
 	<pipeline nom="bank_dsp2_renseigner_facturation" action="" />
 	<pipeline nom="bank_abos_activer_abonnement" action="" />
