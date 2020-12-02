@@ -67,7 +67,11 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $con
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		return array();
 	}
-
+	
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	
 	if (!$row['id_auteur']
 		AND isset($GLOBALS['visiteur_session']['id_auteur'])
 		AND $GLOBALS['visiteur_session']['id_auteur']){
@@ -90,9 +94,8 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $con
 	$contexte['operation'] = "SAL"; // c'est un paiement a l'acte immediat
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$devise_defaut = bank_devise_defaut();
-	$contexte['currency'] = $devise_defaut['code'];
-	$contexte['amount'] = intval(round((10**$devise_defaut['fraction']) * $row['montant'], 0));
+	$contexte['currency'] = $devise_info['code'];
+	$contexte['amount'] = intval(round((10**$devise_info['fraction']) * $row['montant'], 0));
 
 	#if (strlen($montant)<3)
 	#	$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
