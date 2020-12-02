@@ -33,20 +33,23 @@ include_spip('presta/paybox/inc/paybox');
  * @return string
  */
 function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, $refabonne, $ppps, $config = null){
-
 	include_spip('inc/bank');
+	
 	if (!$config){
 		$config = bank_config("paybox", true);
 	}
 	$config['mode'] .= "_dplus"; // pour les logs
 	$mode = $config['mode'];
-	$devise_defaut = bank_devise_defaut();
 
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		spip_log("Transaction inconnue $id_transaction/$transaction_hash", $mode . _LOG_ERREUR);
 		return "";
 	}
-
+	
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	
 	// securite : eviter de faire payer plusieurs fois une meme transaction si bug en amont
 	if ($row['statut']=='ok'){
 		spip_log("Transaction $id_transaction/$transaction_hash deja reglee", $mode . _LOG_INFO_IMPORTANTE);
@@ -63,7 +66,7 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	$mail = sql_getfetsel('email', "spip_auteurs", 'id_auteur=' . intval($row['id_auteur']));
 
 	// passage en centimes d'euros
-	$montant = intval(round((10**$devise_defaut['fraction']) * $row['montant']));
+	$montant = intval(round((10**$devise_info['fraction']) * $row['montant']));
 	if (strlen($montant)<10){
 		$montant = str_pad($montant, 10, '0', STR_PAD_LEFT);
 	}
@@ -77,7 +80,7 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	$parm['CLE'] = $config['DIRECT_PLUS_CLE'];
 	$parm['DATEQ'] = date('dmYHis');
 	$parm['TYPE'] = _PAYBOX_DIRECTPLUS_AUTHDEBIT_ABONNE;
-	$parm['DEVISE'] = (string)$devise_defaut['code_num'];
+	$parm['DEVISE'] = (string)$devise_info['code_num'];
 	$parm['REFERENCE'] = intval($id_transaction);
 	$parm['ARCHIVAGE'] = intval($id_transaction);
 	$parm['DIFFERE'] = '000';
