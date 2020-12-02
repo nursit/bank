@@ -25,7 +25,7 @@
 				<input type="hidden" name="amount" value="#MONTANT" />
 				<input type="hidden" name="no_note" value="1" />
 				<input type="hidden" name="business" value="#ENV{config/BUSINESS_USERNAME}" />
-				<input type="hidden" name="currency_code" value="[(#VAL|bank_devise_defaut|table_valeur{code}|strtoupper)]" />
+				<input type="hidden" name="currency_code" value="[(#DEVISE|strtoupper)]" />
 				<input type="hidden" name="lc" value="FR" />
 				<input type="hidden" name="invoice" value="#ID_TRANSACTION-#TRANSACTION_HASH" />
 				<BOUCLE_profil(AUTEURS){id_auteur}>

@@ -103,7 +103,11 @@ function paypal_traite_response($config, $response){
 			)
 		);
 	}
-
+	
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	
 	if ($row['reglee']=='oui'){
 		return array($id_transaction, true);
 	} // cette transaction a deja ete reglee. double entree, on ne fait rien
@@ -155,8 +159,7 @@ function paypal_traite_response($config, $response){
 	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
 
 	// une monnaie est-elle bien indique (et en EUR) ?
-	$devise_defaut = bank_devise_defaut();
-	if (!isset($response['mc_currency']) OR ($response['mc_currency'] != strtoupper($devise_defaut['code']))) {
+	if (!isset($response['mc_currency']) OR ($response['mc_currency'] != strtoupper($devise_info['code']))) {
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,
