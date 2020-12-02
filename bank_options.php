@@ -225,7 +225,7 @@ function bank_lister_devises() {
  * Renvoie une ou toutes les infos sur une devise
  * 
  * @param string $code
- *    Code alphabétique à 3 lettres de la devise
+ *    Identifiant ISO 4217 alpha d'une devise
  */
 function bank_devise_info($code, $info='') {
 	$code = strtoupper($code);

@@ -71,10 +71,13 @@ function bank_inserer_transaction_dist($montant, $options = array()){
 	$montant = round($montant, 2);
 	$montant_ht = (isset($options['montant_ht']) ? $options['montant_ht'] : $montant);
 	$montant_ht = round($montant_ht, 2);
-
+	
+	$devise_defaut = bank_devise_defaut();
+	
 	$set = array(
 		'montant' => str_replace(',', '.', round($montant, 2)),
 		'montant_ht' => str_replace(',', '.', round($montant_ht, 2)),
+		'devise' => $devise_defaut['code'],
 		'id_auteur' => isset($options['id_auteur']) ? intval($options['id_auteur']) : 0,
 		'auteur_id' => isset($options['auteur_id']) ? $options['auteur_id'] : "",
 		'auteur' => isset($options['auteur']) ? $options['auteur'] : "",
