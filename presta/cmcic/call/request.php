@@ -99,7 +99,11 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		return array();
 	}
-
+	
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	
 	include_spip('inc/filtres');
 	$contexte = array();
 
@@ -119,8 +123,7 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 
 
 	// Currency : ISO 4217 compliant
-	$devise_defaut = bank_devise_defaut();
-	$devise = strtoupper($devise_defaut['code']);
+	$devise = strtoupper($devise_info['code']);
 	// Amount : format  "xxxxx.yy" (no spaces)
 	$montant = $row['montant'];
 	$contexte['version'] = $oTpe->sVersion;
