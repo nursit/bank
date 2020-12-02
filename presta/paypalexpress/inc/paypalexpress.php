@@ -104,7 +104,11 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm = 
 		);
 		return false;
 	}
-
+	
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	
 	if ($row['reglee']=='oui'){
 		bank_transaction_invalide($id_transaction,
 			array(
@@ -127,8 +131,7 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm = 
 	portion of the URL that buyers will return to after authorizing payment
 	*/
 	$paymentAmount = $row['montant'];
-	$devise_defaut = bank_devise_defaut();
-	$currencyCodeType = strtoupper($devise_defaut['code']);
+	$currencyCodeType = strtoupper($devise_info['code']);
 	$paymentType = "Sale";
 
 
@@ -213,7 +216,11 @@ function bank_paypalexpress_checkoutpayment($payerid, $config){
 			)
 		);
 	}
-
+	
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	
 	// hmm bizare, double hit ? On fait comme si c'etait OK
 	if ($row['reglee']=='oui'){
 		spip_log("Erreur transaction $id_transaction deja reglee", $mode . _LOG_INFO_IMPORTANTE);
@@ -242,8 +249,7 @@ function bank_paypalexpress_checkoutpayment($payerid, $config){
 	*/
 	$token = urlencode($_SESSION['token']);
 	$paymentAmount = $row['montant'];
-	$devise_defaut = bank_devise_defaut();
-	$currencyCodeType = strtoupper($devise_defaut['code']);
+	$currencyCodeType = strtoupper($devise_info['code']);
 	$paymentType = "Sale";
 	$payerID = urlencode($_SESSION['payer_id']);
 	$serverName = urlencode($_SERVER['SERVER_NAME']);
