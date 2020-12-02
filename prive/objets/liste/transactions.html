@@ -18,6 +18,7 @@
 				<th class='autorisation_id' scope='col'>[(#TRI{autorisation_id,<:bank:label_tri_autorisation:>,ajax})]</th>
 				<th class='montant_ht' scope='col'>[(#TRI{montant_ht,<:bank:label_tri_montant_ht:>,ajax})]</th>
 				<th class='montant' scope='col'>[(#TRI{montant,<:bank:label_tri_montant_ttc:>,ajax})]</th>
+				<th class='devise' scope='col'>[(#TRI{devise,<:bank:label_tri_devise:>,ajax})]</th>
 				<th class='regle' scope='col'>[(#TRI{montant_regle,<:bank:label_tri_montant_paye:>,ajax})]</th>
 				<th class='date' scope='col'>[(#TRI{date_transaction,<:date:>,ajax})]</th>
 				<th class='statut' scope='col'>[(#TRI{statut,<:bank:label_tri_statut:>,ajax})]</th>
@@ -44,6 +45,7 @@
 				<td class="autorisation_id"><abbr title="#AUTORISATION_ID">[(#AUTORISATION_ID|couper{15})]</abbr></td>
 				<td class="montant_ht">#MONTANT_HT</td>
 				<td class="montant">#MONTANT</td>
+				<td class="devise">#DEVISE</td>
 				<td class="regle">#MONTANT_REGLE</td>
 				<td class="date">#DATE_TRANSACTION</td>
 				<td class="statut">[(#STATUT|match{echec|ok|rembourse}|et{#MESSAGE|trim|strlen}|?{[<abbr title="[(#MESSAGE|attribut_html)[ - (#ERREUR|attribut_html)]]">(#STATUT)</abbr>],#STATUT})][(#STATUT|in_array{#LISTE{commande,attente}}|et{#AUTORISER{regler,transaction,#ID_TRANSACTION}})<br/><a href="[(#URL_ECRIRE{payer,id_transaction=#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]"><:bank:payer:></a>]</td>
