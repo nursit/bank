@@ -187,6 +187,63 @@ function bank_annonce_version_plugin($format = 'string'){
 }
 
 /**
+ * 	Renvoie la liste des devises possibles, et toutes leurs infos nécessaires
+ * 
+ * @pipeline_appel bank_lister_devises
+ * @return array
+ * 		Tableau de toutes les devises avec pour chacune leurs infos complètes au format
+ * 		```
+ * 		array(
+ * 			'EUR' => array(
+ * 				'code' => 'EUR',
+ * 				'code_num' => 978,
+ * 				'nom' => 'euro',
+ * 				'fraction' => 2,
+ * 				'symbole' => '€',
+ * 				'locale' => 'fr_FR',
+ * 			)
+ * 		)
+ * 		```
+ */
+function bank_lister_devises() {
+	$devises = array(
+		'EUR' => array(
+			'code' => 'EUR',
+			'code_num' => 978,
+			'nom' => 'euro',
+			'fraction' => 2,
+			'symbole' => '€',
+		),
+	);
+	
+	$devises = pipeline('bank_lister_devises', $devises);
+	
+	return $devises;
+}
+
+/**
+ * Renvoie une ou toutes les infos sur une devise
+ * 
+ * @param string $code
+ *    Code alphabétique à 3 lettres de la devise
+ */
+function bank_devise_info($code, $info='') {
+	$code = strtoupper($code);
+	$devises = bank_lister_devises();
+	$retour = null;
+	
+	if (isset($devises[$code])) {
+		$retour = $devises[$code];
+		
+		if ($info) {
+			$retour = (isset($retour[$info]) ? $retour[$info] : null);
+		}
+	}
+	
+	return $retour;
+}
+
+/**
  * Renvoie la devise par défaut utilisée par Bank, modifiable par pipeline
  * 
  * @pipeline_appel bank_devise_defaut
@@ -194,15 +251,11 @@ function bank_annonce_version_plugin($format = 'string'){
  *     Identifiant ISO 4217 alpha d'une devise
  */
 function bank_devise_defaut() {
-	$devise = array(
-		'code' => 'EUR',
-		'code_num' => 978,
-		'fraction' => 2,
-	);
+	$devise_defaut = bank_devise_info('EUR');
 	
-	$devise = pipeline('bank_devise_defaut', $devise);
+	$devise_defaut = pipeline('bank_devise_defaut', $devise_defaut);
 	
-	return $devise;
+	return $devise_defaut;
 }
 
 /**
