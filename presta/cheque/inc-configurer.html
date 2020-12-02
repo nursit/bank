@@ -1,4 +1,14 @@
 <ul class="editer-groupe">
+	#SET{devises, #REM|bank_lister_devises}
+	#SET{name, #ENV{casier,''}_devise}#SET{obli,oui}#SET{defaut,#REM|bank_devise_defaut|table_valeur{code}}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}"><:bank:label_configuration_cheque_devise:></label>
+		<select name="#ENV{casier,''}[devise]" id="#GET{name}">
+			<BOUCLE_devises(DATA){source table, #GET{devises}}{par nom}>
+			<option value="#VALEUR{code}" [(#ENV*{#ENV{casier, ''}}|table_valeur{devise,#GET{defaut}}|=={#VALEUR{code}}|oui)selected="selected"]>[(#VALEUR{nom})] (#VALEUR{code})</option>
+			</BOUCLE_devises>
+		</select>
+	</li>
 	#SET{name,#ENV{casier,''}_ordre}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 		<label for="#GET{name}"><:bank:label_configuration_cheque_ordre:></label>[
