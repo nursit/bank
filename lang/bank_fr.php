@@ -157,6 +157,7 @@ _ Compte bancaire :
 	'label_resilier_abonnement' => 'Résilier',
 	'label_tri_mode' => 'Mode',
 	'label_tri_autorisation' => 'Autorisation',
+	'label_tri_devise' => 'Devise',
 	'label_tri_montant_ht' => 'HT',
 	'label_tri_montant_ttc' => 'TTC',
 	'label_tri_montant_paye' => 'Réglé',
