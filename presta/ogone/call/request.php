@@ -95,7 +95,7 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $con
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
 	$contexte['currency'] = $devise_info['code'];
-	$contexte['amount'] = intval(round((10**$devise_info['fraction']) * $row['montant'], 0));
+	$contexte['amount'] = intval(round(100 * $row['montant'], 0));
 
 	#if (strlen($montant)<3)
 	#	$montant = str_pad($montant,3,'0',STR_PAD_LEFT);
