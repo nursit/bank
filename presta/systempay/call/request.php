@@ -74,7 +74,11 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		return array();
 	}
-
+	
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	
 	if (!$row['id_auteur']
 		AND isset($GLOBALS['visiteur_session']['id_auteur'])
 		AND $GLOBALS['visiteur_session']['id_auteur']){
@@ -110,9 +114,8 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 	//$parm['vads_validation_mode'] = 0;
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$devise_defaut = bank_devise_defaut();
-	$parm['vads_currency'] = $devise_defaut['code_num'];
-	$parm['vads_amount'] = intval(round((10**$devise_defaut['fraction']) * $row['montant'], 0));
+	$parm['vads_currency'] = $devise_info['code_num'];
+	$parm['vads_amount'] = intval(round((10**$devise_info['fraction']) * $row['montant'], 0));
 
 	$parm['vads_language'] = $GLOBALS['spip_lang'];
 
@@ -200,7 +203,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 				}
 
 				// montant de l'echeance
-				$parm['vads_sub_amount'] = intval(round((10**$devise_defaut['fraction']) * $echeance['montant'], 0));
+				$parm['vads_sub_amount'] = intval(round((10**$devise_info['fraction']) * $echeance['montant'], 0));
 				// meme devise que le paiement initial
 				$parm['vads_sub_currency'] = $parm['vads_currency'];
 
@@ -235,7 +238,7 @@ function presta_systempay_call_request_dist($id_transaction, $transaction_hash, 
 				if ($nb_init>0){
 					$parm['vads_sub_init_amount_number'] = $nb_init;
 					$parm['vads_sub_init_amount'] = $parm['vads_amount'];
-					if (isset($echeance['montant_init']) AND ($m = intval(round((10**$devise_defaut['fraction']) * $echeance['montant_init'], 0)))>0){
+					if (isset($echeance['montant_init']) AND ($m = intval(round((10**$devise_info['fraction']) * $echeance['montant_init'], 0)))>0){
 						$parm['vads_sub_init_amount'] = $m;
 					}
 				}
