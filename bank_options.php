@@ -88,6 +88,7 @@ function bank_affiche_payer($config, $type, $id_transaction, $transaction_hash, 
 		$devise_info = bank_devise_defaut();
 	}
 	
+	// On teste si ce prestataire sait gérer la devise demandée, sinon on ne l'affiche pas
 	if (!bank_tester_devise_presta($config['presta'], $devise_info['code'])) {
 		spip_log('La devise ' . $devise_info['code'] . 'n’est pas supportée pour presta=' . $config['presta'], 'bank' . _LOG_ERREUR);
 		return '';
