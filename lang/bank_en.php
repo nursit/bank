@@ -116,6 +116,7 @@ _ Bank account:
 	'label_configuration_cheque_adresse' => 'Address where checks should be sent',
 	'label_configuration_cheque_notice' => 'Additional displayed information',
 	'label_configuration_cheque_ordre' => 'Pay to the order of',
+	'label_configuration_nom_compte' => 'Account name',
 	'label_configuration_type' => 'Payments type',
 	'label_configuration_type_abo' => 'Recurring payments',
 	'label_configuration_type_abo_acte' => 'Both',

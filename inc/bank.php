@@ -229,6 +229,9 @@ function bank_config_id($config){
 		){
 			unset($t[$k]);
 		}
+		elseif (substr($k,-1) === '_' and empty($v)){
+			unset($t[$k]);
+		}
 
 	}
 	ksort($t);
@@ -430,7 +433,6 @@ function bank_porteur_infos_facturation($transaction){
 	// un peu de (re)mise en forme
 	$infos = array_map('trim', $infos);
 
-	$infos['adresse'] =
 	$lignes = explode("\n", $infos['adresse']);
 	$lignes = array_map('trim', $lignes);
 	$lignes = array_filter($lignes);
