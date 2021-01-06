@@ -116,6 +116,7 @@ _ Compte bancaire :
 	'label_configuration_cheque_adresse' => 'Adresse où envoyer les chèques',
 	'label_configuration_cheque_notice' => 'Information complémentaire affichée',
 	'label_configuration_cheque_ordre' => 'Ordre',
+	'label_configuration_nom_compte' => 'Nom du compte',
 	'label_configuration_type' => 'Type de paiements',
 	'label_configuration_type_abo' => 'Paiements Récurrents',
 	'label_configuration_type_abo_acte' => 'Les deux',
