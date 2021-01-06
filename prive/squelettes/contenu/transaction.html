@@ -6,7 +6,19 @@
 		<BOUCLE_auteur(AUTEURS){id_auteur}{tout}>
 		<div class="qui">Liée à [<a href='[(#ID_AUTEUR|generer_url_entite{auteur})]'>(#NOM)</a>[ \((#EMAIL)\)]]</div>
 		</BOUCLE_auteur>
-		[<div class="qui">Liée à (#AUTEUR)</div>]
+			<B_auteuralt>
+			<div class="qui">
+				<p>Liée à #AUTEUR</p>
+				<BOUCLE_auteuralt(AUTEURS){email=#AUTEUR}{si #ID_AUTEUR|non|et{#AUTEUR|email_valide}|et{#STATUT|=={ok}}|et{#AUTORISER{webmestere}}}{tout}{0,10}{!par id_auteur}>
+				<div class="notice">
+					<p>Cet email correspond à l'auteur <a href='[(#ID_AUTEUR|generer_url_entite{auteur})]'>##ID_AUTEUR[ (#NOM)]</a></p>
+					#BOUTON_ACTION{Associer la transaction à cet auteur,#URL_ACTION_AUTEUR{attribuer_transaction,#ID_TRANSACTION-#ID_AUTEUR,#SELF}}
+				</div>
+				</BOUCLE_auteuralt>
+			</div>
+			</B_auteuralt>
+			[<div class="qui">Liée à (#AUTEUR)</div>]
+			<//B_auteuralt>
 		<//B_auteur>
 		[<div class="date">Date : (#DATE_TRANSACTION|affdate_heure)</div>]
 		[<div class="mode">Mode : (#MODE)</div>]
