@@ -173,7 +173,9 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 			'country' => '',
 		],
 		// obligatoire mais tous les champs sont optionels (ou obligatoire 'si applicables' -> on laisse tout vide)
-		'shipping' => [],
+		// il ne faut pas envoyer un tableau vide cela declenche une erreur chez monetico, donc on ne renseigne pas
+		// 'shipping' => [],
+
 		// optionnel, on ne renseigne pas
 		// 'shoppingCart' => [],
 		// optionnel, service minimum
