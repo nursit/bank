@@ -14,6 +14,8 @@ if (!defined('_ECRIRE_INC_VERSION')){
 	return;
 }
 
+include_spip('inc/bank_devises');
+
 /**
  * Retourner la liste des prestataires connus
  */
