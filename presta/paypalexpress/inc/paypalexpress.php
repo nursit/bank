@@ -108,7 +108,16 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm = 
 	// On peut maintenant connaître la devise et ses infos
 	$devise = $row['devise'];
 	$devise_info = bank_devise_info($devise);
-	
+	if (!$devise_info) {
+		bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "devise $devise inconnue",
+			)
+		);
+		return false;
+	}
+
 	if ($row['reglee']=='oui'){
 		bank_transaction_invalide($id_transaction,
 			array(
@@ -216,15 +225,23 @@ function bank_paypalexpress_checkoutpayment($payerid, $config){
 			)
 		);
 	}
-	
-	// On peut maintenant connaître la devise et ses infos
-	$devise = $row['devise'];
-	$devise_info = bank_devise_info($devise);
-	
+
 	// hmm bizare, double hit ? On fait comme si c'etait OK
 	if ($row['reglee']=='oui'){
 		spip_log("Erreur transaction $id_transaction deja reglee", $mode . _LOG_INFO_IMPORTANTE);
 		return array($id_transaction, true);
+	}
+
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	if (!$devise_info) {
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "devise $devise inconnue",
+			)
+		);
 	}
 
 	// verifier que le payerid est conforme
