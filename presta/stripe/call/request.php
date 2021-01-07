@@ -27,13 +27,13 @@ include_spip('presta/stripe/inc/stripe');
  *   configuration du module
  * @param string $type
  *   type de paiement : acte ou abo
- * @return array
+ * @return array|false
  */
 function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $config, $type = "acte"){
 	$mode = 'stripe';
 	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
 		spip_log("call_request : config invalide " . var_export($config, true), $mode . _LOG_ERREUR);
-		return "";
+		return false;
 	}
 	$mode = $config['presta'];
 	if (isset($config['mode_test']) AND $config['mode_test']){
@@ -50,13 +50,17 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable", $mode . _LOG_ERREUR);
-		return "";
+		return false;
 	}
 	
 	// On peut maintenant connaître la devise et ses infos
 	$devise = $row['devise'];
 	$devise_info = bank_devise_info($devise);
-	
+	if (!$devise_info) {
+		spip_log("Transaction #$id_transaction : la devise $devise n’est pas connue", $mode . _LOG_ERREUR);
+		return false;
+	}
+
 	if (!$row['id_auteur']
 		AND isset($GLOBALS['visiteur_session']['id_auteur'])
 		AND $GLOBALS['visiteur_session']['id_auteur']){
@@ -79,28 +83,28 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 				// si plus d'une echeance initiale prevue on ne sait pas faire avec Stripe
 				if (isset($echeance['count_init']) AND $echeance['count_init']>1){
 					spip_log("Transaction #$id_transaction : nombre d'echeances init " . $echeance['count_init'] . ">1 non supporte", $mode . _LOG_ERREUR);
-					return "";
+					return false;
 				}
 
 				// si nombre d'echeances limitees, on ne sait pas faire avec Stripe
 				if (isset($echeance['count']) AND $echeance['count']>0){
 					spip_log("Transaction #$id_transaction : nombre d'echeances " . $echeance['count'] . ">0 non supporte", $mode . _LOG_ERREUR);
-					return "";
+					return false;
 				}
 
 				if (isset($echeance['date_start']) AND $echeance['date_start'] AND strtotime($echeance['date_start'])>time()){
 					spip_log("Transaction #$id_transaction : date_start " . $echeance['date_start'] . " non supportee", $mode . _LOG_ERREUR);
-					return "";
+					return false;
 				}
 
 			}
 		}
 		if (!$echeance){
-			return "";
+			return false;
 		}
 
 		// Nouveaux abonnements non fonctionnels en l'etat
-		return "";
+		return false;
 	}
 
 	$billing = bank_porteur_infos_facturation($row);

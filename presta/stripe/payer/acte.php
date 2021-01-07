@@ -25,6 +25,7 @@ function presta_stripe_payer_acte_dist($config, $id_transaction, $transaction_ha
 
 	$call_request = charger_fonction('request', 'presta/stripe/call');
 	$contexte = $call_request($id_transaction, $transaction_hash, $config);
+
 	// si moyen de paiement pas applicable
 	if (!$contexte){
 		return '';
