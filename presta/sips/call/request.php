@@ -22,7 +22,7 @@ if (!defined('_ECRIRE_INC_VERSION')){
  * @param string $transaction_hash
  * @param $config
  *   configuration du module
- * @return array
+ * @return array|false
  */
 function presta_sips_call_request_dist($id_transaction, $transaction_hash, $config){
 	$mode = 'sips';
@@ -33,13 +33,17 @@ function presta_sips_call_request_dist($id_transaction, $transaction_hash, $conf
 
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable", $mode . _LOG_ERREUR);
-		return "";
+		return false;
 	}
 	
 	// On peut maintenant connaître la devise et ses infos
 	$devise = $row['devise'];
 	$devise_info = bank_devise_info($devise);
-	
+	if (!$devise_info) {
+		spip_log("Transaction #$id_transaction : la devise $devise n’est pas connue", 'bank' . _LOG_ERREUR);
+		return false;
+	}
+
 	if (!$row['id_auteur']
 		AND isset($GLOBALS['visiteur_session']['id_auteur'])
 		AND $GLOBALS['visiteur_session']['id_auteur']){
