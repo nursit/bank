@@ -40,11 +40,11 @@ function genie_bank_daily_reporting_dist($t){
 				if ($jour['date_paiement']>date('Y-m-d 00:00:00', strtotime("-1 day", $now))){
 					$texte .= "<h2>" . affdate($jour['date_paiement']) . "</h2>
 " . $jour['nb'] . " Paiements OK <br />
-Total HT : <b>" . affiche_monnaie($jour['total_ht']) . "</b><br />
-Total TTC : <b>" . affiche_monnaie($jour['total']) . "</b><br />
+Total HT : <b>" . bank_affiche_montant($jour['total_ht']) . "</b><br />
+Total TTC : <b>" . bank_affiche_montant($jour['total']) . "</b><br />
 ";
 				}
-				$lignes .= "<tr><td>" . affdate($jour['date_paiement']) . "</td><td>" . $jour['nb'] . "</td><td>" . affiche_monnaie($jour['total_ht']) . "</td><td>" . affiche_monnaie($jour['total']) . "</td></tr>\n";
+				$lignes .= "<tr><td>" . affdate($jour['date_paiement']) . "</td><td>" . $jour['nb'] . "</td><td>" . bank_affiche_montant($jour['total_ht']) . "</td><td>" . bank_affiche_montant($jour['total']) . "</td></tr>\n";
 			}
 			$texte .= "<h2>Paiements 15 derniers jours</h2>
 <table class='spip'>
@@ -61,7 +61,7 @@ $lignes
 			);
 			$lignes = "";
 			foreach ($mois as $moi){
-				$lignes .= "<tr><td>" . affdate_mois_annee($moi['date_paiement']) . "</td><td>" . $moi['nb'] . "</td><td>" . affiche_monnaie($moi['total_ht']) . "</td><td>" . affiche_monnaie($moi['total']) . "</td></tr>\n";
+				$lignes .= "<tr><td>" . affdate_mois_annee($moi['date_paiement']) . "</td><td>" . $moi['nb'] . "</td><td>" . bank_affiche_montant($moi['total_ht']) . "</td><td>" . bank_affiche_montant($moi['total']) . "</td></tr>\n";
 			}
 
 			$texte .= "<h2>Paiements 12 derniers mois</h2>

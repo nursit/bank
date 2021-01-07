@@ -33,14 +33,53 @@ if (isset($GLOBALS['meta']['bank_paiement'])
 	unset($GLOBALS['config_bank_paiement']);
 }
 
+/**
+ * fonction pour afficher facilement un montant en passant juste montant+devise
+ *
+ * @param string|float $montant
+ * @param string $code_devise
+ * @param bool|string $unite
+ * @return string
+ */
+function bank_affiche_montant($montant, $code_devise = null, $unite = true) {
+
+	if (!function_exists('bank_devise_info')) {
+		include_spip('inc/bank');
+	}
+	$devise = bank_devise_info($code_devise);
+
+	include_spip('inc/filtres');
+	if ($fonction_formater = chercher_filtre('montant_formater')) {
+		$options = [
+			'currency' => $devise['code'],
+			'currency_display' => $unite ? ($unite === 'symbol' ? 'symbol' : 'code') : 'none',
+		];
+		return $fonction_formater($montant, $options);
+	}
+
+	// falback : la veille fonction affiche_monnaie
+	return affiche_monnaie($montant, $devise['fraction'], $unite ? '&nbsp;'.$devise['code'] : '');
+}
+
+
 if (!function_exists('affiche_monnaie')){
+	/**
+	 * @param string | float $valeur
+	 * @param int $decimales
+	 * @param bool $unite
+	 * @return string
+	 * @deprecated
+	 */
 	function affiche_monnaie($valeur, $decimales = 2, $unite = true){
 		if ($unite===true){
+			if (!function_exists('bank_devise_defaut')) {
+				include_spip('inc/bank');
+			}
 			$devise_defaut = bank_devise_defaut();
 			$unite = '&nbsp;'.$devise_defaut['code'];
-			if (substr(trim($valeur), -1)=="%"){
-				$unite = "&nbsp;%";
-			}
+		}
+		if (substr(trim($valeur), -1)=="%"){
+			$unite = "&nbsp;%";
 		}
 		if (!$unite){
 			$unite = "";

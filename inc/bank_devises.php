@@ -77,13 +77,18 @@ function bank_lister_devises() {
  *    Identifiant ISO 4217 alpha d'une devise
  */
 function bank_devise_info($code, $info='') {
-	$code = strtoupper($code);
-	$devises = bank_lister_devises();
 	$retour = null;
 
-	if (isset($devises[$code])) {
-		$retour = $devises[$code];
+	if ($code) {
+		$code = strtoupper($code);
+		$devises = bank_lister_devises();
 
+		if (isset($devises[$code])) {
+			$retour = $devises[$code];
+		}
+	}
+	else {
+		$retour = bank_devise_defaut();
 	}
 
 	// si une info est demandee, il faut retourner une valeur credible meme si la devise n'est plus connue

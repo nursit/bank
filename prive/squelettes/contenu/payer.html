@@ -19,7 +19,7 @@
 	#BOITE_FERMER
 
 	<div class="payer">
-		[(#SET{titre,[<:bank:titre_payer_transaction:>(#VAL{' #'}|concat{#ID_TRANSACTION,'&nbsp;: ',#MONTANT|affiche_monnaie})]})]
+		[(#SET{titre,[<:bank:titre_payer_transaction:>(#VAL{' #'}|concat{#ID_TRANSACTION,'&nbsp;: ',#MONTANT|bank_affiche_montant{#DEVISE}})]})]
 		<INCLURE{fond=modeles/payer_acte,id_transaction,transaction_hash,title=#GET{titre}}>
 	</div>
 
