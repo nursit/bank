@@ -27,20 +27,28 @@ include_spip('presta/paybox/inc/paybox');
  *   configuration du module
  * @param string $type
  *   type de paiement : acte ou abo
- * @return array
+ * @return array|false
  */
 function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $config, $type = "acte"){
 
 	$mode = 'paybox';
 	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
 		spip_log("call_request : config invalide " . var_export($config, true), $mode . _LOG_ERREUR);
-		return "";
+		return false;
 	}
 	$mode = $config['presta'];
 
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable", $mode . _LOG_ERREUR);
-		return "";
+		return false;
+	}
+
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	if (!$devise_info) {
+		spip_log("Transaction #$id_transaction : la devise $devise n’est pas connue", $mode . _LOG_ERREUR);
+		return false;
 	}
 
 	$cartes = array('CB', 'VISA', 'EUROCARD_MASTERCARD', 'E_CARD');
@@ -60,7 +68,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	$mail = bank_porteur_email($row);
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$montant = intval(round((10**$devise_defaut['fraction']) * $row['montant'], 0));
+	$montant = intval(round((10**$devise_info['fraction']) * $row['montant'], 0));
 	if (strlen($montant)<3){
 		$montant = str_pad($montant, 3, '0', STR_PAD_LEFT);
 	}
@@ -74,7 +82,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 
 	$parm['PBX_OUTPUT'] = "C"; // recuperer uniquement les hidden
 	$parm['PBX_LANGUE'] = "FRA";
-	$parm['PBX_DEVISE'] = (string)$devise_defaut['code_num'];
+	$parm['PBX_DEVISE'] = (string)$devise_info['code_num'];
 	$parm['PBX_TOTAL'] = $montant;
 	$parm['PBX_PORTEUR'] = defined('_PBX_PORTEUR') ? _PBX_PORTEUR : $mail;
 	$parm['PBX_CMD'] = intval($id_transaction);
@@ -103,12 +111,12 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 			$decrire_echeance = charger_fonction("decrire_echeance", "abos", true)
 			AND $echeance = $decrire_echeance($id_transaction, false)){
 			if ($echeance['montant']>0){
-				$montant_echeance = str_pad(intval(round((10**$devise_defaut['fraction']) * $echeance['montant'])), 10, "0", STR_PAD_LEFT);
+				$montant_echeance = str_pad(intval(round((10**$devise_info['fraction']) * $echeance['montant'])), 10, "0", STR_PAD_LEFT);
 
 				// si plus d'une echeance initiale prevue on ne sait pas faire avec Paybox
 				if (isset($echeance['count_init']) AND $echeance['count_init']>1){
 					spip_log("Transaction #$id_transaction : nombre d'echeances init " . $echeance['count_init'] . ">1 non supporte", $mode . _LOG_ERREUR);
-					return "";
+					return false;
 				}
 
 				// infos de l'abonnement :

@@ -30,7 +30,7 @@ include_spip('presta/paybox/inc/paybox');
  *   fournit par Paybox lors de l'appel initial avec un ppps:U;
  * @param array $config
  *   configuration paybox qui contient les infos de connexion directplus
- * @return string
+ * @return array
  */
 function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, $refabonne, $ppps, $config = null){
 	include_spip('inc/bank');
@@ -43,17 +43,21 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		spip_log("Transaction inconnue $id_transaction/$transaction_hash", $mode . _LOG_ERREUR);
-		return "";
+		return array(0, false);
 	}
-	
-	// On peut maintenant connaître la devise et ses infos
-	$devise = $row['devise'];
-	$devise_info = bank_devise_info($devise);
-	
+
 	// securite : eviter de faire payer plusieurs fois une meme transaction si bug en amont
 	if ($row['statut']=='ok'){
 		spip_log("Transaction $id_transaction/$transaction_hash deja reglee", $mode . _LOG_INFO_IMPORTANTE);
-		return "";
+		return array($id_transaction, true);
+	}
+
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	if (!$devise_info) {
+		spip_log("Transaction #$id_transaction : la devise $devise n’est pas connue", $mode . _LOG_ERREUR);
+		return array(0, false);
 	}
 
 	if (!$row['id_auteur']
