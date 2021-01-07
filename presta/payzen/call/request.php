@@ -83,7 +83,7 @@ function presta_payzen_call_request_dist($id_transaction, $transaction_hash, $co
 	$devise = $row['devise'];
 	$devise_info = bank_devise_info($devise);
 	if (!$devise_info){
-		spip_log("Transaction #$id_transaction : la devise $devise n’est pas connue", 'bank' . _LOG_ERREUR);
+		spip_log("Transaction #$id_transaction : la devise $devise n’est pas connue", $mode . _LOG_ERREUR);
 		return false;
 	}
 

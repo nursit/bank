@@ -28,8 +28,10 @@ function presta_sips_call_request_dist($id_transaction, $transaction_hash, $conf
 	$mode = 'sips';
 	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
 		spip_log("call_request : config invalide " . var_export($config, true), $mode . _LOG_ERREUR);
-		$mode = $config['presta'];
+		return false;
 	}
+
+	$mode = $config['presta'];
 
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable", $mode . _LOG_ERREUR);
@@ -40,7 +42,7 @@ function presta_sips_call_request_dist($id_transaction, $transaction_hash, $conf
 	$devise = $row['devise'];
 	$devise_info = bank_devise_info($devise);
 	if (!$devise_info) {
-		spip_log("Transaction #$id_transaction : la devise $devise n’est pas connue", 'bank' . _LOG_ERREUR);
+		spip_log("Transaction #$id_transaction : la devise $devise n’est pas connue", $mode . _LOG_ERREUR);
 		return false;
 	}
 
