@@ -26,6 +26,10 @@ function presta_ogone_payer_acte_dist($config, $id_transaction, $transaction_has
 	$call_request = charger_fonction('request', 'presta/ogone/call');
 	$contexte = $call_request($id_transaction, $transaction_hash, $config);
 
+	if (!$contexte) {
+		return '';
+	}
+
 	$contexte['sandbox'] = (ogone_is_sandbox($config) ? ' ' : '');
 	$contexte['config'] = $config;
 

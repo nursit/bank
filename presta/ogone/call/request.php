@@ -61,17 +61,29 @@ include_spip('presta/ogone/inc/ogone');
  * @param string $transaction_hash
  * @param $config
  *   configuration du module
- * @return array
+ * @return array|bool
  */
 function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $config){
-	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
-		return array();
+	$mode = 'ogone';
+	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
+		spip_log("call_request : config invalide " . var_export($config, true), $mode . _LOG_ERREUR);
+		return false;
 	}
-	
+	$mode = $config['presta'];
+
+	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
+		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable", $mode . _LOG_ERREUR);
+		return false;
+	}
+
 	// On peut maintenant connaître la devise et ses infos
 	$devise = $row['devise'];
 	$devise_info = bank_devise_info($devise);
-	
+	if (!$devise_info) {
+		spip_log("Transaction #$id_transaction : la devise $devise n’est pas connue", $mode . _LOG_ERREUR);
+		return false;
+	}
+
 	if (!$row['id_auteur']
 		AND isset($GLOBALS['visiteur_session']['id_auteur'])
 		AND $GLOBALS['visiteur_session']['id_auteur']){
