@@ -25,6 +25,11 @@ function presta_sipsv2_payer_acte_dist($config, $id_transaction, $transaction_ha
 
 	$call_request = charger_fonction('request', 'presta/sipsv2/call');
 	$contexte = $call_request($id_transaction, $transaction_hash, $config);
+
+	if (!$contexte) {
+		return '';
+	}
+
 	$contexte['config'] = $config;
 
 	$contexte['sandbox'] = ($config['mode_test'] ? ' ' : '');
