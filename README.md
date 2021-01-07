@@ -1,4 +1,4 @@
-# Plugin Bank v4 pour SPIP <small>Paiement bancaire</small>
+# Plugin Bank v5 pour SPIP <small>Paiement bancaire</small>
 
 Ce plugin permet de gérer les interfaces techniques avec les prestataires bancaires.
 
@@ -17,6 +17,10 @@ Il peut aussi être complété par
 
 
 ### Changelog
+
+* [WIP] Version 5.0-dev
+  * Support des devises
+  * A jour des reports de la version 4.6.4
 
 * Version 4.6
   * Ajout du prestataire Clic&Pay pour les commerçants du groupe Crédit du Nord qui supporte le paiement par SEPA pour les paiements uniques et les paiements récurrents, déclinaison de Payzen
