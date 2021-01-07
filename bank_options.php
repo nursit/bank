@@ -195,7 +195,9 @@ function bank_annonce_version_plugin($format = 'string'){
 }
 
 /**
- * 	Renvoie la liste des devises possibles, et toutes leurs infos nécessaires
+ * Renvoie la liste des devises possibles, et toutes leurs infos nécessaires
+ * en s'assurant que la liste fournie par les plugins est toujours conforme
+ * et contient au moins la devise EUR
  * 
  * @pipeline_appel bank_lister_devises
  * @return array
@@ -214,18 +216,38 @@ function bank_annonce_version_plugin($format = 'string'){
  * 		```
  */
 function bank_lister_devises() {
-	$devises = array(
-		'EUR' => array(
-			'code' => 'EUR',
-			'code_num' => 978,
-			'nom' => 'euro',
-			'fraction' => 2,
-			'symbole' => '€',
-		),
-	);
-	
-	$devises = pipeline('bank_lister_devises', $devises);
-	
+	static $devises = null;
+
+	if (is_null($devises)) {
+		$devises_dist = array(
+			'EUR' => array(
+				'code' => 'EUR',
+				'code_num' => 978,
+				'nom' => 'euro',
+				'fraction' => 2,
+				'symbole' => '€',
+			),
+		);
+
+		$devises = pipeline('bank_lister_devises', $devises_dist);
+
+		// s'assurer que la chaque devise est conforme et complete
+		foreach ($devises as $k => $devise) {
+			if (empty($devise['code'])
+				or empty($devise['code_num'])
+				or empty($devise['nom'])
+				or empty($devise['fraction'])
+				or empty($devise['symbole'])
+			) {
+				unset($devises[$k]);
+			}
+		}
+
+		if (empty($devises['EUR'])) {
+			$devises = array_merge($devises, $devises_dist);
+		}
+	}
+
 	return $devises;
 }
 
@@ -255,14 +277,24 @@ function bank_devise_info($code, $info='') {
  * Renvoie la devise par défaut utilisée par Bank, modifiable par pipeline
  * 
  * @pipeline_appel bank_devise_defaut
- * @return string
- *     Identifiant ISO 4217 alpha d'une devise
+ * @return array|null
+ *   description de la devise par defaut
  */
 function bank_devise_defaut() {
-	$devise_defaut = bank_devise_info('EUR');
-	
-	$devise_defaut = pipeline('bank_devise_defaut', $devise_defaut);
-	
+	static $devise_defaut = null;
+
+	if (is_null($devise_defaut)) {
+		$devise_defaut_code = pipeline('bank_devise_defaut', 'EUR');
+
+		$devise_defaut_code = ($devise_defaut_code ? $devise_defaut_code : 'EUR');
+		$devise_defaut = bank_devise_info($devise_defaut_code);
+
+		if (!$devise_defaut) {
+			// EUR est toujours connu et defini
+			$devise_defaut = bank_devise_info('EUR');
+		}
+	}
+
 	return $devise_defaut;
 }
 
@@ -301,7 +333,9 @@ function bank_tester_devise_presta($config, $devise = null) {
 		$devise = strtoupper($devise);
 		$devises_ok = array_map('strtoupper', $devises_ok);
 		$ok = in_array($devise, $devises_ok);
-	} elseif (is_bool($devises_ok)) {
+	}
+	// true|false : principalement pour simu et gratuit qui acceptent toutes les devises par principe
+	elseif (is_bool($devises_ok)) {
 		$ok = $devises_ok;
 	}
 
