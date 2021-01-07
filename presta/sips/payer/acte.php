@@ -25,6 +25,11 @@ function presta_sips_payer_acte_dist($config, $id_transaction, $transaction_hash
 
 	$call_request = charger_fonction('request', 'presta/sips/call');
 	$contexte = $call_request($id_transaction, $transaction_hash, $config);
+
+	if (!$contexte) {
+		return '';
+	}
+
 	$contexte['config'] = $config;
 
 	$contexte = array_merge($options, $contexte);

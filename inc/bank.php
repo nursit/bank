@@ -14,6 +14,8 @@ if (!defined('_ECRIRE_INC_VERSION')){
 	return;
 }
 
+include_spip('inc/bank_devises');
+
 /**
  * Retourner la liste des prestataires connus
  */
@@ -900,13 +902,81 @@ function bank_simple_call_resilier_abonnement($uid, $config){
 	$message = "Abonne UID : $uid\nTransactions :\n";
 
 
-	$trans = sql_allfetsel("id_transaction,date_paiement,montant", "spip_transactions", "abo_uid=" . sql_quote($uid) . " AND statut=" . sql_quote('ok') . " AND mode LIKE " . sql_quote($config['presta'] . '%'));
+	$trans = sql_allfetsel("id_transaction,date_paiement,montant,devise", "spip_transactions", "abo_uid=" . sql_quote($uid) . " AND statut=" . sql_quote('ok') . " AND mode LIKE " . sql_quote($config['presta'] . '%'));
 	foreach ($trans as $tran){
-		$message .= "#" . $tran['id_transaction'] . " " . $tran['date_paiement'] . " " . affiche_monnaie($tran['montant']) . "\n";
+		$message .= "#" . $tran['id_transaction'] . " " . $tran['date_paiement'] . " " . bank_affiche_montant($tran['montant'],$tran['devise']) . "\n";
 	}
 
 	$envoyer_mail = charger_fonction("envoyer_mail", "inc");
 	$envoyer_mail($GLOBALS['meta']['email_webmaster'], $sujet, $message);
 
 	return false;
+}
+
+
+/**
+ * Trouver un logo pour un presta donne
+ * Historiquement les logos etaient des .gif, possiblement specifique aux prestas
+ * On peut les surcharger par un .png (ou un .svg a partir de SPIP 3.2.5)
+ * @param $mode
+ * @param $logo
+ * @return bool|string
+ */
+function bank_trouver_logo($mode, $logo){
+	static $svg_allowed;
+	if (is_null($svg_allowed)){
+		$svg_allowed = false;
+		// _SPIP_VERSION_ID definie en 3.3 et 3.2.5-dev
+		if (defined('_SPIP_VERSION_ID') and _SPIP_VERSION_ID>=30205){
+			$svg_allowed = true;
+		} else {
+			$branche = explode('.', $GLOBALS['spip_version_branche']);
+			if ($branche[0]==3 and $branche[1]==2 and $branche[2]>=5){
+				$svg_allowed = true;
+			}
+		}
+	}
+
+	if (substr($logo, -4)=='.gif'
+		and $f = bank_trouver_logo($mode, substr(strtolower($logo), 0, -4) . ".png")){
+		return $f;
+	}
+	if ($svg_allowed
+		and substr($logo, -4)=='.png'
+		and $f = bank_trouver_logo($mode, substr(strtolower($logo), 0, -4) . ".svg")){
+		return $f;
+	}
+
+	// d'abord dans un dossier presta/
+	if ($f = find_in_path("presta/$mode/logo/$logo")){
+		return $f;
+	} // sinon le dossier generique
+	elseif ($f = find_in_path("bank/logo/$logo")) {
+		return $f;
+	}
+	return "";
+}
+
+
+/**
+ * Annoncer SPIP + plugin&version pour les logs de certains providers
+ * @param string $format
+ * @return string
+ */
+function bank_annonce_version_plugin($format = 'string'){
+	$infos = array(
+		'name' => 'SPIP ' . $GLOBALS['spip_version_branche'] . ' + Bank',
+		'url' => 'https://github.com/nursit/bank',
+		'version' => '',
+	);
+	include_spip('inc/filtres');
+	if ($info_plugin = chercher_filtre("info_plugin")){
+		$infos['version'] = 'v' . $info_plugin("bank", "version");
+	}
+
+	if ($format==='string'){
+		return $infos['name'] . $infos['version'] . '(' . $infos['url'] . ')';
+	}
+
+	return $infos;
 }

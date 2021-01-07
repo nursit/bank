@@ -11,11 +11,11 @@
  */
 ]
 <BOUCLE_payer(TRANSACTIONS){id_transaction}{transaction_hash}>
-	<h1>Je règle ma commande</h1>
-	<p>Montant : <strong>[(#MONTANT|affiche_monnaie)]</strong>
+	<h1>Je rÃ¨gle ma commande</h1>
+	<p>MontantÂ : <strong>[(#MONTANT|bank_affiche_montant{#DEVISE})]</strong>
 	<br />#AUTEUR
 	</p>
-	<INCLURE{fond=modeles/payer_acte,id_transaction,transaction_hash,title='Je choisis mon mode de paiement sécurisé'}>
+	<INCLURE{fond=modeles/payer_acte,id_transaction,transaction_hash,title='Je choisis mon mode de paiement sÃ©curisÃ©'}>
 	<style>
 	.payer_mode {margin:1em 0;border-bottom: 1px solid #eee;}
 	.payer_mode .boutons {margin-bottom: 1.5em;}

@@ -22,18 +22,19 @@ if (!defined('_ECRIRE_INC_VERSION')){
  * @param string $transaction_hash
  * @param $config
  *   configuration du module
- * @return array
+ * @return array|false
  */
 function presta_sipsv2_call_request_dist($id_transaction, $transaction_hash, $config){
-
 	include_spip('presta/sipsv2/inc/sipsv2');
 	$mode = 'sipsv2';
 	$logname = 'spipsvdeux';
 
 	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
 		spip_log("call_request : config invalide " . var_export($config, true), $logname . _LOG_ERREUR);
-		$mode = $config['presta'];
+		return false;
 	}
+
+	$mode = $config['presta'];
 	$logname = str_replace(array('1', '2', '3', '4', '5', '6', '7', '8', '9'), array('un', 'deux', 'trois', 'quatre', 'cinq', 'six', 'sept', 'huit', 'neuf'), $mode);
 
 	$cartes = array('CB', 'VISA', 'MASTERCARD');
@@ -44,7 +45,15 @@ function presta_sipsv2_call_request_dist($id_transaction, $transaction_hash, $co
 
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable", $logname . _LOG_ERREUR);
-		return "";
+		return false;
+	}
+	
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	if (!$devise_info) {
+		spip_log("Transaction #$id_transaction : la devise $devise n’est pas connue", $logname . _LOG_ERREUR);
+		return false;
 	}
 
 	if (!$row['id_auteur']
@@ -59,7 +68,7 @@ function presta_sipsv2_call_request_dist($id_transaction, $transaction_hash, $co
 	$mail = bank_porteur_email($row);
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$montant = intval(round(100*$row['montant'], 0));
+	$montant = intval(round((10**$devise_info['fraction']) * $row['montant'], 0));
 
 	list($merchant_id, $key_version, $secret_key) = sipsv2_key($config);
 	$service = $config['service'];
@@ -68,7 +77,7 @@ function presta_sipsv2_call_request_dist($id_transaction, $transaction_hash, $co
 	$parm = array();
 	$parm['merchantId'] = $merchant_id;
 	$parm['amount'] = $montant;
-	$parm['currencyCode'] = "978";
+	$parm['currencyCode'] = (string)$devise_info['code_num'];
 
 	$parm['customerId'] = intval($row['id_auteur']) ? $row['id_auteur'] : $row['auteur_id'];
 	$parm['orderId'] = intval($id_transaction);

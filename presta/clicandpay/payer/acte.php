@@ -27,6 +27,10 @@ function presta_clicandpay_payer_acte_dist($config, $id_transaction, $transactio
 	$call_request = charger_fonction('request', 'presta/payzen/call');
 	$contexte = $call_request($id_transaction, $transaction_hash, $config);
 
+	if (!$contexte) {
+		return '';
+	}
+
 	$contexte['sandbox'] = ($config['mode_test'] ? ' ' : '');
 	$contexte['config'] = $config;
 

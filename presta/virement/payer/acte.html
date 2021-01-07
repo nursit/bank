@@ -16,7 +16,7 @@
     [(#AUTORISER{encaisservirement,transaction,#ID_TRANSACTION}|et{#REM|test_espace_prive}|non)
 	    [<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	    #SET{ordre,#ENV{config/ordre,#NOM_SITE_SPIP}|wrap{'<b>'}}
-			#SET{montant,#MONTANT|affiche_monnaie|wrap{'<b>'}}
+			#SET{montant,#MONTANT|bank_affiche_montant{#DEVISE}|wrap{'<b>'}}
 			#SET{transaction,#ID_TRANSACTION|wrap{'<b>'}}
 	    #SET{iban,#ENV{config/iban}|wrap{'<b>'}}
 	    #SET{bic,#ENV{config/bic}|wrap{'<b>'}}

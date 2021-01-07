@@ -30,6 +30,10 @@ function presta_payzen_payer_abonnement_dist($config, $id_transaction, $transact
 	// cela permet d'avoir un premier hit sans paiement puis un hit du paiement dans l'heure (arrivera 13j apres en SEPA)
 	$contexte = $call_request($id_transaction, $transaction_hash, $config, "REGISTER_PAY_SUBSCRIBE");
 
+	if (!$contexte) {
+		return '';
+	}
+
 	$contexte['sandbox'] = ($config['mode_test'] ? ' ' : '');
 	$contexte['config'] = $config;
 

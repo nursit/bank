@@ -283,10 +283,20 @@ function ogone_traite_reponse_transaction($config, $response){
 
 	// Ouf, le reglement a ete accepte
 
+	if ($response['currency']!=$row['devise']){
+		spip_log($t = "call_response : id_transaction $id_transaction, devise " . $response['currency'] . "!=" . $row['devise'] . ":" . var_export($response, true), $mode . _LOG_ERREUR);
+
+		// on log ca dans un journal dedie
+		spip_log($t, $mode . '_reglements_douteux');
+
+		// mais on continue en acceptant quand meme le paiement
+		// car l'erreur est en general dans le traitement
+	}
+
 	// on verifie que le montant est bon !
 	$montant_regle = floatval($response['amount']);
 	if ($montant_regle!=$row['montant']){
-		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=" . $row['montant'] . ":" . var_export($response, true), $mode);
+		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=" . $row['montant'] . ":" . var_export($response, true), $mode . _LOG_ERREUR);
 		// on log ca dans un journal dedie
 		spip_log($t, $mode . '_reglements_partiels');
 

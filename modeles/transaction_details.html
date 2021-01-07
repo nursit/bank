@@ -13,7 +13,7 @@
 				<BOUCLE_detail(POUR){tableau #GET{items}}>
 				<tr class="[(#COMPTEUR_BOUCLE|alterner{odd,even})]">
 					<td class="produit">[(#VALEUR{id}|appliquer_filtre{affiche_produit_clair,#VALEUR{quantity}})]</td>
-					<td class="prix">[(#VALEUR{net_price}|affiche_monnaie)]</td>
+					<td class="prix">[(#VALEUR{net_price}|bank_affiche_montant{#DEVISE})]</td>
 				</tr>
 				</BOUCLE_detail>
 				[<tr class="odd">
@@ -25,15 +25,15 @@
 			<tfoot>
 			<tr>
 				<td class="produit" colspan="1">Total HT</td>
-				<td class="prix">[(#MONTANT_HT|affiche_monnaie)]</td>
+				<td class="prix">[(#MONTANT_HT||bank_affiche_montant{#DEVISE})]</td>
 			</tr>
 			<tr>
 				<td class="produit" colspan="1">TVA</td>
-				<td class="prix">[(#MONTANT|moins{#MONTANT_HT}|affiche_monnaie)]</td>
+				<td class="prix">[(#MONTANT|moins{#MONTANT_HT}||bank_affiche_montant{#DEVISE})]</td>
 			</tr>
 			<tr>
 				<td class="produit"  colspan="1">Total TTC</td>
-				<td class="prix">[(#MONTANT|affiche_monnaie)]</td>
+				<td class="prix">[(#MONTANT||bank_affiche_montant{#DEVISE})]</td>
 			</tr>
 			</tfoot>
 		</table>

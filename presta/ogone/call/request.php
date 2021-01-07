@@ -61,11 +61,27 @@ include_spip('presta/ogone/inc/ogone');
  * @param string $transaction_hash
  * @param $config
  *   configuration du module
- * @return array
+ * @return array|bool
  */
 function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $config){
+	$mode = 'ogone';
+	if (!is_array($config) OR !isset($config['type']) OR !isset($config['presta'])){
+		spip_log("call_request : config invalide " . var_export($config, true), $mode . _LOG_ERREUR);
+		return false;
+	}
+	$mode = $config['presta'];
+
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
-		return array();
+		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable", $mode . _LOG_ERREUR);
+		return false;
+	}
+
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	if (!$devise_info) {
+		spip_log("Transaction #$id_transaction : la devise $devise n’est pas connue", $mode . _LOG_ERREUR);
+		return false;
 	}
 
 	if (!$row['id_auteur']
@@ -90,8 +106,8 @@ function presta_ogone_call_request_dist($id_transaction, $transaction_hash, $con
 	$contexte['operation'] = "SAL"; // c'est un paiement a l'acte immediat
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$contexte['currency'] = "EUR";
-	$contexte['amount'] = intval(round(100*$row['montant'], 0));
+	$contexte['currency'] = $devise_info['code'];
+	$contexte['amount'] = intval(round(100 * $row['montant'], 0));
 
 	#if (strlen($montant)<3)
 	#	$montant = str_pad($montant,3,'0',STR_PAD_LEFT);

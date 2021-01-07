@@ -103,7 +103,7 @@ function paypal_traite_response($config, $response){
 			)
 		);
 	}
-
+	
 	if ($row['reglee']=='oui'){
 		return array($id_transaction, true);
 	} // cette transaction a deja ete reglee. double entree, on ne fait rien
@@ -155,7 +155,7 @@ function paypal_traite_response($config, $response){
 	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
 
 	// une monnaie est-elle bien indique (et en EUR) ?
-	if (!isset($response['mc_currency']) OR ($response['mc_currency']!='EUR')){
+	if (!isset($response['mc_currency']) OR ($response['mc_currency'] != strtoupper($row['devise']))) {
 		return bank_transaction_echec($id_transaction,
 			array(
 				'mode' => $mode,

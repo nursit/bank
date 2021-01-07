@@ -200,6 +200,10 @@ function filtre_bank_lister_configs_dist($type){
 	return bank_lister_configs($type);
 }
 
+function filtre_bank_trouver_logo_dist($mode, $logo) {
+	include_spip('inc/bank');
+	return bank_trouver_logo($mode, $logo);
+}
 
 /**
  * Afficher la liste des transactions d'un auteur sur la page auteur de l'espace prive

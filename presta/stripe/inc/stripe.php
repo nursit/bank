@@ -217,7 +217,10 @@ function stripe_traite_reponse_transaction($config, &$response){
 			)
 		);
 	}
-
+	
+	// On peut maintenant connaître la devise et ses infos
+	$devise_fraction = bank_devise_info($row['devise'], 'fraction');
+	
 	// ok, on traite le reglement
 	$date = $_SERVER['REQUEST_TIME'];
 	$date_paiement = date('Y-m-d H:i:s', $date);
@@ -297,7 +300,7 @@ function stripe_traite_reponse_transaction($config, &$response){
 	// Ouf, le reglement a ete accepte
 
 	// on verifie que le montant est bon !
-	$montant_regle = $payment->amount_received/100;
+	$montant_regle = $payment->amount_received / (10**$devise_fraction);
 
 	if ($montant_regle!=$row['montant']){
 		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=" . $row['montant'] . ":" . var_export($payment, true), $mode);

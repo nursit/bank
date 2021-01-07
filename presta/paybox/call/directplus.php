@@ -30,11 +30,11 @@ include_spip('presta/paybox/inc/paybox');
  *   fournit par Paybox lors de l'appel initial avec un ppps:U;
  * @param array $config
  *   configuration paybox qui contient les infos de connexion directplus
- * @return string
+ * @return array
  */
 function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, $refabonne, $ppps, $config = null){
-
 	include_spip('inc/bank');
+	
 	if (!$config){
 		$config = bank_config("paybox", true);
 	}
@@ -43,13 +43,21 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 
 	if (!$row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction) . " AND transaction_hash=" . sql_quote($transaction_hash))){
 		spip_log("Transaction inconnue $id_transaction/$transaction_hash", $mode . _LOG_ERREUR);
-		return "";
+		return array(0, false);
 	}
 
 	// securite : eviter de faire payer plusieurs fois une meme transaction si bug en amont
 	if ($row['statut']=='ok'){
 		spip_log("Transaction $id_transaction/$transaction_hash deja reglee", $mode . _LOG_INFO_IMPORTANTE);
-		return "";
+		return array($id_transaction, true);
+	}
+
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	if (!$devise_info) {
+		spip_log("Transaction #$id_transaction : la devise $devise n’est pas connue", $mode . _LOG_ERREUR);
+		return array(0, false);
 	}
 
 	if (!$row['id_auteur']
@@ -62,7 +70,7 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	$mail = sql_getfetsel('email', "spip_auteurs", 'id_auteur=' . intval($row['id_auteur']));
 
 	// passage en centimes d'euros
-	$montant = intval(round(100*$row['montant']));
+	$montant = intval(round((10**$devise_info['fraction']) * $row['montant']));
 	if (strlen($montant)<10){
 		$montant = str_pad($montant, 10, '0', STR_PAD_LEFT);
 	}
@@ -76,7 +84,7 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	$parm['CLE'] = $config['DIRECT_PLUS_CLE'];
 	$parm['DATEQ'] = date('dmYHis');
 	$parm['TYPE'] = _PAYBOX_DIRECTPLUS_AUTHDEBIT_ABONNE;
-	$parm['DEVISE'] = "978";
+	$parm['DEVISE'] = (string)$devise_info['code_num'];
 	$parm['REFERENCE'] = intval($id_transaction);
 	$parm['ARCHIVAGE'] = intval($id_transaction);
 	$parm['DIFFERE'] = '000';

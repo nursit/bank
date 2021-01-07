@@ -33,13 +33,53 @@ if (isset($GLOBALS['meta']['bank_paiement'])
 	unset($GLOBALS['config_bank_paiement']);
 }
 
+/**
+ * fonction pour afficher facilement un montant en passant juste montant+devise
+ *
+ * @param string|float $montant
+ * @param string $code_devise
+ * @param bool|string $unite
+ * @return string
+ */
+function bank_affiche_montant($montant, $code_devise = null, $unite = true) {
+
+	if (!function_exists('bank_devise_info')) {
+		include_spip('inc/bank');
+	}
+	$devise = bank_devise_info($code_devise);
+
+	include_spip('inc/filtres');
+	if ($fonction_formater = chercher_filtre('montant_formater')) {
+		$options = [
+			'currency' => $devise['code'],
+			'currency_display' => $unite ? ($unite === 'symbol' ? 'symbol' : 'code') : 'none',
+		];
+		return $fonction_formater($montant, $options);
+	}
+
+	// falback : la veille fonction affiche_monnaie
+	return affiche_monnaie($montant, $devise['fraction'], $unite ? '&nbsp;'.$devise['code'] : '');
+}
+
+
 if (!function_exists('affiche_monnaie')){
+	/**
+	 * @param string | float $valeur
+	 * @param int $decimales
+	 * @param bool $unite
+	 * @return string
+	 * @deprecated
+	 */
 	function affiche_monnaie($valeur, $decimales = 2, $unite = true){
 		if ($unite===true){
-			$unite = "&nbsp;EUR";
-			if (substr(trim($valeur), -1)=="%"){
-				$unite = "&nbsp;%";
+			if (!function_exists('bank_devise_defaut')) {
+				include_spip('inc/bank');
 			}
+			$devise_defaut = bank_devise_defaut();
+			$unite = '&nbsp;'.$devise_defaut['code'];
+		}
+		if (substr(trim($valeur), -1)=="%"){
+			$unite = "&nbsp;%";
 		}
 		if (!$unite){
 			$unite = "";
@@ -59,7 +99,6 @@ if (!function_exists('affiche_monnaie')){
  * @return string
  */
 function bank_affiche_payer($config, $type, $id_transaction, $transaction_hash, $options = null){
-
 	// compatibilite ancienne syntaxe, titre en 4e argument de #PAYER_XXX
 	if (is_string($options)){
 		$options = array(
@@ -78,14 +117,32 @@ function bank_affiche_payer($config, $type, $id_transaction, $transaction_hash, 
 	}
 
 	$quoi = ($type=='abo' ? 'abonnement' : 'acte');
-
-	if ($payer = charger_fonction($quoi, 'presta/' . $config['presta'] . '/payer', true)){
-		return $payer($config, $id_transaction, $transaction_hash, $options);
+	
+	// On va chercher la devise de la transaction
+	if ($devise = sql_getfetsel('devise', 'spip_transactions', 'id_transaction = '.intval($id_transaction))) {
+		$devise_info = bank_devise_info($devise);
+		if (!$devise_info) {
+			spip_log("bank_affiche_payer: Transaction #$id_transaction : la devise $devise n’est pas connue", 'bank' . _LOG_ERREUR);
+			return '';
+		}
+	}
+	// Sinon celle par défaut
+	else {
+		$devise_info = bank_devise_defaut();
+	}
+	
+	// On teste si ce prestataire sait gérer la devise demandée, sinon on ne l'affiche pas
+	if (!bank_tester_devise_presta($config, $devise_info['code'])) {
+		spip_log("bank_affiche_payer: Transaction #$id_transaction la devise " . $devise_info['code'] . 'n’est pas supportée pour presta=' . $config['presta'], 'bank' . _LOG_ERREUR);
+		return '';
+	}
+	
+	if (!$payer = charger_fonction($quoi, 'presta/' . $config['presta'] . '/payer', true)) {
+		spip_log("bank_affiche_payer: Transaction #$id_transaction pas de payer/$quoi pour presta=" . $config['presta'], "bank" . _LOG_ERREUR);
+		return '';
 	}
 
-	spip_log("Pas de payer/$quoi pour presta=" . $config['presta'], "bank" . _LOG_ERREUR);
-	return "";
-
+	return $payer($config, $id_transaction, $transaction_hash, $options);
 }
 
 /**
@@ -114,68 +171,3 @@ function bank_affiche_gerer_abonnement($config, $abo_uid){
 }
 
 
-/**
- * Trouver un logo pour un presta donne
- * Historiquement les logos etaient des .gif, possiblement specifique aux prestas
- * On peut les surcharger par un .png (ou un .svg a partir de SPIP 3.2.5)
- * @param $mode
- * @param $logo
- * @return bool|string
- */
-function bank_trouver_logo($mode, $logo){
-	static $svg_allowed;
-	if (is_null($svg_allowed)){
-		$svg_allowed = false;
-		// _SPIP_VERSION_ID definie en 3.3 et 3.2.5-dev
-		if (defined('_SPIP_VERSION_ID') and _SPIP_VERSION_ID>=30205){
-			$svg_allowed = true;
-		} else {
-			$branche = explode('.', $GLOBALS['spip_version_branche']);
-			if ($branche[0]==3 and $branche[1]==2 and $branche[2]>=5){
-				$svg_allowed = true;
-			}
-		}
-	}
-
-	if (substr($logo, -4)=='.gif'
-		and $f = bank_trouver_logo($mode, substr(strtolower($logo), 0, -4) . ".png")){
-		return $f;
-	}
-	if ($svg_allowed
-		and substr($logo, -4)=='.png'
-		and $f = bank_trouver_logo($mode, substr(strtolower($logo), 0, -4) . ".svg")){
-		return $f;
-	}
-
-	// d'abord dans un dossier presta/
-	if ($f = find_in_path("presta/$mode/logo/$logo")){
-		return $f;
-	} // sinon le dossier generique
-	elseif ($f = find_in_path("bank/logo/$logo")) {
-		return $f;
-	}
-	return "";
-}
-
-/**
- * Annoncer SPIP + plugin&version pour les logs de certains providers
- * @param string $format
- * @return string
- */
-function bank_annonce_version_plugin($format = 'string'){
-	$infos = array(
-		'name' => 'SPIP ' . $GLOBALS['spip_version_branche'] . ' + Bank',
-		'url' => 'https://github.com/nursit/bank',
-		'version' => '',
-	);
-	include_spip('inc/filtres');
-	if ($info_plugin = chercher_filtre("info_plugin")){
-		$infos['version'] = 'v' . $info_plugin("bank", "version");
-	}
-
-	if ($format==='string'){
-		return $infos['name'] . $infos['version'] . '(' . $infos['url'] . ')';
-	}
-
-	return $infos;
-}

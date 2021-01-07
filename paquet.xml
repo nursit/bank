@@ -1,12 +1,12 @@
 <paquet
 	prefix="bank"
 	categorie="outil"
-	version="4.6.4"
-	etat="stable"
+	version="5.0.0"
+	etat="dev"
 	compatibilite="[3.1.0;3.3.*]"
 	logo="prive/themes/spip/images/bank-32.png"
 	documentation="http://contrib.spip.net/4627"
-	schema="1.6.5"
+	schema="2.0.0"
 >
 
 	<nom>Banque&amp;paiement</nom>
@@ -22,6 +22,8 @@
 	<pipeline nom="affiche_auteurs_interventions" inclure="bank_fonctions.php" />
 	<pipeline nom="taches_generales_cron" inclure="bank_fonctions.php" />
 
+	<pipeline nom="bank_lister_devises" action="" />
+	<pipeline nom="bank_devise_defaut" action="" />
 	<pipeline nom="bank_dsp2_renseigner_facturation" action="" />
 	<pipeline nom="bank_abos_activer_abonnement" action="" />
 	<pipeline nom="bank_abos_decrire_echeance" action="" />

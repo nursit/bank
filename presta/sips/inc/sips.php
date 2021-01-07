@@ -253,7 +253,10 @@ function sips_traite_reponse_transaction($config, $response){
 			)
 		);
 	}
-
+	
+	// On peut maintenant connaître la devise et ses infos
+	$devise_fraction = bank_devise_info($row['devise'], 'fraction');
+	
 	/*
 	include_spip('inc/filtres');
 	if ($transaction_hash!=modulo($row['transaction_hash'],999999)){
@@ -309,7 +312,7 @@ function sips_traite_reponse_transaction($config, $response){
 	// Ouf, le reglement a ete accepte
 
 	// on verifie que le montant est bon !
-	$montant_regle = $response[($mode=='sipsabo' ? 'sub_' : '') . 'amount']/100;
+	$montant_regle = $response[($mode=='sipsabo' ? 'sub_' : '') . 'amount'] / (10**$devise_fraction);
 	if ($montant_regle!=$row['montant']){
 		spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=" . $row['montant'] . ":" . sips_shell_args($response), $mode);
 		// on log ca dans un journal dedie

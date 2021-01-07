@@ -55,7 +55,7 @@ function inc_bank_editer_ticket_admin_dist($id_transaction, $sujet = "Transactio
 	$header = "MIME-Version: 1.0\n" .
 		"Content-Type: text/html; charset=" . $GLOBALS['meta']['charset'] . "\n" .
 		"Content-Transfer-Encoding: 8bit\n";
-	$sujet = "$sujet #$id_transaction [" . affiche_monnaie($montant) . "]";
+	$sujet = "$sujet #$id_transaction [" . bank_affiche_montant($montant, $row['devise']) . "]";
 	if (strlen($description['libelle'])){
 		$sujet .= " | " . $description['libelle'];
 	}

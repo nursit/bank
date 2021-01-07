@@ -104,6 +104,19 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm = 
 		);
 		return false;
 	}
+	
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	if (!$devise_info) {
+		bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "devise $devise inconnue",
+			)
+		);
+		return false;
+	}
 
 	if ($row['reglee']=='oui'){
 		bank_transaction_invalide($id_transaction,
@@ -127,7 +140,7 @@ function bank_paypalexpress_order_init($config, $id_transaction, $url_confirm = 
 	portion of the URL that buyers will return to after authorizing payment
 	*/
 	$paymentAmount = $row['montant'];
-	$currencyCodeType = "EUR";
+	$currencyCodeType = strtoupper($devise_info['code']);
 	$paymentType = "Sale";
 
 
@@ -219,6 +232,18 @@ function bank_paypalexpress_checkoutpayment($payerid, $config){
 		return array($id_transaction, true);
 	}
 
+	// On peut maintenant connaître la devise et ses infos
+	$devise = $row['devise'];
+	$devise_info = bank_devise_info($devise);
+	if (!$devise_info) {
+		return bank_transaction_invalide($id_transaction,
+			array(
+				'mode' => $mode,
+				'erreur' => "devise $devise inconnue",
+			)
+		);
+	}
+
 	// verifier que le payerid est conforme
 	if ($payerid!==$_SESSION['payer_id']){
 		$trace = "Payerid:$payerid\n" . var_export($_SESSION, true);
@@ -241,7 +266,7 @@ function bank_paypalexpress_checkoutpayment($payerid, $config){
 	*/
 	$token = urlencode($_SESSION['token']);
 	$paymentAmount = $row['montant'];
-	$currencyCodeType = "EUR";
+	$currencyCodeType = strtoupper($devise_info['code']);
 	$paymentType = "Sale";
 	$payerID = urlencode($_SESSION['payer_id']);
 	$serverName = urlencode($_SERVER['SERVER_NAME']);
