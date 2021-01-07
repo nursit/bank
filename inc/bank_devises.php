@@ -84,8 +84,29 @@ function bank_devise_info($code, $info='') {
 	if (isset($devises[$code])) {
 		$retour = $devises[$code];
 
-		if ($info) {
-			$retour = (isset($retour[$info]) ? $retour[$info] : null);
+	}
+
+	// si une info est demandee, il faut retourner une valeur credible meme si la devise n'est plus connue
+	// cas du traitement differe d'un paiement
+	if ($info) {
+		if ($retour and isset($retour[$info])) {
+			$retour = $retour[$info];
+		}
+		else {
+			switch ($info) {
+				case 'fraction':
+					$retour = 2; // best bet
+				  break;
+				case 'code':
+				case 'code_num':
+				case 'nom':
+				case 'symbole':
+					$retour = $code;
+					break;
+				default:
+					$retour = null;
+					break;
+			}
 		}
 	}
 
