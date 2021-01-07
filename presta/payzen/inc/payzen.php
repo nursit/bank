@@ -521,8 +521,9 @@ function payzen_traite_reponse_transaction($config, $response){
 	if ($is_payment){
 		// Ouf, le reglement a ete accepte
 		// on verifie que le montant est bon !
-		$devise_defaut = bank_devise_defaut();
-		$montant_regle = $response['vads_effective_amount'] / (10**$devise_defaut['fraction']);
+		$devise = $row['devise'];
+		$devise_info = bank_devise_info($devise);
+		$montant_regle = $response['vads_effective_amount'] / (10**$devise_info['fraction']);
 		if ($montant_regle!=$row['montant']){
 			spip_log($t = "call_response : id_transaction $id_transaction, montant regle $montant_regle!=" . $row['montant'] . ":" . bank_shell_args($response), $mode);
 			// on log ca dans un journal dedie
