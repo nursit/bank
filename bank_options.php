@@ -132,26 +132,3 @@ function bank_affiche_gerer_abonnement($config, $abo_uid){
 }
 
 
-/**
- * Annoncer SPIP + plugin&version pour les logs de certains providers
- * @param string $format
- * @return string
- */
-function bank_annonce_version_plugin($format = 'string'){
-	$infos = array(
-		'name' => 'SPIP ' . $GLOBALS['spip_version_branche'] . ' + Bank',
-		'url' => 'https://github.com/nursit/bank',
-		'version' => '',
-	);
-	include_spip('inc/filtres');
-	if ($info_plugin = chercher_filtre("info_plugin")){
-		$infos['version'] = 'v' . $info_plugin("bank", "version");
-	}
-
-	if ($format==='string'){
-		return $infos['name'] . $infos['version'] . '(' . $infos['url'] . ')';
-	}
-
-	return $infos;
-}
-
