@@ -1,4 +1,4 @@
-# Plugin Bank v5 pour SPIP <small>Paiement bancaire</small>
+# Plugin Bank v5-dev pour SPIP <small>Paiement bancaire</small>
 
 Ce plugin permet de gérer les interfaces techniques avec les prestataires bancaires.
 
@@ -11,8 +11,8 @@ Le plugin ne fournit pas un processus de paiement complet côté front, il ne pr
 
 Il peut aussi être complété par
 
-* le plugin factures https://github.com/nursit/factures
-
+* le plugin Intl pour une gestion étendue des devises https://git.spip.net/spip-contrib-extensions/intl/
+* le plugin Factures https://github.com/nursit/factures
 
 
 
@@ -61,15 +61,16 @@ Le paiement par SEPA est pris en charge via PayZen.
 
 Le plugin permet le paiement à l'acte via les plateformes techniques suivantes :
 
+* ClicAndPay
 * Monetico (C.I.C, Crédit Mutuel)
 * Ogone
-* Paybox
-* Paypal (par formulaire simple ou Paypal Express)
+* PayBox
+* PayPal (par formulaire simple ou Paypal Express)
+* PayZen
 * SIPS (Elysnet, Mercanet, Scellius, Sogenactif)
 * SIPSv2 (Mercanet, Scellius, Sogenactif)
 * Stripe
 * SystemPay (Banque Populaire CyberPlus, O.S.B., SystemPay et SP Plus)
-* PayZen
 
 Par ailleurs, il est aussi possible d'utiliser les modes de paiement suivant :
 
