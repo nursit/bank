@@ -72,6 +72,7 @@ function bank_inserer_transaction_dist($montant, $options = array()){
 	$montant_ht = (isset($options['montant_ht']) ? $options['montant_ht'] : $montant);
 	$montant_ht = round($montant_ht, 2);
 	
+	include_spip('inc/bank');
 	$devise_defaut = bank_devise_defaut();
 	
 	$set = array(
