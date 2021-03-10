@@ -55,7 +55,7 @@ function bank_lister_devises() {
 			if (empty($devise['code'])
 				or empty($devise['code_num'])
 				or empty($devise['nom'])
-				or empty($devise['fraction'])
+				or !isset($devise['fraction'])
 				or empty($devise['symbole'])
 			) {
 				unset($devises[$k]);
