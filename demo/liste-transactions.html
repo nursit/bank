@@ -1,0 +1,91 @@
+<B_transactions>
+<h3>Transactions</h3>
+<div class='pagination' >#PAGINATION</div>
+<table class="spip">
+<thead>
+	<tr>
+		<th>id</th>
+		<th>id_auteur</th>
+		<th>auteur_id</th>
+		<th>auteur</th>
+		<th>mode</th>
+		<th>autorisation</th>
+		<th>HT</th>
+		<th>TTC</th>
+		<th>R&eacute;gl&eacute;</th>
+		<th>date</th>
+		<th>statut</th>
+		<th> </th>
+		<th>panier</th>
+		<th>facture</th>
+		<th>Parrain</th>
+		<th> </th>
+	</tr>
+</thead>
+<tbody>
+<BOUCLE_transactions(TRANSACTIONS){statut==#ENV{statutcde,'.'}}{!par id_transaction}{pagination 50}>
+	<tr class='[(#COMPTEUR_BOUCLE|alterner{row_even,row_odd})]'>
+		<td>#ID_TRANSACTION</td>
+		<td><a href='#URL_AUTEUR{#ID_AUTEUR}'>#ID_AUTEUR</a></td>
+		<td>#AUTEUR_ID</a></td>
+		<td>#AUTEUR</a></td>
+		<td>#MODE</td>
+		<td>#AUTORISATION_ID</td>
+		<td>#MONTANT_HT</td>
+		<td>#MONTANT</td>
+		<td>#MONTANT_REGLE</td>
+		<td>#DATE_TRANSACTION</td>
+		<td>#STATUT</td>
+		<td> </td>
+		<td>#ID_PANIER</td>
+		<td>#ID_FACTURE</td>
+		<td>#PARRAIN</td>
+		<td><a href="[(#SELF|parametre_url{id_transaction,#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]">Payer</a></td>
+	</tr>
+</BOUCLE_transactions>
+</tbody>
+</table>
+</div>
+</B_transactions>
+<style type="text/css">
+	.pagination ul,.pagination li {list-style: none;padding: 0;margin: 0;display: inline-block;}
+	.pagination span,.pagination strong,.pagination a {display: inline-block;padding: 0.25em 0.5em; background: #f4f4f4; margin-right: 0.25em;}
+	.pagination a:empty {display: none}
+	table.spip {}
+	table.spip td,table.spip th{padding: 0.25em 0.5em;border-bottom: 1px solid #ddd;}
+	table.spip thead td,table.spip thead th{background: #ddd;font-weight: bold}
+	table.spip tbody tr:nth-child(2n) td, table.spip tbody tr:nth-child(2n) th {background: #f4f4f4}
+	#formulaire_mode_paiement {
+		background: #f4f4f4;
+		padding: 1em;
+	}
+	.payer_modes {
+		max-width: 50em;
+	}
+	.payer_mode {
+		border-bottom: 1px solid #ddd;
+		padding-bottom: 1em;
+		margin-bottom: 1em;
+		position: relative;
+	}
+	.payer_mode .boutons,
+	.payer_mode .info {
+		text-align: right;
+	}
+	#formulaire_mode_paiement .payer_mode:before {
+		content: attr(class);
+		display: inline-block;
+		position: absolute;
+		bottom:100%;
+		top:auto;
+		right: 0;
+		left: auto;
+		font-size: 0.8em;
+		font-family: monospace;
+		line-height: 1;
+		color:#000;
+		opacity: 0.5;
+		z-index: 10;
+		background: none;
+	}
+</style>

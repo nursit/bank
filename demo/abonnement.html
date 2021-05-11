@@ -22,20 +22,38 @@
 </head>
 <body>
 
+<?php
+function abos_decrire_echeance($id_transaction) {
+	$transaction = sql_fetsel('*', 'spip_transactions', 'id_transaction='.intval($id_transaction));
+
+	$desc = array(
+		'montant' => $transaction['montant'],
+		'montant_init' => $transaction['montant'],
+		'count_init' => 0, // c'est deja une echeance, par defaut
+		'count' => 0, // indefiniment
+		'freq' => 'monthly',
+		'date_start' => '',
+		'wha_oid' => '',
+	);
+	return $desc;
+}
+?>
 <div style="display: flex;flex-direction: row">
 	<div style="flex-basis: 50%;padding:20px;">
 		<h3>Creer une transaction</h3>
 		#FORMULAIRE_DEMO_CREER_TRANSACTION
 	</div>
 	<div style="flex-basis: 50%;padding:20px;">
+		<h3>Souscrire un abonnement</h3>
 		<BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 			Transaction ##ID_TRANSACTION pour un montant de #MONTANT&euro;
-		<INCLURE{fond=modeles/payer_acte,id_transaction,transaction_hash,title=#VAL{Regler la transaction #}|concat{#ID_TRANSACTION}}>
+		<INCLURE{fond=modeles/payer_abonnement,id_transaction,transaction_hash,title=#VAL{Abonnement via la transaction #}|concat{#ID_TRANSACTION}}>
 		</BOUCLE_trans>
 	</div>
 </div>
 
 <hr />
 <INCLURE{fond=demo/liste-transactions,env,ajax} />
+
 </body>
 </html>

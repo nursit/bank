@@ -11,58 +11,57 @@
  */
 ]<div class="formulaire_spip formulaire_configurer formulaire_#FORM">
 
-[<p class="reponse_formulaire reponse_formulaire_ok">(#ENV*{message_ok})</p>]
-[<p class="reponse_formulaire reponse_formulaire_erreur">(#ENV*{message_erreur})</p>]
+	[<p class="reponse_formulaire reponse_formulaire_ok">(#ENV*{message_ok})</p>]
+	[<p class="reponse_formulaire reponse_formulaire_erreur">(#ENV*{message_erreur})</p>]
+	<form method="post" action="#ENV{action}"><div>
+		#ACTION_FORMULAIRE{#ENV{action}}
+		<div class="editer-groupe">
+			#SET{name,montant}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
+			<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
+				<label>#GET{name}</label>[
+				<span class='erreur_message'>(#GET{erreur})</span>]
+				<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
+			</div>
+			#SET{name,montant_ht}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
+			<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
+				<label>#GET{name}</label>[
+				<span class='erreur_message'>(#GET{erreur})</span>]
+				<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
+			</div>
+			#SET{name,id_auteur}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
+			<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
+				<label>#GET{name}</label>[
+				<span class='erreur_message'>(#GET{erreur})</span>]
+				<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
+			</div>
+			#SET{name,auteur_id}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
+			<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
+				<label>#GET{name}</label>[
+				<span class='erreur_message'>(#GET{erreur})</span>]
+				<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
+			</div>
+			#SET{name,auteur}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
+			<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
+				<label>#GET{name}</label>[
+				<span class='erreur_message'>(#GET{erreur})</span>]
+				<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
+			</div>
+			#SET{name,parrain}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
+			<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
+				<label>#GET{name}</label>[
+				<span class='erreur_message'>(#GET{erreur})</span>]
+				<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
+			</div>
+			#SET{name,tracking_id}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
+			<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
+				<label>#GET{name}</label>[
+				<span class='erreur_message'>(#GET{erreur})</span>]
+				<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
+			</div>
+		</div>
 
-<form method="post" action="#ENV{action}"><div>
-	#ACTION_FORMULAIRE{#ENV{action}}
-	<div class="editer-groupe">
-		#SET{name,montant}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
-		<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
-			<label>#GET{name}</label>[
-			<span class='erreur_message'>(#GET{erreur})</span>]
-			<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
-		</div>
-		#SET{name,montant_ht}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
-		<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
-			<label>#GET{name}</label>[
-			<span class='erreur_message'>(#GET{erreur})</span>]
-			<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
-		</div>
-		#SET{name,id_auteur}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
-		<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
-			<label>#GET{name}</label>[
-			<span class='erreur_message'>(#GET{erreur})</span>]
-			<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
-		</div>
-		#SET{name,auteur_id}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
-		<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
-			<label>#GET{name}</label>[
-			<span class='erreur_message'>(#GET{erreur})</span>]
-			<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
-		</div>
-		#SET{name,auteur}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
-		<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
-			<label>#GET{name}</label>[
-			<span class='erreur_message'>(#GET{erreur})</span>]
-			<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
-		</li>
-		#SET{name,parrain}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
-		<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
-			<label>#GET{name}</label>[
-			<span class='erreur_message'>(#GET{erreur})</span>]
-			<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
-		</div>
-		#SET{name,tracking_id}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
-		<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
-			<label>#GET{name}</label>[
-			<span class='erreur_message'>(#GET{erreur})</span>]
-			<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
-		</div>
-	</div>
-
-	<p class="boutons">
-		<input type="submit" name="enregistrer" class="submit" value="Creer la transaction" />
-	</p>
-</div></form>
+		<p class="boutons">
+			<input type="submit" name="enregistrer" class="submit" value="Creer la transaction" />
+		</p>
+	</div></form>
 </div>
