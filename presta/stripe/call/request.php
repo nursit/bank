@@ -82,18 +82,19 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 
 				// si plus d'une echeance initiale prevue on ne sait pas faire avec Stripe
 				if (isset($echeance['count_init']) AND $echeance['count_init']>1){
-					spip_log("Transaction #$id_transaction : nombre d'echeances init " . $echeance['count_init'] . ">1 non supporte", $mode . _LOG_ERREUR);
+					spip_log("Abonnement Transaction #$id_transaction : nombre d'echeances init " . $echeance['count_init'] . ">1 non supporte", $mode . _LOG_ERREUR);
 					return false;
 				}
 
 				// si nombre d'echeances limitees, on ne sait pas faire avec Stripe
 				if (isset($echeance['count']) AND $echeance['count']>0){
-					spip_log("Transaction #$id_transaction : nombre d'echeances " . $echeance['count'] . ">0 non supporte", $mode . _LOG_ERREUR);
+					spip_log("Abonnement Transaction #$id_transaction : nombre d'echeances " . $echeance['count'] . ">0 non supporte", $mode . _LOG_ERREUR);
 					return false;
 				}
 
+				// on ne sait pas faire une date de debut decalee dans le futur
 				if (isset($echeance['date_start']) AND $echeance['date_start'] AND strtotime($echeance['date_start'])>time()){
-					spip_log("Transaction #$id_transaction : date_start " . $echeance['date_start'] . " non supportee", $mode . _LOG_ERREUR);
+					spip_log("Abonnement Transaction #$id_transaction : date_start " . $echeance['date_start'] . " non supportee", $mode . _LOG_ERREUR);
 					return false;
 				}
 
@@ -203,6 +204,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 					'price_data' => [
 						'unit_amount' => $item['amount'],
 						'currency' => $item['currency'],
+						'nickname' => $item['name'],
 						'product_data' => [
 							'name' => $item['name'],
 							'description' => $item['description'],
@@ -227,122 +229,130 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		}
 
 		$session = \Stripe\Checkout\Session::create($session_desc);
+		//ray($session_desc, $session);
 
 		$contexte['checkout_session_id'] = $session->id;
 	}
 
-	/*
 	// est-ce un abonnement ?
+	// TODO
 	if ($type === 'abo' and $echeance){
 		if ($echeance['montant'] > 0) {
 
+			/*
+			 * Create a Price from $item and $echeance
+			 * https://stripe.com/docs/api/prices/create
+			 */
 			$montant_echeance = intval(round((10**$devise_info['fraction']) * $echeance['montant'], 0));
 			if (strlen($montant_echeance) < 3) {
 				$montant_echeance = str_pad($montant_echeance, 3, '0', STR_PAD_LEFT);
 			}
 
 			$interval = 'month';
-			if (isset($echeance['freq']) AND $echeance['freq'] == 'yearly') {
-				$interval = 'year';
-			}
-
-			$desc_plan = array(
-				'amount' => $montant_echeance,
-				'interval' => $interval,
-				'name' => "#$id_transaction [$nom_site]",
-				'currency' => $contexte['currency'],
-				'metadata' => $desc_charge['metadata'],
-			);
-
-			// dans tous les cas on fait preleve la premiere echeance en paiement unique
-			// et en faisant démarrer l'abonnement par "1 periode" en essai sans paiement
-			// ca permet de gerer le cas paiement initial different, et de recuperer les infos de CB dans tous les cas
-			$time_start = strtotime($date_paiement);
-			$time_paiement_1_interval = strtotime("+1 $interval", $time_start);
-			$nb_days = intval(round(($time_paiement_1_interval - $time_start) / 86400));
-			$desc_plan['trial_period_days'] = $nb_days;
-
-			// un id unique (sauf si on rejoue le meme paiement)
-			$desc_plan['id'] = md5(json_encode($desc_plan) . "-$transaction_hash");
-
-			try {
-				$plan = \Stripe\Plan::retrieve($desc_plan['id']);
-			} catch (Exception $e) {
-				// erreur si on ne retrouve pas le plan, on ignore
-				$plan = false;
-			}
-
-			try {
-				if (!$plan) {
-					$plan = \Stripe\Plan::create($desc_plan);
-				}
-				if (!$plan) {
-					$erreur = "Erreur creation plan d'abonnement";
-					$erreur_code = "plan_failed";
-				}
-			} catch (Exception $e) {
-				if ($body = $e->getJsonBody()) {
-					$err = $body['error'];
-					list($erreur_code, $erreur) = stripe_error_code($err);
-				} else {
-					$erreur = $e->getMessage();
-					$erreur_code = 'error';
+			if (!empty($echeance['freq'])) {
+				switch ($echeance['freq']) {
+					case "day":
+					case "dayly":
+						// debug purpose only, not fully supported by the bank plugin
+						$interval = 'day';
+						break;
+					case "week":
+					case "weekly":
+					// debug purpose only, not fully supported by the bank plugin
+						$interval = 'week';
+						break;
+					case "year":
+					case "yearly":
+						$interval = 'year';
+						break;
+					default:
+						$interval = 'month';
 				}
 			}
 
-			if ($erreur or $erreur_code) {
-				// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
-				if ($row['reglee'] == 'oui') {
-					return array($id_transaction, true);
-				}
-
-				// sinon enregistrer l'absence de paiement et l'erreur
-				return bank_transaction_echec($id_transaction,
-					array(
-						'mode' => $mode,
-						'config_id' => $config_id,
-						'date_paiement' => $date_paiement,
-						'code_erreur' => $erreur_code,
-						'erreur' => $erreur,
-						'log' => var_export($response, true),
-					)
-				);
+			$session_desc = [
+				'payment_method_types' => $payment_types,
+				'mode' => 'subscription',
+				'line_items' => [],
+				// transfer the session id to the success URL
+				'success_url' => $url_success . '&session_id={CHECKOUT_SESSION_ID}',
+				'cancel_url' => $url_success, // on revient sur success aussi car response gerera l'echec du fait de l'absence de session_id
+				'locale' => $GLOBALS['spip_lang'],
+			];
+			if (!$checkout_customer){
+				$session_desc['customer_email'] = $contexte['email'];
+			} else {
+				$session_desc['customer'] = $checkout_customer;
 			}
 
+			$desc_item = [
+				'price_data' => [
+					'currency' => $contexte['currency'],
+					'unit_amount' => $montant_echeance,
+					'recurring' => [
+						'interval' => $interval,
+						'interval_count' => 1,
+						//'trial_period_days' => 0, // default
+					],
+					'billing_scheme' => 'per_unit',
+					'metadata' => [
+						'name' => $contexte['name'],
+						'description' => $contexte['description']
+					],
+					'nickname' => $item['name'],
+					'product_data' => [
+						'name' => $item['name'],
+						'description' => $item['description'],
+					]
+				],
+				'quantity' => 1
+			];
+
+			// toutes les echeances sont identiques : on cree un unique price et vogue la galere
+			// https://stripe.com/docs/billing/migration/migrating-prices
+			if ($montant_echeance === $item['amount']) {
+
+				$session_desc['line_items'][] = $desc_item;
+				ray("Echeance unique : ",$session_desc);
+			}
+			else {
+				// on ajoute un free trial sur le recuring item
+				$time_start = time();
+				$time_paiement_1_interval = strtotime("+1 $interval", $time_start);
+				$nb_days = intval(round(($time_paiement_1_interval - $time_start) / 86400));
+				$desc_item['price_data']['reccuring']['trial_period_days'] = $nb_days;
+
+
+				// et on ajoute un item pour la premiere echeance
+				$desc_item_first = [
+					'price_data' => [
+						'currency' => $contexte['currency'],
+						'unit_amount' => $item['amount'],
+						'metadata' => [
+							'name' => $contexte['name'],
+							'description' => $contexte['description']
+						],
+						'nickname' => $item['name'],
+						'product_data' => [
+							'name' => "1ère échéance : ". $item['name'],
+							'description' => $item['description'],
+						]
+					],
+					'quantity' => 1
+				];
+
+				$session_desc['line_items'][] = $desc_item_first;
+				$session_desc['line_items'][] = $desc_item;
+			}
+
+
+			$session = \Stripe\Checkout\Session::create($session_desc);
+
+			$contexte['checkout_session_id'] = $session->id;
+			ray($session_desc, $session);
 		}
 
-		if ($plan and $customer) {
-			$desc_sub = array(
-				'customer' => $customer->id,
-				'plan' => $plan->id,
-				'metadata' => array(
-					'id_transaction' => $id_transaction,
-				),
-			);
-
-			try {
-				$sub = \Stripe\Subscription::create($desc_sub);
-				if (!$sub) {
-					$erreur = "Erreur creation subscription";
-					$erreur_code = "sub_failed";
-				} else {
-					$response['abo_uid'] = $sub->id;
-				}
-			} catch (Exception $e) {
-				if ($body = $e->getJsonBody()) {
-					$err = $body['error'];
-					list($erreur_code, $erreur) = stripe_error_code($err);
-				} else {
-					$erreur = $e->getMessage();
-					$erreur_code = 'error';
-				}
-			}
-		} else {
-			$erreur = "Erreur creation subscription (plan or customer missing)";
-			$erreur_code = "sub_failed";
-		}
 	}
-  */
 
 
 	return $contexte;
