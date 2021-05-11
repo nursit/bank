@@ -48,7 +48,7 @@ function stripe_available_cards($config){
  */
 function stripe_init_api($config){
 
-	include_spip('presta/stripe/lib/stripe-php-6/init');
+	include_spip('presta/stripe/lib/stripe-php-7/init');
 
 	// Set secret key
 	// See keys here: https://dashboard.stripe.com/account/apikeys
