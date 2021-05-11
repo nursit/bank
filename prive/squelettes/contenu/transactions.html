@@ -7,4 +7,6 @@
 		</BOUCLE_filtres>
 	</ul>
 </div>
-<INCLURE{fond=prive/objets/liste/transactions,env,ajax,nb=50,sinon=<:bank:info_aucune_transaction:>} />
+<div class="table-transactions-wrapper">
+	<INCLURE{fond=prive/objets/liste/transactions,env,ajax,nb=50,sinon=<:bank:info_aucune_transaction:>} />
+</div>

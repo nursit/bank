@@ -3,7 +3,7 @@
 	categorie="outil"
 	version="5.0.0"
 	etat="dev"
-	compatibilite="[3.1.0;3.3.*]"
+	compatibilite="[3.2.0;4.0.*]"
 	logo="prive/themes/spip/images/bank-32.png"
 	documentation="http://contrib.spip.net/4627"
 	schema="2.0.0"
