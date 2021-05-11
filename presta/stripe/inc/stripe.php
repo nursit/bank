@@ -81,6 +81,13 @@ function stripe_set_webhook($config){
 	$base_endpoint = substr($url_endpoint, 0, $p+1);
 	spip_log("stripe_set_webhook: endpoint $url_endpoint base $base_endpoint", $mode);
 
+	// verifier que le endpoint n'est pas un localhost, sinon on laisse tomber
+	$parts = parse_url($base_endpoint);
+	if ($parts['host'] === 'localhost') {
+		spip_log("stripe_set_webhook: Impossible de creer un endpoint sur localhost -- request Ignoree", $mode . _LOG_ERREUR);
+		return;
+	}
+
 
 	$existing_endpoint_id = null;
 	try {

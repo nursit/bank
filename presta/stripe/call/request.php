@@ -99,6 +99,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 
 			}
 		}
+		ray($echeance);
 		if (!$echeance){
 			return false;
 		}

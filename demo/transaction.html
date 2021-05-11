@@ -97,15 +97,20 @@
 	.payer_mode .info {
 		text-align: right;
 	}
-	.payer_mode:before {
+	#formulaire_mode_paiement .payer_mode:before {
 		content: attr(class);
 		display: inline-block;
 		position: absolute;
 		bottom:100%;
+		top:auto;
 		right: 0;
+		left: auto;
 		font-size: 0.8em;
 		font-family: monospace;
 		line-height: 1;
-		color:#888;
+		color:#000;
+		opacity: 0.5;
+		z-index: 10;
+		background: none;
 	}
 </style>
