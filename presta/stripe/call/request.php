@@ -197,12 +197,28 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	if ($type==='acte'){
 		$session_desc = [
 			'payment_method_types' => $payment_types,
-			'line_items' => [[$item]],
+			'mode' => 'payment',
+			'line_items' => [
+				[
+					'price_data' => [
+						'unit_amount' => $item['amount'],
+						'currency' => $item['currency'],
+						'product_data' => [
+							'name' => $item['name'],
+							'description' => $item['description'],
+						]
+					],
+					'quantity' => 1,
+				]
+			],
 			// transfer the session id to the success URL
 			'success_url' => $url_success . '&session_id={CHECKOUT_SESSION_ID}',
-			'cancel_url' => $url_success,
+			'cancel_url' => $url_success, // on revient sur success aussi car response gerera l'echec du fait de l'absence de session_id
 			'locale' => $GLOBALS['spip_lang'],
 		];
+		if (!empty($item['images'])) {
+			$session_desc['line_items'][0]['price_data']['product_data']['images'] = $item['images'];
+		}
 
 		if (!$checkout_customer){
 			$session_desc['customer_email'] = $contexte['email'];
