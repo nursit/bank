@@ -46,7 +46,10 @@ function bank_lister_instal_prestas(){
 function bank_presta_install(){
 	$prestas = bank_lister_instal_prestas();
 	#var_dump($prestas);
-	$config = unserialize($GLOBALS['meta']['bank_paiement']);
+	if (!isset($GLOBALS['meta']['bank_paiement'])
+	  or !$config = unserialize($GLOBALS['meta']['bank_paiement'])) {
+		$config = array();
+	}
 	foreach ($prestas as $p){
 		if (
 			(isset($config['presta'][$p]) AND $config['presta'][$p])

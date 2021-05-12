@@ -19,7 +19,10 @@ function genie_bank_daily_reporting_dist($t){
 	$now = time();
 	if (intval(date('H', $now))>=1 AND intval(date('H', $now))<=7){
 		// il faut avoir configure un ou des emails de notification
-		$c = unserialize($GLOBALS['meta']['bank_paiement']);
+		if (!isset($GLOBALS['meta']['bank_paiement'])
+		  or !$c = unserialize($GLOBALS['meta']['bank_paiement'])) {
+			$c = array();
+		}
 		if (isset($c['email_reporting']) AND strlen($email = $c['email_reporting'])){
 			include_spip('inc/filtres');
 
@@ -86,7 +89,10 @@ $lignes
 	// une alerte mail sur les transactions dont le traitement du paiement a ete interrompu
 	if ($transactions = sql_allfetsel('*', 'spip_transactions', 'finie<0')){
 		include_spip('inc/filtres');
-		$c = unserialize($GLOBALS['meta']['bank_paiement']);
+		if (!isset($GLOBALS['meta']['bank_paiement'])
+		  or !$c = unserialize($GLOBALS['meta']['bank_paiement'])) {
+			$c = array();
+		}
 		$email = $GLOBALS['meta']['email_webmaster'];
 		if (isset($c['email_ticket_admin'])){
 			$email = $c['email_ticket_admin'];
