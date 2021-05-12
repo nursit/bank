@@ -24,9 +24,17 @@ include_spip('base/abstract_sql');
  */
 function inc_bank_editer_ticket_admin_dist($id_transaction, $sujet = "Transaction OK"){
 	// il faut avoir configure un ou des emails de notification
-	$c = unserialize($GLOBALS['meta']['bank_paiement']);
+	if (!isset($GLOBALS['meta']['bank_paiement'])
+	  or !$c = unserialize($GLOBALS['meta']['bank_paiement'])) {
+		$c = array();
+	}
 	if (!isset($c['email_ticket_admin']) OR !strlen($email = $c['email_ticket_admin'])){
-		spip_log(var_export($GLOBALS['meta']['bank_paiement'], true), 'bank_ticket');
+		if (!isset($GLOBALS['meta']['bank_paiement'])) {
+			spip_log("Aucune configuration dans bank_paiement", 'bank_ticket' . _LOG_ERREUR);
+		}
+		else {
+			spip_log("Configuration bank_paiement incomplete ".var_export($GLOBALS['meta']['bank_paiement'], true), 'bank_ticket' . _LOG_ERREUR);
+		}
 		return;
 	}
 	$ticket = "";
