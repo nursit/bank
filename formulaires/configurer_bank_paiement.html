@@ -20,30 +20,30 @@
 	#ACTION_FORMULAIRE{#ENV{action}}
 	<fieldset>
 		<legend><:bank:label_notifications:></legend>
-		<ul class="editer-groupe">
-			<li class="editer long_label editer_email_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
+		<div class="editer-groupe">
+			<div class="editer long_label editer_email_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
 				<label><:bank:label_email_ticket_admin:></label>[
 				<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_ticket_admin})</span>]
 				<input type="text" class="text" name="email_ticket_admin" value="#ENV*{email_ticket_admin}" />
-			</li>
-			<li class="editer long_label editer_email_from_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
+			</div>
+			<div class="editer long_label editer_email_from_ticket_admin[ (#ENV**{erreurs}|table_valeur{email_ticket_admin}|oui)erreur]">
 				<label><:bank:label_email_from_ticket_admin:></label>[
 				<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_ticket_admin})</span>]
 				#SET{default,#CONFIG{adresse_site}|parse_url|table_valeur{host}|ltrim{w.}}
 				<input type="text" class="text" name="email_from_ticket_admin" value="#ENV*{email_from_ticket_admin}" placeholder="reglements@#GET{default}"/>
-			</li>
-			<li class="editer long_label editer_email_reporting[ (#ENV**{erreurs}|table_valeur{email_reporting}|oui)erreur]">
+			</div>
+			<div class="editer long_label editer_email_reporting[ (#ENV**{erreurs}|table_valeur{email_reporting}|oui)erreur]">
 				<label><:bank:label_email_reporting:></label>[
 				<span class='erreur_message'>(#ENV**{erreurs}|table_valeur{email_reporting})</span>]
 				<input type="text" class="text" name="email_reporting" value="#ENV*{email_reporting}" />
-			</li>
-		</ul>
+			</div>
+		</div>
 	</fieldset>
 
 	<h3 class="titrem"><:bank:label_prestataires:></h3>
-	<ul class="editer-groupe">
+	<div class="editer-groupe">
 		#SET{name,action_append_presta}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
-		<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<div class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 			<label for="#GET{name}"><:bank:label_action_append_presta:></label>[
 			<span class='erreur_message'>(#GET{erreurs})</span>
 			]
@@ -54,24 +54,24 @@
 					<option value="#GET{val}">[(#VAL{bank:label_presta_}|concat{#VALEUR}|_T|textebrut)]</option>
 				</BOUCLE_prestas>
 			</select>
-			<input type="submit" name="action_append" value="<:bouton_ajouter|attribut_html:>" style="float:right;" />
-		</li>
-	</ul>
+			<input type="submit" class="btn" name="action_append" value="<:bouton_ajouter|attribut_html:>" style="float:right;" />
+		</div>
+	</div>
 	<BOUCLE_configs(POUR){tableau #REM|bank_lister_configs}>
 		<fieldset>
 			<legend>[(#VAL{bank:label_presta_}|concat{#VALEUR{presta}}|_T)][ \(<tt>(#VALEUR|bank_config_id)</tt>\)]</legend>
-			<ul class="editer-groupe">
+			<div class="editer-groupe">
 				#SET{casier,config_#CLE}
 				#SET{name,#GET{casier}_actif}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 				#SET{disabled,''}
 				[(#AUTORISER{utilisermodepaiement,_#CLE}|non)#SET{disabled,true}]
-				<li class="editer pleine_largeur editer_presta editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
+				<div class="editer pleine_largeur editer_presta editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">[
 					<span class='erreur_message'>(#GET{erreurs})</span>
 					]
 					<span class="action">
-						<button type="submit" class="noscroll btn btn_secondaire" name="action_up[#GET{casier}]" title="<:bank:bouton_monter|attribut_html:>" value="X">[(#CHEMIN_IMAGE{up-12.png}|balise_img{<:bank:bouton_monter:>})]</button>
-						<button type="submit" class="noscroll btn btn_secondaire" name="action_down[#GET{casier}]" title="<:bank:bouton_descendre|attribut_html:>" value="X">[(#CHEMIN_IMAGE{down-12.png}|balise_img{<:bank:bouton_descendre:>})]</button>
-						<button type="submit" class="noscroll btn btn_danger" name="action_del[#GET{casier}]" title="<:lien_supprimer|attribut_html:>" value="X"
+						<button type="submit" class="noscroll btn btn_secondaire btn_mini" name="action_up[#GET{casier}]" title="<:bank:bouton_monter|attribut_html:>" value="X">[(#CHEMIN_IMAGE{up-12.png}|balise_img{<:bank:bouton_monter:>})]</button>
+						<button type="submit" class="noscroll btn btn_secondaire btn_mini" name="action_down[#GET{casier}]" title="<:bank:bouton_descendre|attribut_html:>" value="X">[(#CHEMIN_IMAGE{down-12.png}|balise_img{<:bank:bouton_descendre:>})]</button>
+						<button type="submit" class="noscroll btn btn_danger btn_mini" name="action_del[#GET{casier}]" title="<:lien_supprimer|attribut_html:>" value="X"
 							onclick="return confirm('<:bank:texte_confirmer_suppression_presta|attribut_html|texte_script:>');"
 							>[(#CHEMIN_IMAGE{supprimer-12.png}|balise_img{<:lien_supprimer:>})]</button>
 					</span>
@@ -88,15 +88,15 @@
 					</div>
 					<input type="hidden" name="#GET{casier}\[presta\]" value="[(#VALEUR{presta})]" />
 					<input type="hidden" name="#GET{casier}\[type\]" value="acte" />
-				</li>
+				</div>
 				[(#CHEMIN{presta/#VALEUR{presta}/inc-configurer.html}|oui)
-				<li class="fieldset suite">
+				<div class="fieldset suite">
 					<fieldset>
 						<INCLURE{fond=presta/#VALEUR{presta}/inc-configurer,casier=#GET{casier},mode=#CLE,env} />
 					</fieldset>
-				</li>
+				</div>
 				]
-			</ul>
+			</div>
 		</fieldset>
 	</BOUCLE_configs>
 	<p class="boutons">
@@ -109,7 +109,7 @@
 	.muted {opacity: 0.6;}
 	.suite {margin-left: 40px;font-size: 0.9em;}
 	.formulaire_spip .editer_presta {position: relative;}
-	.formulaire_spip .editer_presta .action {position:absolute;right:10px;top:10px;z-index: 2;opacity:0.7;}
+	.formulaire_spip .editer_presta .action {position:absolute;right:var(--spip-form-spacing-x,10px);margin-right: 0.5em;top:var(--spip-form-spacing-y, 10px);z-index: 2;opacity:0.7;}
 	.formulaire_spip .editer_presta:hover .action {opacity:1;}
 	.formulaire_spip .editer_presta .action button img {vertical-align: top;}
 	.formulaire_spip .editer_presta .presta_label {width: 50%;margin-left: 1em;border:0;border-bottom: 1px solid #ddd;}
