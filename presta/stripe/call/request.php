@@ -181,6 +181,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 					$checkout_customer = $customer_id;
 				}
 			} catch (Exception $e) {
+				// On ignore silencieusement cette erreur
 			}
 		}
 	}
@@ -228,7 +229,14 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			$session_desc['customer'] = $checkout_customer;
 		}
 
-		$session = \Stripe\Checkout\Session::create($session_desc);
+		try {
+			$session = \Stripe\Checkout\Session::create($session_desc);
+		}
+		catch (Exception $e) {
+			spip_log("call_request: Erreur lors de la creation du Checkout\Session acte : ".$e->getMessage(), $mode . _LOG_ERREUR);
+			erreur_squelette($e->getMessage());
+			return false;
+		}
 		//ray($session_desc, $session);
 
 		$contexte['checkout_session_id'] = $session->id;
@@ -313,7 +321,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			if ($montant_echeance === $item['amount']) {
 
 				$session_desc['line_items'][] = $desc_item;
-				ray("Echeance unique : ",$session_desc);
+				//ray("Echeance unique : ",$session_desc);
 			}
 			else {
 				// on ajoute un free trial sur le recuring item
@@ -346,10 +354,17 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			}
 
 
-			$session = \Stripe\Checkout\Session::create($session_desc);
+			try {
+				$session = \Stripe\Checkout\Session::create($session_desc);
+			}
+			catch (Exception $e) {
+				spip_log("call_request: Erreur lors de la creation du Checkout\Session abonnement : ".$e->getMessage(), $mode . _LOG_ERREUR);
+				erreur_squelette($e->getMessage());
+				return false;
+			}
 
 			$contexte['checkout_session_id'] = $session->id;
-			ray($session_desc, $session);
+			//ray($session_desc, $session);
 		}
 
 	}
