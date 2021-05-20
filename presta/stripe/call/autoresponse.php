@@ -75,6 +75,7 @@ function stripe_dispatch_event($config, $event, $auto = 'auto'){
 	} else {
 		spip_log("call_{$auto}response : event $type - $f not existing", $mode . $auto . _LOG_DEBUG);
 		$res = null;
+		spip_log($event, "stripe_db" . _LOG_ERREUR);
 	}
 
 	return $res;
@@ -98,22 +99,28 @@ function stripe_retrieve_event($config, $auto = 'auto'){
 		$endpoint_secret = $config[$key_webhook_secret];
 		$payload = @file_get_contents('php://input');
 		$sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
+
 		try {
+			\Stripe\WebhookSignature::verifyHeader($payload, $sig_header, $endpoint_secret, 300);
 			$event = \Stripe\Webhook::constructEvent(
 				$payload, $sig_header, $endpoint_secret
 			);
-		} catch (\UnexpectedValueException $e) {
+		} catch (\Stripe\Exception\SignatureVerificationException $e) {
 			$erreur = $e->getMessage();
-			$erreur_code = 'error';
-			// Invalid payload
-			spip_log("erreur Webhook stripe_retrieve_event \UnexpectedValueException: $erreur", $mode . _LOG_ERREUR);
+			// Invalid signature
+			spip_log("erreur Webhook stripe_retrieve_event \Stripe\Exception\SignatureVerificationException: $erreur", $mode . _LOG_ERREUR);
 			http_response_code(400); // PHP 5.4 or greater
 			exit();
-		} catch (\Stripe\Error\SignatureVerification $e) {
+		} catch (\Stripe\Exception\UnexpectedValueException $e) {
 			$erreur = $e->getMessage();
-			$erreur_code = 'error';
+			// Invalid payload
+			spip_log("erreur Webhook stripe_retrieve_event \Stripe\Exception\UnexpectedValueException: $erreur", $mode . _LOG_ERREUR);
+			http_response_code(400); // PHP 5.4 or greater
+			exit();
+		} catch (\Exception $e) {
+			$erreur = $e->getMessage();
 			// Invalid signature
-			spip_log("erreur Webhook stripe_retrieve_event \Stripe\Error\SignatureVerification: $erreur", $mode . _LOG_ERREUR);
+			spip_log("erreur Webhook stripe_retrieve_event \Exception: $erreur", $mode . _LOG_ERREUR);
 			http_response_code(400); // PHP 5.4 or greater
 			exit();
 		}
