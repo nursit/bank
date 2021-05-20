@@ -81,7 +81,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			if ($echeance['montant']>0){
 
 				// si plus d'une echeance initiale prevue on ne sait pas faire avec Stripe
-				if (isset($echeance['count_init']) AND $echeance['count_init']>1){
+				if (isset($echeance['count_init']) AND $echeance['count_init']>1 AND ($echeance['montant'] != $echeance['montant_init'])){
 					spip_log("Abonnement Transaction #$id_transaction : nombre d'echeances init " . $echeance['count_init'] . ">1 non supporte", $mode . _LOG_ERREUR);
 					return false;
 				}
@@ -323,47 +323,19 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 				ray("Echeance unique : ",$session_desc);
 			}
 			elseif (intval($montant_initial) < intval($montant_echeance)) {
-				// on ajoute un free trial sur le recuring item
-				$time_start = time();
-				$time_paiement_1_interval = strtotime("+1 $interval", $time_start);
-				$nb_days = intval(round(($time_paiement_1_interval - $time_start) / 86400));
-				//$desc_item['price_data']['recurring']['trial_period_days'] = $nb_days;
+				$session_desc['line_items'][] = $desc_item;
+
+				$v = $echeance['montant'] - $echeance['montant_init'];
+				$montant_remise = intval(round((10**$devise_info['fraction']) * $v, 0));
+				if (strlen($montant_remise) < 3) {
+					$montant_remise = str_pad($montant_remise, 3, '0', STR_PAD_LEFT);
+				}
 
 				// et on ajoute une remise pour la premiere echeance
-				$desc_item_first = [
-					'price_data' => [
-						'currency' => $contexte['currency'],
-						'unit_amount' => $montant_initial,
-						'product_data' => [
-							'name' => "1ère échéance ". $item['name'],
-							'description' => $item['description'],
-						]
-					],
-					'quantity' => 1
-				];
-
-				$session_desc['line_items'][] = $desc_item_first;
-
-				// et il faut creer un Price via l'API pour pouvoir utiliser trial_period_days
-				/*
-				$price_desc = $desc_item['price_data'];
-				try {
-					$price = \Stripe\Price::create($price_desc);
-				}
-				catch (Exception $e) {
-					spip_log($s = "call_request: Erreur lors de la creation du Price::create : ".$e->getMessage(), $mode . _LOG_ERREUR);
-					erreur_squelette("[$mode] $s");
-					return false;
-				}
-
-				$desc_item['price'] = $price->id;
-				unset($desc_item['price_data']);
-				*/
-				$session_desc['line_items'][] = $desc_item;
 				// et on ajoute un coupon pour la premiere echeance de l'abonnement
 				$coupon = \Stripe\Coupon::create([
 					'currency' => $contexte['currency'],
-					'amount_off' => $montant_echeance,
+					'amount_off' => $montant_remise,
 					'duration' => 'once'
 				]);
 				$session_desc['discounts'][0]['coupon'] = $coupon->id;
