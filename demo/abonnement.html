@@ -23,21 +23,9 @@
 <body>
 
 <?php
-function abos_decrire_echeance($id_transaction) {
-	$transaction = sql_fetsel('*', 'spip_transactions', 'id_transaction='.intval($id_transaction));
-
-	$desc = array(
-		'montant' => $transaction['montant'],
-		'montant_init' => $transaction['montant'],
-		'count_init' => 0, // c'est deja une echeance, par defaut
-		'count' => 0, // indefiniment
-		'freq' => 'monthly',
-		'date_start' => '',
-		'wha_oid' => '',
-	);
-	return $desc;
-}
+	include_spip('demo/abonnement_options');
 ?>
+
 <div style="display: flex;flex-direction: row">
 	<div style="flex-basis: 50%;padding:20px;">
 		<h3>Creer une transaction</h3>
