@@ -105,8 +105,6 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			return false;
 		}
 
-		// Nouveaux abonnements non fonctionnels en l'etat
-		return false;
 	}
 
 	$billing = bank_porteur_infos_facturation($row);
@@ -232,8 +230,8 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			$session = \Stripe\Checkout\Session::create($session_desc);
 		}
 		catch (Exception $e) {
-			spip_log("call_request: Erreur lors de la creation du Checkout\Session acte : ".$e->getMessage(), $mode . _LOG_ERREUR);
-			erreur_squelette($e->getMessage());
+			spip_log($s = "call_request: Erreur lors de la creation du Checkout\Session acte : ".$e->getMessage(), $mode . _LOG_ERREUR);
+			erreur_squelette("[$mode] $s");
 			return false;
 		}
 		//ray($session_desc, $session);
@@ -253,6 +251,13 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			$montant_echeance = intval(round((10**$devise_info['fraction']) * $echeance['montant'], 0));
 			if (strlen($montant_echeance) < 3) {
 				$montant_echeance = str_pad($montant_echeance, 3, '0', STR_PAD_LEFT);
+			}
+			$montant_initial = $montant_echeance;
+			if (isset($echeance['montant_init'])) {
+				$montant_initial = intval(round((10**$devise_info['fraction']) * $echeance['montant_init'], 0));
+				if (strlen($montant_initial) < 3) {
+					$montant_initial = str_pad($montant_initial, 3, '0', STR_PAD_LEFT);
+				}
 			}
 
 			$interval = 'month';
@@ -301,12 +306,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 						'interval_count' => 1,
 						//'trial_period_days' => 0, // default
 					],
-					'billing_scheme' => 'per_unit',
-					'metadata' => [
-						'name' => $contexte['name'],
-						'description' => $contexte['description']
-					],
-					'nickname' => $item['name'],
+					//'billing_scheme' => 'per_unit', // implicite, non modifiable via price_data
 					'product_data' => [
 						'name' => $item['name'],
 						'description' => $item['description'],
@@ -317,31 +317,73 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 
 			// toutes les echeances sont identiques : on cree un unique price et vogue la galere
 			// https://stripe.com/docs/billing/migration/migrating-prices
-			if ($montant_echeance === $item['amount']) {
+			if ($montant_echeance === $montant_initial) {
 
 				$session_desc['line_items'][] = $desc_item;
-				//ray("Echeance unique : ",$session_desc);
+				ray("Echeance unique : ",$session_desc);
 			}
-			else {
+			elseif (intval($montant_initial) < intval($montant_echeance)) {
 				// on ajoute un free trial sur le recuring item
 				$time_start = time();
 				$time_paiement_1_interval = strtotime("+1 $interval", $time_start);
 				$nb_days = intval(round(($time_paiement_1_interval - $time_start) / 86400));
-				$desc_item['price_data']['reccuring']['trial_period_days'] = $nb_days;
+				//$desc_item['price_data']['recurring']['trial_period_days'] = $nb_days;
 
-
-				// et on ajoute un item pour la premiere echeance
+				// et on ajoute une remise pour la premiere echeance
 				$desc_item_first = [
 					'price_data' => [
 						'currency' => $contexte['currency'],
-						'unit_amount' => $item['amount'],
-						'metadata' => [
-							'name' => $contexte['name'],
-							'description' => $contexte['description']
-						],
-						'nickname' => $item['name'],
+						'unit_amount' => $montant_initial,
 						'product_data' => [
-							'name' => "1ère échéance : ". $item['name'],
+							'name' => "1ère échéance ". $item['name'],
+							'description' => $item['description'],
+						]
+					],
+					'quantity' => 1
+				];
+
+				$session_desc['line_items'][] = $desc_item_first;
+
+				// et il faut creer un Price via l'API pour pouvoir utiliser trial_period_days
+				/*
+				$price_desc = $desc_item['price_data'];
+				try {
+					$price = \Stripe\Price::create($price_desc);
+				}
+				catch (Exception $e) {
+					spip_log($s = "call_request: Erreur lors de la creation du Price::create : ".$e->getMessage(), $mode . _LOG_ERREUR);
+					erreur_squelette("[$mode] $s");
+					return false;
+				}
+
+				$desc_item['price'] = $price->id;
+				unset($desc_item['price_data']);
+				*/
+				$session_desc['line_items'][] = $desc_item;
+				// et on ajoute un coupon pour la premiere echeance de l'abonnement
+				$coupon = \Stripe\Coupon::create([
+					'currency' => $contexte['currency'],
+					'amount_off' => $montant_echeance,
+					'duration' => 'once'
+				]);
+				$session_desc['discounts'][0]['coupon'] = $coupon->id;
+				ray("Première echeance reduite : ",$session_desc);
+			}
+			elseif (intval($montant_initial) > intval($montant_echeance)) {
+
+				$v = $echeance['montant_init'] - $echeance['montant'];
+				$montant_surcharge = intval(round((10**$devise_info['fraction']) * $v, 0));
+				if (strlen($montant_surcharge) < 3) {
+					$montant_surcharge = str_pad($montant_surcharge, 3, '0', STR_PAD_LEFT);
+				}
+
+				// et on ajoute une surcharge pour la premiere echeance
+				$desc_item_first = [
+					'price_data' => [
+						'currency' => $contexte['currency'],
+						'unit_amount' => $montant_surcharge,
+						'product_data' => [
+							'name' => "1ère échéance complément ". $item['name'],
 							'description' => $item['description'],
 						]
 					],
@@ -350,6 +392,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 
 				$session_desc['line_items'][] = $desc_item_first;
 				$session_desc['line_items'][] = $desc_item;
+				ray("Première echeance plus elevee : ",$session_desc);
 			}
 
 
@@ -357,17 +400,18 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 				$session = \Stripe\Checkout\Session::create($session_desc);
 			}
 			catch (Exception $e) {
-				spip_log("call_request: Erreur lors de la creation du Checkout\Session abonnement : ".$e->getMessage(), $mode . _LOG_ERREUR);
-				erreur_squelette($e->getMessage());
+				spip_log($s = "call_request: Erreur lors de la creation du Checkout\Session abonnement : ".$e->getMessage(), $mode . _LOG_ERREUR);
+				erreur_squelette("[$mode] $s");
 				return false;
 			}
 
 			$contexte['checkout_session_id'] = $session->id;
-			//ray($session_desc, $session);
+			ray($session_desc, $session);
 		}
 
 	}
 
 
+	ray("call_request stripe", $contexte);
 	return $contexte;
 }
