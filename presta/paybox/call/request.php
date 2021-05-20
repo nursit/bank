@@ -67,11 +67,8 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 
 	$mail = bank_porteur_email($row);
 
-	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$montant = intval(round((10**$devise_info['fraction']) * $row['montant'], 0));
-	if (strlen($montant)<3){
-		$montant = str_pad($montant, 3, '0', STR_PAD_LEFT);
-	}
+	// passage en centimes et formattage
+	$montant = bank_formatter_montant_selon_fraction($row['montant'], $devise_info['fraction'], 3);
 
 	// Affectation des parametres obligatoires
 	// seuls les PBX_ sont envoyees dans le formulaire
@@ -111,7 +108,8 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 			$decrire_echeance = charger_fonction("decrire_echeance", "abos", true)
 			AND $echeance = $decrire_echeance($id_transaction, false)){
 			if ($echeance['montant']>0){
-				$montant_echeance = str_pad(intval(round((10**$devise_info['fraction']) * $echeance['montant'])), 10, "0", STR_PAD_LEFT);
+				// passage en centimes et formattage
+				$montant_echeance = bank_formatter_montant_selon_fraction($echeance['montant'], $devise_info['fraction'], 10);
 
 				// si plus d'une echeance initiale prevue on ne sait pas faire avec Paybox
 				if (isset($echeance['count_init']) AND $echeance['count_init']>1){

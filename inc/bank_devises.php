@@ -186,3 +186,53 @@ function bank_tester_devise_presta($config, $devise = null) {
 
 	return $ok;
 }
+
+/**
+ * Formatter un montant en entier, en fonction de la fraction que l'on veut representer
+ * Pour les Euros : fraction = 2 => 0.01€ donne 001 et 10€ donne 1000
+ *
+ * @param int|float $montant
+ * @param int $fraction
+ * @param null|int $min_length
+ * @return string
+ */
+function bank_formatter_montant_selon_fraction($montant, $fraction, $min_length = null) {
+
+	$fraction = intval($fraction);
+	switch ($fraction) {
+		case 0:
+			$coeff = 1;
+			break;
+		case 1:
+			$coeff = 10;
+			break;
+		case 2:
+			$coeff = 100;
+			break;
+		default:
+			$coeff = 10 ** $fraction;
+			break;
+	}
+
+	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
+	$fmt = round($coeff * abs($montant), 0);
+	$fmt = strval(intval($fmt));
+
+	// si pas de min_length indique, il faut se baser sur la $fraction : 2 decimales = 3 chiffres minimum
+	if (is_null($min_length)) {
+		$min_length = $fraction + 1;
+	}
+
+	// completer par des 0 a gauche si le nombre est trop court
+	if ($min_length and strlen($fmt) < $min_length){
+		$fmt = str_pad($fmt, $min_length, '0', STR_PAD_LEFT);
+	}
+
+	// et on peut remettre le signe - en tete si besoin
+	// on le remet ici pour ne pas impacter le calcul de la longueur mini
+	if ($montant < 0) {
+		$fmt = '-' . $fmt;
+	}
+
+	return $fmt;
+}

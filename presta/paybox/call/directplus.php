@@ -69,11 +69,8 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 	// recuperer l'email
 	$mail = sql_getfetsel('email', "spip_auteurs", 'id_auteur=' . intval($row['id_auteur']));
 
-	// passage en centimes d'euros
-	$montant = intval(round((10**$devise_info['fraction']) * $row['montant']));
-	if (strlen($montant)<10){
-		$montant = str_pad($montant, 10, '0', STR_PAD_LEFT);
-	}
+	// passage en centimes et formattage sur 10 chiffres
+	$montant = bank_formatter_montant_selon_fraction($row['montant'], $devise_info['fraction'], 10);
 
 	//		Affectation des parametres obligatoires
 	$parm = array('VERSION' => '00104', 'SITE' => $config['PBX_SITE'], 'RANG' => $config['PBX_RANG'], 'IDENTIFIANT' => '');

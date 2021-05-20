@@ -111,10 +111,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	$email = $billing['email'];
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$montant = intval(round((10**$devise_info['fraction']) * $row['montant'], 0));
-	if (strlen($montant)<3){
-		$montant = str_pad($montant, 3, '0', STR_PAD_LEFT);
-	}
+	$montant = bank_formatter_montant_selon_fraction($row['montant'], $devise_info['fraction'], 3);
 
 	include_spip('inc/filtres_mini'); // url_absolue
 

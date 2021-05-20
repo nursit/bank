@@ -58,7 +58,7 @@ function presta_sips_call_request_dist($id_transaction, $transaction_hash, $conf
 	$mail = bank_porteur_email($row);
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
-	$montant = intval(round((10**$devise_info['fraction']) * $row['montant'], 0));
+	$montant = intval(bank_formatter_montant_selon_fraction($row['montant'], $devise_info['fraction'], 0));
 
 	$merchant_id = $config['merchant_id'];
 	$service = $config['service'];

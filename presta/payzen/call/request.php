@@ -123,7 +123,7 @@ function presta_payzen_call_request_dist($id_transaction, $transaction_hash, $co
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
 	$parm['vads_currency'] = $devise_info['code_num'];
-	$parm['vads_amount'] = intval(round((10**$devise_info['fraction']) * $row['montant'], 0));
+	$parm['vads_amount'] = intval(bank_formatter_montant_selon_fraction($row['montant'], $devise_info['fraction'], 0));
 
 	$parm['vads_language'] = $GLOBALS['spip_lang'];
 
@@ -211,7 +211,7 @@ function presta_payzen_call_request_dist($id_transaction, $transaction_hash, $co
 				}
 
 				// montant de l'echeance
-				$parm['vads_sub_amount'] = intval(round((10**$devise_info['fraction']) * $echeance['montant'], 0));
+				$parm['vads_sub_amount'] = intval(bank_formatter_montant_selon_fraction($echeance['montant'], $devise_info['fraction'], 0));
 				// meme devise que le paiement initial
 				$parm['vads_sub_currency'] = $parm['vads_currency'];
 
@@ -246,7 +246,9 @@ function presta_payzen_call_request_dist($id_transaction, $transaction_hash, $co
 				if ($nb_init>0){
 					$parm['vads_sub_init_amount_number'] = $nb_init;
 					$parm['vads_sub_init_amount'] = $parm['vads_amount'];
-					if (isset($echeance['montant_init']) AND ($m = intval(round((10**$devise_info['fraction']) * $echeance['montant_init'], 0)))>0){
+					if (isset($echeance['montant_init'])
+						AND ($m = intval(bank_formatter_montant_selon_fraction($echeance['montant_init'], $devise_info['fraction'], 0)))>0){
+
 						$parm['vads_sub_init_amount'] = $m;
 					}
 				}
