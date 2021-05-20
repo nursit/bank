@@ -100,7 +100,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 
 			}
 		}
-		ray($echeance);
+		//ray($echeance);
 		if (!$echeance){
 			return false;
 		}
@@ -240,7 +240,6 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	}
 
 	// est-ce un abonnement ?
-	// TODO
 	if ($type === 'abo' and $echeance){
 		if ($echeance['montant'] > 0) {
 
@@ -248,16 +247,10 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			 * Create a Price from $item and $echeance
 			 * https://stripe.com/docs/api/prices/create
 			 */
-			$montant_echeance = intval(round((10**$devise_info['fraction']) * $echeance['montant'], 0));
-			if (strlen($montant_echeance) < 3) {
-				$montant_echeance = str_pad($montant_echeance, 3, '0', STR_PAD_LEFT);
-			}
+			$montant_echeance = bank_formatter_montant_selon_fraction($echeance['montant'], $devise_info['fraction'], 3);
 			$montant_initial = $montant_echeance;
 			if (isset($echeance['montant_init'])) {
-				$montant_initial = intval(round((10**$devise_info['fraction']) * $echeance['montant_init'], 0));
-				if (strlen($montant_initial) < 3) {
-					$montant_initial = str_pad($montant_initial, 3, '0', STR_PAD_LEFT);
-				}
+				$montant_initial = bank_formatter_montant_selon_fraction($echeance['montant_init'], $devise_info['fraction'], 3);
 			}
 
 			$interval = 'month';
@@ -270,7 +263,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 						break;
 					case "week":
 					case "weekly":
-					// debug purpose only, not fully supported by the bank plugin
+						// debug purpose only, not fully supported by the bank plugin
 						$interval = 'week';
 						break;
 					case "year":
@@ -320,16 +313,12 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			if ($montant_echeance === $montant_initial) {
 
 				$session_desc['line_items'][] = $desc_item;
-				ray("Echeance unique : ",$session_desc);
+				//ray("Echeance unique : ",$session_desc);
 			}
 			elseif (intval($montant_initial) < intval($montant_echeance)) {
 				$session_desc['line_items'][] = $desc_item;
 
-				$v = $echeance['montant'] - $echeance['montant_init'];
-				$montant_remise = intval(round((10**$devise_info['fraction']) * $v, 0));
-				if (strlen($montant_remise) < 3) {
-					$montant_remise = str_pad($montant_remise, 3, '0', STR_PAD_LEFT);
-				}
+				$montant_remise = bank_formatter_montant_selon_fraction($echeance['montant'] - $echeance['montant_init'], $devise_info['fraction'], 3);
 
 				// et on ajoute une remise pour la premiere echeance
 				// et on ajoute un coupon pour la premiere echeance de l'abonnement
@@ -339,15 +328,11 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 					'duration' => 'once'
 				]);
 				$session_desc['discounts'][0]['coupon'] = $coupon->id;
-				ray("Première echeance reduite : ",$session_desc);
+				//ray("Première echeance reduite : ",$session_desc);
 			}
 			elseif (intval($montant_initial) > intval($montant_echeance)) {
 
-				$v = $echeance['montant_init'] - $echeance['montant'];
-				$montant_surcharge = intval(round((10**$devise_info['fraction']) * $v, 0));
-				if (strlen($montant_surcharge) < 3) {
-					$montant_surcharge = str_pad($montant_surcharge, 3, '0', STR_PAD_LEFT);
-				}
+				$montant_surcharge = bank_formatter_montant_selon_fraction($echeance['montant_init'] - $echeance['montant'], $devise_info['fraction'], 3);
 
 				// et on ajoute une surcharge pour la premiere echeance
 				$desc_item_first = [
@@ -364,7 +349,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 
 				$session_desc['line_items'][] = $desc_item_first;
 				$session_desc['line_items'][] = $desc_item;
-				ray("Première echeance plus elevee : ",$session_desc);
+				//ray("Première echeance plus elevee : ",$session_desc);
 			}
 
 
@@ -378,12 +363,12 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			}
 
 			$contexte['checkout_session_id'] = $session->id;
-			ray($session_desc, $session);
+			//ray($session_desc, $session);
 		}
 
 	}
 
 
-	ray("call_request stripe", $contexte);
+	//ray("call_request stripe", $contexte);
 	return $contexte;
 }
