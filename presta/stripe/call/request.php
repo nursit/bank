@@ -205,7 +205,6 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 					'price_data' => [
 						'unit_amount' => $item['amount'],
 						'currency' => $item['currency'],
-						'nickname' => $item['name'],
 						'product_data' => [
 							'name' => $item['name'],
 							'description' => $item['description'],
