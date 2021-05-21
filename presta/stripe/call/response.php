@@ -62,9 +62,9 @@ function presta_stripe_call_response_dist($config, $response = null){
 	// Si c'est un abonnement :
 	// A la creation
 	//    - au premier appel, sur checkout_session_completed on a id_transaction + abo_uid
-	//    - au second appel, sur invoice_finalized on a abo_uid + payment_id + billing_reason = subscription_create
+	//    - au second appel, sur invoice_payment_succeeded on a abo_uid + payment_id + billing_reason = subscription_create
 	// Au renouvellemnt
-	//    - sur invoice_finalized on a  abo_uid + payment_id + billing_reason = subscription_cycle
+	//    - sur invoice_payment_succeeded on a  abo_uid + payment_id + billing_reason = subscription_cycle
 
 	if (empty($response['payment_id'])
 		and empty($response['abo_uid'])

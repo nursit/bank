@@ -75,8 +75,8 @@ function stripe_dispatch_event($config, $event, $auto = 'auto'){
 		spip_log("call_{$auto}response : event $type => $f()", $mode . _LOG_DEBUG);
 		$res = $f($config, $event);
 		spip_log("call_{$auto}response : $f() = " . json_encode($res), $mode . _LOG_DEBUG);
-		// loger le debug
-		if (!$res) {
+		// loger le debug si echec
+		if ($res === false) {
 			spip_log($event, "stripe_db" . _LOG_DEBUG);
 		}
 	} else {
@@ -232,7 +232,38 @@ function stripe_webhook_customer_subscription_created_dist($config, $event) {
 	}
 
 	// TODO ?
-	return false;
+
+	return null;
+}
+
+function stripe_webhook_customer_subscription_deleted_dist($config, $event) {
+	$mode = $config['presta'] . 'auto';
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
+
+	$subscription = $event->data->object;
+	// il faut recuperer abo_uid, pour resilier l'abonnement
+	if ($subscription->object=="subscription"){
+		$abo_uid = $subscription->id;
+
+		if ($subscription->customer){
+			$pay_uid = $subscription->customer;
+		}
+
+		if ($resilier = charger_fonction('resilier', 'abos', true)){
+			$options = array(
+				'notify_bank' => false, // pas la peine : stripe a deja resilie l'abo vu paiement refuse
+				'immediat' => true,
+				'message' => "[bank] Abonnement resilie par Stripe ",
+				'erreur' => true,
+			);
+			$resilier("uid:$abo_uid", $options);
+		}
+
+	}
+
+	return null;
 }
 
 /**
@@ -241,7 +272,7 @@ function stripe_webhook_customer_subscription_created_dist($config, $event) {
  * @param object $event
  * @return bool|array
  */
-function stripe_webhook_invoice_finalized_dist($config, $event){
+function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
 	$mode = $config['presta'] . 'auto';
 	if (isset($config['mode_test']) AND $config['mode_test']){
 		$mode .= "_test";
