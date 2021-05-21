@@ -190,7 +190,7 @@ function stripe_webhook_checkout_session_completed_dist($config, $event){
 			$qs = end($qs);
 			parse_str($qs, $c);
 			// verifier la signature
-			$r = bank_response_simple($config['presta'], $c);
+			$r = bank_response_simple($config['presta'] . ((isset($config['mode_test']) and $config['mode_test']) ? '_test' : ''), $c);
 			if ($r===false){
 				spip_log("Echec verification signature success_url ".$session->success_url . " ".json_encode($c), $mode . _LOG_ERREUR);
 				return false;
