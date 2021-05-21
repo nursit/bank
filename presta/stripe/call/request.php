@@ -122,7 +122,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 	if ($type==='abo'){
 		$contexte['abo'] = 1;
 	}
-	$contexte['sign'] = bank_sign_response_simple($config['presta'], $contexte);
+	$contexte['sign'] = bank_sign_response_simple($mode, $contexte);
 
 	$url_success = bank_url_api_retour($config, "response");
 	$url_cancel = bank_url_api_retour($config, "cancel");
