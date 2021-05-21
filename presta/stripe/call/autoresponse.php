@@ -25,7 +25,7 @@ include_spip('presta/stripe/inc/stripe');
 function presta_stripe_call_autoresponse_dist($config){
 
 	include_spip('inc/bank');
-	$mode = $config['presta'];
+	$mode = $config['presta'] . 'auto';
 	if (isset($config['mode_test']) AND $config['mode_test']){
 		$mode .= "_test";
 	}
@@ -38,7 +38,7 @@ function presta_stripe_call_autoresponse_dist($config){
 	}
 
 	if ($erreur or $erreur_code){
-		spip_log('call_autoresponse ' . $inactif . ': ' . "$erreur_code - $erreur", $mode . 'auto' . _LOG_ERREUR);
+		spip_log('call_autoresponse ' . $inactif . ': ' . "$erreur_code - $erreur", $mode . _LOG_ERREUR);
 		http_response_code(400); // PHP 5.4 or greater
 		exit();
 	} else {
@@ -57,13 +57,13 @@ function presta_stripe_call_autoresponse_dist($config){
 
 
 function stripe_dispatch_event($config, $event, $auto = 'auto'){
-	$mode = $config['presta'];
+	$mode = $config['presta'] . $auto;
 	if (isset($config['mode_test']) AND $config['mode_test']){
 		$mode .= "_test";
 	}
 
 	if (!$event){
-		spip_log("call_{$auto}response : event NULL", $mode . $auto . _LOG_ERREUR);
+		spip_log("call_{$auto}response : event NULL", $mode . _LOG_ERREUR);
 		return null;
 	}
 
@@ -72,11 +72,11 @@ function stripe_dispatch_event($config, $event, $auto = 'auto'){
 
 	if (function_exists($f = "stripe_webhook_$type")
 		or function_exists($f = $f . '_dist')){
-		spip_log("call_{$auto}response : event $type => $f()", $mode . $auto . _LOG_DEBUG);
+		spip_log("call_{$auto}response : event $type => $f()", $mode . _LOG_DEBUG);
 		$res = $f($config, $event);
-		spip_log("call_{$auto}response : $f() = " . json_encode($res), $mode . $auto . _LOG_DEBUG);
+		spip_log("call_{$auto}response : $f() = " . json_encode($res), $mode . _LOG_DEBUG);
 	} else {
-		spip_log("call_{$auto}response : event $type - $f not existing", $mode . $auto . _LOG_DEBUG);
+		spip_log("call_{$auto}response : event $type - $f not existing", $mode . _LOG_DEBUG);
 		$res = null;
 		spip_log($event, "stripe_db" . _LOG_ERREUR);
 	}
@@ -90,7 +90,7 @@ function stripe_retrieve_event($config, $auto = 'auto'){
 
 	$event = null;
 
-	$mode = $config['presta'];
+	$mode = $config['presta'] . $auto;
 	if (isset($config['mode_test']) AND $config['mode_test']){
 		$mode .= "_test";
 	}
@@ -111,19 +111,19 @@ function stripe_retrieve_event($config, $auto = 'auto'){
 		} catch (\Stripe\Exception\SignatureVerificationException $e) {
 			$erreur = $e->getMessage();
 			// Invalid signature
-			spip_log("erreur Webhook stripe_retrieve_event \Stripe\Exception\SignatureVerificationException: $erreur", $mode . $auto . _LOG_ERREUR);
+			spip_log("erreur Webhook stripe_retrieve_event \Stripe\Exception\SignatureVerificationException: $erreur", $mode . _LOG_ERREUR);
 			http_response_code(400); // PHP 5.4 or greater
 			exit();
 		} catch (\Stripe\Exception\UnexpectedValueException $e) {
 			$erreur = $e->getMessage();
 			// Invalid payload
-			spip_log("erreur Webhook stripe_retrieve_event \Stripe\Exception\UnexpectedValueException: $erreur", $mode . $auto . _LOG_ERREUR);
+			spip_log("erreur Webhook stripe_retrieve_event \Stripe\Exception\UnexpectedValueException: $erreur", $mode . _LOG_ERREUR);
 			http_response_code(400); // PHP 5.4 or greater
 			exit();
 		} catch (\Exception $e) {
 			$erreur = $e->getMessage();
 			// Invalid signature
-			spip_log("erreur Webhook stripe_retrieve_event \Exception: $erreur", $mode . $auto . _LOG_ERREUR);
+			spip_log("erreur Webhook stripe_retrieve_event \Exception: $erreur", $mode . _LOG_ERREUR);
 			http_response_code(400); // PHP 5.4 or greater
 			exit();
 		}
@@ -149,7 +149,7 @@ function stripe_retrieve_event($config, $auto = 'auto'){
 				$erreur = $e->getMessage();
 				$erreur_code = 'error';
 			}
-			spip_log("erreur \Stripe\Event::retrieve($event_id): $erreur", $mode . $auto . _LOG_ERREUR);
+			spip_log("erreur \Stripe\Event::retrieve($event_id): $erreur", $mode . _LOG_ERREUR);
 		}
 	}
 
@@ -211,7 +211,7 @@ function stripe_webhook_checkout_session_completed_dist($config, $event){
  * @return bool|array
  */
 function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
-	$mode = $config['presta'];
+	$mode = $config['presta'] . 'auto';
 	if (isset($config['mode_test']) AND $config['mode_test']){
 		$mode .= "_test";
 	}
@@ -247,7 +247,7 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
 						$erreur = $e->getMessage();
 						$erreur_code = 'error';
 					}
-					spip_log("stripe_webhook_invoice_payment_succeeded_dist: Erreur #$erreur_code $erreur", $mode . 'auto' . _LOG_ERREUR);
+					spip_log("stripe_webhook_invoice_payment_succeeded_dist: Erreur #$erreur_code $erreur", $mode . _LOG_ERREUR);
 				}
 			}
 		}
@@ -273,7 +273,10 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
  * @return bool|array
  */
 function stripe_webhook_invoice_payment_failed_dist($config, $event){
-	$mode = $config['presta'];
+	$mode = $config['presta'] . 'auto';
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
 
 	$response = array();
 	$invoice = $event->data->object;
@@ -306,7 +309,7 @@ function stripe_webhook_invoice_payment_failed_dist($config, $event){
 						$erreur = $e->getMessage();
 						$erreur_code = 'error';
 					}
-					spip_log("stripe_webhook_invoice_payment_succeeded_dist: Erreur #$erreur_code $erreur", $mode . 'auto' . _LOG_ERREUR);
+					spip_log("stripe_webhook_invoice_payment_succeeded_dist: Erreur #$erreur_code $erreur", $mode . _LOG_ERREUR);
 				}
 			}
 		}
