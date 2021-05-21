@@ -69,6 +69,16 @@ function presta_stripe_call_response_dist($config, $response = null){
 	if (empty($response['payment_id'])
 		and empty($response['abo_uid'])
 		and $checkout_session_id){
+
+		// si c'est un retour apres paiement, on a peut etre deja tout enregistre via les webhook serveur, notamment dans le cas d'un abonnement
+		if (!empty($response['id_transaction']) and !empty($response['transaction_hash'])) {
+			if ($t = sql_fetsel("*", "spip_transactions", "id_transaction=".intval($response['id_transaction'])." AND transaction_hash=".sql_quote($response['transaction_hash']))) {
+				if ($t['reglee'] === 'oui') {
+					return array($response['id_transaction'], true);
+				}
+			}
+		}
+
 		$response['checkout_session_id'] = $checkout_session_id;
 		try {
 			$session = \Stripe\Checkout\Session::retrieve($checkout_session_id);
