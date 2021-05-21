@@ -35,7 +35,7 @@ function presta_stripe_call_response_dist($config, $response = null){
 
 	// recuperer la reponse en post et la decoder, en verifiant la signature
 	if (!$response){
-		$response = bank_response_simple($mode);
+		$response = bank_response_simple($config['presta']);
 	}
 
 	// Stripe session_id
