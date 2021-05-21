@@ -75,6 +75,10 @@ function stripe_dispatch_event($config, $event, $auto = 'auto'){
 		spip_log("call_{$auto}response : event $type => $f()", $mode . _LOG_DEBUG);
 		$res = $f($config, $event);
 		spip_log("call_{$auto}response : $f() = " . json_encode($res), $mode . _LOG_DEBUG);
+		// loger le debug
+		if (!$res) {
+			spip_log($event, "stripe_db" . _LOG_DEBUG);
+		}
 	} else {
 		spip_log("call_{$auto}response : event $type - $f not existing", $mode . _LOG_DEBUG);
 		$res = null;
@@ -163,6 +167,10 @@ function stripe_retrieve_event($config, $auto = 'auto'){
  * @return bool
  */
 function stripe_webhook_checkout_session_completed_dist($config, $event){
+	$mode = $config['presta'] . 'auto';
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
 
 	$response = array();
 	$session = $event->data->object;
@@ -181,9 +189,10 @@ function stripe_webhook_checkout_session_completed_dist($config, $event){
 			$qs = explode('?', $session->success_url);
 			$qs = end($qs);
 			parse_str($qs, $c);
-			$mode = $config['presta'];
+			// verifier la signature
 			$r = bank_response_simple($config['presta'], $c);
 			if ($r===false){
+				spip_log("Echec verification signature success_url ".$session->success_url . " ".json_encode($c), $mode . _LOG_ERREUR);
 				return false;
 			}
 
