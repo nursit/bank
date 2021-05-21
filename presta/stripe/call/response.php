@@ -58,7 +58,17 @@ function presta_stripe_call_response_dist($config, $response = null){
 	// charger l'API Stripe avec la cle
 	stripe_init_api($config);
 
-	if (!$response['payment_id'] and $checkout_session_id){
+	// Si c'est un paiement a l'acte : on doit avoir checkout_session_id + payment_id
+	// Si c'est un abonnement :
+	// A la creation
+	//    - au premier appel, sur checkout_session_completed on a id_transaction + abo_uid
+	//    - au second appel, sur invoice_finalized on a abo_uid + payment_id + billing_reason = subscription_create
+	// Au renouvellemnt
+	//    - sur invoice_finalized on a  abo_uid + payment_id + billing_reason = subscription_cycle
+
+	if (empty($response['payment_id'])
+		and empty($response['abo_uid'])
+		and $checkout_session_id){
 		$response['checkout_session_id'] = $checkout_session_id;
 		try {
 			$session = \Stripe\Checkout\Session::retrieve($checkout_session_id);
@@ -78,16 +88,45 @@ function presta_stripe_call_response_dist($config, $response = null){
 		}
 	}
 
-	if (!$response['payment_id']){
+	if (empty($response['payment_id'])){
+		// enregistrer l'abo_uid sur la transaction sur le checkout_session
+		if (!empty($response['abo_uid'])
+			and !empty($response['id_transaction'])
+			and !empty($response['transaction_hash'])) {
+			sql_updateq("spip_transactions", ['abo_uid' => $response['abo_uid']], "abo_uid='' AND id_transaction=".intval($response['id_transaction'])." AND transaction_hash=".sql_quote($response['transaction_hash'])." AND reglee='non'");
+
+			spip_log("call_response : abo_uid ".$response['abo_uid']." enregistre sur transaction #".$response['id_transaction'], $mode . _LOG_INFO_IMPORTANTE);
+			// on renvoi l'id avec un false, car pour le moment non payee
+			return array($response['id_transaction'], false);
+		}
+
 		spip_log("call_response : checkout_session_id invalide / no payment_id", $mode . _LOG_ERREUR);
 		return array(0, false);
 	}
 
 
 	$recurence = false;
+	if (!empty($response['billing_reason']) and in_array($response['billing_reason'], ['subscription_create', 'subscription_cycle'])) {
+		$response['abo'] = true;
+	}
+
+	// c'est une creation d'abonnement et il nous manque le numero de transaction ? le retrouver
+	if (
+		(!empty($response['billing_reason']) and $response['billing_reason'] === 'subscription_create')
+		and !empty($response['payment_id'])
+		and empty($response['id_transaction'])
+		and !empty($response['abo_uid'])){
+		if ($t = sql_fetsel("*", "spip_transactions", "reglee='non' AND abo_uid=".sql_quote($response['abo_uid'])." AND date_transaction>".sql_quote(date('Y-m-d H:i:s', strtotime("-12hours"))))){
+			$response['id_transaction'] = $t['id_transaction'];
+			$response['transaction_hash'] = $t['transaction_hash'];
+		}
+	}
+
 	// c'est une reconduction d'abonnement ?
-	if (isset($response['payment_id']) and $response['payment_id']
-		and isset($response['abo_uid']) and $response['abo_uid']){
+	if (
+		(!empty($response['billing_reason']) and $response['billing_reason'] === 'subscription_cycle')
+		and !empty($response['payment_id'])
+		and !empty($response['abo_uid'])){
 
 		// verifier qu'on a pas deja traite cette recurrence !
 		$where_deja = [];
@@ -165,7 +204,7 @@ function presta_stripe_call_response_dist($config, $response = null){
 			if ($success){
 
 				if ($renouveler_abonnement = charger_fonction('renouveler_abonnement', 'abos', true)){
-					$renouveler_abonnement($id_transaction, $response['abo'], $mode);
+					$renouveler_abonnement($id_transaction, $abo_uid, $mode);
 				}
 			}
 

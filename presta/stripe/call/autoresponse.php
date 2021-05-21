@@ -175,10 +175,17 @@ function stripe_webhook_checkout_session_completed_dist($config, $event){
 	$response = array();
 	$session = $event->data->object;
 	// il faut recuperer $charge, pay_id et abo_uid, creer un id_transaction
-	if ($session->object=="checkout.session"){
+	if ($session->object=="checkout.session"
+	  and $session->payment_status == "paid"){
 		$response['checkout_session_id'] = $session->id;
 		if ($session->payment_intent){
 			$response['payment_id'] = $session->payment_intent;
+		}
+		if ($session->subscription){
+			$response['abo_uid'] = $session->subscription;
+		}
+		if ($session->customer){
+			$response['pay_uid'] = $session->customer;
 		}
 		if ($session->locale) {
 			$response['lang'] = $session->locale;
@@ -202,9 +209,9 @@ function stripe_webhook_checkout_session_completed_dist($config, $event){
 
 	spip_log($event, "stripe_db");
 
-	if (isset($response['payment_id'])
-		and isset($response['id_transaction'])
-		and isset($response['transaction_hash'])){
+	if ((!empty($response['payment_id']) or !empty($response['abo_uid']))
+		and !empty($response['id_transaction'])
+		and !empty($response['transaction_hash'])){
 		$call_response = charger_fonction('response', 'presta/stripe/call');
 		$res = $call_response($config, $response);
 		return $res;
@@ -214,12 +221,27 @@ function stripe_webhook_checkout_session_completed_dist($config, $event){
 }
 
 /**
+ * @param $config
+ * @param $event
+ * @return bool|array
+ */
+function stripe_webhook_customer_subscription_created_dist($config, $event) {
+	$mode = $config['presta'] . 'auto';
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
+
+	// TODO ?
+	return false;
+}
+
+/**
  * Payment succeed
  * @param array $config
  * @param object $event
  * @return bool|array
  */
-function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
+function stripe_webhook_invoice_finalized_dist($config, $event){
 	$mode = $config['presta'] . 'auto';
 	if (isset($config['mode_test']) AND $config['mode_test']){
 		$mode .= "_test";
@@ -227,7 +249,7 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
 
 	$response = array();
 	$invoice = $event->data->object;
-	// il faut recuperer $charge, pay_id et abo_uid, creer un id_transaction
+	// il faut recuperer $charge, pay_id et abo_uid, creer ou retrouver un id_transaction
 	if ($invoice->object=="invoice"){
 		if ($invoice->subscription){
 			$response['abo_uid'] = $invoice->subscription;
@@ -238,11 +260,16 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
 		if ($invoice->charge){
 			$response['charge_id'] = $invoice->charge;
 		}
+		if ($invoice->billing_reason){
+			// subscription_create ou subscription_cycle
+			$response['billing_reason'] = $invoice->billing_reason;
+		}
 		if ($invoice->payment_intent){
 			$response['payment_id'] = $invoice->payment_intent;
 			if (!isset($response['charge_id'])){
 				try {
 					$payment = \Stripe\PaymentIntent::retrieve($response['payment_id']);
+					spip_log($payment, "stripe_db");
 					if ($payment->charges
 						and $payment->charges->data
 						and $charge = end($payment->charges->data)){

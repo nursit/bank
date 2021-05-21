@@ -330,11 +330,6 @@ function stripe_traite_reponse_transaction($config, &$response){
 		}
 	}
 
-	/*elseif($sub){
-		$transaction = $sub->id;
-		$authorisation_id = $plan->id;
-	}*/
-
 	$set = array(
 		"autorisation_id" => "$transaction/$authorisation_id",
 		"mode" => "$mode/$config_id",
