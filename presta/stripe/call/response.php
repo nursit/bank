@@ -73,9 +73,26 @@ function presta_stripe_call_response_dist($config, $response = null){
 		// si c'est un retour apres paiement, on a peut etre deja tout enregistre via les webhook serveur, notamment dans le cas d'un abonnement
 		if (!empty($response['id_transaction']) and !empty($response['transaction_hash'])) {
 			if ($t = sql_fetsel("*", "spip_transactions", "id_transaction=".intval($response['id_transaction'])." AND transaction_hash=".sql_quote($response['transaction_hash']))) {
-				if ($t['reglee'] === 'oui') {
-					return array($response['id_transaction'], true);
+				// SI c'est un GET on est probablement en concurrence avec les webhook, dans ce cas attendre un peu et reverifier
+				// avant de passer a la suite
+				// sur du paiement a l'acte on attends juste une seconde,
+				// sur du paiement par abonnement on se donne 10s ce qui doit largement couvrir le traitement en cours - sinon on va declarer faussement un echec dans ce cas
+				$nb_try_max = $nb_try = 0;
+				if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+					$nb_try_max = ($t['abo_uid'] ? 10 : 1);
 				}
+				do {
+					if ($nb_try>0) {
+						spip_log("call_response : transaction #".$response['id_transaction']." en cours traitement, pas finie => sleep(1)", $mode . _LOG_DEBUG);
+						sleep(1);
+						$t = sql_fetsel("*", "spip_transactions", "id_transaction=".intval($response['id_transaction'])." AND transaction_hash=".sql_quote($response['transaction_hash']));
+					}
+					if ($t['reglee'] === 'oui') {
+						return array($response['id_transaction'], true);
+					}
+					$nb_try++;
+				} while ($nb_try <= $nb_try_max);
+				spip_log("call_response : transaction #".$response['id_transaction']." en cours traitement, pas finie, tant pis, on continue", $mode . _LOG_DEBUG);
 			}
 		}
 

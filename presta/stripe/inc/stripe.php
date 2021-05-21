@@ -270,38 +270,8 @@ function stripe_traite_reponse_transaction($config, &$response){
 	}
 
 	// essayer de retrouver ou creer un customer pour l'id_auteur
-	if ($customer_id = $payment->customer){
-		try {
-			$customer = \Stripe\Customer::retrieve($customer_id);
-
-			// si customer retrouve, on ajoute la source et la transaction
-			if ($customer){
-				$response['pay_id'] = $customer->id;
-				$metadata = $customer->metadata;
-				if (!$metadata){
-					$metadata = array();
-				}
-				if (isset($metadata['id_transaction'])){
-					$metadata['id_transaction'] .= ',' . $id_transaction;
-				} else {
-					$metadata['id_transaction'] = $id_transaction;
-				}
-				if ($row['id_auteur']>0){
-					$metadata['id_auteur'] = $row['id_auteur'];
-					$customer->metadata = $metadata;
-					$customer->description = sql_getfetsel('nom', 'spip_auteurs', 'id_auteur=' . intval($row['id_auteur']));
-				}
-				$customer->save();
-			}
-		} catch (Exception $e) {
-			if ($body = $e->getJsonBody()){
-				$err = $body['error'];
-				list($erreur_code, $erreur) = stripe_error_code($err);
-			} else {
-				$erreur = $e->getMessage();
-			}
-			spip_log("Echec recherche customer transaction #$id_transaction $erreur", $mode . _LOG_ERREUR);
-		}
+	if (empty($response['pay_id']) and $customer_id = $payment->customer) {
+		$response['pay_id'] = $customer_id;
 	}
 
 	// Ouf, le reglement a ete accepte
@@ -323,11 +293,6 @@ function stripe_traite_reponse_transaction($config, &$response){
 		and $charge = end($payment->charges->data)){
 		$transaction = $charge['balance_transaction'];
 		$date_paiement = date('Y-m-d H:i:s', $charge['created']);
-		try {
-			\Stripe\Charge::update($charge->id, ['description' => $payment->description,]);
-		} catch (Exception $e) {
-			spip_log('call_response: erreur lors de la modification de la charge ' . $charge->id . ' :: ' . $e->getMessage(), $mode . _LOG_ERREUR);
-		}
 	}
 
 	$set = array(
@@ -385,6 +350,50 @@ function stripe_traite_reponse_transaction($config, &$response){
 
 	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
 	spip_log("call_response : id_transaction $id_transaction, reglee", $mode);
+
+	// faire les updates chez Stripe, *apres* avoir mis la transaction a jour
+	// pour faire au plus vite et mieux gerer les concurrences
+	if (!empty($response['pay_id'])){
+		try {
+			$customer = \Stripe\Customer::retrieve($response['pay_id']);
+
+			// si customer retrouve, on ajoute la source et la transaction
+			if ($customer){
+				$metadata = $customer->metadata;
+				if (!$metadata){
+					$metadata = array();
+				}
+				if (isset($metadata['id_transaction'])){
+					$metadata['id_transaction'] .= ',' . $id_transaction;
+				} else {
+					$metadata['id_transaction'] = $id_transaction;
+				}
+				if ($row['id_auteur']>0){
+					$metadata['id_auteur'] = $row['id_auteur'];
+					$customer->metadata = $metadata;
+					$customer->description = sql_getfetsel('nom', 'spip_auteurs', 'id_auteur=' . intval($row['id_auteur']));
+				}
+				$customer->save();
+			}
+		} catch (Exception $e) {
+			if ($body = $e->getJsonBody()){
+				$err = $body['error'];
+				list($erreur_code, $erreur) = stripe_error_code($err);
+			} else {
+				$erreur = $e->getMessage();
+			}
+			spip_log("Echec recherche/update customer transaction #$id_transaction $erreur", $mode . _LOG_ERREUR);
+		}
+	}
+
+	if ($charge and $payment){
+		try {
+			\Stripe\Charge::update($charge->id, ['description' => $payment->description,]);
+		} catch (Exception $e) {
+			spip_log('call_response: erreur lors de la modification de la charge ' . $charge->id . ' :: ' . $e->getMessage(), $mode . _LOG_ERREUR);
+		}
+	}
+
 
 	$options = array('row_prec' => $row);
 	if (!empty($response['lang'])) {
