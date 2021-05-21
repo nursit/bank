@@ -257,7 +257,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			if (!empty($echeance['freq'])) {
 				switch ($echeance['freq']) {
 					case "day":
-					case "dayly":
+					case "daily":
 						// debug purpose only, not fully supported by the bank plugin
 						$interval = 'day';
 						break;
