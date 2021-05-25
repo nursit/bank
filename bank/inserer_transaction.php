@@ -17,6 +17,7 @@ if (!defined('_ECRIRE_INC_VERSION')){
  * @param string $montant
  * @param array $options
  *   string montant_ht
+ *   string devise
  *   int id_auteur
  *   string auteur_id
  *   string auteur
@@ -78,7 +79,7 @@ function bank_inserer_transaction_dist($montant, $options = array()){
 	$set = array(
 		'montant' => str_replace(',', '.', round($montant, 2)),
 		'montant_ht' => str_replace(',', '.', round($montant_ht, 2)),
-		'devise' => $devise_defaut['code'],
+		'devise' => (!empty($options['devise']) ? $options['devise'] : $devise_defaut['code']),
 		'id_auteur' => isset($options['id_auteur']) ? intval($options['id_auteur']) : 0,
 		'auteur_id' => isset($options['auteur_id']) ? $options['auteur_id'] : "",
 		'auteur' => isset($options['auteur']) ? $options['auteur'] : "",
