@@ -13,7 +13,7 @@ if (!defined('_ECRIRE_INC_VERSION')){
 	return;
 }
 
-include_spip('presta/payzen/inc/payzen');
+include_spip('presta/stripe/inc/stripe');
 
 /**
  * Jamais appele directement dans le plugin bank/
