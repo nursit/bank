@@ -109,20 +109,34 @@ function presta_paybox_call_directplus_dist($id_transaction, $transaction_hash, 
 
 		// requete en POST sur PAYBOX DIRECT PLUS
 		$url = paybox_url_directplus($config);
-		#spip_log("Appel de $url avec ".var_export($parm,true),$mode);
-		$res = recuperer_page($url, false, false, 1048576, $parm);
-		parse_str($res, $r);
-
-		if ($r['CODEREPONSE']=='00005'){
-			spip_log("Collision Reponse : $res", $mode);
-			// hum
-			sleep(1);
-		} else {
-			spip_log("Reponse : $res", $mode);
+		$options = array(
+			'taille_max' => 1048576,
+			'datas' => $parm,
+		);
+		$res = recuperer_url($url, $options);
+		if (!$res or empty($res['page'])) {
+			spip_log("paybox_call_directplus: Echec appel de recuperer_url sur $url avec ".json_encode($parm), $mode . _LOG_ERREUR);
+			$r = array();
+		}
+		else {
+			parse_str($res['page'], $r);
 		}
 
-	} while ($r['CODEREPONSE']=='00005' AND $maxtry-->0);
+		if (!empty($r)) {
+			if ($r['CODEREPONSE']=='00005'){
+				spip_log("paybox_call_directplus: Collision Reponse : ".json_encode($res), $mode . _LOG_INFO_IMPORTANTE);
+				// hum
+				sleep(1);
+			} else {
+				spip_log("paybox_call_directplus: Reponse : ".json_encode($res), $mode . _LOG_DEBUG);
+			}
+		}
 
+	} while ((empty($r) or $r['CODEREPONSE']=='00005') AND $maxtry-->0);
+
+	if (empty($r)) {
+		return '';
+	}
 	#var_dump($r);
 	/*
 	 * array(10) {
