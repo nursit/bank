@@ -30,6 +30,7 @@ function presta_paybox_call_resilier_abonnement_dist($uid, $config = 'paybox'){
 		$mode = sql_getfetsel("mode", "spip_transactions", "abo_uid=" . sql_quote($uid) . " AND statut=" . sql_quote('ok') . " AND mode LIKE " . sql_quote($config . '%'));
 		$config = bank_config($mode);
 	}
+	$mode = $config['mode'];
 
 	$args =
 		"VERSION=001"
@@ -42,13 +43,20 @@ function presta_paybox_call_resilier_abonnement_dist($uid, $config = 'paybox'){
 	$url = paybox_url_resil($config) . "?" . $args;
 
 	include_spip('inc/distant');
-	$reponse = recuperer_page($url);
-	spip_log("uid:$uid, $url, reponse:$reponse", 'paybox_abos_resil');
+	$res = recuperer_url($url);
+	if (!$res or empty($res['page'])) {
+		spip_log("paybox_call_resilier_abonnement: Echec appel de recuperer_url sur $url", 'paybox_abos_resil' . _LOG_ERREUR);
+		return false;
+	}
 
-	parse_str($reponse, $res);
-	if ($res['ACQ']=='OK' AND $res['ABONNEMENT']==$uid){
+	parse_str($res['page'], $r);
+
+	if (!empty($r['ACQ']) and $r['ACQ']=='OK'
+		and !empty($r['ABONNEMENT']) and $r['ABONNEMENT']==$uid){
+		spip_log("paybox_call_resilier_abonnement: uid:$uid, $url, reponse:".json_encode($res), 'paybox_abos_resil' . _LOG_DEBUG);
 		return true;
 	}
 
+	spip_log("paybox_call_resilier_abonnement: uid:$uid, $url, reponse:".json_encode($res), 'paybox_abos_resil' . _LOG_ERREUR);
 	return false;
 }

@@ -373,70 +373,31 @@ function bank_paypalexpress_hash_call($config, $methodName, $nvpStr){
 	//NVPRequest for submitting to server
 	$nvpreq = "METHOD=" . urlencode($methodName) . "&VERSION=" . urlencode($api_version) . "&PWD=" . urlencode($API_Password) . "&USER=" . urlencode($API_UserName) . "&SIGNATURE=" . urlencode($API_Signature) . $nvpStr;
 
-	//$response = recuperer_page($API_Endpoint,false,false,1048576,$nvpReqArray);
-
-	if (!function_exists('curl_init')){
-		include_spip('inc/distant');
-		$response = recuperer_page($API_Endpoint . "?$nvpreq");
-		$erreur = ($response===false);
-		$erreur_msg = "recuperer_page impossible";
-	} else {
-		//setting the curl parameters.
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $API_Endpoint);
-		#curl_setopt($ch, CURLOPT_VERBOSE, 1);
-		curl_setopt($ch, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_1_1);
-
-		//turning off the server and peer verification(TrustManager Concept).
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-		if (!defined('CURL_SSLVERSION_TLSv1_2')){
-			define('CURL_SSLVERSION_TLSv1_2', 6);
-		}
-		curl_setopt($ch, CURLOPT_SSLVERSION, CURL_SSLVERSION_TLSv1_2);
-
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-		curl_setopt($ch, CURLOPT_HEADER, false);
-		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_FORBID_REUSE, true);
-		curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
-		//if USE_PROXY constant set to TRUE in Constants.php, then only proxy will be enabled.
-		//Set proxy name to PROXY_HOST and port number to PROXY_PORT in constants.php
-		if (_PAYPAL_API_USE_PROXY){
-			curl_setopt($ch, CURLOPT_PROXY, _PAYPAL_API_PROXY_HOST . ":" . _PAYPAL_API_PROXY_PORT);
-		}
-
-		//setting the nvpreq as POST FIELD to curl
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $nvpreq);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: Close', 'User-Agent: SPIP/Bank'));
-
-		//getting response from server
-		$response = curl_exec($ch);
-		$erreur = curl_errno($ch);
-		$erreur_msg = curl_error($ch);
-		if (!$erreur){
-			//closing the curl
-			curl_close($ch);
-		}
+	$proxy_host = $proxy_port = '';
+	if (_PAYPAL_API_USE_PROXY){
+		$proxy_host = _PAYPAL_API_PROXY_HOST;
+		$proxy_port = _PAYPAL_API_PROXY_PORT;
 	}
 
-	//convrting NVPResponse to an Associative Array
-	$nvpResArray = bank_paypalexpress_deformatNVP($response);
-	//$nvpReqArray=bank_paypalexpress_deformatNVP($nvpreq);
-	//$_SESSION['nvpReqArray']=$nvpReqArray;
+	$bank_recuperer_post_https = charger_fonction("bank_recuperer_post_https", "inc");
+	list($response, $erreur, $erreur_msg) = $bank_recuperer_post_https($API_Endpoint, $nvpreq, '', $proxy_host, $proxy_port);
 
 	if ($erreur){
 		// moving to display page to display curl errors
 		$_SESSION['curl_error_no'] = $erreur;
 		$_SESSION['curl_error_msg'] = $erreur_msg;
-		spip_log('Erreur curl : ' . $erreur . ';' . $erreur_msg, $config['presta'] . _LOG_ERREUR);
+		spip_log('Erreur bank_recuperer_post_https : ' . $erreur . ';' . $erreur_msg, $config['presta'] . _LOG_ERREUR);
 		return false;
 	}
+
+	//convrting NVPResponse to an Associative Array
+	$nvpResArray = bank_paypalexpress_deformatNVP($response);
 
 	return $nvpResArray;
 }
 
-/** This function will take NVPString and convert it to an Associative Array and it will decode the response.
+/**
+ * This function will take NVPString and convert it to an Associative Array and it will decode the response.
  * It is usefull to search for a particular key and displaying arrays.
  * @nvpstr is NVPString.
  * @nvpArray is Associative Array.
