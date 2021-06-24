@@ -481,7 +481,20 @@ function payzen_traite_reponse_transaction($config, $response){
 	// si c'est un SEPA, on a pas encore la transaction et le numero d'autorisation car il y a un delai avant presentation
 	// (paiement dans le futur)
 	if ($is_sepa AND !$transaction){
-		list($transaction, $authorisation_id) = explode("_", $response['vads_card_number']);
+		if (!empty($response['vads_card_number'])){
+			list($transaction, $authorisation_id) = explode("_", $response['vads_card_number']);
+		}
+		// on a pas toujours l'IBAN dans le card_number, dans ce cas on se rabat sur
+		// - vads_identifier qui contient le numero de mandat
+		// - vads_trans_uuid qui contient un numero de transaction unique genere par payzen
+		elseif (!empty($response['vads_identifier']) and !empty($response['vads_trans_uuid'])) {
+			$transaction = $response['vads_trans_uuid'];
+			$authorisation_id = $response['vads_identifier'];
+		}
+		// et sinon generer une erreur specifique qui pointe precisement ce probleme
+		if (!$transaction or !$authorisation_id){
+			$erreur = "SEPA sans reference de paiement (vads_card_number ou vads_identifier + vads_trans_uuid)";
+		}
 	}
 
 	if ($is_payment AND !$erreur AND !in_array($response['vads_trans_status'], array('AUTHORISED', 'CAPTURED', 'WAITING_AUTHORISATION'))){
