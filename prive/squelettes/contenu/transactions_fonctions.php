@@ -17,7 +17,7 @@ if (!defined('_ECRIRE_INC_VERSION')){
 function bank_transactions_statuts(){
 	$statuts = sql_allfetsel("statut, count(id_transaction) as n", "spip_transactions", "", "statut");
 	if ($statuts){
-		$statuts = array_combine(array_map('reset', $statuts), array_map('end', $statuts));
+		$statuts = array_column($statuts, 'n', 'statut');
 		ksort($statuts);
 	} else {
 		$statuts = array('ok' => 0);
