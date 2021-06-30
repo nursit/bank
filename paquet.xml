@@ -4,7 +4,7 @@
 	version="5.0.1"
 	etat="test"
 	compatibilite="[3.2.0;4.0.*]"
-	logo="prive/themes/spip/images/bank-32.png"
+	logo="prive/themes/spip/images/bank-64.png"
 	documentation="http://contrib.spip.net/4627"
 	schema="2.0.0"
 >
