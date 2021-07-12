@@ -15,7 +15,7 @@
 	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 		<BOUCLE_cb(POUR){tableau #ENV{hidden}}>
-		[(#INCLURE{fond=presta/paybox/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{paybox}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
+		[(#INCLURE{fond=presta/paybox/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{paybox}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|bank_label_bouton_img_ou_texte{[(#CLE|bank_label_payer_par_carte)]})]})]
 		</BOUCLE_cb>
 	</div>
 	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=Paybox}:></div>]

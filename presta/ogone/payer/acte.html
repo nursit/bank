@@ -15,7 +15,7 @@
 	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 		<BOUCLE_cb(POUR){tableau #ENV{cards}}>
-		[(#INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand=#CLE,pm=CreditCard,logobrand=[(#VAL{ogone}|bank_trouver_logo{#VALEUR}|balise_img{[(#CLE|bank_label_payer_par_carte)]}|inserer_attribut{title,[(#CLE|bank_label_payer_par_carte)]})]})]
+		[(#INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand=#CLE,pm=CreditCard,logobrand=[(#VAL{ogone}|bank_trouver_logo{#VALEUR}|bank_label_bouton_img_ou_texte{[(#CLE|bank_label_payer_par_carte)]})]})]
 		</BOUCLE_cb>
 	</div>
 	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=Ogone}:></div>]

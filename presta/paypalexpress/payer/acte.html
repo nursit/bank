@@ -15,7 +15,7 @@
 	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons' title="<:bank:payer_avec{nom=Paypal}|attribut_html:>">
 		[(#BOUTON_ACTION{
-		#ENV{logo}|balise_img{<:bank:payer_avec{nom=Paypal}:>},
+		#ENV{logo}|bank_label_bouton_img_ou_texte{<:bank:payer_avec{nom=Paypal}:>},
 		[(#URL_ACTION_AUTEUR{paypalexpress_order,[(#ID_TRANSACTION)-#ENV{config/presta}[-(#ENV{config}|bank_config_id)]], #SELF}|parametre_url{url_confirm,#ENV{url_confirm}})]})]
 	</div>
 	[(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=PaypalExpress}:></div>]
