@@ -87,7 +87,7 @@ function inc_bank_recuperer_post_https_dist($url, $datas = '', $user_agent = '',
 		}
 
 		//NVPRequest for submitting to server
-		$nvpreq = "";
+		$nvpreq = $datas;
 		if (is_array($datas) AND count($datas)){
 			$nvpreq = http_build_query($datas);
 		}
