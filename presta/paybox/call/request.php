@@ -65,7 +65,8 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 		);
 	}
 
-	$mail = bank_porteur_email($row);
+	$billing = bank_porteur_infos_facturation($row);
+	$mail = $billing['email'];
 
 	// passage en centimes d'euros : round en raison des approximations de calcul de PHP
 	$montant = intval(round((10**$devise_info['fraction']) * $row['montant'], 0));
