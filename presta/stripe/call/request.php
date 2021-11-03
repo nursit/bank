@@ -249,8 +249,10 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			 */
 			$montant_echeance = bank_formatter_montant_selon_fraction($echeance['montant'], $devise_info['fraction'], 3);
 			$montant_initial = $montant_echeance;
-			if (isset($echeance['montant_init'])) {
-				$montant_initial = bank_formatter_montant_selon_fraction($echeance['montant_init'], $devise_info['fraction'], 3);
+			// un montant_init=0 doit etre ignore (TODO distinguer null et 0 dans tous les modes de paiement recurrent)
+			if (isset($echeance['montant_init'])
+				and intval($m = bank_formatter_montant_selon_fraction($echeance['montant_init'], $devise_info['fraction'], 3))>0){
+				$montant_initial = $m;
 			}
 
 			$interval = 'month';
