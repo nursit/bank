@@ -65,7 +65,8 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 		);
 	}
 
-	$mail = bank_porteur_email($row);
+	$billing = bank_porteur_infos_facturation($row);
+	$mail = $billing['email'];
 
 	// passage en centimes et formattage
 	$montant = bank_formatter_montant_selon_fraction($row['montant'], $devise_info['fraction'], 3);
