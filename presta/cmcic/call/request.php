@@ -147,7 +147,8 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 	// dans une page de redirection pour les mobiles
 	$contexte['texte-libre'] = urlencode(serialize($contenu));
 
-	$contexte['mail'] = bank_porteur_email($row);
+	$billing = bank_porteur_infos_facturation($row);
+	$contexte['mail'] = $billing['email'];
 
 	$contexte['ThreeDSecureChallenge'] = presta_cmcic_3ds_policy_dist($id_transaction, $config);
 
@@ -184,7 +185,6 @@ function presta_cmcic_call_request_dist($id_transaction, $transaction_hash, $con
 		],
 	];
 
-	$billing = bank_porteur_infos_facturation($row);
 	if ($billing['prenom']){
 		$contexte_commande['billing']['firstName'] = $billing['prenom'];
 	}
