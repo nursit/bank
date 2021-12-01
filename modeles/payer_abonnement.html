@@ -17,9 +17,9 @@
 	<div id='formulaire_mode_paiement' class="abonnement">
 		<BOUCLE_payant(CONDITION){si #MONTANT|floatval|>{0.0}}>
 			<B_modes>
-			[(#GET{compteur_modes_actifs}|>{1}|oui)<h3 class='selectionnez'>
-			[(#ENV{title,<:bank:titre_mode_paiement_securise:>})]
-			</h3>]
+			<h3 class='selectionnez'>
+				[(#GET{compteur_modes_actifs}|>{1}|?{#ENV{title,<:bank:titre_mode_paiement_securise:>},#ENV{title,<:bank:paiement_securise:>}})]
+			</h3>
 			<div class="payer_modes">
 				<BOUCLE_modes(POUR){tableau #VAL{abo}|bank_lister_configs}{si #MONTANT|floatval|>{0.0}}>[
 					(#VALEUR{actif}|oui)
