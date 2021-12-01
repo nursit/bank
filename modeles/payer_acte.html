@@ -15,11 +15,13 @@
 	<INCLURE{fond=modeles/confirmer_payer_acte,id_transaction=#EVAL{$_SESSION}|table_valeur{id_transaction},order_resume=#EVAL{$_SESSION}|table_valeur{order_resume},checkout=#VAL{checkout}|_request} />
 </BOUCLE_si>
 	<BOUCLE_macommande(TRANSACTIONS){id_transaction=#ENV{id_transaction}}{statut IN commande,attente}>
+		#SET{compteur_modes_actifs,0}
+		<BOUCLE_compteur_modes_actifs(POUR){tableau #VAL{acte}|bank_lister_configs}>[(#VALEUR{actif}|oui)#SET{compteur_modes_actifs,#GET{compteur_modes_actifs}|plus{1}}]</BOUCLE_compteur_modes_actifs>
 		[(#REM) choix du mode de paiement]
 		<div id='formulaire_mode_paiement' class="acte">
 			<BOUCLE_payant(CONDITION){si #MONTANT|floatval|>{0.0}}>
 				<B_modes>
-				[(#TOTAL_BOUCLE|>{1}|oui)<h3 class='selectionnez'>
+				[(#GET{compteur_modes_actifs}|>{1}|oui)<h3 class='selectionnez'>
 				[(#ENV*{title,<:bank:titre_mode_paiement_securise:>})]
 				</h3>]
 				<div class="payer_modes">
