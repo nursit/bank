@@ -25,7 +25,8 @@
 				</h3>
 				<div class="payer_modes">
 					<BOUCLE_modes(POUR){tableau #VAL{acte}|bank_lister_configs}>[(#VALEUR{actif}|oui)
-						#PAYER_ACTE{#VALEUR,#ID_TRANSACTION,#TRANSACTION_HASH,#ENV{title,''}}
+						#SET{options,#ARRAY{'payer_par_title',#ENV{payer_par_title_#VALEUR{presta},#ENV{payer_par_title,''}}}}
+						#PAYER_ACTE{#VALEUR,#ID_TRANSACTION,#TRANSACTION_HASH,#GET{options}}
 						#SET{compteur_modes_actifs,#GET{compteur_modes_actifs}|plus{1}}
 					]</BOUCLE_modes>
 				</div>
@@ -34,10 +35,11 @@
 				<//B_modes>
 			</BOUCLE_payant>
 				<h3 class='selectionnez'>
-				[(#ENV{title,<:bank:titre_rien_a_payer:>})]
+				[(#ENV{title_rien_a_payer,<:bank:titre_rien_a_payer:>})]
 				</h3>
 				<div class="payer_modes">
-					#PAYER_ACTE{gratuit,#ID_TRANSACTION,#TRANSACTION_HASH,#ENV{title,''}}
+					#SET{options,#ARRAY{'payer_par_title',#ENV{payer_par_title_gratuit,#ENV{payer_par_title,''}}}}
+					#PAYER_ACTE{gratuit,#ID_TRANSACTION,#TRANSACTION_HASH,#GET{options}}
 				</div>
 			<//B_payant>
 		</div>

@@ -13,7 +13,7 @@
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 <B_cb>
 <div class='payer_mode payer_#ENV{presta,payzen} payer_abonnement'>
-	<h4 class="titre h4"><:bank:abonnement_par_carte_bancaire:></h4>
+	<h4 class="titre h4">[(#ENV{payer_par_title,<:bank:abonnement_par_carte_bancaire:>})]</h4>
 	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 	<BOUCLE_cb(POUR){tableau #ENV{hidden}}{cle !IN SDD,E_CV}>
@@ -25,7 +25,7 @@
 </B_cb>
 <B_sepa>
 <div class='payer_mode payer_#ENV{presta,payzen} payer_sepa payer_abonnement'>
-	<h4 class="titre h4"><:bank:abonnement_par_prelevement_sepa:></h4>
+	<h4 class="titre h4">[(#ENV{payer_par_title,<:bank:abonnement_par_prelevement_sepa:>})]</h4>
 	[<p class="explication">(#ENV{config/presta}|concat{_sepa}|bank_explication_mode_paiement)</p>]
 	<p class="explication"><:bank:info_prelevement_sepa{presta=PayZen}:></p>
 	<div class='boutons'>

@@ -102,7 +102,7 @@ function bank_affiche_payer($config, $type, $id_transaction, $transaction_hash, 
 	// compatibilite ancienne syntaxe, titre en 4e argument de #PAYER_XXX
 	if (is_string($options)){
 		$options = array(
-			'title' => $options,
+			'payer_par_title' => $options,
 		);
 	}
 	// invalide ou null ?

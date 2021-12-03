@@ -12,7 +12,7 @@
 ]#CACHE{0}
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 <div class="payer_mode payer_cheque payer_acte payer_attente">
-	<h4 class="titre h4"><:bank:payer_par_cheque:></h4>
+	<h4 class="titre h4">[(#ENV{payer_par_title,<:bank:payer_par_cheque:>})]</h4>
 	#SET{ordre,#ENV{config/ordre,#NOM_SITE_SPIP}|wrap{'<b>'}}
 	#SET{montant,#MONTANT|bank_affiche_montant{#DEVISE}|wrap{'<b>'}}
 	#SET{transaction,#ID_TRANSACTION|wrap{'<b>'}}

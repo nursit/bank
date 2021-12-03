@@ -12,7 +12,7 @@
 ]#CACHE{0}
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
   <div class="payer_mode payer_stripe payer_abonnement">
-	  <h4 class="titre h4"><:bank:abonnement_par_carte_bancaire:></h4>
+	  <h4 class="titre h4">[(#ENV{payer_par_title,<:bank:abonnement_par_carte_bancaire:>})]</h4>
 	  [<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	  <div class='boutons'>
 		  [(#SET{id,[abo(#ID_TRANSACTION)]})][(#SET{texte,<:bank:payer_par_carte_bancaire:>})]

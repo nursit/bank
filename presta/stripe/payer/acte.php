@@ -48,7 +48,7 @@ function presta_stripe_payer_acte_dist($config, $id_transaction, $transaction_ha
 		if (in_array($card, $cartes)) {
 			$img = bank_trouver_logo("stripe", $logo_this_card);
 			$logo[] = bank_label_bouton_img_ou_texte($img, bank_label_payer_par_carte($card));
-			if ($card !== 'card') {
+			if ($card !== 'card' and empty($options['payer_par_title'])) {
 				$contexte['payer_par_title'] = _T('bank:payer_par_moyen_securise');
 			}
 		}

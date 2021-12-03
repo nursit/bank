@@ -11,7 +11,7 @@
  */
 ]#CACHE{0}
 <div class='payer_mode payer_paybox payer_abonnement'>
-	<h4 class="titre h4"><:bank:abonnement_choisissez_cb:></h4>
+	<h4 class="titre h4">[(#ENV{payer_par_title,<:bank:abonnement_choisissez_cb:>})]</h4>
 	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
 		<BOUCLE_cb(POUR){tableau #ENV{hidden}}>

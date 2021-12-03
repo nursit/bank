@@ -11,7 +11,8 @@
  */
 ]#CACHE{0}
 <div class='payer_mode payer_sips [payer_sips_(#ENV{service})] payer_acte'>
-	<h4 class="titre h4">[(#ENV{code,''}|?{'Erreur appel API de paiement.',<:bank:payer_par_carte_bancaire:>})]</h4>
+	<h4 class="titre h4">[(#ENV{payer_par_title,<:bank:payer_par_carte_bancaire:>})]</h4>
+	[<strong>(#ENV{code}|?{'Erreur appel API de paiement.'})</strong>]
 	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	[<div class="error">(#ENV*{error})</div>]
 	[<div class='boutons'>

@@ -11,7 +11,7 @@
  */
 ]#CACHE{0}
 <div class='payer_mode payer_paypalexpress payer_acte'>
-	<h4 class="titre h4"><:bank:payer_avec{nom=Paypal Express}:></h4>
+	<h4 class="titre h4">[(#ENV{payer_par_title,<:bank:payer_avec{nom=Paypal Express}:>})]</h4>
 	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons' title="<:bank:payer_avec{nom=Paypal}|attribut_html:>">
 		[(#BOUTON_ACTION{
