@@ -358,6 +358,10 @@ function stripe_webhook_invoice_payment_failed_dist($config, $event){
 		if ($invoice->charge){
 			$response['charge_id'] = $invoice->charge;
 		}
+		if ($invoice->billing_reason){
+			// subscription_create ou subscription_cycle
+			$response['billing_reason'] = $invoice->billing_reason;
+		}
 		if ($invoice->payment_intent){
 			$response['payment_id'] = $invoice->payment_intent;
 			if (!isset($response['charge_id'])){
@@ -376,7 +380,7 @@ function stripe_webhook_invoice_payment_failed_dist($config, $event){
 						$erreur = $e->getMessage();
 						$erreur_code = 'error';
 					}
-					spip_log("stripe_webhook_invoice_payment_succeeded_dist: Erreur #$erreur_code $erreur", $mode . _LOG_ERREUR);
+					spip_log("stripe_webhook_invoice_payment_failed_dist: Erreur #$erreur_code $erreur", $mode . _LOG_ERREUR);
 				}
 			}
 		}
