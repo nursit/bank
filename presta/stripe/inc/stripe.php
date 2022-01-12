@@ -368,6 +368,15 @@ function stripe_traite_reponse_transaction($config, &$response){
 				} else {
 					$metadata['id_transaction'] = $id_transaction;
 				}
+
+				// limiter la longueur de id_transaction sinon Stripe fait une erreur
+				// on ne garde que les plus recentes
+				while (strlen($metadata['id_transaction']) > 256) {
+					$t = explode(',', $metadata['id_transaction']);
+					array_shift($t);
+					$metadata['id_transaction'] = implode(',', $t);
+				}
+
 				if ($row['id_auteur']>0){
 					$metadata['id_auteur'] = $row['id_auteur'];
 					$customer->metadata = $metadata;
