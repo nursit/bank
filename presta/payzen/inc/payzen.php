@@ -32,6 +32,9 @@ function payzen_url_serveur($config){
 				case "osb":
 					$host = "https://secure.osb.pf";
 					break;
+				case "scelliusv3":
+					$host = "https://scelliuspaiement.labanquepostale.fr";
+					break;
 				case "systempay":
 				case "cyberplus":
 				case "spplus":
@@ -49,10 +52,6 @@ function payzen_url_serveur($config){
 		Provision. A voir si ce sont des presta ou des services...
 		case "sogecommerce":
 			$host = "https://sogecommerce.societegenerale.eu";
-			break;
-
-		case "scelliuspaiement":
-			$host = "https://scelliuspaiement.labanquepostale.fr";
 			break;
 		*/
 
