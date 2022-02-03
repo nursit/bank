@@ -18,9 +18,10 @@ Il peut aussi être complété par
 
 ### Changelog
 
-* [WIP] Version 5.0-dev
+* Version 5.0
   * Support des devises
-  * A jour des reports de la version 4.6.4
+  * Réintégration du support des paiements par abonnement avec Stripe
+  * Support de Scellius v3 (Banque Postale)
 
 * Version 4.6
   * Ajout du prestataire Clic&Pay pour les commerçants du groupe Crédit du Nord qui supporte le paiement par SEPA pour les paiements uniques et les paiements récurrents, déclinaison de Payzen
@@ -86,7 +87,7 @@ Le plugin permet aussi les paiements mensuels avec les plateformes techniques su
 
 * Paybox
 * PayZen
-* Stripe [ Deprecated : plus de nouveau paiement par abonnement, a refaire suite à la mise en place des SCA https://stripe.com/docs/billing/migration/strong-customer-authentication]
+* Stripe
 
 Un mode de paiement "Simulation" permet de tester le workflow de paiement pendant la phase de developpement. 
 
