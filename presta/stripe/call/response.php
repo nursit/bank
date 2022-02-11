@@ -150,8 +150,9 @@ function presta_stripe_call_response_dist($config, $response = null){
 		//
 		$nb_try = 0;
 		$nb_try_max = 10;
+		$date_min = date('Y-m-d H:i:s', strtotime("-12hours", $_SERVER['REQUEST_TIME']));
 		do {
-			if ($t = sql_fetsel("*", "spip_transactions", "reglee='non' AND abo_uid=".sql_quote($response['abo_uid'])." AND date_transaction>".sql_quote(date('Y-m-d H:i:s', strtotime("-12hours"))))){
+			if ($t = sql_fetsel("*", "spip_transactions", "reglee='non' AND abo_uid=".sql_quote($response['abo_uid'])." AND date_transaction>".sql_quote($date_min))){
 				$response['id_transaction'] = $t['id_transaction'];
 				$response['transaction_hash'] = $t['transaction_hash'];
 			}
