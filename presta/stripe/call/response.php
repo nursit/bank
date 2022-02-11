@@ -51,7 +51,7 @@ function presta_stripe_call_response_dist($config, $response = null){
 	}
 
 	if (!$response or (!$checkout_session_id and !$response['charge_id'] and !$response['payment_id'])){
-		spip_log("call_response : checkout_session_id invalide / no payment_id", $mode . _LOG_ERREUR);
+		spip_log("call_response : checkout_session_id invalide / no payment_id [#1]", $mode . _LOG_ERREUR);
 		return array(0, false);
 	}
 
@@ -61,8 +61,10 @@ function presta_stripe_call_response_dist($config, $response = null){
 	// Si c'est un paiement a l'acte : on doit avoir checkout_session_id + payment_id
 	// Si c'est un abonnement :
 	// A la creation
-	//    - au premier appel, sur checkout_session_completed on a id_transaction + abo_uid
-	//    - au second appel, sur invoice_payment_succeeded on a abo_uid + payment_id + billing_reason = subscription_create
+	//    - on a un appel, sur checkout_session_completed, ou on recoit [id_transaction + abo_uid]
+	//    - on a un appel, sur invoice_payment_succeeded, on on recoit [abo_uid + payment_id + billing_reason = subscription_create]
+	// l'ordre des 2 appels n'est pas parfaitement certain pour des raisons de concurrence, sur invoice_payment_succeeded il faut donc temporiser jusqu'a avoir recu le abo_uid qui relie id_transaction
+	//
 	// Au renouvellemnt
 	//    - sur invoice_payment_succeeded on a  abo_uid + payment_id + billing_reason = subscription_cycle
 
@@ -120,14 +122,15 @@ function presta_stripe_call_response_dist($config, $response = null){
 		if (!empty($response['abo_uid'])
 			and !empty($response['id_transaction'])
 			and !empty($response['transaction_hash'])) {
-			sql_updateq("spip_transactions", ['abo_uid' => $response['abo_uid']], "abo_uid='' AND id_transaction=".intval($response['id_transaction'])." AND transaction_hash=".sql_quote($response['transaction_hash'])." AND reglee='non'");
 
+			sql_updateq("spip_transactions", ['abo_uid' => $response['abo_uid']], "abo_uid='' AND id_transaction=".intval($response['id_transaction'])." AND transaction_hash=".sql_quote($response['transaction_hash'])." AND reglee='non'");
 			spip_log("call_response : abo_uid ".$response['abo_uid']." enregistre sur transaction #".$response['id_transaction'], $mode . _LOG_INFO_IMPORTANTE);
+
 			// on renvoi l'id avec un false, car pour le moment non payee
 			return array($response['id_transaction'], false);
 		}
 
-		spip_log("call_response : checkout_session_id invalide / no payment_id", $mode . _LOG_ERREUR);
+		spip_log("call_response : checkout_session_id invalide / no payment_id [#2] " . ($response ? var_export($response, true): ''), $mode . _LOG_ERREUR);
 		return array(0, false);
 	}
 
@@ -143,9 +146,31 @@ function presta_stripe_call_response_dist($config, $response = null){
 		and !empty($response['payment_id'])
 		and empty($response['id_transaction'])
 		and !empty($response['abo_uid'])){
-		if ($t = sql_fetsel("*", "spip_transactions", "reglee='non' AND abo_uid=".sql_quote($response['abo_uid'])." AND date_transaction>".sql_quote(date('Y-m-d H:i:s', strtotime("-12hours"))))){
-			$response['id_transaction'] = $t['id_transaction'];
-			$response['transaction_hash'] = $t['transaction_hash'];
+
+		//
+		$nb_try = 0;
+		$nb_try_max = 10;
+		do {
+			if ($t = sql_fetsel("*", "spip_transactions", "reglee='non' AND abo_uid=".sql_quote($response['abo_uid'])." AND date_transaction>".sql_quote(date('Y-m-d H:i:s', strtotime("-12hours"))))){
+				$response['id_transaction'] = $t['id_transaction'];
+				$response['transaction_hash'] = $t['transaction_hash'];
+			}
+			else {
+				spip_log("call_response : transaction inconnue pour abo_uid  ".$response['abo_uid']." - on attends le webhook checkout_session_completed => sleep(1)", $mode . _LOG_DEBUG);
+				sleep(1);
+			}
+			$nb_try++;
+		} while (empty($response['id_transaction']) and $nb_try <= $nb_try_max);
+
+		if (empty($response['id_transaction']) and empty($response['transaction_hash'])) {
+			// on a un probleme car on a jamais recu le webhook checkout_session_completed qui permet d'associer abo_uid et id_transaction
+			return bank_transaction_invalide(0,
+				array(
+					'mode' => $mode,
+					'erreur' => "subscription_create: Impossible de trouver le id_transaction de l'abonnement Stripe ".$response['abo_uid'],
+					'log' => var_export($response, true),
+				)
+			);
 		}
 	}
 
