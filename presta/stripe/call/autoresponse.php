@@ -185,7 +185,7 @@ function stripe_webhook_checkout_session_completed_dist($config, $event){
 			$response['abo_uid'] = $session->subscription;
 		}
 		if ($session->customer){
-			$response['pay_uid'] = $session->customer;
+			$response['pay_id'] = $session->customer;
 		}
 		if ($session->locale) {
 			$response['lang'] = $session->locale;
@@ -248,7 +248,7 @@ function stripe_webhook_customer_subscription_deleted_dist($config, $event) {
 		$abo_uid = $subscription->id;
 
 		if ($subscription->customer){
-			$pay_uid = $subscription->customer;
+			$pay_id = $subscription->customer;
 		}
 
 		if ($resilier = charger_fonction('resilier', 'abos', true)){
@@ -286,7 +286,7 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
 			$response['abo_uid'] = $invoice->subscription;
 		}
 		if ($invoice->customer){
-			$response['pay_uid'] = $invoice->customer;
+			$response['pay_id'] = $invoice->customer;
 		}
 		if ($invoice->charge){
 			$response['charge_id'] = $invoice->charge;
@@ -324,7 +324,7 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
 
 	if (isset($response['charge_id'])
 		and isset($response['abo_uid'])
-		and isset($response['pay_uid'])){
+		and isset($response['pay_id'])){
 		$call_response = charger_fonction('response', 'presta/stripe/call');
 		$res = $call_response($config, $response);
 		return $res;
@@ -353,7 +353,7 @@ function stripe_webhook_invoice_payment_failed_dist($config, $event){
 			$response['abo_uid'] = $invoice->subscription;
 		}
 		if ($invoice->customer){
-			$response['pay_uid'] = $invoice->customer;
+			$response['pay_id'] = $invoice->customer;
 		}
 		if ($invoice->charge){
 			$response['charge_id'] = $invoice->charge;
@@ -390,7 +390,7 @@ function stripe_webhook_invoice_payment_failed_dist($config, $event){
 
 	if (isset($response['charge_id'])
 		and isset($response['abo_uid'])
-		and isset($response['pay_uid'])){
+		and isset($response['pay_id'])){
 		$call_response = charger_fonction('response', 'presta/stripe/call');
 		$res = $call_response($config, $response);
 		return $res;
