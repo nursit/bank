@@ -273,6 +273,29 @@ function stripe_webhook_customer_subscription_deleted_dist($config, $event) {
  * @return bool|array
  */
 function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
+	return stripe_webhook_invoice_payment_result('payment_succeeded', $config, $event);
+}
+
+
+
+/**
+ * Payment failed
+ * @param array $config
+ * @param object $event
+ * @return bool|array
+ */
+function stripe_webhook_invoice_payment_failed_dist($config, $event){
+	return stripe_webhook_invoice_payment_result('payment_failed', $config, $event);
+}
+
+
+/**
+ * Payment result : meme traitement pour succeed ou fail
+ * @param array $config
+ * @param object $event
+ * @return bool|array
+ */
+function stripe_webhook_invoice_payment_result($raison, $config, $event){
 	$mode = $config['presta'] . 'auto';
 	if (isset($config['mode_test']) AND $config['mode_test']){
 		$mode .= "_test";
@@ -300,7 +323,7 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
 			if (!isset($response['charge_id'])){
 				try {
 					$payment = \Stripe\PaymentIntent::retrieve($response['payment_id']);
-					spip_log($payment, "stripe_db");
+					spip_log("$raison: ".var_export($payment,true), "stripe_db");
 					if ($payment->charges
 						and $payment->charges->data
 						and $charge = end($payment->charges->data)){
@@ -314,7 +337,7 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
 						$erreur = $e->getMessage();
 						$erreur_code = 'error';
 					}
-					spip_log("stripe_webhook_invoice_payment_succeeded_dist: Erreur #$erreur_code $erreur", $mode . _LOG_ERREUR);
+					spip_log("stripe_webhook_invoice_payment_result:$raison: Erreur #$erreur_code $erreur", $mode . _LOG_ERREUR);
 				}
 			}
 		}
@@ -328,7 +351,7 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
 					$product_id = $line->price->product;
 					try {
 						$product = \Stripe\Product::retrieve($product_id);
-						spip_log($product, "stripe_db");
+						spip_log("$raison: ".var_export($product,true), "stripe_db");
 						if (!empty($product->metadata->id_transaction)
 						  and !empty($product->metadata->transaction_hash)) {
 							$response['id_transaction'] = $product->metadata->id_transaction;
@@ -343,81 +366,20 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
 							$erreur = $e->getMessage();
 							$erreur_code = 'error';
 						}
-						spip_log("stripe_webhook_invoice_payment_succeeded_dist: Erreur #$erreur_code $erreur", $mode . _LOG_ERREUR);
+						spip_log("stripe_webhook_invoice_payment_result:$raison: Erreur #$erreur_code $erreur", $mode . _LOG_ERREUR);
 					}
 
 				}
 			}
 		}
-	}
 
-	spip_log($event, "stripe_db");
-
-	if (isset($response['charge_id'])
-		and isset($response['abo_uid'])
-		and isset($response['pay_id'])){
-		$call_response = charger_fonction('response', 'presta/stripe/call');
-		$res = $call_response($config, $response);
-		return $res;
-	}
-
-	return false;
-}
-
-/**
- * Payment failed
- * @param array $config
- * @param object $event
- * @return bool|array
- */
-function stripe_webhook_invoice_payment_failed_dist($config, $event){
-	$mode = $config['presta'] . 'auto';
-	if (isset($config['mode_test']) AND $config['mode_test']){
-		$mode .= "_test";
-	}
-
-	$response = array();
-	$invoice = $event->data->object;
-	// il faut recuperer $charge, pay_id et abo_uid, creer un id_transaction
-	if ($invoice->object=="invoice"){
-		if ($invoice->subscription){
-			$response['abo_uid'] = $invoice->subscription;
-		}
-		if ($invoice->customer){
-			$response['pay_id'] = $invoice->customer;
-		}
-		if ($invoice->charge){
-			$response['charge_id'] = $invoice->charge;
-		}
-		if ($invoice->billing_reason){
-			// subscription_create ou subscription_cycle
-			$response['billing_reason'] = $invoice->billing_reason;
-		}
-		if ($invoice->payment_intent){
-			$response['payment_id'] = $invoice->payment_intent;
-			if (!isset($response['charge_id'])){
-				try {
-					$payment = \Stripe\PaymentIntent::retrieve($response['payment_id']);
-					if ($payment->charges
-						and $payment->charges->data
-						and $charge = end($payment->charges->data)){
-						$response['charge_id'] = $charge->id;
-					}
-				} catch (Exception $e) {
-					if ($body = $e->getJsonBody()){
-						$err = $body['error'];
-						list($erreur_code, $erreur) = stripe_error_code($err);
-					} else {
-						$erreur = $e->getMessage();
-						$erreur_code = 'error';
-					}
-					spip_log("stripe_webhook_invoice_payment_failed_dist: Erreur #$erreur_code $erreur", $mode . _LOG_ERREUR);
-				}
-			}
+		// un helper pour eviter de faire une alerte frauduleuse si on ne trouve pas le id_transaction sur une notif de non paiement...
+		if (isset($invoice->paid)) {
+			$response['paid'] = $invoice->paid;
 		}
 	}
 
-	spip_log($event, "stripe_db");
+	spip_log("$raison: ".var_export($event,true), "stripe_db");
 
 	if (isset($response['charge_id'])
 		and isset($response['abo_uid'])

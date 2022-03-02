@@ -165,7 +165,15 @@ function presta_stripe_call_response_dist($config, $response = null){
 		} while (empty($response['id_transaction']) and $nb_try <= $nb_try_max);
 
 		if (empty($response['id_transaction']) and empty($response['transaction_hash'])) {
-			// on a un probleme car on a jamais recu le webhook checkout_session_completed qui permet d'associer abo_uid et id_transaction
+
+			// pas la peine d'alerter les foules si c'etait un echec
+			if (!isset($response['paid']) or $response['paid'] == 0) {
+				spip_log("call_response : subscription_create impossible de trouver le id_transaction " . ($response ? var_export($response, true): ''), $mode . _LOG_ERREUR);
+				return array(0, false);
+			}
+
+			// on a un probleme car on a pas trouve le id_transaction dans les metadata
+			// + on a jamais recu le webhook checkout_session_completed qui permet d'associer abo_uid et id_transaction
 			return bank_transaction_invalide(0,
 				array(
 					'mode' => $mode,
