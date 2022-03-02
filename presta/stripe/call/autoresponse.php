@@ -318,6 +318,37 @@ function stripe_webhook_invoice_payment_succeeded_dist($config, $event){
 				}
 			}
 		}
+		// retrouver le id_transaction grace aux metadata du product si possible, uniquement a la creation de la subscription
+		// pour les renouvelleemnt on va creer une transaction
+		if (!empty($response['billing_reason'])
+		  and $response['billing_reason'] === 'subscription_create'
+		  and $invoice->lines){
+			foreach ($invoice->lines->data as $line) {
+				if (!empty($line->price) and !empty($line->price->product)) {
+					$product_id = $line->price->product;
+					try {
+						$product = \Stripe\Product::retrieve($product_id);
+						spip_log($product, "stripe_db");
+						if (!empty($product->metadata->id_transaction)
+						  and !empty($product->metadata->transaction_hash)) {
+							$response['id_transaction'] = $product->metadata->id_transaction;
+							$response['transaction_hash'] = $product->metadata->transaction_hash;
+							break;
+						}
+					} catch (Exception $e) {
+						if ($body = $e->getJsonBody()){
+							$err = $body['error'];
+							list($erreur_code, $erreur) = stripe_error_code($err);
+						} else {
+							$erreur = $e->getMessage();
+							$erreur_code = 'error';
+						}
+						spip_log("stripe_webhook_invoice_payment_succeeded_dist: Erreur #$erreur_code $erreur", $mode . _LOG_ERREUR);
+					}
+
+				}
+			}
+		}
 	}
 
 	spip_log($event, "stripe_db");

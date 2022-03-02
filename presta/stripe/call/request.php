@@ -147,6 +147,10 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		'amount' => $contexte['amount'],
 		'currency' => $contexte['currency'],
 		'quantity' => 1,
+		'metadata' => [
+			'id_transaction' => $id_transaction,
+			'transaction_hash' => $transaction_hash,
+		],
 	];
 
 	if (!$contexte['image']){
@@ -187,6 +191,12 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		// TODO : creer un customer avec les billing infos
 	}
 
+	// mettre le customer id en base dans la transaction pour aider a la retrouver en cas d'echec
+	if ($checkout_customer and empty($row['pay_id'])) {
+		$row['pay_id'] = $customer->id;
+		sql_updateq("spip_transactions", ['pay_id' => $row['pay_id']], 'id_transaction='.intval($id_transaction));
+	}
+
 
 	$payment_types = array_intersect($cartes, array_keys($cartes_possibles));
 	if (!$payment_types) {
@@ -206,6 +216,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 						'product_data' => [
 							'name' => $item['name'],
 							'description' => $item['description'],
+							'metadata' => $item['metadata'],
 						]
 					],
 					'quantity' => 1,
@@ -292,6 +303,8 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 				$session_desc['customer'] = $checkout_customer;
 			}
 
+
+			// TODO : ajouter des metadata pour retouver la transaction associee ?
 			$desc_item = [
 				'price_data' => [
 					'currency' => $contexte['currency'],
@@ -305,6 +318,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 					'product_data' => [
 						'name' => $item['name'],
 						'description' => $item['description'],
+						'metadata' => $item['metadata'],
 					]
 				],
 				'quantity' => 1
@@ -344,6 +358,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 						'product_data' => [
 							'name' => "1ère échéance complément ". $item['name'],
 							'description' => $item['description'],
+							'metadata' => $item['metadata'],
 						]
 					],
 					'quantity' => 1
