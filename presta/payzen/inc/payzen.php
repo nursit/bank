@@ -444,25 +444,25 @@ function payzen_traite_reponse_transaction($config, $response){
 
 	// date paiement et date transaction
 	$t = gmmktime(
-		substr($date, 8, 2), //Heures
-		substr($date, 10, 2), //min
-		substr($date, 12, 2), //sec
-		substr($date, 4, 2), //mois
-		substr($date, 6, 2), //jour
-		substr($date, 0, 4) //annee
+		intval(substr($date, 8, 2)), //Heures
+		intval(substr($date, 10, 2)), //min
+		intval(substr($date, 12, 2)), //sec
+		intval(substr($date, 4, 2)), //mois
+		intval(substr($date, 6, 2)), //jour
+		intval(substr($date, 0, 4)) //annee
 	);
 	$date_paiement = date('Y-m-d H:i:s', $t);
 	$date_transaction = $date_paiement;
 	if (isset($response['vads_presentation_date'])){
 		$date = $response['vads_trans_date'];
 		$t = gmmktime(
-			substr($date, 8, 2), //Heures
-			substr($date, 10, 2), //min
-			substr($date, 12, 2), //sec
-			substr($date, 4, 2), //mois
-			substr($date, 6, 2), //jour
-			substr($date, 0, 4) //annee
-		);
+			intval(substr($date, 8, 2)), //Heures
+			intval(substr($date, 10, 2)), //min
+			intval(substr($date, 12, 2)), //sec
+			intval(substr($date, 4, 2)), //mois
+			intval(substr($date, 6, 2)), //jour
+			intval(substr($date, 0, 4)) //annee
+			);
 		$date_transaction = date('Y-m-d H:i:s', $t);
 	}
 
