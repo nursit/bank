@@ -433,15 +433,16 @@ function payzen_traite_reponse_transaction($config, $response){
 		);
 	}
 
-
 	// ok, on traite le reglement
-	$date = $response['vads_effective_creation_date'];
 	// si c'est un paiement SEPA, on prend la date de presentation du SEPA comme date de paiement
 	// (date_paiement dans le futur donc)
-	if ($is_sepa){
+	// si c'est une annulation pas de date de paiement donc idem on utilise la date de presentation
+	if ($is_sepa or empty($response['vads_effective_creation_date'])){
 		$date = $response['vads_presentation_date'];
 	}
-
+	else {
+		$date = $response['vads_effective_creation_date'];
+	}
 
 	// date paiement et date transaction
 	$t = gmmktime(
