@@ -380,8 +380,11 @@ function payzen_traite_reponse_transaction($config, $response){
 
 	// si c'est une souscription ou un register, lever les bons flags
 	// si pas de paiement on veut enregistrer les donnees et sortir de la sans generer d'erreur (le paiement arrivera plus tard)
-	if ($response['vads_page_action']
-		AND in_array($response['vads_page_action'], array('REGISTER', 'REGISTER_SUBSCRIBE', 'REGISTER_PAY_SUBSCRIBE', 'SUBSCRIBE'))){
+	if (isset($response['vads_page_action'])
+		and $response['vads_page_action']
+		and in_array($response['vads_page_action'], array('REGISTER', 'REGISTER_SUBSCRIBE', 'REGISTER_PAY_SUBSCRIBE', 'SUBSCRIBE')
+		)
+	){
 		$is_registering = true;
 		if ($response['vads_page_action']!=='REGISTER_PAY_SUBSCRIBE'){
 			$is_payment = false;
@@ -390,7 +393,7 @@ function payzen_traite_reponse_transaction($config, $response){
 			$is_subscribing = true;
 		}
 	} // cas appel depuis BO
-	elseif (in_array($response['vads_url_check_src'], array('BO', 'REC', 'RETRY'))) {
+	elseif (isset($response['vads_url_check_src']) and in_array($response['vads_url_check_src'], array('BO', 'REC', 'RETRY'))) {
 		if (isset($response['vads_identifier']) AND $response['vads_identifier']){
 			$is_registering = true;
 		}
