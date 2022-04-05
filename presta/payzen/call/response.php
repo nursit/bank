@@ -125,8 +125,8 @@ function presta_payzen_call_response_dist($config, $response = null){
 
 	if (
 		($recurence
-			OR strpos($response['vads_page_action'], "SUBSCRIBE")!==false
-			OR in_array($response['vads_url_check_src'], array('RETRY')))
+			OR (isset($response['vads_page_action']) and strpos($response['vads_page_action'], "SUBSCRIBE")!==false)
+			OR (isset($response['vads_url_check_src']) and in_array($response['vads_url_check_src'], array('RETRY'))))
 		AND isset($response['vads_subscription'])
 		AND $abo_uid = $response['vads_subscription']
 		AND $id_transaction){
