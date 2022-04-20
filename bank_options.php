@@ -39,9 +39,12 @@ if (isset($GLOBALS['meta']['bank_paiement'])
  * @param string|float $montant
  * @param string $code_devise
  * @param bool|string $unite
+ *   une valeur false signifie qu'on veut juste le montant bien formaté en nombre, sans devise
+ * @param bool $raw
+ *   une valeur true signifie qu'on veut le resultat sous forme de texte brut, sans markup
  * @return string
  */
-function bank_affiche_montant($montant, $code_devise = null, $unite = true) {
+function bank_affiche_montant($montant, $code_devise = null, $unite = true, $raw = false) {
 
 	if (!function_exists('bank_devise_info')) {
 		include_spip('inc/bank');
@@ -49,12 +52,22 @@ function bank_affiche_montant($montant, $code_devise = null, $unite = true) {
 	$devise = bank_devise_info($code_devise);
 
 	include_spip('inc/filtres');
-	if ($fonction_formater = chercher_filtre('montant_formater')) {
+	if ($montant_formater = chercher_filtre('montant_formater')) {
 		$options = [
 			'currency' => $devise['code'],
 			'currency_display' => $unite ? ($unite === 'symbol' ? 'symbol' : 'code') : 'none',
 		];
-		return $fonction_formater($montant, $options);
+		// si option $raw on veut un montant en texte brut, sans markup encapsulant
+		if ($raw) {
+			$options['markup'] = false;
+		}
+		$result = $montant_formater($montant, $options);
+		// si jamais la fonction $montant_formater n'a pas respecte l'option markup, on nettoie pour faire au mieux
+		// mais sans garantie du resultat...
+		if ($raw) {
+			$result = strip_tags($result);
+		}
+		return $result;
 	}
 
 	// falback : la veille fonction affiche_monnaie

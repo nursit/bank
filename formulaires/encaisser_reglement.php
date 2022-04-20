@@ -38,7 +38,7 @@ function formulaires_encaisser_reglement_charger_dist($id_transaction, $config){
 		'_id_transaction' => $id_transaction,
 		'_mode' => $mode,
 		'autorisation_id' => '',
-		'montant' => bank_affiche_montant($transaction['montant'], $transaction['devise'], false),
+		'montant' => bank_affiche_montant($transaction['montant'], $transaction['devise'], false, true),
 		'_autorisation_id_suffixe' => "/" . autorisation_suffixe(),
 	);
 
