@@ -34,9 +34,11 @@ function stripe_available_cards($config){
 		//'sepa_debit' => "SEPA_SDD.gif",
 	);
 
-	#if ($config['type']=='abo'){
-	#	unset($cartes_possibles['E-CARTEBLEUE']);
-	#}
+	// pas de bancontact ni de ideal en abonnement
+	if ($config['type']=='abo'){
+		unset($cartes_possibles['bancontact']);
+		unset($cartes_possibles['ideal']);
+	}
 
 	return $cartes_possibles;
 }
@@ -224,10 +226,10 @@ function stripe_traite_reponse_transaction($config, &$response){
 			)
 		);
 	}
-	
+
 	// On peut maintenant connaître la devise et ses infos
 	$devise_fraction = bank_devise_info($row['devise'], 'fraction');
-	
+
 	// ok, on traite le reglement
 	$date = $_SERVER['REQUEST_TIME'];
 	$date_paiement = date('Y-m-d H:i:s', $date);
