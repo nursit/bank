@@ -489,7 +489,7 @@ function bank_description_transaction($id_transaction, $transaction = null){
 
 	if (!$description['libelle'] and $description['description']){
 		$description['libelle'] = $description['description'];
-		unset($description['description']);
+		$description['description'] = '';
 	}
 
 	return $description;

@@ -99,6 +99,8 @@ function stripe_retrieve_event($config, $auto = 'auto'){
 		$mode .= "_test";
 	}
 
+	$erreur = $erreur_code = '';
+
 	// methode securisee par une cle secrete partagee
 	// You can find your endpoint's secret in your webhook settings
 	$key_webhook_secret = (($config['mode_test']) ? 'WEBHOOK_SECRET_KEY_test' : 'WEBHOOK_SECRET_KEY');
@@ -139,7 +141,6 @@ function stripe_retrieve_event($config, $auto = 'auto'){
 		$event_json = json_decode($input);
 		$event_id = $event_json->id;
 
-		$erreur = $erreur_code = '';
 		try {
 			// $event_id = 'evt_194CExB63f1NFl4k4qNLVNiS'; // debug
 			// Verify the event by fetching it from Stripe

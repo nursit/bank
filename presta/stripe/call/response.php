@@ -237,7 +237,8 @@ function presta_stripe_call_response_dist($config, $response = null){
 	// stripe_traite_reponse_transaction modifie $response
 	list($id_transaction, $success) = stripe_traite_reponse_transaction($config, $response);
 
-	if (($recurence or $response['abo'])
+	if (($recurence or !empty($response['abo']))
+		and !empty($response['abo_uid'])
 		and $abo_uid = $response['abo_uid']
 		and $id_transaction){
 
