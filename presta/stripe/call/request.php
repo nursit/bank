@@ -52,7 +52,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		spip_log("call_request : transaction $id_transaction / $transaction_hash introuvable", $mode . _LOG_ERREUR);
 		return false;
 	}
-	
+
 	// On peut maintenant connaître la devise et ses infos
 	$devise = $row['devise'];
 	$devise_info = bank_devise_info($devise);
@@ -142,8 +142,8 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 
 	$description = bank_description_transaction($id_transaction, $row);
 	$item = [
-		'name' => $description['libelle'],
-		'description' => $description['description'],
+		'name' => empty($description['libelle']) ? null : $description['libelle'], // mandatory, erreur si null fournit
+		'description' => empty($description['description']) ? null : $description['description'], // erreur si chaine vide fourni, il faut mieux passer un null
 		'amount' => $contexte['amount'],
 		'currency' => $contexte['currency'],
 		'quantity' => 1,
