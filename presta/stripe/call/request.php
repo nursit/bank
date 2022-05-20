@@ -205,6 +205,14 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 
 	// acte : utiliser une checkout session
 	if ($type==='acte'){
+		$product_data = [
+			'name' => $item['name'],
+			'description' => $item['description'],
+			'metadata' => $item['metadata'],
+		];
+		if (empty($product_data['description'])) {
+			unset($product_data['description']);
+		}
 		$session_desc = [
 			'payment_method_types' => $payment_types,
 			'mode' => 'payment',
@@ -213,11 +221,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 					'price_data' => [
 						'unit_amount' => $item['amount'],
 						'currency' => $item['currency'],
-						'product_data' => [
-							'name' => $item['name'],
-							'description' => $item['description'],
-							'metadata' => $item['metadata'],
-						]
+						'product_data' => $product_data
 					],
 					'quantity' => 1,
 				]
@@ -304,7 +308,14 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			}
 
 
-			// TODO : ajouter des metadata pour retouver la transaction associee ?
+			$product_data = [
+				'name' => $item['name'],
+				'description' => $item['description'],
+				'metadata' => $item['metadata'],
+			];
+			if (empty($product_data['description'])) {
+				unset($product_data['description']);
+			}
 			$desc_item = [
 				'price_data' => [
 					'currency' => $contexte['currency'],
@@ -315,11 +326,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 						//'trial_period_days' => 0, // default
 					],
 					//'billing_scheme' => 'per_unit', // implicite, non modifiable via price_data
-					'product_data' => [
-						'name' => $item['name'],
-						'description' => $item['description'],
-						'metadata' => $item['metadata'],
-					]
+					'product_data' => $product_data
 				],
 				'quantity' => 1
 			];
@@ -351,15 +358,12 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 				$montant_surcharge = bank_formatter_montant_selon_fraction($echeance['montant_init'] - $echeance['montant'], $devise_info['fraction'], 3);
 
 				// et on ajoute une surcharge pour la premiere echeance
+				$product_data['name'] = "1ère échéance complément ". $item['name'];
 				$desc_item_first = [
 					'price_data' => [
 						'currency' => $contexte['currency'],
 						'unit_amount' => $montant_surcharge,
-						'product_data' => [
-							'name' => "1ère échéance complément ". $item['name'],
-							'description' => $item['description'],
-							'metadata' => $item['metadata'],
-						]
+						'product_data' => $product_data
 					],
 					'quantity' => 1
 				];
