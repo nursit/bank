@@ -229,7 +229,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 			// transfer the session id to the success URL
 			'success_url' => $url_success . '&session_id={CHECKOUT_SESSION_ID}',
 			'cancel_url' => $url_success, // on revient sur success aussi car response gerera l'echec du fait de l'absence de session_id
-			'locale' => $GLOBALS['spip_lang'],
+			'locale' => stripe_locale($GLOBALS['spip_lang']),
 		];
 		if (!empty($item['images'])) {
 			$session_desc['line_items'][0]['price_data']['product_data']['images'] = $item['images'];
@@ -299,7 +299,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 				// transfer the session id to the success URL
 				'success_url' => $url_success . '&session_id={CHECKOUT_SESSION_ID}',
 				'cancel_url' => $url_success, // on revient sur success aussi car response gerera l'echec du fait de l'absence de session_id
-				'locale' => $GLOBALS['spip_lang'],
+				'locale' => stripe_locale($GLOBALS['spip_lang']),
 			];
 			if (!$checkout_customer){
 				$session_desc['customer_email'] = $contexte['email'];

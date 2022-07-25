@@ -43,6 +43,20 @@ function stripe_available_cards($config){
 	return $cartes_possibles;
 }
 
+/**
+ * Choix de la langue : on utilise celle du site si connue de stripe, sinon auto
+ * @param string $lang
+ * @return string
+ */
+function stripe_locale($lang) {
+	if (in_array($lang, [
+		"bg", "cs", "da", "de", "el", "en", "en-GB", "es", "es-419", "et", "fi", "fil", "fr", "fr-CA", "hr", "hu", "id", "it", "ja", "ko", "lt", "lv", "ms", "mt", "nb", "nl", "pl", "pt", "pt-BR", "ro", "ru", "sk", "sl", "sv", "th", "tr", "vi", "zh", "zh-HK", "zh-TW"
+	])) {
+		return $lang;
+	}
+
+	return "auto";
+}
 
 /**
  * Initialiser l'API Stripe : chargement de la lib et inits des static
