@@ -72,11 +72,11 @@ function bank_url_api_retour($config, $action, $args = ""){
 		$is_api = false;
 		if (file_exists($f = _DIR_RACINE . ".htaccess")){
 			lire_fichier($f, $contenu);
-			if (($p = strpos($contenu, 'spip.php?action=api_$1'))!==false){
+			if (($p = strpos($contenu, 'spip.php?action=api_$'))!==false){
 				$p_ligne = strrpos(substr($contenu, 0, $p), "\n");
 				$ligne = substr($contenu, $p_ligne, $p-$p_ligne);
 				$ligne = ltrim($ligne);
-				if ($ligne[0]!=="#"){
+				if ($ligne[0]!=="#" and strpos($ligne, "RewriteRule") === 0){
 					$is_api = true;
 				}
 			}
