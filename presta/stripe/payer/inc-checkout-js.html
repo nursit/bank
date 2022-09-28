@@ -27,4 +27,12 @@ function stripe_button_#ENV{id}_callback() {
 
 	//e.preventDefault();
 	return false;
+}[(#ENV{autosubmit}|oui)
+function run_callback_#ENV{id}() {
+	if (typeof Stripe !== 'undefined') {
+		return stripe_button_#ENV{id}_callback();
+	}
+	setTimeout(run_callback_#ENV{id}, 100);
 }
+run_callback_#ENV{id}();
+]

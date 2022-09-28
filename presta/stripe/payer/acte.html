@@ -14,12 +14,20 @@
   <div class="payer_mode payer_stripe payer_acte">
 	  <h4 class="titre h4">[(#ENV{payer_par_title,<:bank:payer_par_carte_bancaire:>})]</h4>
 	  [<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
-	  <div class='boutons'>
-		  [(#SET{id,[acte(#ID_TRANSACTION)]})][(#SET{texte,<:bank:payer_par_carte_bancaire:>})]
-		  [(#BOUTON_ACTION{[(#ENV*{logos})],#ENV*{action},stripe_button_#GET{id},'','',[stripe_button_(#GET{id})_callback\(\)]})]
-		  [<script src="https://js.stripe.com/v3/"></script>
-		  <script type="text/javascript">(#INCLURE{fond=presta/stripe/payer/inc-checkout-js,env,id=#GET{id}}|compacte{js})</script>]
+	  <div class='boutons[ (#ENV{autosubmit}|?{loading})]'>
+		  [(#SET{texte,<:bank:payer_par_carte_bancaire:>})]
+		  [(#ENV{checkout_session_id}|oui)
+		    [(#SET{id,[acte(#ID_TRANSACTION)]})]
+		    [(#BOUTON_ACTION{[(#ENV*{logos})],#ENV*{action},stripe_button_#GET{id},'','',[stripe_button_(#GET{id})_callback\(\)]})]
+		    [<script src="https://js.stripe.com/v3/"></script>
+		    <script type="text/javascript">(#INCLURE{fond=presta/stripe/payer/inc-checkout-js,env,id=#GET{id}}|compacte{js})</script>]
+		  ]
+		  [(#ENV{checkout_session_id}|non)
+		    [(#BOUTON_ACTION{[(#ENV*{logos})],[(#URL_ACTION_AUTEUR{stripe_process_checkout,[(#ENV*{action}|base64_encode)],#SELF})],ajax stripe_button_process})]
+		    <script type="text/javascript">jQuery(function(){jQuery('.payer_stripe .boutons').on('click', '.stripe_button_process', function(){jQuery(this).closest('.boutons').addClass('loading')})})</script>
+		  ]
 	  </div>
 	  [(#ENV{sandbox}|oui)<div class="info"><:bank:info_mode_test{presta=Stripe}:></div>]
+	  <style type="text/css">.payer_stripe .loading .bouton_action_post{position: relative} .payer_stripe .loading .bouton_action_post::after{content:'';display: block;position: absolute;left:0;right: 0;top:0;bottom: 0;background: rgba(255,255,255,0.5) url([(#CHEMIN{images/loader.svg})]) no-repeat center;background-size: contain;}</style>
   </div>
 </BOUCLE_trans>

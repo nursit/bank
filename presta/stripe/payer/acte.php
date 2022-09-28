@@ -23,8 +23,9 @@ if (!defined('_ECRIRE_INC_VERSION')){
  */
 function presta_stripe_payer_acte_dist($config, $id_transaction, $transaction_hash, $options = array()){
 
+	$process_checkout = $options['process_checkout'] ?? false;
 	$call_request = charger_fonction('request', 'presta/stripe/call');
-	$contexte = $call_request($id_transaction, $transaction_hash, $config);
+	$contexte = $call_request($id_transaction, $transaction_hash, $config, 'acte', ['process_checkout' => $process_checkout]);
 
 	// si moyen de paiement pas applicable
 	if (!$contexte){
@@ -59,6 +60,5 @@ function presta_stripe_payer_acte_dist($config, $id_transaction, $transaction_ha
 
 	$contexte = array_merge($options, $contexte);
 
-	return recuperer_fond('presta/stripe/payer/acte', $contexte);
+	return recuperer_fond('presta/stripe/payer/acte', $contexte, $process_checkout ? [] : ['ajax' => true]);
 }
-
