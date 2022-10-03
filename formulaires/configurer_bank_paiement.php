@@ -95,30 +95,24 @@ function bank_deplacer_config($nom, $sens = "up"){
 	}
 
 	$kp = $vp = null;
-	list($k, $v) = each($config);
-	while ($k AND $k!==$nom){
-		$new[$k] = $v;
+	foreach ($config as $k => $v) {
+		if ($k === $nom and $kp and $sens === "up") {
+			array_pop($new);
+			$new[$k] = $v;
+			$new[$kp] = $vp;
+		}
+		elseif ($kp === $nom and $sens === "down") {
+			array_pop($new);
+			$new[$k] = $v;
+			$new[$kp] = $vp;
+		}
+		else {
+			$new[$k] = $v;
+		}
 		$kp = $k;
 		$vp = $v;
-		list($k, $v) = each($config);
 	}
 
-	if ($kp AND $sens=="up" AND $k===$nom){
-		array_pop($new);
-		$new[$k] = $v;
-		$new[$kp] = $vp;
-	} elseif ($sens=="down" AND $k===$nom AND list($k2, $v2) = each($config)) {
-		$new[$k2] = $v2;
-		$new[$k] = $v;
-	} elseif ($k) {
-		$new[$k] = $v;
-	}
-
-	list($k, $v) = each($config);
-	while ($k){
-		$new[$k] = $v;
-		list($k, $v) = each($config);
-	}
 	ecrire_config("bank_paiement/", $new);
 }
 
