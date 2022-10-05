@@ -1,4 +1,4 @@
-# Plugin Bank v5-dev pour SPIP <small>Paiement bancaire</small>
+# Plugin Bank v5 pour SPIP <small>Paiement bancaire</small>
 
 Ce plugin permet de gérer les interfaces techniques avec les prestataires bancaires.
 
@@ -17,6 +17,9 @@ Il peut aussi être complété par
 
 
 ### Changelog
+
+* Version 5.1
+  * Compatibilité SPIP 4.1
 
 * Version 5.0
   * Support des devises
@@ -37,10 +40,10 @@ Il peut aussi être complété par
     * seul le paiement à l'acte est implémenté, les nouveaux paiements récurrents ne sont plus possibles (TODO)
   * Suppression du prestataire Internet+ (code non maintenu, non testé en situation réelle depuis trop longtemps)
   * Passage a la plateforme Monetico au lieu de CMCIC (rien a reconfigurer, c'est un switch transparent)
-  
+
 * Version 3 du plugin
   * Nécessite SPIP 3.0+, compatible SPIP 3.1 et SPIP 3.2
-  * Refonte de la configuration : 
+  * Refonte de la configuration :
     * on peut avoir plusieurs modules du même prestataire technique avec des paramètres différents
     * possibilité de configurer l'ordre de présentation des modes de paiement
     * possibilité de configurer les CB proposées pour les prestataires par CB qui le permettent (tous sauf SIPS)
@@ -89,7 +92,6 @@ Le plugin permet aussi les paiements mensuels avec les plateformes techniques su
 * PayZen
 * Stripe
 
-Un mode de paiement "Simulation" permet de tester le workflow de paiement pendant la phase de developpement. 
+Un mode de paiement "Simulation" permet de tester le workflow de paiement pendant la phase de developpement.
 
 Les documentations (pdf) des différentes plateformes sont centralisées à cette adresse : http://www.nursit.com/doc_presta_bank .
-
