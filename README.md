@@ -18,6 +18,10 @@ Il peut aussi être complété par
 
 ### Changelog
 
+* Version 5.2
+  * Amélioration du paiement par Stripe qui ne génère plus de checkout à chaque affichage de la page de paiement
+  * Compatibilité PHP 8+
+
 * Version 5.1
   * Compatibilité SPIP 4.1
 
@@ -74,7 +78,7 @@ Le plugin permet le paiement à l'acte via les plateformes techniques suivantes 
 * SIPS (Elysnet, Mercanet, Scellius, Sogenactif)
 * SIPSv2 (Mercanet, Scellius, Sogenactif)
 * Stripe
-* SystemPay (Banque Populaire CyberPlus, O.S.B., SystemPay et SP Plus)
+* SystemPay (Banque Populaire CyberPlus, O.S.B., La Poste Scellius v3, SystemPay et SP Plus)
 
 Par ailleurs, il est aussi possible d'utiliser les modes de paiement suivant :
 
