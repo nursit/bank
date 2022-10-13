@@ -45,6 +45,12 @@ function sipsv2_url_serveur($config){
 			} else {
 				$host = "https://payment-webinit.scellius.labanquepostale.fr";
 			}
+		case "sherlocks2":
+			if ($config['mode_test']){
+				$host = "https://sherlocks-payment-webinit-simu.secure.lcl.fr/";
+			} else {
+				$host = "https://sherlocks-payment-webinit.secure.lcl.fr/";
+			}
 			break;
 		default:
 			$host = "https://payment-webinit.simu.sogenactif.com";
