@@ -274,7 +274,7 @@ function cmcic_response($config){
 		$mode .= "_test";
 	}
 
-	// Begin Main : Retrieve Variables posted by CMCIC Payment Server 
+	// Begin Main : Retrieve Variables posted by CMCIC Payment Server
 	$MoneticoPaiement_bruteVars = getMethode();
 	spip_log("call_response : réception des variables cmcic", $mode);
 
@@ -373,11 +373,27 @@ function cmcic_gerer_transaction_payee($config, $id_transaction, $response, $row
 	$date_paiement = date("Y-m-d H:i:s", $now);
 
 	// recuperer la date de paiement si possible
-	if (isset($response['date'])){
-		// 24/05/2019:10:00:25
-		$d = explode(':', $response['date']);
-		list($j, $m, $a) = explode('/', $d[0]);
-		if ($t = mktime($d[1], $d[2], $d[3], $m, $j, $a)){
+	if (isset($response['date'])) {
+		if (strpos($response['date'], '_a_') !== false) {
+			// 01/11/2022_a_05:58:52
+			$d = explode('_a_', $response['date'], 2);
+			list($j, $m, $a) = explode('/', reset($d));
+			$a = intval($a); // securité
+			list($h, $i, $s) = explode(':', end($d));
+		} else {
+			// 24/05/2019:10:00:25 ? soyons robuste...
+			$d = explode(':', $response['date']);
+			list($j, $m, $a) = explode('/', reset($d));
+			$a = intval($a); // securité
+			$s = intval(array_pop($d));
+			$i = intval(array_pop($d));
+			$h = array_pop($d);
+			if (!is_numeric(strval($h))) {
+				$h = preg_replace(",^.*[^\d]([\d]+)$,", "\\1", $h);
+            }
+			$h = intval($h);
+		}
+		if ($t = mktime($h, $i, $s, $m, $j, $a)){
 			$date_paiement = date("Y-m-d H:i:s", $t);
 		}
 	}
