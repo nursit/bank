@@ -121,7 +121,7 @@ function bank_declarer_tables_objets_sql($tables){
 		),
 		'key' => array(
 			"PRIMARY KEY" => "id_bank_recurrence",
-			"KEY id_auteur" => "id_transaction",
+			"UNIQUE id_transaction" => "id_transaction",
 		),
 		'rechercher_champs' => array(
 			'id_bank_recurrence' => 1,
