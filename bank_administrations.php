@@ -72,7 +72,7 @@ function bank_upgrade($nom_meta_base_version, $version_cible){
 
 	$maj = array();
 	$maj['create'] = array(
-		array('maj_tables', array('spip_transactions')),
+		array('maj_tables', array('spip_transactions', 'spip_bank_recurrences')),
 	);
 
 	$maj['0.1.3'] = array(
@@ -140,6 +140,11 @@ function bank_upgrade($nom_meta_base_version, $version_cible){
 
 	$maj['2.0.2'] = array(
 		array("sql_alter", "TABLE spip_transactions CHANGE abo_uid abo_uid varchar(100) NOT NULL DEFAULT ''"),
+	);
+
+	// creation de la table spip_bank_recurrences
+	$maj['2.1.0'] = array(
+		array('maj_tables', array('spip_bank_recurrences')),
 	);
 
 	include_spip('base/upgrade');

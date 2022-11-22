@@ -92,5 +92,41 @@ function bank_declarer_tables_objets_sql($tables){
 			'mode' => 1,
 		)
 	);
+
+	$tables['spip_bank_recurrences'] = array(
+		'page' => false,
+		'titre' => "abo_uid as titre, '' as lang",
+		'date' => 'date_creation',
+		'principale' => 'oui',
+		'texte_objets' => 'bank:titre_bank_reccurences',
+		'texte_objet' => 'bank:titre_bank_reccurence',
+		'info_aucun_objet' => 'bank:info_aucune_bank_reccurence',
+		'info_1_objet' => 'bank:info_1_bank_reccurence',
+		'info_nb_objets' => 'bank:info_nb_bank_reccurences',
+		'field' => array(
+			"id_bank_recurrence" => "bigint(21) NOT NULL",
+			"id_transaction" => "bigint(21) NOT NULL DEFAULT 0", // id_transaction de la premiere occurence
+			"date_creation" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
+			"uid" => "varchar(55) NOT NULL DEFAULT ''", // numero de recurence unique
+
+			"echeances" => "TEXT NOT NULL DEFAULT ''", // contenu sous forme json de la description des echeances
+			"date_echeance" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL", // date de la prochaine echeance
+			"count_echeance" => "bigint(21) NOT NULL DEFAULT 0", // compteur d'echeances
+
+			"payment_data" => "TEXT NOT NULL DEFAULT ''", // informations nécessaires pour déclencher un nouveau paiement
+
+			"statut" => "varchar(25) NOT NULL DEFAULT ''", // prepa,valide,echec,fini
+
+			"maj" => "TIMESTAMP"
+		),
+		'key' => array(
+			"PRIMARY KEY" => "id_bank_recurrence",
+			"KEY id_auteur" => "id_transaction",
+		),
+		'rechercher_champs' => array(
+			'id_bank_recurrence' => 1,
+			'uid' => 1,
+		)
+	);
 	return $tables;
 }
