@@ -58,9 +58,57 @@ function bank_recurrence_invalide($id_transaction = "", $args = array()) {
 	return bank_transaction_invalide(empty($args['id_transaction']) ? 0 : $args['id_transaction'], $args);
 }
 
+function bank_recurrence_generate_uid($id_bank_recurrence, $id_transaction) {
+	$cpt = 0;
+	do {
+		$uid = "sub_";
+		$parts = [$id_bank_recurrence, $id_transaction];
+		if ($cpt) {
+			$parts[] = $cpt;
+		}
+		$parts = array_map('dechex',$parts);
+		$parts = implode('.', $parts);
+		if ($d = gzdeflate($parts)) {
+			$parts = $d;
+		}
+		$uid .= bin2hex($parts);
+		$cpt++;
+	} while (sql_countsel('spip_bank_recurrences', ['uid='.sql_quote($uid),"id_bank_recurrence!=".intval($id_bank_recurrence)]));
+	return $uid;
+}
 
-function bank_recurrence_creer($id_transaction) {
+function bank_recurrence_decode_uid($uid) {
+	$hash = substr($uid, 4);
+	$hash = hex2bin($hash);
+	if ($d = gzinflate($hash)) {
+		$hash = $d;
+	}
+	$parts = explode('.', $hash);
+	$parts = array_map('hexdec',$parts);
+	$id_bank_recurrence = array_shift($parts);
+	$id_transaction = array_shift($parts);
+	return [$id_bank_recurrence, $id_transaction];
+}
+
+function bank_recurrence_creer($id_transaction, $mode, $echeance = null) {
 	$abo_uid = "";
+
+	if (is_null($echeance)) {
+		if (!$decrire_echeance = charger_fonction("decrire_echeance", "abos", true)
+			or !$echeance = $decrire_echeance($id_transaction)) {
+			spip_log("bank_recurrence_creer: Abonnement Transaction #$id_transaction impossible d'obtenir la description des echeances", $mode . _LOG_ERREUR);
+			return false;
+		}
+	}
+
+	// on ne sait pas faire une date de debut decalee dans le futur
+	// TODO a prevoir dans le futur
+	if (isset($echeance['date_start'])
+	  and $echeance['date_start']
+	  and strtotime($echeance['date_start'])>time()){
+		spip_log("bank_recurrence_creer: Abonnement Transaction #$id_transaction : date_start " . $echeance['date_start'] . " non supportee", $mode . _LOG_ERREUR);
+		return false;
+	}
 
 	// dans tous les cas on créé la récurrence en base en mode prepa, sauf si elle existe déjà
 	if (!$recurrence = sql_fetsel('*', 'spip_bank_recurrences', 'id_transaction='.intval($id_transaction))) {
@@ -68,17 +116,30 @@ function bank_recurrence_creer($id_transaction) {
 			'id_transaction' => $id_transaction,
 			'statut' => 'prepa',
 			'date_creation' => date('Y-m-d H:i:s'),
+			'echeances' => json_encode($echeance)
 		);
-		$id_bank_recurrences = sql_insertq('spip_bank_recurrences', $ins);
-
+		$id_bank_recurrence = sql_insertq('spip_bank_recurrences', $ins);
+		if (!$id_bank_recurrence) {
+			spip_log("bank_recurrence_creer: Abonnement Transaction #$id_transaction : impossible de créer la recurrence en base dans spip_bank_recurrences", $mode . _LOG_ERREUR);
+			return false;
+		}
+		$recurrence = sql_fetsel('*', 'spip_bank_recurrences', 'id_bank_recurrence=' . intval($id_bank_recurrence));
 	}
-	if (!$decrire_echeance = charger_fonction("decrire_echeance", "abos", true)
-		or !$echeance = $decrire_echeance($id_transaction)) {
-		// ECHEC description echeance, on ne sait pas creer un abonnement
 
+	// verifier qu'on est bien en statut prepa, sinon problème
+	if ($recurrence['statut'] !== 'prepa') {
+		spip_log("bank_recurrence_creer: Abonnement Transaction #$id_transaction : recurrence $id_bank_recurrence statut inatendu '".$recurrence['statut']."'", $mode . _LOG_ERREUR);
+		return false;
 	}
 
-	// TODO : creer la recurrence
+	// générer un numéro d'abonnement unique
+	$uid = bank_recurrence_generate_uid($id_bank_recurrence, $id_transaction);
+	$set = array(
+		'uid' => $uid,
+	);
+	if (!sql_updateq('spip_bank_recurrences', $set, 'id_bank_recurrence=' . intval($id_bank_recurrence))) {
+		return false;
+	}
 
-	return $abo_uid;
+	return $uid;
 }
