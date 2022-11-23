@@ -902,20 +902,26 @@ function bank_simple_call_resilier_abonnement($uid, $config){
 		$config = bank_config($mode);
 	}
 
-	// on envoie un mail au webmestre avec reference pour que le webmestre aille faire la resiliation manuellement
-	$sujet = "[" . $GLOBALS['meta']['nom_site'] . "] Demande Resiliation Abonnement " . $config['presta'];
-	$message = "Abonne UID : $uid\nTransactions :\n";
+	// tenter avec la gestion des recurrences internes au plugin
+	include_spip('inc/bank_recurrences');
+	$ok = bank_recurrence_resilier($uid, $mode);
+
+	if (!$ok) {
+		// on envoie un mail au webmestre avec reference pour que le webmestre aille faire la resiliation manuellement
+		$sujet = "[" . $GLOBALS['meta']['nom_site'] . "] Demande Resiliation Abonnement " . $config['presta'];
+		$message = "Abonne UID : $uid\nTransactions :\n";
 
 
-	$trans = sql_allfetsel("id_transaction,date_paiement,montant,devise", "spip_transactions", "abo_uid=" . sql_quote($uid) . " AND statut=" . sql_quote('ok') . " AND mode LIKE " . sql_quote($config['presta'] . '%'));
-	foreach ($trans as $tran){
-		$message .= "#" . $tran['id_transaction'] . " " . $tran['date_paiement'] . " " . bank_affiche_montant($tran['montant'],$tran['devise']) . "\n";
+		$trans = sql_allfetsel("id_transaction,date_paiement,montant,devise", "spip_transactions", "abo_uid=" . sql_quote($uid) . " AND statut=" . sql_quote('ok') . " AND mode LIKE " . sql_quote($config['presta'] . '%'));
+		foreach ($trans as $tran){
+			$message .= "#" . $tran['id_transaction'] . " " . $tran['date_paiement'] . " " . bank_affiche_montant($tran['montant'],$tran['devise']) . "\n";
+		}
+
+		$envoyer_mail = charger_fonction("envoyer_mail", "inc");
+		$envoyer_mail($GLOBALS['meta']['email_webmaster'], $sujet, $message);
 	}
 
-	$envoyer_mail = charger_fonction("envoyer_mail", "inc");
-	$envoyer_mail($GLOBALS['meta']['email_webmaster'], $sujet, $message);
-
-	return false;
+	return $ok;
 }
 
 
