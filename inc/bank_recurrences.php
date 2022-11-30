@@ -46,6 +46,13 @@ function bank_recurrence_invalide($id_transaction = "", $args = array()) {
 	return bank_transaction_invalide($id_transaction, $args);
 }
 
+/**
+ * Générer un uid abonnement hexa unique qui contient $id_bank_recurrence et $id_transaction initiale
+ * on gère la collision au cas où mais elle ne peut théoriquement pas se produire
+ * @param int $id_bank_recurrence
+ * @param int $id_transaction
+ * @return string
+ */
 function bank_recurrence_generate_uid($id_bank_recurrence, $id_transaction) {
 	$cpt = 0;
 	do {
@@ -65,6 +72,11 @@ function bank_recurrence_generate_uid($id_bank_recurrence, $id_transaction) {
 	return $uid;
 }
 
+/**
+ * Décoder un uid abonnement (et vérification de sa validité du coup)
+ * @param string $uid
+ * @return array|false
+ */
 function bank_recurrence_decode_uid($uid) {
 	if (strpos($uid, 'sub_') !== 0) {
 		return false;
@@ -94,6 +106,18 @@ function bank_recurrence_decode_uid($uid) {
 	return ['id_bank_recurrence' => $id_bank_recurrence, 'id_transaction' => $id_transaction];
 }
 
+/**
+ * Calculer les champs à mettre à jour pour la prochaine échéance : date_echeance_next et date_fin éventuelle
+ *
+ * // TODO : calculer depuis la date de départ + n échéances plutot que depuis la date de dernière échéance pour éviter une dérive temporelle
+ *
+ * @param $echeances
+ * @param $date_start
+ * @param $date_echeance
+ * @param $count_echeance
+ * @param $date_fin
+ * @return array|false
+ */
 function bank_recurrence_calculer_echeance_next($echeances, $date_start, $date_echeance, $count_echeance, $date_fin) {
 	if (is_string($echeances)) {
 		$echeances = json_decode($echeances, true);
@@ -151,6 +175,14 @@ function bank_recurrence_calculer_echeance_next($echeances, $date_start, $date_e
 	return $set;
 }
 
+/**
+ * Créer une recurrence en statut prepa, lors de la préparation d'un paiement qui va démarrer un abonnement
+ *
+ * @param int $id_transaction
+ * @param string $mode
+ * @param array $echeance
+ * @return false|string
+ */
 function bank_recurrence_creer($id_transaction, $mode, $echeance = null) {
 	$abo_uid = "";
 
@@ -213,6 +245,14 @@ function bank_recurrence_creer($id_transaction, $mode, $echeance = null) {
 	return $uid;
 }
 
+/**
+ * Activer la récurrence suite au premier paiement réussi, et actualiser la date de prochaine échéance
+ *
+ * @param int $id_transaction
+ * @param string $abo_uid
+ * @param string $mode
+ * @return bool|mixed
+ */
 function bank_recurrence_activer($id_transaction, $abo_uid, $mode) {
 	if (!$recurrence = sql_fetsel(
 		'*',
@@ -287,7 +327,15 @@ function bank_recurrence_activer($id_transaction, $abo_uid, $mode) {
 	return $abo_uid;
 }
 
-function bank_recurrence_renouveler($id_transaction, $abo_uid, $mode) {
+/**
+ * Prolonger une récurrence suite au paiement réussi de l'échéance
+ *
+ * @param int $id_transaction
+ * @param string $abo_uid
+ * @param string $mode
+ * @return false|string
+ */
+function bank_recurrence_prolonger($id_transaction, $abo_uid, $mode) {
 	if (!$recurrence = sql_fetsel(
 		'*',
 		'spip_bank_recurrences',
@@ -335,7 +383,15 @@ function bank_recurrence_renouveler($id_transaction, $abo_uid, $mode) {
 	return $abo_uid;
 }
 
-
+/**
+ * Résilier une récurrence suite à echec du paiement de de l'échéance
+ *
+ * @param int $id_transaction
+ * @param string $abo_uid
+ * @param string $mode
+ * @param string $statut
+ * @return bool
+ */
 function bank_recurrence_resilier($id_transaction, $abo_uid, $mode, $statut = 'echec') {
 
 	$ok = true;
