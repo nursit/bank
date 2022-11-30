@@ -111,8 +111,11 @@ function bank_declarer_tables_objets_sql($tables){
 
 			"echeances" => "TEXT NOT NULL DEFAULT ''", // contenu sous forme json de la description des echeances
 			"date_start" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL", // date de la premiere echeance
+
 			"date_echeance" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL", // date de la derniere echeance payee
 			"count_echeance" => "bigint(21) NOT NULL DEFAULT 0", // compteur de la derniere echeance payee
+			"id_transaction_echeance" => "bigint(21) NOT NULL DEFAULT 0", // id_transaction de la derniere echeance payee
+
 			"date_echeance_next" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL", // date de l'echeance suivante
 			"date_fin" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL", // date de fin cause validite carte par exemple, ou cause nombre d'echeances atteint
 
