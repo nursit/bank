@@ -48,7 +48,7 @@ function bank_declarer_tables_objets_sql($tables){
 			"autorisation_id" => "varchar(255) NOT NULL DEFAULT ''", // numero d'autorisation de debit envoye par le presta bancaire
 			"refcb" => "varchar(100) NOT NULL DEFAULT ''", // reference CB partielle (type/numero de carte tronque par exemple)
 			"validite" => "varchar(10) NOT NULL DEFAULT ''", // fin de validite de la CB (pour les paiements recurrents)
-			"abo_uid" => "varchar(55) NOT NULL DEFAULT ''", // numero d'abonne pour les paiements recurrents
+			"abo_uid" => "varchar(100) NOT NULL DEFAULT ''", // numero d'abonne pour les paiements recurrents
 			"pay_id" => "varchar(100) NOT NULL DEFAULT ''", // identifiant pour declencher un nouveau paiement sans saisie de carte
 
 			"montant_regle" => "varchar(25) NOT NULL DEFAULT ''", // montant regle (renvoye par le presta) en euros

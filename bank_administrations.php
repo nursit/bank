@@ -138,6 +138,10 @@ function bank_upgrade($nom_meta_base_version, $version_cible){
 		array("sql_alter", "TABLE spip_transactions CHANGE auteur auteur varchar(255) NOT NULL DEFAULT ''"),
 	);
 
+	$maj['2.0.2'] = array(
+		array("sql_alter", "TABLE spip_transactions CHANGE abo_uid abo_uid varchar(100) NOT NULL DEFAULT ''"),
+	);
+
 	include_spip('base/upgrade');
 	maj_plugin($nom_meta_base_version, $version_cible, $maj);
 
