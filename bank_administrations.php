@@ -127,10 +127,15 @@ function bank_upgrade($nom_meta_base_version, $version_cible){
 	$maj['1.6.5'] = array(
 		array("sql_alter", "table spip_transactions CHANGE autorisation_id autorisation_id varchar(255) NOT NULL DEFAULT ''"),
 	);
-	
+
 	// Ajout du champ "devise"
 	$maj['2.0.0'] = array(
 		array("sql_alter", "table spip_transactions ADD devise char(3) NOT NULL DEFAULT 'EUR' AFTER montant"),
+	);
+
+	$maj['2.0.1'] = array(
+		array("sql_alter", "TABLE spip_transactions CHANGE auteur_id auteur_id varchar(255) NOT NULL DEFAULT ''"),
+		array("sql_alter", "TABLE spip_transactions CHANGE auteur auteur varchar(255) NOT NULL DEFAULT ''"),
 	);
 
 	include_spip('base/upgrade');
@@ -271,4 +276,3 @@ function bank_install($action, $prefix, $version_cible){
 			break;
 	}
 }
-
