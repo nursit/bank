@@ -25,7 +25,7 @@ function bank_recurrences_watch($max_items = 0, $timeout = null) {
 		$recurrences = sql_allfetsel(
 			'*, date_echeance_next<='.sql_quote($now_fin_journee).' as termine',
 			'spip_recurrences',
-			"statut='valide' AND (termine OR date_echeance_next<=".sql_quote($now_fin_journee).")",
+			"statut='valide' AND id_transaction_echeance_next=0 AND (termine OR date_echeance_next<=".sql_quote($now_fin_journee).")",
 			'',
 			'termine DESC, date_echeance_next',
 			'0,5'
@@ -192,6 +192,7 @@ function bank_recurrence_calculer_echeance_next($echeances, $date_start, $date_e
 	}
 	$set = array(
 		'date_echeance_next' => $date_next_echeance,
+		'id_transaction_echeance_next' => 0,
 	);
 	// si jamais on a atteint le nombre maxi d'echeances, alors la date theorique de la prochaine c'est la date de fin
 	if (!empty($echeances['count'])) {
@@ -452,6 +453,8 @@ function bank_recurrence_resilier($id_transaction, $abo_uid, $mode, $statut = 'e
 				'count_echeance' => $recurrence['count_echeance'] + 1,
 				'date_echeance' => date('Y-m-d H:i:s', $now),
 				'id_transaction_echeance' => $id_transaction,
+				'date_echeance_next' => '0000-00-00 00:00:00',
+				'id_transaction_echeance_next' => 0,
 				'statut' => $statut,
 			);
 			sql_updateq('spip_bank_recurrences', $set, 'id_bank_recurrence='.intval($id_bank_recurrence));
@@ -510,6 +513,7 @@ function bank_recurrence_terminer($abo_uid, $statut = 'fini') {
 			$set = array(
 				'date_fin' => date('Y-m-d H:i:s', $now),
 				'date_echeance_next' => '0000-00-00 00:00:00',
+				'id_transaction_echeance_next' => 0,
 				'statut' => $statut
 			);
 			sql_updateq('spip_bank_recurrences', $set, 'id_bank_recurrence='.intval($id_bank_recurrence));
