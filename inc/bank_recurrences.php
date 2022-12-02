@@ -23,7 +23,7 @@ function bank_recurrences_watch($max_items = 0, $timeout = null) {
 	$nb = 0;
 	do {
 		$recurrences = sql_allfetsel(
-			'*, date_echeance_next<='.sql_quote($now_fin_journee).' as termine',
+			'uid, date_fin<='.sql_quote($now).' as termine',
 			'spip_recurrences',
 			"statut='valide' AND id_transaction_echeance_next=0 AND (termine OR date_echeance_next<=".sql_quote($now_fin_journee).")",
 			'',
@@ -39,10 +39,10 @@ function bank_recurrences_watch($max_items = 0, $timeout = null) {
 					return false; // on a pas fini
 				}
 				if ($recurrence['termine']) {
-					bank_recurrence_terminer($recurrence);
+					bank_recurrence_terminer($recurrence['uid']);
 				}
 				else {
-					bank_recurrence_renouveler($recurrence);
+					bank_recurrence_renouveler($recurrence['uid']);
 				}
 			}
 		}
@@ -481,11 +481,9 @@ function bank_recurrence_resilier($id_transaction, $abo_uid, $mode, $statut = 'e
 }
 
 /**
- * Résilier une récurrence suite à echec du paiement de de l'échéance
+ * Terminer une récurrence qui arrive à la fin de ses échéances
  *
- * @param int $id_transaction
  * @param string $abo_uid
- * @param string $mode
  * @param string $statut
  * @return bool
  */
@@ -537,4 +535,117 @@ function bank_recurrence_terminer($abo_uid, $statut = 'fini') {
 	}
 
 	return $ok;
+}
+
+/**
+ * Renouvler une récurrence dont l'échéance est arrivée
+ *
+ * @param string $abo_uid
+ * @param string $statut
+ * @return bool
+ */
+function bank_recurrence_renouveler($abo_uid) {
+
+	if (!$recurrence = sql_fetsel(
+		'*',
+		'spip_bank_recurrences',
+		'uid='.sql_quote($abo_uid))) {
+
+		spip_log("bank_recurrence_renouveler: Abonnement $abo_uid introuvable pour renouveler recurrence", 'recurrence' . _LOG_ERREUR);
+		return false;
+	}
+
+	$id_bank_recurrence = $recurrence['id_bank_recurrence'];
+	if ($recurrence['id_transaction_echeance_next'] != 0) {
+		spip_log("bank_recurrence_renouveler: Abonnement $abo_uid déjà en cours de renouvelement par un autre processus", 'recurrence' . _LOG_ERREUR);
+		return false;
+	}
+
+	$id_jeton = -getmypid();
+	if (!sql_updateq('spip_bank_recurrences', array('id_transaction_echeance_next' => $id_jeton), 'id_transaction_echeance_next=0 and id_bank_recurrence='.intval($id_bank_recurrence))
+	  or sql_getfetsel('id_transaction_echeance_next', 'spip_bank_recurrences', 'id_bank_recurrence='.intval($id_bank_recurrence)) != $id_jeton) {
+		spip_log("bank_recurrence_renouveler: Abonnement $abo_uid Recurrence #$id_bank_recurrence | impossible de poser le jeton id_transaction_echeance_next=$id_jeton", 'recurrence' . _LOG_ERREUR);
+		bank_recurrence_invalide(0, array(
+			'erreur' => "Abonnement $abo_uid Recurrence #$id_bank_recurrence | impossible de poser le jeton id_transaction_echeance_next=$id_jeton",
+			'log' => '',
+			'send_mail' => true,
+			'sujet' => "Echec renouvellement recurrence #$id_bank_recurrence",
+			'update' => false,
+			'where' => 'bank_recurrence_renouveler',
+		));
+		return false;
+	}
+
+	// recuperons le mode et le presta depuis la premiere transaction de la recurrence
+	if (!$mode = sql_getfetsel('mode', 'spip_transactions', 'id_transaction='.intval($recurrence['id_transaction']))
+	  or !$config = bank_config($mode, true)
+	  or empty($config['presta'])) {
+		spip_log("bank_recurrence_renouveler: Abonnement $abo_uid Recurrence #$id_bank_recurrence | impossible de retrouver le prestaire de paiement", 'recurrence' . _LOG_ERREUR);
+		bank_recurrence_invalide(0, array(
+			'erreur' => "Abonnement $abo_uid Recurrence #$id_bank_recurrence | impossible de retrouver le prestaire de paiement",
+			'log' => '',
+			'send_mail' => true,
+			'sujet' => "Echec renouvellement recurrence #$id_bank_recurrence",
+			'update' => false,
+			'where' => 'bank_recurrence_renouveler',
+		));
+		return false;
+	}
+
+
+	// ok ici on a le jeton, la récurrence est à nous
+	if (!$preparer_echeance = charger_fonction('preparer_echeance', 'abos', true)) {
+		spip_log("bank_recurrence_renouveler: Abonnement $abo_uid Recurrence #$id_bank_recurrence | aucune fonction abos/preparer_echeance disponible", 'recurrence' . _LOG_ERREUR);
+		// on est en echec, on laisse le jeton sur id_transaction_echeance_next pour ne pas re-essayer à nouveau sur cette recurrence
+		bank_recurrence_invalide(0, array(
+			'erreur' => "Abonnement $abo_uid Recurrence #$id_bank_recurrence | aucune fonction abos/preparer_echeance disponible",
+			'log' => '',
+			'send_mail' => true,
+			'sujet' => "Echec renouvellement recurrence #$id_bank_recurrence",
+			'update' => false,
+			'where' => 'bank_recurrence_renouveler',
+		));
+		return false;
+	}
+
+	$id_transaction = $preparer_echeance("uid:" . $abo_uid);
+	if (!$id_transaction) {
+		spip_log("bank_recurrence_renouveler: Abonnement $abo_uid Recurrence #$id_bank_recurrence | echec création d'une transaction pour le renouvellement", 'recurrence' . _LOG_ERREUR);
+		// ici on libère le jeton, on re-essayera plus tard
+		sql_updateq('spip_bank_recurrences', array('id_transaction_echeance_next' => 0), 'id_bank_recurrence='.intval($id_bank_recurrence));
+		// on envoie un mail d'alerte
+		bank_recurrence_invalide(0, array(
+			'erreur' => "Abonnement $abo_uid Recurrence #$id_bank_recurrence | echec création d'une transaction pour le renouvellement",
+			'log' => '',
+			'send_mail' => true,
+			'sujet' => "Echec renouvellement recurrence #$id_bank_recurrence",
+			'update' => false,
+			'where' => 'bank_recurrence_renouveler',
+		));
+		return false;
+	}
+
+	// notons l'id_transaction qu'on a préparé pour cette echeance
+	sql_updateq('spip_bank_recurrences', array('id_transaction_echeance_next' => $id_transaction), 'id_bank_recurrence='.intval($id_bank_recurrence));
+	$transaction = sql_fetsel('*', 'spip_transactions', 'id_transaction='.intval($id_transaction));
+
+
+	$response = array(
+		'id_transaction' => $id_transaction,
+		'transaction_hash' => $transaction['transaction_hash'],
+		'abo' => 'recurrence',
+		'abo_uid' => $abo_uid
+	);
+
+	$call_response = charger_fonction("response", "presta/".$config['presta']."/call/");
+	$res = $call_response($config, $response);
+
+	$id_transaction = array_shift($res);
+	$success = array_shift($res);
+
+	if (!$id_transaction or !$success) {
+		return false;
+	}
+
+	return true;
 }
