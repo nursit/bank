@@ -117,11 +117,12 @@ function bank_declarer_tables_objets_sql($tables){
 			"id_transaction_echeance" => "bigint(21) NOT NULL DEFAULT 0", // id_transaction de la derniere echeance payee
 
 			"date_echeance_next" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL", // date de l'echeance suivante
-			"date_fin" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL", // date de fin cause validite carte par exemple, ou cause nombre d'echeances atteint
+			"date_fin_prevue" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL", // date de fin cause validite carte par exemple, ou cause nombre d'echeances atteint
 
 			"payment_data" => "TEXT NOT NULL DEFAULT ''", // informations nécessaires pour déclencher un nouveau paiement
 
 			"statut" => "varchar(25) NOT NULL DEFAULT ''", // prepa,valide,echec,fini
+			"date_fin" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL", // date de fin cause validite carte par exemple, ou cause nombre d'echeances atteint
 
 			"maj" => "TIMESTAMP"
 		),
