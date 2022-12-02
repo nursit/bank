@@ -888,6 +888,7 @@ function bank_simple_call_response($config, $response = null){
  * Jamais appele directement dans le plugin bank/
  * mais par une eventuelle methode abos/resilier d'un plugin externe
  * c'est une fallback quand le presta ne sait pas gerer le desabonnement en appel serveur
+ * ou qu'il repose sur bank_recurrences
  * ou quand cela echoue
  *
  * @param string $uid
@@ -904,7 +905,7 @@ function bank_simple_call_resilier_abonnement($uid, $config){
 
 	// tenter avec la gestion des recurrences internes au plugin
 	include_spip('inc/bank_recurrences');
-	$ok = bank_recurrence_resilier($uid, $mode);
+	$ok = bank_recurrence_terminer($uid);
 
 	if (!$ok) {
 		// on envoie un mail au webmestre avec reference pour que le webmestre aille faire la resiliation manuellement
