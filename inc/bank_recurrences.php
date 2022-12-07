@@ -286,9 +286,10 @@ function bank_recurrence_creer($id_transaction, $mode, $echeance = null) {
  * @param int $id_transaction
  * @param string $abo_uid
  * @param string $mode
+ * @param ?string $payment_data
  * @return bool|mixed
  */
-function bank_recurrence_activer($id_transaction, $abo_uid, $mode) {
+function bank_recurrence_activer($id_transaction, $abo_uid, $mode, $payment_data = null) {
 	if (!$recurrence = sql_fetsel(
 		'*',
 		'spip_bank_recurrences',
@@ -325,6 +326,10 @@ function bank_recurrence_activer($id_transaction, $abo_uid, $mode) {
 		'date_echeance' => date('Y-m-d H:i:s', $now),
 		'id_transaction_echeance' => $id_transaction,
 	];
+	if (!empty($payment_data)) {
+		$set['payment_data'] = $payment_data;
+	}
+
 	$validite = null;
 	$date_fin = $recurrence['date_fin_prevue'];
 	if (!empty($transaction['validite'])) {
@@ -368,9 +373,10 @@ function bank_recurrence_activer($id_transaction, $abo_uid, $mode) {
  * @param int $id_transaction
  * @param string $abo_uid
  * @param string $mode
+ * @param ?string $payment_data
  * @return false|string
  */
-function bank_recurrence_prolonger($id_transaction, $abo_uid, $mode) {
+function bank_recurrence_prolonger($id_transaction, $abo_uid, $mode, $payment_data = null) {
 	if (!$recurrence = sql_fetsel(
 		'*',
 		'spip_bank_recurrences',
@@ -393,6 +399,9 @@ function bank_recurrence_prolonger($id_transaction, $abo_uid, $mode) {
 		'date_echeance' => date('Y-m-d H:i:s', $now),
 		'id_transaction_echeance' => $id_transaction,
 	];
+	if (!empty($payment_data)) {
+		$set['payment_data'] = $payment_data;
+	}
 
 	$set_echeance = bank_recurrence_calculer_echeance_next(
 		$recurrence['echeances'],
@@ -634,7 +643,8 @@ function bank_recurrence_renouveler($abo_uid) {
 		'id_transaction' => $id_transaction,
 		'transaction_hash' => $transaction['transaction_hash'],
 		'abo' => 'recurrence',
-		'abo_uid' => $abo_uid
+		'abo_uid' => $abo_uid,
+		'payment_data' => $recurrence['payment_data']
 	);
 
 	$call_response = charger_fonction("response", "presta/".$config['presta']."/call/");
@@ -644,6 +654,14 @@ function bank_recurrence_renouveler($abo_uid) {
 	$success = array_shift($res);
 
 	if (!$id_transaction or !$success) {
+		bank_recurrence_invalide(0, array(
+			'erreur' => "Abonnement $abo_uid Recurrence #$id_bank_recurrence | echec paiement transaction #" . ($id_transaction ? $id_transaction : $response['id_transaction']),
+			'log' => '',
+			'send_mail' => true,
+			'sujet' => "Echec renouvellement recurrence #$id_bank_recurrence",
+			'update' => false,
+			'where' => 'bank_recurrence_renouveler',
+		));
 		return false;
 	}
 
