@@ -37,6 +37,10 @@ function presta_paybox_call_response_dist($config, $response = null){
 		return array(0, false);
 	}
 
+	if (!isset($response['ETAT_PBX'])) {
+		$response['ETAT_PBX'] = '';
+	}
+
 	if ($response['ETAT_PBX']==='PBX_RECONDUCTION_ABT'){
 		// c'est un revouvellement initie par paybox
 		// verifier qu'on a pas deja traite cette recurrence !
