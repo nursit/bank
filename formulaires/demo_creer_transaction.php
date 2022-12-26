@@ -13,10 +13,15 @@ if (!defined('_ECRIRE_INC_VERSION')){
 	return;
 }
 
+include_spip('inc/bank_devises');
+
 function formulaires_demo_creer_transaction_charger_dist(){
+
+	$devise_defaut = bank_devise_defaut();
 	$valeurs = array(
 		'montant' => '',
 		'montant_ht' => '',
+		'devise' => $devise_defaut['code'],
 		'id_auteur' => '',
 		'auteur_id' => '',
 		'auteur' => '',
@@ -29,6 +34,13 @@ function formulaires_demo_creer_transaction_charger_dist(){
 
 function formulaires_demo_creer_transaction_verifier_dist(){
 	$erreurs = array();
+
+	$devise = _request('devise');
+	$devises = bank_lister_devises();
+	if (!isset($devises[$devise])) {
+		$erreurs['devise'] = _L("Devise inconnue ! Installez le plugin intl ?");
+	}
+
 	return $erreurs;
 }
 
@@ -40,14 +52,19 @@ function formulaires_demo_creer_transaction_traiter_dist(){
 		and isset($GLOBALS['visiteur_session']['id_auteur'])){
 		$id_auteur = $GLOBALS['visiteur_session']['id_auteur'];
 	}
-	$id_transaction = $inserer_transaction(
-		_request('montant'),
-		_request('montant_ht'),
-		$id_auteur,
-		_request('auteur_id'),
-		_request('auteur'),
-		_request('parrain'),
-		_request('tracking_id'));
+
+	$montant = _request('montant');
+	$options = array(
+		'montant_ht' => _request('montant_ht'),
+		'devise' => _request('devise') ?: 'EUR',
+		'id_auteur' => $id_auteur,
+		'auteur_id' => _request('auteur_id'),
+		'auteur' => _request('auteur'),
+		'parrain' => _request('parrain'),
+		'tracking_id' => _request('tracking_id'),
+	);
+
+	$id_transaction = $inserer_transaction($montant, $options);
 
 	if ($id_transaction){
 		return array('message_ok' => "Transaction $id_transaction cree", 'editable' => true);
@@ -55,4 +72,3 @@ function formulaires_demo_creer_transaction_traiter_dist(){
 		return array('message_erreur' => "Echec creation de la transaction", 'editable' => true);
 	}
 }
-
