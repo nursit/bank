@@ -12,7 +12,17 @@
 <style>
 ]
 
-.transaction .infos {color:#666;margin-bottom: 1em;}
+.transaction .infos {margin-bottom: 1.5em;}
+
+.transaction .champ .label {color: #666;}
+.transaction .champ .label,
+.transaction .champ .valeur {display: block;}
+
+.transaction .infos .champ {margin-bottom: 0.375em; display: flex}
+.transaction .infos .champ .label {flex-basis: 25%;max-width: 25%;}
+.transaction .infos .champ.montant .valeur,
+.transaction .infos .champ.montant_regle .valeur {font-weight: bold}
+
 .box_modalbox .transaction .message {max-width: 60em;}
 .liste-objets.transactions th.id_auteur img {vertical-align: bottom;}
 .liste-objets.transactions th.id_auteur .on img {background-color: #888}

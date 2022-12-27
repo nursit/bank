@@ -47,6 +47,21 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'explication_page_configurer_paiement' => 'Set up active payment systems',
 
 // I
+	'info_liee_a_qui' => "Linked to:",
+	'info_autorisation_paiement' => "Authorisation Nb:",
+	'info_montant_transaction' => "Amount:",
+	'info_montant_regle' => "Paid Amount:",
+	'info_date_paiement' => "Payment Date:",
+	'info_abo_uid' => "Subscription Nb:",
+	'info_refcb' => "Card Nb:",
+	'info_validite' => "Validity:",
+	'info_pay_id' => "Payment ID:",
+	'info_commande' => "Order linked:",
+	'info_facture' => "Invoice linked:",
+	'info_message_utilisateur' => "Displayed Message:",
+	'info_erreur_interne' => "Error:",
+	'info_mode_paiement' => 'Payment mode:',
+
 	'info_aucune_transaction' => 'No transaction',
 	'info_1_transaction' => '1 transaction',
 	'info_cheque_envoyer' => 'Send your check made out in Euros
@@ -208,4 +223,3 @@ _ Bank account:
 	'titre_transaction' => 'Transaction',
 	'titre_transactions' => 'Transactions',
 );
-

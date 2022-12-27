@@ -47,6 +47,21 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'explication_page_configurer_paiement' => 'Configurez les systèmes de paiement actifs',
 
 // I
+    'info_liee_a_qui' => "Liée à :",
+    'info_autorisation_paiement' => "N° Autorisation :",
+	'info_montant_transaction' => "Montant :",
+	'info_montant_regle' => "Montant Réglé :",
+	'info_date_paiement' => "Date de Paiement :",
+	'info_abo_uid' => "N° Abonnement :",
+	'info_refcb' => "N° Carte :",
+	'info_validite' => "Validité :",
+	'info_pay_id' => "ID de Paiement :",
+	'info_commande' => "Commande liée :",
+	'info_facture' => "Facture liée :",
+	'info_message_utilisateur' => "Message affiché :",
+	'info_erreur_interne' => "Erreur :",
+	'info_mode_paiement' => 'Mode Paiement :',
+
 	'info_aucune_transaction' => 'Aucune transaction',
 	'info_1_transaction' => '1 transaction',
 	'info_cheque_envoyer' => 'Envoyez votre chèque libellé en euros
