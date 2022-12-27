@@ -28,6 +28,12 @@
 				<span class='erreur_message'>(#GET{erreur})</span>]
 				<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
 			</div>
+			#SET{name,devise}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
+			<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
+				<label>#GET{name}</label>[
+				<span class='erreur_message'>(#GET{erreur})</span>]
+				<input type="text" class="text" name="#GET{name}" value="#ENV*{#GET{name}}" />
+			</div>
 			#SET{name,id_auteur}#SET{erreur,#ENV**{erreurs}|table_valeur{#GET{name}}}
 			<div class="editer editer_#GET{name}[ (#GET{erreur}|oui)erreur]">
 				<label>#GET{name}</label>[

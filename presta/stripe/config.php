@@ -72,7 +72,7 @@ function action_stripe_process_checkout_dist() {
 			}
 		}
 		if ($mode and bank_response_simple($mode, $contexte)) {
-			$quoi = (($contexte['abo'] ?? false) ? 'abo' : 'acte');
+			$quoi = ((isset($contexte['abo']) ? $contexte['abo'] : false) ? 'abo' : 'acte');
 			$call_request = charger_fonction('request', 'presta/stripe/call');
 			$contexte = $call_request($id_transaction, $transaction_hash, $config, $quoi, ['process_checkout' => true]);
 			$checkout_session_id = $contexte['checkout_session_id'];
@@ -83,7 +83,7 @@ function action_stripe_process_checkout_dist() {
 			$GLOBALS['redirect'] = $redirect;
 		}
 		else {
-			$mode = $mode ?: 'stripe';
+			$mode = ($mode ?: 'stripe');
 			spip_log("action_stripe_process_checkout_dist: action corrompue '$action' impossible de traiter la demande", $mode . _LOG_ERREUR);
 		}
 	}

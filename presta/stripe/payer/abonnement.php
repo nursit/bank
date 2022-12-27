@@ -23,7 +23,7 @@ if (!defined('_ECRIRE_INC_VERSION')){
  */
 function presta_stripe_payer_abonnement_dist($config, $id_transaction, $transaction_hash, $options = array()){
 
-	$process_checkout = $options['process_checkout'] ?? false;
+	$process_checkout = (isset($options['process_checkout']) ? $options['process_checkout'] : false);
 	$call_request = charger_fonction('request', 'presta/stripe/call');
 	$contexte = $call_request($id_transaction, $transaction_hash, $config, 'abo', ['process_checkout' => $process_checkout]);
 

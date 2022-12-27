@@ -34,8 +34,8 @@ function bank_declarer_tables_objets_sql($tables){
 		'field' => array(
 			"id_transaction" => "bigint(21) NOT NULL",
 			"id_auteur" => "bigint(21) NOT NULL", // auteur (spip) loge qui realise la transaction
-			"auteur_id" => "varchar(19) NOT NULL", // autre identifiant auteur a defaut
-			"auteur" => "varchar(255) NOT NULL", // a defaut info auteur autre (email, n°...)
+			"auteur_id" => "varchar(255) NOT NULL DEFAULT ''", // autre identifiant auteur a defaut
+			"auteur" => "varchar(255) NOT NULL DEFAULT ''", // a defaut info auteur autre (email, n°...)
 			"transaction_hash" => "bigint(21) NOT NULL DEFAULT 0", // signature qui sert a securise un minima les skels
 			"date_transaction" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL",
 
@@ -48,7 +48,7 @@ function bank_declarer_tables_objets_sql($tables){
 			"autorisation_id" => "varchar(255) NOT NULL DEFAULT ''", // numero d'autorisation de debit envoye par le presta bancaire
 			"refcb" => "varchar(100) NOT NULL DEFAULT ''", // reference CB partielle (type/numero de carte tronque par exemple)
 			"validite" => "varchar(10) NOT NULL DEFAULT ''", // fin de validite de la CB (pour les paiements recurrents)
-			"abo_uid" => "varchar(55) NOT NULL DEFAULT ''", // numero d'abonne pour les paiements recurrents
+			"abo_uid" => "varchar(100) NOT NULL DEFAULT ''", // numero d'abonne pour les paiements recurrents
 			"pay_id" => "varchar(100) NOT NULL DEFAULT ''", // identifiant pour declencher un nouveau paiement sans saisie de carte
 
 			"montant_regle" => "varchar(25) NOT NULL DEFAULT ''", // montant regle (renvoye par le presta) en euros

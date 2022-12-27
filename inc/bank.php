@@ -606,6 +606,11 @@ function bank_transaction_echec($id_transaction, $args = array()){
 		"erreur" => $args['erreur'],
 		"message" => _T("bank:erreur_transaction_echec", array("ref" => "#$id_transaction")),
 	);
+
+	if (!empty($args['set'])) {
+		$set = array_merge($args['set'], $set);
+	}
+
 	// verifier que le champ erreur existe pour ne pas risquer de planter l'enregistrement si l'up de base n'a pas encore ete fait
 	if ($row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction))
 		AND !isset($row['erreur'])){
