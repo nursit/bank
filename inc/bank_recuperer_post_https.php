@@ -19,30 +19,45 @@ if (!defined('_ECRIRE_INC_VERSION')){
  * @param string $url
  * @param array|string $datas
  *   $datas peut etre un tableau de paire=>valeur, ou une chaine de get paire=valeur&...
- * @param string $user_agent
- * @param string $proxy_host
- * @param string $proxy_port
+ * @param array $options
+ * @param @deprecated string $proxy_host
+ * @param @deprecated string $proxy_port
  * @return array
  */
-function inc_bank_recuperer_post_https_dist($url, $datas = '', $user_agent = '', $proxy_host = '', $proxy_port = ''){
+function inc_bank_recuperer_post_https_dist($url, $datas = '', $options = [], $proxy_host = '', $proxy_port = ''){
+
+	if (is_string($options)) {
+		$user_agent = $options;
+		$options = [
+			'user_agent' => $user_agent,
+		];
+	}
+	if ($proxy_host) {
+		$options['proxy_host'] = $proxy_host;
+	}
+	if ($proxy_port) {
+		$options['proxy_port'] = $proxy_port;
+	}
 
 	$erreur = false;
 	$erreur_msg = "";
+	$data_string = $datas;
+	if (is_array($datas) AND count($datas)){
+		$data_string = http_build_query($datas);
+	}
 
 	if (!function_exists('curl_init')){
 		include_spip('inc/distant');
-		$nvpreq = $datas;
-		if (is_array($datas) AND count($datas)){
-			$nvpreq = http_build_query($datas);
-		}
-		spip_log("bank_recuperer_post_https sur $url via recuperer_url : $nvpreq", 'bank' . _LOG_DEBUG);
+		spip_log("bank_recuperer_post_https sur $url via recuperer_url : $data_string", 'bank' . _LOG_DEBUG);
 
-		$options = array(
-			'taille_max' => 1048576,
-			'datas' => $datas,
-			'boundary' => null
-		);
-		$response = recuperer_url($url, $options);
+		$recuperer_options = $options;
+		$recuperer_options['taille_max'] = 1048576;
+		$recuperer_options['datas'] = $datas;
+		if (!isset($recuperer_options['boundary'])) {
+			$recuperer_options['boundary'] = null;
+		}
+
+		$response = recuperer_url($url, $recuperer_options);
 		if (!$response or $response['status'] !== 200) {
 			spip_log("bank_recuperer_post_https sur $url via recuperer_url : " . json_encode($response), 'bank' . _LOG_ERREUR);
 			$erreur = true;
@@ -82,24 +97,27 @@ function inc_bank_recuperer_post_https_dist($url, $datas = '', $user_agent = '',
 		curl_setopt($ch, CURLOPT_ENCODING, 'gzip');
 		curl_setopt($ch, CURLOPT_BINARYTRANSFER, true);
 
-		if ($proxy_host) {
-			curl_setopt ($ch, CURLOPT_PROXY, $proxy_host . ($proxy_port ? ":$proxy_port" : ''));
+		if (!empty($options['proxy_host'])) {
+			$proxy = $options['proxy_host'] . (!empty($options['proxy_port']) ? ':' . $options['proxy_port'] : '');
+			curl_setopt ($ch, CURLOPT_PROXY, $proxy);
 		}
 
-		//NVPRequest for submitting to server
-		$nvpreq = $datas;
-		if (is_array($datas) AND count($datas)){
-			$nvpreq = http_build_query($datas);
-		}
-		spip_log("bank_recuperer_post_https sur $url via curl : $nvpreq", 'bank' . _LOG_DEBUG);
+		spip_log("bank_recuperer_post_https sur $url via curl : $data_string", 'bank' . _LOG_DEBUG);
 
-		if (!$user_agent){
-			$user_agent = "SPIP/Bank";
+		$user_agent = (empty($options['user_agent']) ? "SPIP/Bank" : '');
+
+		$headers = [];
+		if (!empty($options['headers'])) {
+			foreach ($options['headers'] as $champ => $valeur) {
+				$headers[] = $champ . ': ' . $valeur;
+			}
 		}
+		$headers[] = 'Connection: Close';
+		$headers[] = "User-Agent: $user_agent";
 
 		//setting the nvpreq as POST FIELD to curl
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $nvpreq);
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Connection: Close', "User-Agent: $user_agent"));
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
 
 		//getting response from server
 		$response = curl_exec($ch);
@@ -116,4 +134,3 @@ function inc_bank_recuperer_post_https_dist($url, $datas = '', $user_agent = '',
 
 	return array($response, $erreur, $erreur ? $erreur_msg : '');
 }
-
