@@ -985,3 +985,84 @@ function bank_annonce_version_plugin($format = 'string'){
 
 	return $infos;
 }
+
+
+
+/**
+ * Calcul du nom du jeton checkout
+ * Permet de gerer/eviter un double hit au moment de faire un appel au presta paiement pour preparer un paiement
+ * @param string $mode
+ * @param int $id_transaction
+ * @return string
+ */
+function bank_lock_checkout_token($mode, $id_transaction) {
+	return sous_repertoire(_DIR_TMP, 'bank') . $mode . "_checkout_" . strval($id_transaction) . ".lock";
+}
+
+/**
+ * Gestion du jeton checkout
+ *
+ * Le premier appel
+ * `$contexte = bank_lock_or_get_checkout($mode, $jeton);`
+ * permet de poser le jeton si pas de concurrence (retourne une valeur null),
+ * ou d'attendre que le process concurrent ait fini la même operation
+ * et dans ce cas retourne le `$contexte` obtenu par le process concurrent
+ *
+ * Si le premier appel renvoie une valeur null (on est le premier)
+ * le second appel permet de stocker le résultat ou de libérer le jeton en cas d'échec (si `$contexte===false`) :
+ * `bank_lock_or_get_checkout($mode, $jeton, $contexte);`
+ *
+ *
+ * @see bank_lock_checkout_token()
+ * @param string $mode
+ * @param string $jeton
+ *   jeton précédemment calculé par la fonction `bank_lock_checkout_token()`
+ * @param array|null|false $contexte
+ *   null : premier appel pour poser le lock ou attendre le résultat du process concurrent déjà en cours
+ *   array : stocker le résultat dans le jeton
+ *   false : echec de l'opération, on libère le lock
+ * @return array|null|false
+ */
+function bank_lock_or_get_checkout($mode, $jeton, $contexte = null) {
+	// le call request a echoué, libérer le jeton
+	if ($contexte === false) {
+		@unlink($jeton);
+		return false;
+	}
+	// le call request a reussi, stocker son résultat dans le jeton pour un éventuel hit concurrent qui attends
+	if (is_array($contexte)) {
+		file_put_contents($jeton, json_encode($contexte));
+
+		// nettoyer les vieux jetons
+		$oldies = glob(_DIR_TMP . "bank/" . $mode . "_checkout_*.lock");
+		foreach ($oldies as $old) {
+			if (filemtime($old) < $_SERVER['REQUEST_TIME'] - 86400) {
+				@unlink($old);
+			}
+		}
+		return $contexte;
+	}
+	// appel initial, on pose le jeton si il n'existe pas, sinon on attends son résultat (10s maxi)
+	if (is_null($contexte)) {
+		// anti double action : si on a deja un lock sur cette transaction datant de moins de 10s
+		// on attends le resultat fourni par le process concurrent
+		// sinon au bout de 10s on continue notre hit, tant pis
+		$jeton_valid = 10; // 10 secondes
+		if (file_exists($jeton) and filemtime($jeton) > $_SERVER['REQUEST_TIME'] - $jeton_valid) {
+			do {
+				spip_log("bank_lock_checkout() WAIT (double hit)", $mode . _LOG_INFO_IMPORTANTE);
+				$c = file_get_contents($jeton);
+				if ($c and $contexte = json_decode($c, true)) {
+					return $contexte;
+				}
+				sleep(1);
+			} while (time() < $_SERVER['REQUEST_TIME'] + $jeton_valid);
+
+			spip_log("bank_lock_checkout WAIT FAIL", $mode . _LOG_INFO_IMPORTANTE);
+		}
+		else {
+			@touch($jeton);
+		}
+	}
+	return null;
+}
