@@ -180,6 +180,7 @@ _ Bank account:
 	'label_signature_algo' => 'Sign Method',
 	'label_tri_mode' => 'Method',
 	'label_tri_autorisation' => 'Authorization',
+	'label_tri_devise' => 'Cur.',
 	'label_tri_montant_ht' => 'Net',
 	'label_tri_montant_ttc' => 'Gr.',
 	'label_tri_montant_paye' => 'Paid',

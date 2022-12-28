@@ -150,7 +150,7 @@ _ Compte bancaire :
 	'label_enregistrer_reglement_montant' => 'Montant réglé',
 	'label_filtre_statut_' => 'Toutes',
 	'label_filtre_statut_ok' => 'OK',
-	'label_filtre_statut_commande' => 'Cde',
+	'label_filtre_statut_commande' => 'Commande',
 	'label_filtre_statut_attente' => 'Att.',
 	'label_filtre_statut_echec' => 'Echec',
 	'label_filtre_statut_abandon' => 'Abandon',
