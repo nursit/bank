@@ -52,4 +52,15 @@
 .liste-objets.transactions .regle  {width: 5em}
 .liste-objets.transactions .date {width: 11em}
 
-.liste-objets.transactions.full-width { width: 95vw;left: 50%;margin-left: -47.5vw;z-index: 100;}
+.liste-objets.transactions .row_ok {background-color: hsl(var(--spip-color-success--h, 72), 55%, 90%);}
+.liste-objets.transactions .row_echec {background-color: hsl(var(--spip-color-error--h, 356), 55%, 95%);}
+.liste-objets.transactions .row_commande td {color: #777}
+.liste-objets.transactions .row_attente {background-color: hsl(var(--spip-color-notice--h,47), 90%, 90%);}
+.liste-objets.transactions .row_rembourse {background-color: hsl(var(--spip-color-info--h,197), 45%, 93%);}
+.liste-objets.transactions .row_abandon {background-color: #ddd; color: #777;}
+.liste-objets.transactions .row_abandon td {background-color: #ddd;}
+
+.table-transactions-wrapper.auteur .liste-objets.transactions th.autorisation_id,
+.table-transactions-wrapper.auteur .liste-objets.transactions td.autorisation_id {display: none}
+.box_mediabox .table-transactions-wrapper.auteur .liste-objets.transactions th.autorisation_id,
+.box_mediabox .table-transactions-wrapper.auteur .liste-objets.transactions td.autorisation_id {display: table-cell}

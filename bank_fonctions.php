@@ -217,6 +217,7 @@ function bank_affiche_auteurs_interventions($flux){
 
 		$flux['data'] .= '<!--bank-->' . recuperer_fond('prive/squelettes/inclure/liste-transactions', array(
 				'id_auteur' => $id_auteur,
+				'quoi' => 'auteur',
 			));
 
 	}

@@ -1,4 +1,4 @@
-<div class="table-transactions-wrapper" id="liste-transactions-wrapper">
+<div class="table-transactions-wrapper[ (#ENV{quoi})]" id="liste-transactions-wrapper">
 	<button class="btn btn_mini btn_secondaire toggle-full-width"
 	        onclick="jQuery.modalbox('#liste-transactions-wrapper',{type:'inline',minWidth:'95vw',minHeight:'95vh',maxWidth:'100vw',mawHeight:'100vh'});">[(#CHEMIN_IMAGE{expand-16.png}|balise_img)]</button>
 	<INCLURE{fond=prive/objets/liste/transactions,env,ajax} />
