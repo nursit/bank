@@ -8,6 +8,7 @@
 }})
 ]#SET{has_facture,''}#SET{has_commande,''}#SET{has_parrain,''}<B_transactions>
 <div class='liste-objets transactions[(#GET{has_facture}|oui)w-id_facture][(#GET{has_commande}|oui)w-id_commande][(#GET{has_parrain}|oui)w-parrain]'>
+	<div class="table-scroll">
 	<table class='spip liste'>
 	[<caption><strong class="caption">(#ENV*{titre,#GRAND_TOTAL|singulier_ou_pluriel{bank:info_1_transaction,bank:info_nb_transactions}})</strong></caption>]
 		<thead>
@@ -47,7 +48,7 @@
 				<td class="montant_ht">#MONTANT_HT</td>
 				<td class="montant">#MONTANT</td>
 				<td class="regle">#MONTANT_REGLE</td>
-				<td class="date">#DATE_TRANSACTION</td>
+				<td class="date">[(#DATE_PAIEMENT|intval|oui)<abbr title="Paid on #DATE_PAIEMENT">][(#DATE_TRANSACTION|replace{' ',' <small>'}|concat{'</small>'})][(#DATE_PAIEMENT|intval|oui)</abbr>]</td>
 				<td class="statut">[(#STATUT|match{echec|ok|rembourse}|et{#MESSAGE|trim|strlen}|?{[<abbr title="[(#MESSAGE|attribut_html)[ - (#ERREUR|attribut_html)]]">(#STATUT)</abbr>],#STATUT})][(#STATUT|in_array{#LISTE{commande,attente}}|et{#AUTORISER{regler,transaction,#ID_TRANSACTION}})<br/><a href="[(#URL_ECRIRE{payer,id_transaction=#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]"><:bank:payer:></a>]</td>
 				<td class="parrain">[(#PARRAIN)<br />#TRACKING_ID#SET{has_parrain,' '}]</td>
 				<td class="id_commande">[<a href='[(#ID_COMMANDE|generer_url_entite{commande})]'(#ID_COMMANDE|oui)>#ID_COMMANDE</a>#SET{has_commande,' '}]</td>
@@ -56,6 +57,7 @@
 		</BOUCLE_transactions>
 		</tbody>
 	</table>
+	</div>
 	[<nav class='pagination'>(#PAGINATION{prive})</nav>]
 </div>
 </B_transactions>[
