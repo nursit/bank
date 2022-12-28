@@ -37,7 +37,7 @@ function presta_paybox_call_response_dist($config, $response = null){
 		return array(0, false);
 	}
 
-	if ($response['ETAT_PBX']==='PBX_RECONDUCTION_ABT'){
+	if (!empty($response['ETAT_PBX']) and $response['ETAT_PBX']==='PBX_RECONDUCTION_ABT'){
 		// c'est un revouvellement initie par paybox
 		// verifier qu'on a pas deja traite cette recurrence !
 		if ($t2 = sql_fetsel("*", "spip_transactions", "autorisation_id=" . sql_quote($response['trans'] . "/" . $response['auth']))){
@@ -73,49 +73,45 @@ function presta_paybox_call_response_dist($config, $response = null){
 	if ($response['abo'] AND $id_transaction){
 
 		// c'est un premier paiement d'abonnement, l'activer
-		if ($response['ETAT_PBX']!=='PBX_RECONDUCTION_ABT'
-			AND $success){
+		if (empty($response['ETAT_PBX']) or $response['ETAT_PBX']!=='PBX_RECONDUCTION_ABT') {
+			if ($success) {
+				// date de fin de mois de validite de la carte
+				$date_fin = bank_date_fin_mois(2000 + intval(substr($response['valid'], 0, 2)), substr($response['valid'], 2, 2));
 
-			// date de fin de mois de validite de la carte
-			$date_fin = bank_date_fin_mois(2000+intval(substr($response['valid'], 0, 2)), substr($response['valid'], 2, 2));
+				#spip_log('response:'.var_export($response,true),$mode.'db');
+				#spip_log('date_fin:'.$date_fin,$mode.'db');
 
-			#spip_log('response:'.var_export($response,true),$mode.'db');
-			#spip_log('date_fin:'.$date_fin,$mode.'db');
+				// id_transaction contient toute la trame IDB_xx deriere le numero
+				// on ne retient que la valeur entiere
+				$id_transaction = intval($id_transaction);
 
-			// id_transaction contient toute la trame IDB_xx deriere le numero
-			// on ne retient que la valeur entiere
-			$id_transaction = intval($id_transaction);
+				if ($activer_abonnement = charger_fonction('activer_abonnement', 'abos', true)) {
+					$activer_abonnement($id_transaction, $response['abo'], $mode, $date_fin);
+				}
+			}
+		} else {
+			// ici donc $response['ETAT_PBX']==='PBX_RECONDUCTION_ABT'
 
-			if ($activer_abonnement = charger_fonction('activer_abonnement', 'abos', true)){
-				$activer_abonnement($id_transaction, $response['abo'], $mode, $date_fin);
+			if ($success){
+				// c'est un renouvellement reussi, il faut repercuter sur l'abonnement
+
+				if ($renouveler_abonnement = charger_fonction('renouveler_abonnement', 'abos', true)){
+					$renouveler_abonnement($id_transaction, $response['abo'], $mode);
+				}
+			} else {
+				// c'est un renouvellement en echec, il faut le resilier
+
+				if ($resilier = charger_fonction('resilier', 'abos', true)) {
+					$options = array(
+						'notify_bank' => false, // pas la peine : paybox a deja resilie l'abo vu paiement refuse
+						'immediat' => true,
+						'message' => "[bank] Transaction #$id_transaction refusee",
+						'erreur' => true,
+					);
+					$resilier("uid:" . $response['abo'], $options);
+				}
 			}
 		}
-
-		// c'est un renouvellement reussi, il faut repercuter sur l'abonnement
-		if ($response['ETAT_PBX']==='PBX_RECONDUCTION_ABT'
-			AND $success){
-
-			if ($renouveler_abonnement = charger_fonction('renouveler_abonnement', 'abos', true)){
-				$renouveler_abonnement($id_transaction, $response['abo'], $mode);
-			}
-		}
-
-		// c'est un renouvellement en echec, il faut le resilier
-		if ($response['ETAT_PBX']==='PBX_RECONDUCTION_ABT'
-			AND !$success){
-
-			if ($resilier = charger_fonction('resilier', 'abos', true)){
-				$options = array(
-					'notify_bank' => false, // pas la peine : paybox a deja resilie l'abo vu paiement refuse
-					'immediat' => true,
-					'message' => "[bank] Transaction #$id_transaction refusee",
-					'erreur' => true,
-				);
-				$resilier("uid:" . $response['abo'], $options);
-			}
-
-		}
-
 	}
 	return array($id_transaction, $success);
 }
