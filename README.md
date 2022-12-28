@@ -18,7 +18,11 @@ Il peut aussi être complété par
 
 ### Changelog
 
+* Version 5.3
+  * Amélioration de l'UX de la liste des transactions, du détail d'une transaction et des traductions
+
 * Version 5.2
+  * Support de Sherlock2 (LCL) dans SIPSv2
   * Amélioration du paiement par Stripe qui ne génère plus de checkout à chaque affichage de la page de paiement
   * Compatibilité PHP 8+
 
