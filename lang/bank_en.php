@@ -62,6 +62,14 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'info_erreur_interne' => "Error:",
 	'info_mode_paiement' => 'Payment mode:',
 
+	'info_statut_ok' => 'OK',
+	'info_statut_commande' => 'Order',
+	'info_statut_attente' => 'Pending',
+	'info_statut_echec' => 'Failed',
+	'info_statut_abandon' => 'Aborted',
+	'info_statut_rembourse' => 'Refunded',
+
+
 	'info_aucune_transaction' => 'No transaction',
 	'info_1_transaction' => '1 transaction',
 	'info_cheque_envoyer' => 'Send your check made out in Euros

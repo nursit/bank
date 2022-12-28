@@ -50,7 +50,7 @@
 .liste-objets.transactions .montant,
 .liste-objets.transactions .montant_ht,
 .liste-objets.transactions .regle  {width: 5em}
-.liste-objets.transactions .date {width: 11em}
+.liste-objets.transactions .date {width: 11em; text-align: var(--spip-left, left);}
 
 .liste-objets.transactions .row_ok {background-color: hsl(var(--spip-color-success--h, 72), 55%, 90%);}
 .liste-objets.transactions .row_echec {background-color: hsl(var(--spip-color-error--h, 356), 55%, 95%);}
@@ -59,6 +59,8 @@
 .liste-objets.transactions .row_rembourse {background-color: hsl(var(--spip-color-info--h,197), 45%, 93%);}
 .liste-objets.transactions .row_abandon {background-color: #ddd; color: #777;}
 .liste-objets.transactions .row_abandon td {background-color: #ddd;}
+
+.liste-objets.transactions td .btn_pay {margin-bottom: -0.125em;margin-top: -0.125em}
 
 .table-transactions-wrapper.auteur .liste-objets.transactions th.autorisation_id,
 .table-transactions-wrapper.auteur .liste-objets.transactions td.autorisation_id {display: none}

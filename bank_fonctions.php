@@ -224,6 +224,14 @@ function bank_affiche_auteurs_interventions($flux){
 	return $flux;
 }
 
+function bank_traduire_statut_transaction($statut) {
+	$statut = explode("[", $statut);
+	$statut_clair = array_shift($statut);
+	$statut_clair = _T('bank:info_statut_'.$statut_clair);
+	array_unshift($statut, $statut_clair);
+	return implode("[", $statut);
+}
+
 /**
  * Declarer les CRON
  *
