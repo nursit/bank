@@ -133,6 +133,8 @@ function bank_declarer_tables_objets_sql($tables){
 			"statut" => "varchar(25) NOT NULL DEFAULT ''", // prepa,valide,echec,fini
 			"date_fin" => "datetime DEFAULT '0000-00-00 00:00:00' NOT NULL", // date de fin cause validite carte par exemple, ou cause nombre d'echeances atteint
 
+			"log" => "TEXT NOT NULL DEFAULT ''", // un verbatim text des operations effectuées sur ce paiement recurrent
+
 			"maj" => "TIMESTAMP"
 		),
 		'key' => array(

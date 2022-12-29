@@ -143,7 +143,7 @@ function bank_upgrade($nom_meta_base_version, $version_cible){
 	);
 
 	// creation de la table spip_bank_recurrences
-	$maj['2.1.3'] = array(
+	$maj['2.1.4'] = array(
 		array('maj_tables', array('spip_bank_recurrences')),
 	);
 
