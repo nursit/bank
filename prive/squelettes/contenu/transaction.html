@@ -1,8 +1,10 @@
 [(#AUTORISER{menu,_transactions}|sinon_interdire_acces)]
 <BOUCLE_transaction(TRANSACTIONS){id_transaction}>
-<h1 class="grostitre"><:bank:titre_transaction:> ##ID_TRANSACTION</h1>
+
 <div class="transaction">
-	#BOITE_OUVRIR{'',infos simple}
+	[(#BOITE_OUVRIR{[
+		<h1><:bank:titre_transaction:> <tt>#(#ID_TRANSACTION)</tt>[(#VAL{transaction}|objet_icone|inserer_attribut{class,cadre-icone})]</h1>
+	],simple fiche_objet})]
 		<BOUCLE_auteur(AUTEURS){id_auteur}{tout}>
 		<div class="champ qui contenu_qui">
 			<div class='label'><:bank:info_liee_a_qui:></div>
@@ -24,10 +26,16 @@
 			[<div class="qui">Liée à (#AUTEUR)</div>]
 			<//B_auteuralt>
 		<//B_auteur>
-		[<div class="champ date contenu_date_transaction">
-			<div class='label'><:texte_date_creation_objet:></div>
-			<div class='valeur'>(#DATE_TRANSACTION|affdate_heure)</div>
-		</div>]
+
+		<div class="formulaire_spip formulaire_dater">
+			<div class="editer-groupe">
+				<div class="editer long_label editer_date">
+					<label><:texte_date_creation_objet:></label>
+					<span class="affiche">[(#DATE_TRANSACTION|affdate_heure)]</span>
+				</div>
+			</div>
+		</div>
+
 		[<div class="champ mode contenu_mode">
 			<div class='label'><:bank:info_mode_paiement:></div>
 			<div class='valeur'><tt>(#MODE)</tt></div>
@@ -94,25 +102,26 @@
 			<div class='valeur'><a href='[(#URL_PAGE{facture}|parametre_url{id_facture,#ID_FACTURE}|parametre_url{hash,#INFO_DETAILS{facture,#ID_FACTURE}|md5})]'>#ID_FACTURE</a></div>
 		</div>]
 
+		[(#FINIE|<{0}|oui)
+		<div class="msg-alert error"><:bank:erreur_transaction_traitement_incomplet:></div>
+		]
+
+		[<div class="msg-alert notice">
+			<div class="champ message contenu_message">
+				<div class='label'><:bank:info_erreur_interne:></div>
+				<div class='valeur'>(#ERREUR)</div>
+			</div>
+		</div>]
+
+		[<div class="msg-alert info">
+			<div class="champ message contenu_message">
+				<div class='label'><:bank:info_message_utilisateur:></div>
+				<div class='valeur'>(#MESSAGE)</div>
+			</div>
+		</div>]
+
 	#BOITE_FERMER
 
-	[(#FINIE|<{0}|oui)
-	<div class="msg-alert error"><:bank:erreur_transaction_traitement_incomplet:></div>
-	]
-
-	[<div class="msg-alert notice">
-		<div class="champ message contenu_message">
-			<div class='label'><:bank:info_erreur_interne:></div>
-			<div class='valeur'>(#ERREUR)</div>
-		</div>
-	</div>]
-
-	[<div class="msg-alert info">
-		<div class="champ message contenu_message">
-			<div class='label'><:bank:info_message_utilisateur:></div>
-			<div class='valeur'>(#MESSAGE)</div>
-		</div>
-	</div>]
 
 	[(#STATUT|in_array{#LISTE{commande,attente}}|et{#AUTORISER{regler,transaction,#ID_TRANSACTION}})
 		[(#URL_ECRIRE{payer,id_transaction=#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH}|icone_verticale{<:bank:paiement:>,credit-card,'',right})]
