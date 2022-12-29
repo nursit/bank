@@ -16,11 +16,17 @@ if (!defined('_ECRIRE_INC_VERSION')){
 
 include_spip('inc/bank');
 
-function bank_recurrences_watch($max_items = 0, $timeout = null) {
-	// trouver les recurrences à renouveler/terminer
+/**
+ * @param int $max_items
+ * @param null $timeout
+ * @return array
+ */
+function bank_recurrences_watch_lister_actions($max_items = 0, $timeout = null) {
+	// trouver les recurrences à renouveler/terminer et
 	$now = date('Y-m-d H:i:s');
 	$now_fin_journee = date('Y-m-d 23:59:59');
 	$nb = 0;
+	$actions = [];
 	do {
 		$recurrences = sql_allfetsel(
 			'uid, date_fin<='.sql_quote($now).' as termine',
@@ -28,27 +34,27 @@ function bank_recurrences_watch($max_items = 0, $timeout = null) {
 			"statut='valide' AND id_transaction_echeance_next=0 AND (termine OR date_echeance_next<=".sql_quote($now_fin_journee).")",
 			'',
 			'termine DESC, date_echeance_next',
-			'0,5'
+			'0,20'
 		);
 		if (!empty($recurrences)) {
 			foreach ($recurrences as $recurrence) {
-				if (
-					($max_items and $nb >= $max_items)
-					or ($timeout and time()>$timeout)
-				) {
-					return false; // on a pas fini
-				}
 				if ($recurrence['termine']) {
-					bank_recurrence_terminer($recurrence['uid']);
+					$actions[] = ['bank_recurrence_terminer', $recurrence['uid']];
 				}
 				else {
-					bank_recurrence_renouveler($recurrence['uid']);
+					$actions[] = ['bank_recurrence_renouveler', $recurrence['uid']];
+				}
+				if (
+					($max_items and ++$nb >= $max_items)
+					or ($timeout and time()>$timeout)
+				) {
+					return $actions; //on renvoie ce qu'on a deja pu lister
 				}
 			}
 		}
 	} while (!empty($recurrences));
 
-	return true;
+	return $actions;
 }
 
 /**
