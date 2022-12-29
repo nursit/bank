@@ -13,7 +13,7 @@
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
 <div class='payer_mode payer_simu payer_abonnement'>
 	<h4 class="titre h4">S'abonner [SIMULATION] :</h4>
-	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
+	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement{abo})</p>]
 	<div class='boutons'>
 		#BOUTON_ACTION{'Simuler l&#39;abonnement',#ENV{action}}
 		#BOUTON_ACTION{'Simuler l&#39;abonnement avec paiement en attente',#ENV{action_wait}}

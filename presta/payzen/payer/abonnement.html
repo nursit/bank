@@ -14,7 +14,7 @@
 <B_cb>
 <div class='payer_mode payer_#ENV{presta,payzen} payer_abonnement'>
 	<h4 class="titre h4">[(#ENV{payer_par_title,<:bank:abonnement_par_carte_bancaire:>})]</h4>
-	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
+	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement{abo})</p>]
 	<div class='boutons'>
 	<BOUCLE_cb(POUR){tableau #ENV{hidden}}{cle !IN SDD,E_CV}>
 		[(#INCLURE{fond=presta/payzen/payer/inc-choix-paiement,env,hidden=#VALEUR*,brand=#CLE*,logobrand=[(#VAL{#ENV{presta,payzen}}|bank_trouver_logo{#ENV{logo}|table_valeur{#CLE}}|bank_label_bouton_img_ou_texte{[(#CLE|bank_label_payer_par_carte)]})]})]
@@ -26,7 +26,7 @@
 <B_sepa>
 <div class='payer_mode payer_#ENV{presta,payzen} payer_sepa payer_abonnement'>
 	<h4 class="titre h4">[(#ENV{payer_par_title,<:bank:abonnement_par_prelevement_sepa:>})]</h4>
-	[<p class="explication">(#ENV{config/presta}|concat{_sepa}|bank_explication_mode_paiement)</p>]
+	[<p class="explication">(#ENV{config/presta}|concat{_sepa}|bank_explication_mode_paiement{abo})</p>]
 	<p class="explication"><:bank:info_prelevement_sepa{presta=PayZen}:></p>
 	<div class='boutons'>
 	<BOUCLE_sepa(POUR){tableau #ENV{hidden}}{cle=SDD}>

@@ -13,7 +13,7 @@
 <BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
   <div class="payer_mode payer_stripe payer_abonnement">
 	  <h4 class="titre h4">[(#ENV{payer_par_title,<:bank:abonnement_par_carte_bancaire:>})]</h4>
-	  [<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
+	  [<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement{abo})</p>]
 	  <div class='boutons[ (#ENV{autosubmit}|?{loading})]'>
 		  [(#SET{texte,<:bank:payer_par_carte_bancaire:>})]
 		  [(#ENV{checkout_session_id}|oui)

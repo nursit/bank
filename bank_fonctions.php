@@ -147,9 +147,13 @@ function bank_label_payer_par_carte($code_carte){
  * @param string $mode
  * @return string
  */
-function bank_explication_mode_paiement($mode){
-	$mode = preg_replace(",[/-]([0-9A-F]{4})$,Uims", " <span class='small'>\\1</span>", $mode);
-	$explication = _T('bank:explication_mode_paiement_' . $mode, array(), array('force' => false));
+function bank_explication_mode_paiement($mode, $abonnement = false) {
+	$mode = preg_replace(",[/-]([0-9A-F]{4})$,Uims", "", $mode);
+	$chaine = 'bank:explication_mode_paiement_' . $mode;
+	if ($abonnement) {
+		$chaine .= "_abonnement";
+	}
+	$explication = _T($chaine, array(), array('force' => false));
 	return $explication;
 }
 
