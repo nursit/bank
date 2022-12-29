@@ -27,6 +27,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'bouton_monter' => 'monter',
 	'bouton_rembourser' => 'Marquer comme remboursée',
 	'bouton_abondonner_transaction' => 'Abandonner cette transaction',
+	'bouton_annuler_bank_recurrence' => 'Annuler le paiement récurrent',
 
 // C
 	'carte_bleu' => 'Carte Bleue',

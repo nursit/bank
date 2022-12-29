@@ -3,7 +3,11 @@
 
 	#PIPELINE{boite_infos,#ARRAY{data,'',args,#ARRAY{'type',bank_recurrence,'id',#ID_BANK_RECURRENCE}}}
 
+	[(#AUTORISER{annuler,bank_recurrence,#ID_BANK_RECURRENCE})
+	[(#BOUTON_ACTION{<:bank:bouton_annuler_bank_recurrence:>, #URL_ACTION_AUTEUR{annuler_bank_recurrence,#ID_BANK_RECURRENCE,#SELF}, btn btn_danger})]
+	]
 #BOITE_FERMER
+
 
 #PIPELINE{afficher_config_objet,#ARRAY{args,#ARRAY{type,bank_recurrence,id,#ID_BANK_RECURRENCE},data,''}}
 </BOUCLE_bank_recurrence>
