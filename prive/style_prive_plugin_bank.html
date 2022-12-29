@@ -14,20 +14,38 @@
 
 .transaction .infos {margin-bottom: 1.5em;}
 
+.bank_recurrence .champ .label,
 .transaction .champ .label {color: #666;}
+.bank_recurrence .champ .label,
 .transaction .champ .label,
-.transaction .champ .valeur {display: block;}
 
-.transaction .infos .champ {margin-bottom: 0.375em; display: flex}
-.transaction .infos .champ .label {flex-basis: 25%;max-width: 25%;}
-.transaction .infos .champ.montant .valeur,
-.transaction .infos .champ.montant_regle .valeur {font-weight: bold}
+.bank_recurrence .champ .valeur,
+.transaction .champ .valeur {display: block;text-align: var(--spip-left, left);}
+
+.bank_recurrence .fiche_objet .champ {margin-bottom: 0.375em; display: flex}
+.bank_recurrence .fiche_objet .champ .label {flex-basis: 25%;max-width: 25%;}
+.bank_recurrence .fiche_objet .champ .valeur {flex-basis: 75%;max-width: 75%;}
+.transaction .fiche_objet .champ {margin-bottom: 0.375em; display: flex}
+.transaction .fiche_objet .champ .label {flex-basis: 25%;max-width: 25%;}
+.transaction .fiche_objet .champ .valeur {flex-basis: 75%;max-width: 75%;}
+
+.transaction .fiche_objet .champ.montant .valeur,
+.transaction .fiche_objet .champ.montant_regle .valeur {font-weight: bold}
+
+.bank_recurrence .fiche_objet .puce_statut  {width: 16px;height:16px;margin-right: 0.5em;}
+.bank_recurrence .fiche_objet .champ.contenu_echeances .valeur pre { margin: 0; padding: 1em;background-color: rgba(0,0,0,5%); border:1px solid rgba(0,0,0,10%);; border-radius: 0.25em;}
+.bank_recurrence .fiche_objet .champ.contenu_echeances .valeur pre br:first-child{display: none}
+.bank_recurrence .fiche_objet .champ.contenu_echeances {margin-bottom: 1.5em}
 
 .box_modalbox .transaction .message {max-width: 60em;}
 
+.table-recurrences-wrapper,
 .table-transactions-wrapper {position: relative;}
+.table-recurrences-wrapper .btn.toggle-full-width,
 .table-transactions-wrapper .btn.toggle-full-width {position: absolute; right: 0.5em; top: 0.5em;z-index: 10;padding: 0.375em;}
+.box_mediabox .table-recurrences-wrapper .btn.toggle-full-width,
 .box_mediabox .table-transactions-wrapper .btn.toggle-full-width {display: none}
+
 .liste-objets.transactions {}
 .liste-objets.transactions .table-scroll {overflow: auto; overflow-y:visible;}
 .liste-objets.transactions th.id_auteur img {vertical-align: bottom;}
@@ -52,13 +70,16 @@
 .liste-objets.transactions .regle  {width: 5em}
 .liste-objets.transactions .date {width: 11em; text-align: var(--spip-left, left);}
 
+.liste-objets.bank_recurrences .row_valide,
 .liste-objets.transactions .row_ok {background-color: hsl(var(--spip-color-success--h, 72), 55%, 90%);}
+.liste-objets.bank_recurrences .row_echec,
 .liste-objets.transactions .row_echec {background-color: hsl(var(--spip-color-error--h, 356), 55%, 95%);}
+.liste-objets.bank_recurrences .row_prepa,
 .liste-objets.transactions .row_commande td {color: #777}
 .liste-objets.transactions .row_attente {background-color: hsl(var(--spip-color-notice--h,47), 90%, 90%);}
 .liste-objets.transactions .row_rembourse {background-color: hsl(var(--spip-color-info--h,197), 45%, 93%);}
+.liste-objets.bank_recurrences .row_fini,
 .liste-objets.transactions .row_abandon {background-color: #ddd; color: #777;}
-.liste-objets.transactions .row_abandon td {background-color: #ddd;}
 
 .liste-objets.transactions td .btn_pay {margin-bottom: -0.125em;margin-top: -0.125em}
 

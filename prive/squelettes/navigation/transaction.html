@@ -1,0 +1,23 @@
+<BOUCLE_transaction(transactions){id_transaction}{statut?}>
+#BOITE_OUVRIR{'','info'}
+
+	[(#PIPELINE{boite_infos,[(#ARRAY{data,'',args,[(#ARRAY{'type',transaction,'id',#ID_TRANSACTION})]})]}
+	|bank_inserer_dans_boite_infos{[
+		<div class="instituer_objet">
+			<div class="formulaire_spip formulaire_editer formulaire_instituer formulaire_instituer_objet formulaire_instituer_objet-transaction">
+				<div class="editer-groupe">
+					<div class="editer editer_statut statut_valide obligatoire">
+						<label><:bank:info_changer_statut_transaction:></label>
+						<span class="show">
+							<span class="statut">[(#STATUT|puce_statut{transaction})] (#STATUT|bank_traduire_statut_transaction)</span>
+					</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	]})]
+
+#BOITE_FERMER
+
+#PIPELINE{afficher_config_objet,#ARRAY{args,#ARRAY{type,transaction,id,#ID_TRANSACTION},data,''}}
+</BOUCLE_transaction>
