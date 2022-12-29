@@ -251,6 +251,7 @@ function bank_recurrence_creer($id_transaction, $mode, $echeance = null) {
 			spip_log("bank_recurrence_creer: Abonnement Transaction #$id_transaction : impossible de créer la recurrence en base dans spip_bank_recurrences", $mode . _LOG_ERREUR);
 			return false;
 		}
+		bank_recurrence_tracer($id_bank_recurrence, "création de la récurrence selon transaction #$id_transaction " . json_encode($ins));
 		$recurrence = sql_fetsel('*', 'spip_bank_recurrences', 'id_bank_recurrence=' . intval($id_bank_recurrence));
 	}
 
@@ -272,6 +273,7 @@ function bank_recurrence_creer($id_transaction, $mode, $echeance = null) {
 		if (!sql_updateq('spip_bank_recurrences', $set, 'id_bank_recurrence=' . intval($id_bank_recurrence))) {
 			return false;
 		}
+		bank_recurrence_tracer($id_bank_recurrence, "generation d'un UID abonnement uid=$uid");
 	}
 	else {
 		$uid = $recurrence['uid'];
@@ -359,6 +361,7 @@ function bank_recurrence_activer($id_transaction, $abo_uid, $mode, $payment_data
 	$set['statut'] = 'valide';
 
 	sql_updateq('spip_bank_recurrences', $set, 'id_bank_recurrence='.intval($id_bank_recurrence));
+	bank_recurrence_tracer($id_bank_recurrence, "activation de la récurrence statut => valide " . json_encode($set));
 
 	if ($activer_abonnement = charger_fonction('activer_abonnement', 'abos', true)){
 		$activer_abonnement($id_transaction, $abo_uid, $mode, $date_fin);
@@ -418,6 +421,7 @@ function bank_recurrence_prolonger($id_transaction, $abo_uid, $mode, $payment_da
 	$set = array_merge($set, $set_echeance);
 
 	sql_updateq('spip_bank_recurrences', $set, 'id_bank_recurrence='.intval($id_bank_recurrence));
+	bank_recurrence_tracer($id_bank_recurrence, "prolonger la récurrence " . json_encode($set));
 
 	// et renouveller l'abonnement
 	if ($renouveler_abonnement = charger_fonction('renouveler_abonnement', 'abos', true)){
@@ -467,6 +471,7 @@ function bank_recurrence_resilier($id_transaction, $abo_uid, $mode, $statut = 'e
 				'statut' => $statut,
 			);
 			sql_updateq('spip_bank_recurrences', $set, 'id_bank_recurrence='.intval($id_bank_recurrence));
+			bank_recurrence_tracer($id_bank_recurrence, "résiliation de la récurrence " . json_encode($set));
 			spip_log("bank_recurrence_resilier: Résiliation abonnement $abo_uid statut : ".$recurrence['statut'] . " => $statut", $mode . _LOG_INFO_IMPORTANTE);
 		}
 		else {
@@ -524,6 +529,7 @@ function bank_recurrence_terminer($abo_uid, $statut = 'fini') {
 				'statut' => $statut
 			);
 			sql_updateq('spip_bank_recurrences', $set, 'id_bank_recurrence='.intval($id_bank_recurrence));
+			bank_recurrence_tracer($id_bank_recurrence, "fin de la récurrence " . json_encode($set));
 			spip_log("bank_recurrence_terminer: Fin abonnement $abo_uid statut : ".$recurrence['statut'] . " => $statut", 'recurrence' . _LOG_INFO_IMPORTANTE);
 		}
 		else {
@@ -636,6 +642,7 @@ function bank_recurrence_renouveler($abo_uid) {
 
 	// notons l'id_transaction qu'on a préparé pour cette echeance
 	sql_updateq('spip_bank_recurrences', array('id_transaction_echeance_next' => $id_transaction), 'id_bank_recurrence='.intval($id_bank_recurrence));
+	bank_recurrence_tracer($id_bank_recurrence, "préparation du renouvellement de la récurrence id_transaction_echeance_next=$id_transaction");
 	$transaction = sql_fetsel('*', 'spip_transactions', 'id_transaction='.intval($id_transaction));
 
 
@@ -666,4 +673,35 @@ function bank_recurrence_renouveler($abo_uid) {
 	}
 
 	return true;
+}
+
+
+/**
+ * Mise en forme de la trace des abonnements/desabonnements dans le champ optin
+ *
+ * @paraim int $id_bank_recurrence
+ * @param string $action
+ *   nouvelle action tracee
+ * @return string
+ */
+function bank_recurrence_tracer($id_bank_recurrence, $action) {
+	$trace = [ date('Y-m-d H:i:s'),_T('public:par_auteur')];
+
+	if (!empty($GLOBALS['visiteur_session']['id_auteur'])) {
+		$trace[] = "#" . $GLOBALS['visiteur_session']['id_auteur'];
+	}
+	if (!empty($GLOBALS['visiteur_session']['nom'])) {
+		$trace[] = $GLOBALS['visiteur_session']['nom'];
+	}
+	if (!empty($GLOBALS['visiteur_session']['session_nom'])) {
+		$trace[] = $GLOBALS['visiteur_session']['session_nom'];
+	}
+	if (!empty($GLOBALS['visiteur_session']['session_email'])) {
+		$trace[] = $GLOBALS['visiteur_session']['session_email'];
+	}
+	$trace[] = '(' . $GLOBALS['ip'] . ')';
+	$trace[] = ":";
+	$trace[] = trim($action);
+	$trace = "\n" . implode(" ", $trace);
+	sql_update("spip_bank_recurrences", ['log' => "CONCAT(log, " . sql_quote($trace).")"], 'id_bank_recurrence='.intval($id_bank_recurrence));
 }
