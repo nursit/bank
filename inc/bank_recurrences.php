@@ -501,7 +501,7 @@ function bank_recurrence_resilier($id_transaction, $abo_uid, $mode, $statut = 'e
  * @param string $statut
  * @return bool
  */
-function bank_recurrence_terminer($abo_uid, $statut = 'fini') {
+function bank_recurrence_terminer($abo_uid, $statut = 'fini', $immediat = true) {
 
 	$ok = true;
 	if (!$recurrence = sql_fetsel(
@@ -543,7 +543,7 @@ function bank_recurrence_terminer($abo_uid, $statut = 'fini') {
 	if ($resilier = charger_fonction('resilier', 'abos', true)){
 		$options = array(
 			'notify_bank' => false, // pas la peine : recurrence deja resilie ci-dessus
-			'immediat' => true,
+			'immediat' => $immediat,
 			'message' => "[bank] Récurrence $abo_uid terminée",
 		);
 		$resilier("uid:" . $abo_uid, $options);

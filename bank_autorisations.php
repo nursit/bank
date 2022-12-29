@@ -57,6 +57,16 @@ function autoriser_bankrecurrence_modifier_dist($faire, $mode = '', $id = 0, $qu
 	return false;
 }
 
+function autoriser_bankrecurrence_annuler_dist($faire, $mode = '', $id = 0, $qui = NULL, $opt = NULL){
+	if (!autoriser('webmestre')) {
+		return false;
+	}
+	if (intval($id) and sql_countsel('spip_bank_recurrences', 'id_bank_recurrence='.intval($id)." AND statut='valide'")) {
+		return true;
+	}
+	return false;
+}
+
 /**
  * Seuls les webmestres peuvent encaisser un cheque
  * webmaster.
