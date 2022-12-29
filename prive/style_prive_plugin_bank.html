@@ -33,7 +33,9 @@
 .transaction .fiche_objet .champ.montant_regle .valeur {font-weight: bold}
 
 .bank_recurrence .fiche_objet .puce_statut  {width: 16px;height:16px;margin-right: 0.5em;}
-.bank_recurrence .fiche_objet .champ.contenu_echeances .valeur pre { margin: 0; padding: 1em;background-color: rgba(0,0,0,5%); border:1px solid rgba(0,0,0,10%);; border-radius: 0.25em;}
+.bank_recurrence .bank_recurrence_logs pre,
+.bank_recurrence .fiche_objet .champ.contenu_echeances .valeur pre { margin: 0; padding: 1em;background-color: rgba(0,0,0,5%); border:1px solid rgba(0,0,0,10%);; border-radius: 0.25em; overflow: auto}
+.bank_recurrence .bank_recurrence_logs pre br:first-child,
 .bank_recurrence .fiche_objet .champ.contenu_echeances .valeur pre br:first-child{display: none}
 .bank_recurrence .fiche_objet .champ.contenu_echeances {margin-bottom: 1.5em}
 
@@ -83,7 +85,7 @@
 
 .liste-objets.transactions td .btn_pay {margin-bottom: -0.125em;margin-top: -0.125em}
 
-.table-transactions-wrapper.auteur .liste-objets.transactions th.autorisation_id,
-.table-transactions-wrapper.auteur .liste-objets.transactions td.autorisation_id {display: none}
-.box_mediabox .table-transactions-wrapper.auteur .liste-objets.transactions th.autorisation_id,
-.box_mediabox .table-transactions-wrapper.auteur .liste-objets.transactions td.autorisation_id {display: table-cell}
+.table-transactions-wrapper.objet .liste-objets.transactions th.autorisation_id,
+.table-transactions-wrapper.objet .liste-objets.transactions td.autorisation_id {display: none}
+.box_mediabox .table-transactions-wrapper.objet .liste-objets.transactions th.autorisation_id,
+.box_mediabox .table-transactions-wrapper.objet .liste-objets.transactions td.autorisation_id {display: table-cell}

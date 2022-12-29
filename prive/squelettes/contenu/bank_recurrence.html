@@ -54,10 +54,10 @@
 		<div class='valeur'>[<a href='[(#ID_TRANSACTION_ECHEANCE_NEXT|generer_url_entite{transaction})]' class="popin"><:bank:titre_transaction:> #(#ID_TRANSACTION_ECHEANCE_NEXT) [(#INFO_MONTANT{transaction,#ID_TRANSACTION_ECHEANCE_NEXT}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION_ECHEANCE_NEXT}})]</a>]</div>
 	</div>
 	]
-[<div class="champ contenu_echeances">
-	<div class='label'><:bank:info_echeances:></div>
-	<div class='valeur'><pre>(#ECHEANCES**|json_decode{1}|print)</pre></div>
-</div>]
+	[<div class="champ contenu_echeances">
+		<div class='label'><:bank:info_echeances:></div>
+		<div class='valeur'><pre>(#ECHEANCES**|json_decode{1}|print)</pre></div>
+	</div>]
 
 	[(#BOITE_FERMER)]
 
@@ -69,5 +69,10 @@
 	]
 
 #BOITE_FERMER
+	<INCLURE{fond=prive/squelettes/inclure/liste-transactions,env,ajax,nb=50,abo_uid=#UID,quoi='objet bank_recurrence',sinon=<:bank:info_aucune_transaction:>} />
+
+	<div class="bank_recurrence_logs">
+		<pre>[(#LOG|entites_html)]</pre>
+	</div>
 </div>
 </BOUCLE_bank_recurrence>
