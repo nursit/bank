@@ -90,19 +90,27 @@ function bank_declarer_tables_objets_sql($tables){
 			'parrain' => 1,
 			'tracking_id' => 1,
 			'mode' => 1,
-		)
+		),
+		'statut_images' => [
+			'commande' => 'puce-prepa-8.png',
+			'attente' => 'puce-prop-8.png',
+			'ok' => 'puce-publier-8.png',
+			'rembourse' => 'puce-refuser-8.png',
+			'echec' => 'puce-supprimer-8.png',
+			'abandon' => 'puce-supprimer-8.png',
+		],
 	);
 
 	$tables['spip_bank_recurrences'] = array(
 		'page' => false,
-		'titre' => "abo_uid as titre, '' as lang",
+		'titre' => "uid as titre, '' as lang",
 		'date' => 'date_creation',
 		'principale' => 'oui',
-		'texte_objets' => 'bank:titre_bank_reccurences',
-		'texte_objet' => 'bank:titre_bank_reccurence',
-		'info_aucun_objet' => 'bank:info_aucune_bank_reccurence',
-		'info_1_objet' => 'bank:info_1_bank_reccurence',
-		'info_nb_objets' => 'bank:info_nb_bank_reccurences',
+		'texte_objets' => 'bank:titre_bank_recurrences',
+		'texte_objet' => 'bank:titre_bank_recurrence',
+		'info_aucun_objet' => 'bank:info_aucune_bank_recurrence',
+		'info_1_objet' => 'bank:info_1_bank_recurrence',
+		'info_nb_objets' => 'bank:info_nb_bank_recurrences',
 		'field' => array(
 			"id_bank_recurrence" => "bigint(21) NOT NULL",
 			"id_transaction" => "bigint(21) NOT NULL DEFAULT 0", // id_transaction de la premiere occurence
@@ -134,7 +142,34 @@ function bank_declarer_tables_objets_sql($tables){
 		'rechercher_champs' => array(
 			'id_bank_recurrence' => 1,
 			'uid' => 1,
-		)
+		),
+		'statut' => [
+			[
+				'champ' => 'statut',
+				'publie' => 'valide',
+				'previsu' => 'prepa,valide,echec,fini',
+				'exception' => ['statut', 'tout']
+			]
+		],
+		'statut_titres' => [
+			'prepa' => 'bank:info_recurrence_statut_prepa',
+			'valide' => 'bank:info_recurrence_statut_valide',
+			'echec' => 'bank:info_recurrence_statut_echec',
+			'fini' => 'bank:info_recurrence_statut_fini',
+		],
+		'statut_textes_instituer' => [
+			'prepa' => 'bank:info_recurrence_statut_prepa',
+			'valide' => 'bank:info_recurrence_statut_valide',
+			'echec' => 'bank:info_recurrence_statut_echec',
+			'fini' => 'bank:info_recurrence_statut_fini',
+		],
+		'statut_images' => [
+			'prepa' => 'puce-prepa-8.png',
+			'valide' => 'puce-publier-8.png',
+			'echec' => 'puce-supprimer-8.png',
+			'fini' => 'puce-refuser-8.png',
+		],
+		'texte_changer_statut' => 'bank:info_changer_statut_bank_recurrence',
 	);
 	return $tables;
 }

@@ -45,4 +45,7 @@
 
 	<menu nom="configurer_bank" titre="bank:titre_menu_configurer" parent="menu_configuration" icone="images/bank-16.png" action="configurer_bank" />
 	<menu nom="transactions" titre="bank:titre_menu_transactions" parent="menu_activite" icone="images/transaction-16.png" />
+
+    <onglet nom="liste_transactions" titre="bank:titre_menu_transactions" parent="transactions" icone="images/transaction-24.png" action="transactions" />
+    <onglet nom="liste_recurrences" titre="bank:titre_menu_recurrences" parent="transactions" icone="images/bank_recurrence-24.png" action="bank_recurrences" />
 </paquet>

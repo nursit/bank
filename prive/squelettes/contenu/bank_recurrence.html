@@ -1,0 +1,73 @@
+[(#AUTORISER{menu,_bank_recurrences}|sinon_interdire_acces)]
+<BOUCLE_bank_recurrence(bank_recurrences){id_bank_recurrence}{statut?}>
+<div class="bank_recurrence">
+[(#BOITE_OUVRIR{[
+	<h1>[(#STATUT|puce_statut{bank_recurrence}|inserer_attribut{class,'puce_statut'})]<tt>(#UID|sinon{<:info_sans_titre:>})</tt>[(#VAL{bank_recurrence}|objet_icone|inserer_attribut{class,cadre-icone})]</h1>
+],simple fiche_objet})]
+
+	<div class="champ id_transaction contenu_id_transaction">
+		<div class='label'><:bank:info_liee_a_qui:></div>
+		<div class='valeur'>[<a href='[(#ID_TRANSACTION|generer_url_entite{transaction})]' class="popin"><:bank:titre_transaction:> #(#ID_TRANSACTION) [(#INFO_MONTANT{transaction,#ID_TRANSACTION}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION}})]</a>]</div>
+	</div>
+
+	<div class="formulaire_spip formulaire_dater">
+		<div class="editer-groupe">
+			<div class="editer long_label editer_date">
+				<label><:texte_date_creation_objet:></label>
+				<span class="affiche">[(#DATE_CREATION|affdate_heure)]</span>
+			</div>
+		</div>
+	</div>
+
+	[<div class="champ date contenu_date_start">
+		<div class='label'><:bank:info_date_start:></div>
+		<div class='valeur'>(#DATE_START|affdate_heure)</div>
+	</div>]
+
+	[(#BOITE_OUVRIR{<h6>Dernière échéance</h6>,info})]
+	[<div class="champ date contenu_date_echeance">
+		<div class='label'><:bank:info_date_echeance:></div>
+		<div class='valeur'>(#DATE_ECHEANCE|affdate_heure)</div>
+	</div>]
+	[<div class="champ contenu_count_echeance">
+		<div class='label'><:bank:info_count_echeance:></div>
+		<div class='valeur'>(#COUNT_ECHEANCE)</div>
+	</div>]
+	<div class="champ contenu_id_transaction_echeance">
+		<div class='label'><:bank:info_liee_a_qui:></div>
+		<div class='valeur'>[<a href='[(#ID_TRANSACTION_ECHEANCE|generer_url_entite{transaction})]' class="popin"><:bank:titre_transaction:> #(#ID_TRANSACTION_ECHEANCE) [(#INFO_MONTANT{transaction,#ID_TRANSACTION_ECHEANCE}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION_ECHEANCE}})]</a>]</div>
+	</div>
+
+	[(#BOITE_PIED)]
+
+	[<div class="champ contenu_frequence">
+		<div class='label'><:bank:info_echeance_recurrence:></div>
+		<div class='valeur'>(#VAL{bank:info_echeance_recurrence_}|concat{#ECHEANCES**|json_decode|table_valeur{freq}|sinon{monthly}}|_T)</div>
+	</div>]
+	[<div class="champ date contenu_date_echeance_next">
+		<div class='label'><:bank:info_date_echeance_next:></div>
+		<div class='valeur'>(#DATE_ECHEANCE_NEXT|affdate_heure)</div>
+	</div>]
+	[(#ID_TRANSACTION_ECHEANCE_NEXT|intval|oui)
+	<div class="champ contenu_id_transaction_echeance_next">
+		<div class='label'><:bank:info_liee_a_qui:></div>
+		<div class='valeur'>[<a href='[(#ID_TRANSACTION_ECHEANCE_NEXT|generer_url_entite{transaction})]' class="popin"><:bank:titre_transaction:> #(#ID_TRANSACTION_ECHEANCE_NEXT) [(#INFO_MONTANT{transaction,#ID_TRANSACTION_ECHEANCE_NEXT}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION_ECHEANCE_NEXT}})]</a>]</div>
+	</div>
+	]
+[<div class="champ contenu_echeances">
+	<div class='label'><:bank:info_echeances:></div>
+	<div class='valeur'><pre>(#ECHEANCES**|json_decode{1}|print)</pre></div>
+</div>]
+
+	[(#BOITE_FERMER)]
+
+	[(#DATE_FIN|intval|non)
+	[<div class="champ date contenu_date_fin_prevue">
+		<div class='label'><:bank:info_date_fin_prevue:></div>
+		<div class='valeur'>(#DATE_FIN_PREVUE|affdate_heure)</div>
+	</div>]
+	]
+
+#BOITE_FERMER
+</div>
+</BOUCLE_bank_recurrence>
