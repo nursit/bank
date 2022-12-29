@@ -64,11 +64,13 @@ function abos_preparer_echeance_dist($id){
 	);
 
 	if ($id_transaction){
+		spip_log("DEPRECATED : votre site utilise le pipeline `bank_abos_renouveler` qui sera supprimé dans une prochaine version, merci changer pour le pipeline `bank_abos_preparer_echeance`", "bank" . _LOG_AVERTISSEMENT);
 		return $id_transaction;
 	}
 
 	// sinon on essaye d'appeler l'ancien abos/renouveler
 	if ($renouveler = charger_fonction('renouveler', 'abos', true)){
+		spip_log("DEPRECATED : votre site utilise une fonction `$renouveler` qui ne sera plus supportée dans une prochaine version, merci changer pour le pipeline `bank_abos_preparer_echeance`", "bank" . _LOG_AVERTISSEMENT);
 		return $renouveler($id);
 	}
 

@@ -1,4 +1,10 @@
 <?php
+/**
+ * Fichier de test : inclure ce fichier depuis votre fichier mes_options pour tester les abonnements
+ * les deux fonctinos vont prendre la main sur le process normal et decrire un abonnement mensuel de montant fixe
+ * identique à celui de la transaction de départ
+ */
+
 
 if (!function_exists('abos_decrire_echeance')) {
 	function abos_decrire_echeance($id_transaction) {
@@ -9,7 +15,7 @@ if (!function_exists('abos_decrire_echeance')) {
 	                'montant_init' => $transaction['montant'],
 	                'count_init' => 0, // c'est deja une echeance, par defaut
 	                'count' => 0, // indefiniment
-	                'freq' => 'monthly',
+	                'freq' => 'monthly', // daily, monthly ou yearly
 	                'date_start' => '',
 	                'wha_oid' => '',
 	        );
