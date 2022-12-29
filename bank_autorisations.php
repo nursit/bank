@@ -49,6 +49,14 @@ function autoriser_transaction_iconifier_dist($faire, $mode = '', $id = 0, $qui 
 	return false;
 }
 
+function autoriser_bankrecurrence_iconifier_dist($faire, $mode = '', $id = 0, $qui = NULL, $opt = NULL){
+	return false;
+}
+
+function autoriser_bankrecurrence_modifier_dist($faire, $mode = '', $id = 0, $qui = NULL, $opt = NULL){
+	return false;
+}
+
 /**
  * Seuls les webmestres peuvent encaisser un cheque
  * webmaster.

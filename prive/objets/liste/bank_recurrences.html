@@ -1,0 +1,69 @@
+[(#SET{defaut_tri,#ARRAY{
+	id_bank_recurrence,-1,
+	id_transaction,-1,
+	id_transaction_echeance,-1,
+	date_start,#ENV{date_sens,-1},
+	date_echeance,#ENV{date_sens,-1},
+	date_fin_prevue,#ENV{date_sens,-1},
+	date_fin,#ENV{date_sens,-1},
+	statut,1
+}})
+]#SET{has_facture,''}#SET{has_commande,''}#SET{has_parrain,''}<B_bank_recurrences>
+<div class='liste-objets bank_recurrences[(#GET{has_facture}|oui)w-id_facture][(#GET{has_commande}|oui)w-id_commande][(#GET{has_parrain}|oui)w-parrain]'>
+	<div class="table-scroll">
+	<table class='spip liste'>
+	[<caption><strong class="caption">(#ENV*{titre,#GRAND_TOTAL|singulier_ou_pluriel{bank:info_1_bank_recurrence,bank:info_nb_bank_recurrences}})</strong></caption>]
+		<thead>
+			<tr class='first_row'>
+				<th class='id' scope='col'>[(#TRI{id_bank_recurrence,<:info_numero_abbreviation:>,ajax})]</th>
+				<th class='id_transaction' scope='col'>[(#TRI{id_transaction,[(#VAL{transaction}|objet_icone{16})],ajax})]</th>
+				<th class='uid' scope='col'>[(#TRI{uid,<:bank:label_tri_abo_uid:>,ajax})]</th>
+				<th class='date_creation' scope='col'>[(#TRI{date_creation,<:bank:label_tri_date_creation:>,ajax})]</th>
+				<th class='date_start' scope='col'>[(#TRI{date_start,<:bank:label_tri_date_start:>,ajax})]</th>
+				<th class='date_echeance' scope='col'>[(#TRI{date_echeance,<:bank:label_tri_date_echeance:>,ajax})]</th>
+				<th class='count_echeance' scope='col'>[(#TRI{count_echeance,<:bank:label_tri_count_echeance:>,ajax})]</th>
+				<th class='id_transaction_echeance' scope='col'>[(#TRI{id_transaction_echeance,[(#VAL{transaction}|objet_icone{16})],ajax})]</th>
+				<th class='date_echeance_next' scope='col'>[(#TRI{date_echeance_next,<:bank:label_tri_date_echeance_next:>,ajax})]</th>
+				<th class='id_transaction_echeance_next' scope='col'>[(#TRI{id_transaction_echeance_next,[(#VAL{transaction}|objet_icone{16})],ajax})]</th>
+				<th class='date_fin_prevue' scope='col'>[(#TRI{date_fin_prevue,<:bank:label_tri_date_fin_prevue:>,ajax})]</th>
+				<th class='tstatut' scope='col'>[(#TRI{statut,<:bank:label_tri_statut:>,ajax})]</th>
+				<th class='date_fin' scope='col'>[(#TRI{date_fin,<:bank:label_tri_date_fin:>,ajax})]</th>
+			</tr>
+		</thead>
+		<tbody>
+		<BOUCLE_bank_recurrences(bank_recurrences)
+			{id_bank_recurrence?}
+			{id_transaction?}
+			{uid?}
+			{where?}
+			{recherche?}
+			{statut==#ENV{statut,'.'}}
+			{tri #ENV{par,id_bank_recurrence},#GET{defaut_tri}}{pagination #ENV{nb,10}}{0,200000}>
+			<tr class="[(#COMPTEUR_BOUCLE|alterner{row_odd,row_even})][(#ENV{id_bank_recurrence}|is_array|non)[ (#EXPOSE)]] [row_(#STATUT)]">
+				<td class="id"><a href="[(#ID_BANK_RECURRENCE|generer_url_entite{bank_recurrence})]" class="popin">#ID_BANK_RECURRENCE</a></td>
+				<td class="id_transaction">[<a href='[(#ID_TRANSACTION|generer_url_entite{transaction})]' class="popin" title="[(#INFO_MONTANT{transaction,#ID_TRANSACTION}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION}}|attribut_html)]">(#ID_TRANSACTION)</a>]</td>
+				<td class="uid">[<tt>(#UID)</tt>]</td>
+				<td class="date_creation">[(#DATE_CREATION|intval|oui)[(#DATE_CREATION|replace{' ',' <small>'}|concat{'</small>'})]]</td>
+				<td class="date_start">[(#DATE_START|intval|oui)[(#DATE_START|replace{' ',' <small>'}|concat{'</small>'})]]</td>
+				<td class="date_echeance">[(#DATE_ECHEANCE|intval|oui)[(#DATE_ECHEANCE|replace{' ',' <small>'}|concat{'</small>'})]]</td>
+				<td class="count_echeance">#COUNT_ECHEANCE</td>
+				<td class="id_transaction_echeance">[(#ID_TRANSACTION_ECHEANCE|intval|oui)
+					[<a href='[(#ID_TRANSACTION_ECHEANCE|generer_url_entite{transaction})]' class="popin" title="[(#INFO_MONTANT{transaction,#ID_TRANSACTION_ECHEANCE}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION_ECHEANCE}}|attribut_html)]">(#ID_TRANSACTION_ECHEANCE)</a>]
+				]</td>
+				<td class="date_echeance_next">[(#DATE_ECHEANCE_NEXT|intval|oui)[(#DATE_ECHEANCE_NEXT|replace{' ',' <small>'}|concat{'</small>'})]]</td>
+				<td class="id_transaction_echeance_next">[(#ID_TRANSACTION_ECHEANCE_NEXT|intval|oui)
+					[<a href='[(#ID_TRANSACTION_ECHEANCE_NEXT|generer_url_entite{transaction})]' class="popin" title="[(#INFO_MONTANT{transaction,#ID_TRANSACTION_ECHEANCE}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION_ECHEANCE_NEXT}}|attribut_html)]">(#ID_TRANSACTION_ECHEANCE_NEXT)</a>]
+				]</td>
+				<td class="date_fin_prevue">[(#DATE_FIN_PREVUE|intval|oui)[(#DATE_FIN_PREVUE|affdate{Y-m-d})]]</td>
+				<td class="tstatut">[(#STATUT|bank_traduire_statut_bank_recurrence)]</td>
+				<td class="date_fin">[(#DATE_FIN|intval|oui)[(#DATE_FIN|replace{' ',' <small>'}|concat{'</small>'})]]</td>
+			</tr>
+		</BOUCLE_bank_recurrences>
+		</tbody>
+	</table>
+	</div>
+	[<nav class='pagination'>(#PAGINATION{prive})</nav>]
+</div>
+</B_bank_recurrences>[
+<div class="liste-objets bank_recurrences caption-wrap"><strong class="caption">(#ENV*{sinon,''})</strong></div>
+]<//B_bank_recurrences>

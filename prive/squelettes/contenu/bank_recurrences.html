@@ -1,0 +1,14 @@
+[(#AUTORISER{menu,_recurrences}|sinon_interdire_acces)]
+<div class='onglets_simple clearfix'>
+	<ul>
+		<BOUCLE_filtres(POUR){tableau #REM|bank_recurrences_statuts}>
+		<li>[(#SELF|parametre_url{statut,#CLE}|parametre_url{id_bank_recurrence,''}
+			|lien_ou_expose{[(#VAL{bank:label_filtre_recurrence_statut_#CLE}|_T|concat{[(#CLE|?{[ <span class='small'>\((#VALEUR)\)</span>],''})]})],[(#ENV{statut}|=={#CLE}|et{#ENV{id_bank_recurrence,''}|non})],ajax})]</li>
+		</BOUCLE_filtres>
+	</ul>
+</div>
+<div class="table-recurrences-wrapper" id="liste-recurrences-wrapper">
+	<button class="btn btn_mini btn_secondaire toggle-full-width"
+	        onclick="jQuery.modalbox('#liste-recurrences-wrapper',{type:'inline',minWidth:'95vw',minHeight:'95vh',maxWidth:'100vw',mawHeight:'100vh'});">[(#CHEMIN_IMAGE{expand-16.png}|balise_img)]</button>
+	<INCLURE{fond=prive/objets/liste/bank_recurrences,env,ajax,nb=50,sinon=<:bank:info_aucune_bank_recurrence:>} />
+</div>

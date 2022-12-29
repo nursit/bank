@@ -236,6 +236,11 @@ function bank_traduire_statut_transaction($statut) {
 	return implode("[", $statut);
 }
 
+function bank_traduire_statut_bank_recurrence($statut) {
+	$statut = _T('bank:info_recurrence_statut_'.$statut);
+	return $statut;
+}
+
 /**
  * Declarer les CRON
  *

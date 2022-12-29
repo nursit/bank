@@ -1,0 +1,9 @@
+<BOUCLE_bank_recurrence(bank_recurrences){id_bank_recurrence}{statut?}>
+#BOITE_OUVRIR{'','info'}
+
+	#PIPELINE{boite_infos,#ARRAY{data,'',args,#ARRAY{'type',bank_recurrence,'id',#ID_BANK_RECURRENCE}}}
+
+#BOITE_FERMER
+
+#PIPELINE{afficher_config_objet,#ARRAY{args,#ARRAY{type,bank_recurrence,id,#ID_BANK_RECURRENCE},data,''}}
+</BOUCLE_bank_recurrence>
