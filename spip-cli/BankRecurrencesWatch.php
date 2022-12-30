@@ -29,7 +29,20 @@ class BankRecurrencesWatch extends Command {
 			$this->io->text("$nb paiements récurrents à mettre à jour");
 
 			foreach ($actions as $action) {
-				$this->io->care(implode(' ', $action));
+				$display = implode(' ', $action);
+				$this->io->care($display);
+				/**
+				 * @uses bank_recurrence_terminer()
+				 * @uses bank_recurrence_renouveler()
+				 */
+				$callback = array_shift($action);
+				$res = call_user_func_array($callback, $action);
+				if ($res === false) {
+					$this->io->fail($display);
+				}
+				else {
+					$this->io->check($display);
+				}
 			}
 
 			$this->io->success("Tous les paiements récurrents ont été mis à jour");
