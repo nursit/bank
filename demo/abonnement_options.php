@@ -51,7 +51,7 @@ if (!function_exists('abos_preparer_echeance')){
 				'parrain' => $transaction['parrain'],
 				'tracking_id' => $transaction['tracking_id'],
 				'champs' => [
-					'abo_uid' => $id,
+					'abo_uid' => $transaction['abo_uid'],
 				]
 			];
 
