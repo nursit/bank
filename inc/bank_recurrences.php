@@ -147,17 +147,19 @@ function bank_recurrence_decode_uid($uid) {
 
 /**
  * Calculer les champs à mettre à jour pour la prochaine échéance : date_echeance_next et date_fin éventuelle
+ * 2 methodes de calcul :
+ * - depuis la date de départ (a priori c'est celle qu'on utilise)
+ * - depuis la dernière échéance
  *
- * // TODO : calculer depuis la date de départ + n échéances plutot que depuis la date de dernière échéance pour éviter une dérive temporelle
- *
- * @param $echeances
- * @param $date_start
- * @param $date_echeance
- * @param $count_echeance
- * @param $date_fin
+ * @param array $echeances
+ * @param string $date_start
+ * @param string $date_echeance
+ * @param int $count_echeance
+ * @param string $date_fin
+ * @param bool $count_from_start = true
  * @return array|false
  */
-function bank_recurrence_calculer_echeance_next($echeances, $date_start, $date_echeance, $count_echeance, $date_fin) {
+function bank_recurrence_calculer_echeance_next($echeances, $date_start, $date_echeance, $count_echeance, $date_fin, $count_from_start = true) {
 	if (is_string($echeances)) {
 		$echeances = json_decode($echeances, true);
 	}
@@ -175,24 +177,64 @@ function bank_recurrence_calculer_echeance_next($echeances, $date_start, $date_e
 	if (!$t_last_echeance) {
 		return false;
 	}
+	$t_first_echeance = strtotime($date_start);
+	if (!$t_first_echeance) {
+		return false;
+	}
+	// $count_echeance = 1 c'est le date_start
+	// date_echeance doit dont etre date_start + ($count_echeance-1) * periode
+	// et date_echeance_next doit dont etre date_start + $count_echeance- * periode
 	switch ($freq) {
 		case 'daily':
-			$date_next_echeance = date('Y-m-d H:i:s', strtotime('+1day', $t_last_echeance));
+			if ($count_from_start) {
+				$nbdays = $count_echeance;
+				$date_next_echeance = date('Y-m-d H:i:s', strtotime("+{$nbdays} days", $t_first_echeance));
+			}
+			else {
+				$date_next_echeance = date('Y-m-d H:i:s', strtotime('+1day', $t_last_echeance));
+			}
 			break;
 		case 'monthly':
-			// cas particulier : c'est +1 mois mais en restant dans le mois suivant et en restant sur le jour anniversaire du start
+			// cas particulier : c'est +1 mois mais on veut rester sur le jour anniversaire du depart ou les précédents si les mois sont plus courts
+			// pour garder un rythme "1 paiement par mois"
 			$d = date('d', strtotime($date_start));
-			$this_month = strtotime(date('Y-m-01 H:i:s', $t_last_echeance));
-			$next_month = date('Y-m', strtotime('+1month', $this_month));
-			$date_next_echeance = $next_month . "-{$d} " . date('H:i:s', $t_last_echeance);
-			$date_next_echeance = date('Y-m-d H:i:s', strtotime($date_next_echeance));
-			while (strpos($date_next_echeance, $next_month) !== 0) {
-				$date_next_echeance = strtotime('-1day',strtotime($date_next_echeance));
-				$date_next_echeance = date('Y-m-d H:i:s', $date_next_echeance);
+			if ($count_from_start) {
+				$nbmonth = $count_echeance;
+				$nbyears = intval(floor($nbmonth / 12));
+				$nbmonth -= $nbyears * 12;
+
+				// d'abord on calcule en prenant un debut de mois en point de depart
+				$t_first_echeance_debut_mois = strtotime(date('Y-m-01 H:i:s', $t_first_echeance));
+				$t_next_echeance_debut_mois = strtotime("+{$nbyears} years", $t_first_echeance_debut_mois);
+				$t_next_echeance_debut_mois = strtotime("+{$nbmonth} months", $t_next_echeance_debut_mois);
+				$next_month = date('Y-m', $t_next_echeance_debut_mois);
+				// puis on force le même jour que le point de depart et on corrige eventuellement si ça déborde du mois concerné
+				$date_next_echeance = $next_month . "-{$d} " . date('H:i:s', $t_first_echeance);
+				$date_next_echeance = date('Y-m-d H:i:s', strtotime($date_next_echeance));
+				while (strpos($date_next_echeance, $next_month) !== 0) {
+					$date_next_echeance = strtotime('-1day', strtotime($date_next_echeance));
+					$date_next_echeance = date('Y-m-d H:i:s', $date_next_echeance);
+				}
+			}
+			else {
+				$this_month = strtotime(date('Y-m-01 H:i:s', $t_last_echeance));
+				$next_month = date('Y-m', strtotime('+1month', $this_month));
+				$date_next_echeance = $next_month . "-{$d} " . date('H:i:s', $t_last_echeance);
+				$date_next_echeance = date('Y-m-d H:i:s', strtotime($date_next_echeance));
+				while (strpos($date_next_echeance, $next_month) !== 0) {
+					$date_next_echeance = strtotime('-1day', strtotime($date_next_echeance));
+					$date_next_echeance = date('Y-m-d H:i:s', $date_next_echeance);
+				}
 			}
 			break;
 		case 'yearly':
-			$date_next_echeance = date('Y-m-d H:i:s', strtotime('+1year', $t_last_echeance));
+			if ($count_from_start) {
+				$nbyears = $count_echeance;
+				$date_next_echeance = date('Y-m-d H:i:s', strtotime("+{$nbyears} years", $t_first_echeance));
+			}
+			else {
+				$date_next_echeance = date('Y-m-d H:i:s', strtotime('+1year', $t_last_echeance));
+			}
 			break;
 	}
 	$set = array(
