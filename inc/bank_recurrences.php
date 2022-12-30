@@ -17,6 +17,8 @@ if (!defined('_ECRIRE_INC_VERSION')){
 include_spip('inc/bank');
 
 /**
+ * @uses bank_recurrence_terminer()
+ * @uses bank_recurrence_renouveler()
  * @param int $max_items
  * @param null $timeout
  * @return array
@@ -25,34 +27,31 @@ function bank_recurrences_watch_lister_actions($max_items = 0, $timeout = null) 
 	// trouver les recurrences à renouveler/terminer et
 	$now = date('Y-m-d H:i:s');
 	$now_fin_journee = date('Y-m-d 23:59:59');
-	$nb = 0;
 	$actions = [];
-	do {
-		$recurrences = sql_allfetsel(
-			'uid, date_fin<='.sql_quote($now).' as termine',
-			'spip_recurrences',
-			"statut='valide' AND id_transaction_echeance_next=0 AND (termine OR date_echeance_next<=".sql_quote($now_fin_journee).")",
-			'',
-			'termine DESC, date_echeance_next',
-			'0,20'
-		);
-		if (!empty($recurrences)) {
-			foreach ($recurrences as $recurrence) {
-				if ($recurrence['termine']) {
-					$actions[] = ['bank_recurrence_terminer', $recurrence['uid']];
-				}
-				else {
-					$actions[] = ['bank_recurrence_renouveler', $recurrence['uid']];
-				}
-				if (
-					($max_items and ++$nb >= $max_items)
-					or ($timeout and time()>$timeout)
-				) {
-					return $actions; //on renvoie ce qu'on a deja pu lister
-				}
-			}
+
+	$termine_expr = 'date_fin_prevue>\'0001-01-01\' AND date_fin_prevue<='.sql_quote($now);
+	$limit = ($max_items ? "0,$max_items" : '');
+	$res = sql_select(
+		"uid, ($termine_expr) as termine",
+		'spip_bank_recurrences',
+		"statut='valide' AND id_transaction_echeance_next=0 AND (($termine_expr) OR date_echeance_next<=" . sql_quote($now_fin_journee) . ")",
+		'',
+		'termine DESC, date_echeance_next',
+		$limit
+	);
+	while ($recurrence = sql_fetch($res)) {
+		if ($recurrence['termine']) {
+			$actions[] = ['bank_recurrence_terminer', $recurrence['uid']];
 		}
-	} while (!empty($recurrences));
+		else {
+			$actions[] = ['bank_recurrence_renouveler', $recurrence['uid']];
+		}
+
+		if ($timeout and time()>$timeout) {
+			sql_free($res);
+			return $actions; //on renvoie ce qu'on a deja pu lister
+		}
+	}
 
 	return $actions;
 }
@@ -505,57 +504,61 @@ function bank_recurrence_resilier($id_transaction, $abo_uid, $mode, $statut = 'e
  *
  * @param string $abo_uid
  * @param string $statut
+ * @param ?bool $avec_resiliation
+ *   false => ne pas lancer la resiliation abo (car on en vient déjà)
+ *   null => resiliation par défaut en fin de periode en cours
+ *   true => resiliation immediate
  * @return bool
  */
-function bank_recurrence_terminer($abo_uid, $statut = 'fini', $immediat = true) {
+function bank_recurrence_terminer($abo_uid, $statut = 'fini', $avec_resiliation = true) {
 
-	$ok = true;
 	if (!$recurrence = sql_fetsel(
 		'*',
 		'spip_bank_recurrences',
 		'uid='.sql_quote($abo_uid))) {
 
 		spip_log("bank_recurrence_terminer: Abonnement $abo_uid introuvable pour fin recurrence", 'recurrence' . _LOG_ERREUR);
-		$ok = false;
+		return false;
 	}
 
-	if ($ok) {
-		$id_bank_recurrence = $recurrence['id_bank_recurrence'];
-		if (in_array($recurrence['statut'], array('prepa', 'valide'))) {
+	$id_bank_recurrence = $recurrence['id_bank_recurrence'];
+	if (in_array($recurrence['statut'], array('prepa', 'valide'))) {
 
-			if (!in_array($statut, array('echec', 'fini'))) {
-				$statut = 'fini';
-			}
-
-			$now = time();
-			$set = array(
-				'date_fin' => date('Y-m-d H:i:s', $now),
-				'date_echeance_next' => '0000-00-00 00:00:00',
-				'id_transaction_echeance_next' => 0,
-				'statut' => $statut
-			);
-			sql_updateq('spip_bank_recurrences', $set, 'id_bank_recurrence='.intval($id_bank_recurrence));
-			bank_recurrence_tracer($id_bank_recurrence, "fin de la récurrence " . json_encode($set));
-			spip_log("bank_recurrence_terminer: Fin abonnement $abo_uid statut : ".$recurrence['statut'] . " => $statut", 'recurrence' . _LOG_INFO_IMPORTANTE);
+		if (!in_array($statut, array('echec', 'fini'))) {
+			$statut = 'fini';
 		}
-		else {
-			// si on est deja fini ou dans un autre etat, on sort de là
-			spip_log("bank_recurrence_terminer: Fin abonnement $abo_uid impossible car statut=".$recurrence['statut'], 'recurrence' . _LOG_ERREUR);
-			return (in_array($recurrence['statut'], array('echec', 'fini')) ? true : false);
-		}
-	}
 
-	// il faut résilier les fonctions d'abonnement associées au paiement récurrent
-	if ($resilier = charger_fonction('resilier', 'abos', true)){
-		$options = array(
-			'notify_bank' => false, // pas la peine : recurrence deja resilie ci-dessus
-			'immediat' => $immediat,
-			'message' => "[bank] Récurrence $abo_uid terminée",
+		$now = time();
+		$set = array(
+			'date_fin' => date('Y-m-d H:i:s', $now),
+			'date_echeance_next' => '0000-00-00 00:00:00',
+			'id_transaction_echeance_next' => 0,
+			'statut' => $statut
 		);
-		$resilier("uid:" . $abo_uid, $options);
+		sql_updateq('spip_bank_recurrences', $set, 'id_bank_recurrence='.intval($id_bank_recurrence));
+		bank_recurrence_tracer($id_bank_recurrence, "fin de la récurrence " . json_encode($set));
+		spip_log("bank_recurrence_terminer: Fin abonnement $abo_uid statut : ".$recurrence['statut'] . " => $statut", 'recurrence' . _LOG_INFO_IMPORTANTE);
+
+		if ($avec_resiliation !== false) {
+			// il faut résilier les fonctions d'abonnement associées au paiement récurrent
+			if ($resilier = charger_fonction('resilier', 'abos', true)){
+				$options = array(
+					'notify_bank' => false, // pas la peine : recurrence deja resilie ci-dessus
+					'immediat' => $avec_resiliation === true,
+					'message' => "[bank] Récurrence $abo_uid terminée",
+				);
+				$resilier("uid:" . $abo_uid, $options);
+			}
+		}
+
+		return true;
+	}
+	else {
+		// si on est deja fini ou dans un autre etat, on sort de là
+		spip_log("bank_recurrence_terminer: Fin abonnement $abo_uid impossible car statut=".$recurrence['statut'], 'recurrence' . _LOG_ERREUR);
+		return (in_array($recurrence['statut'], array('echec', 'fini')) ? true : false);
 	}
 
-	return $ok;
 }
 
 /**
@@ -649,6 +652,8 @@ function bank_recurrence_renouveler($abo_uid) {
 	// notons l'id_transaction qu'on a préparé pour cette echeance
 	sql_updateq('spip_bank_recurrences', array('id_transaction_echeance_next' => $id_transaction), 'id_bank_recurrence='.intval($id_bank_recurrence));
 	bank_recurrence_tracer($id_bank_recurrence, "préparation du renouvellement de la récurrence id_transaction_echeance_next=$id_transaction");
+	// et le abo_uid sur la transaction
+	sql_updateq('spip_transactions', array('abo_uid' => $abo_uid), 'id_transaction='.intval($id_transaction));
 	$transaction = sql_fetsel('*', 'spip_transactions', 'id_transaction='.intval($id_transaction));
 
 
@@ -675,6 +680,9 @@ function bank_recurrence_renouveler($abo_uid) {
 			'update' => false,
 			'where' => 'bank_recurrence_renouveler',
 		));
+
+		// resilier la recurrence : paiement échoué l'abonnement s'arrête
+		bank_recurrence_resilier($response['id_transaction'], $abo_uid, 'recurrence');
 		return false;
 	}
 

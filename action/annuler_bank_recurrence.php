@@ -33,7 +33,7 @@ function action_annuler_bank_recurrence_dist($id_bank_recurrence = null, $immedi
 
 			include_spip('inc/bank_recurrences');
 			$immediat = ($immediat ? true : false);
-			bank_recurrence_terminer($row["uid"], 'fini', $immediat);
+			bank_recurrence_terminer($row["uid"], 'fini', $immediat ? true : null);
 		}
 	}
 }
