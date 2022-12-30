@@ -905,7 +905,7 @@ function bank_simple_call_resilier_abonnement($uid, $config){
 
 	// tenter avec la gestion des recurrences internes au plugin
 	include_spip('inc/bank_recurrences');
-	$ok = bank_recurrence_terminer($uid);
+	$ok = bank_recurrence_terminer($uid, 'fini', false);
 
 	if (!$ok) {
 		// on envoie un mail au webmestre avec reference pour que le webmestre aille faire la resiliation manuellement
