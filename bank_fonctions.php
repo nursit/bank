@@ -252,5 +252,13 @@ function bank_taches_generales_cron($taches_generales){
 	// les eventuelles transactions interrompues en cours de traitement
 	$taches_generales['bank_daily_reporting'] = 3600*6; // toutes les 6H
 
+	// si on a un cron systeme qui lance spip bank:recurrences:watch c'est plus fiable et dans ce cas il faut inhiber le genie SPIP
+	// avec un define('_BANK_INHIB_GENIE_RECURRENCES_WATCH', true);
+	if ((!defined('_BANK_INHIB_GENIE_RECURRENCES_WATCH') or !_BANK_INHIB_GENIE_RECURRENCES_WATCH)
+		and sql_countsel('spip_bank_recurrences', "statut='valide'")) {
+		// toutes les 3H pour pas risque de rater des renouvellements, mais en principe tout se fait sur les appels en tout debut de journée
+		$taches_generales['bank_recurrences_watch'] = 3600*3;
+	}
+
 	return $taches_generales;
 }
