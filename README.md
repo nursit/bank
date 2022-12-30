@@ -1,4 +1,4 @@
-# Plugin Bank v5 pour SPIP <small>Paiement bancaire</small>
+# Plugin Bank v6 pour SPIP <small>Paiement bancaire</small>
 
 Ce plugin permet de gérer les interfaces techniques avec les prestataires bancaires.
 
@@ -14,9 +14,16 @@ Il peut aussi être complété par
 * le plugin Intl pour une gestion étendue des devises https://git.spip.net/spip-contrib-extensions/intl/
 * le plugin Factures https://github.com/nursit/factures
 
+A partir de la v6 le plugin peut prendre en charge la gestion des paiements recurrents pour les plateformes bancaires qui proposent du paiement direct par empreinte de carte mais pas d'API abonnement.
+Une table `spip_bank_recurrences` est ajoutée et toutes les fonctions dans `inc/bank_recurrences` se chargent de gérer le statut des récurrences et déclencher les paiements quotidiens/mensuels/annuels.
+(Ce n'est pas une gestion d'abonnement et de droits, mais uniquement une gestion du déclenchement des paiements recurrents.
+Pour les plugins de gestion d'abonnement reposant sur le plugin bank le fonctionnement est identique à celui constaté avec les plateformes bancaires qui offrent une API abonnement)
 
 
 ### Changelog
+
+* Version 6.0
+  * Ajout d'une gestion des recurrences pour permettre de faire de la gestion d'abonnement avec les plateformes bancaires qui proposent du paiement direct par empreinte de carte mais pas d'API abonnement
 
 * Version 5.3
   * Amélioration de l'UX de la liste des transactions, du détail d'une transaction et des traductions
