@@ -455,7 +455,7 @@ function bank_recurrence_prolonger($id_transaction, $abo_uid, $mode, $payment_da
 
 	$set_echeance = bank_recurrence_calculer_echeance_next(
 		$recurrence['echeances'],
-		$set['date_start'],
+		$recurrence['date_start'],
 		$set['date_echeance'],
 		$set['count_echeance'],
 		$recurrence['date_fin_prevue']);
@@ -755,7 +755,21 @@ function bank_recurrence_tracer($id_bank_recurrence, $action) {
 	if (!empty($GLOBALS['visiteur_session']['session_email'])) {
 		$trace[] = $GLOBALS['visiteur_session']['session_email'];
 	}
-	$trace[] = '(' . $GLOBALS['ip'] . ')';
+	if (!defined('_IS_CLI')) {
+		define(
+			'_IS_CLI',
+			!isset($_SERVER['HTTP_HOST'])
+			and !strlen($_SERVER['DOCUMENT_ROOT'])
+			and !empty($_SERVER['argv'])
+			and empty($_SERVER['REQUEST_METHOD'])
+		);
+	}
+	if (_IS_CLI) {
+		$trace[] = "(CLI)";
+	}
+	else {
+		$trace[] = '(' . $GLOBALS['ip'] . ')';
+	}
 	$trace[] = ":";
 	$trace[] = trim($action);
 	$trace = "\n" . implode(" ", $trace);
