@@ -40,7 +40,7 @@
 			{statut==#ENV{statut,'.'}}
 			{tri #ENV{par,id_bank_recurrence},#GET{defaut_tri}}{pagination #ENV{nb,10}}{0,200000}>
 			<tr class="[(#COMPTEUR_BOUCLE|alterner{row_odd,row_even})][(#ENV{id_bank_recurrence}|is_array|non)[ (#EXPOSE)]] [row_(#STATUT)]">
-				<td class="id"><a href="[(#ID_BANK_RECURRENCE|generer_url_entite{bank_recurrence})]" class="popin">#ID_BANK_RECURRENCE</a></td>
+				<td class="id"><a href="[(#ID_BANK_RECURRENCE|generer_url_entite{bank_recurrence})]">#ID_BANK_RECURRENCE</a></td>
 				<td class="id_transaction">[<a href='[(#ID_TRANSACTION|generer_url_entite{transaction})]' class="popin" title="[(#INFO_MONTANT{transaction,#ID_TRANSACTION}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION}}|attribut_html)]">(#ID_TRANSACTION)</a>]</td>
 				<td class="uid">[<tt>(#UID)</tt>]</td>
 				<td class="date_creation">[(#DATE_CREATION|intval|oui)[(#DATE_CREATION|replace{' ',' <small>'}|concat{'</small>'})]]</td>
