@@ -75,6 +75,7 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'info_echeance_recurrence_yearly' => 'Yearly',
 	'info_echeances' => 'Instalment:',
 	'info_derniere_echeance' => 'Last due date',
+	'info_echeance_late' => "The @date@ due has not been paid yet",
 
 	'info_statut_ok' => 'OK',
 	'info_statut_commande' => 'Order',
