@@ -24,7 +24,7 @@
 		<div class='valeur'>(#DATE_START|affdate_heure)</div>
 	</div>]
 
-	[(#STATUT|=={valide}|et{#DATE_ECHEANCE_NEXT<#ENV{date}}|oui)
+	[(#STATUT|=={valide}|et{#DATE_ECHEANCE_NEXT|<{#ENV{date}}}|oui)
 	<div class="msg-alert notice">
 		#SET{date,#DATE_ECHEANCE_NEXT|affdate}
 		<:bank:info_echeance_late{date=#GET{date}}:>
