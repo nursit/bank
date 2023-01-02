@@ -54,8 +54,6 @@
 	.prefer-texte .payer_mode .submit .logo {display: none;}
 	.prefer-texte .payer_mode .submit .logo+.texte {display: inline-block;}
 	.payer_mode .submit.disabled {opacity: 50%;cursor: default}
-	/*
-	.payer_mode .boutons .submit {cursor:pointer;border:1px solid #ccc;padding: 2px 4px;margin: 3px;background: #eee;}
-	.payer_mode .boutons .submit:hover {filter: brightness(110%);}
-	.payer_mode .boutons .submit img { height: 35px; width: auto;}*/
+	.payer_mode .bouton_action_post.processing-submitted-form{position: relative}
+	.payer_mode .bouton_action_post.processing-submitted-form::after{content:'';display: block;position: absolute;left:0;right: 0;top:0;bottom: 0;background: rgba(255,255,255,0.5) url([(#CHEMIN{images/loader.svg})]) no-repeat center;background-size: contain;}
 </style>
