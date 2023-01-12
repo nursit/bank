@@ -199,47 +199,61 @@ function bank_config_id($config){
 		return $ids[$hash];
 	}
 
-	$t = $config;
-	// enlever les cles non significatives
-	foreach (array(
-		         'actif',
-		         'config',
-		         'type',
-		         'cartes',
-		         'mode_test',
-		         'label',
-	         ) as $k){
-		if (isset($t[$k])){
-			unset($t[$k]);
+	$presta = $config['presta'];
+	if (include_spip("presta/{$presta}/inc/$presta") and function_exists($f = "{$presta}_list_keys_for_id")) {
+		$keys = $f();
+		$t = [
+			'presta' => $presta
+		];
+		foreach ($keys as $k) {
+			if (substr($k,-1) !== '_' or !empty($config[$k])) {
+				$t[$k] = $config[$k];
+			}
 		}
-	}
-	foreach ($t as $k => $v){
-		if (
-			// enlever les key/secret/signature/certificat
-			stripos($k, "key")!==false
-			OR stripos($k, "cle")!==false
-			OR stripos($k, "secret")!==false
-			OR stripos($k, "signature")!==false
-			OR stripos($k, "certificat")!==false
-			OR stripos($k, "password")!==false
-			OR stripos($k, "token")!==false
-			// enlever les logo/advert/notice/adresse
-			OR stripos($k, "logo")!==false
-			OR stripos($k, "advert")!==false
-			OR stripos($k, "notice")!==false
-			OR stripos($k, "adresse")!==false
-		){
-			unset($t[$k]);
+	} else {
+		// sinon choix des cles par defaut
+		$t = $config;
+		// enlever les cles non significatives
+		foreach (array(
+			         'actif',
+			         'config',
+			         'type',
+			         'cartes',
+			         'mode_test',
+			         'label',
+		         ) as $k){
+			if (isset($t[$k])){
+				unset($t[$k]);
+			}
 		}
-		elseif (substr($k,-1) === '_' and empty($v)){
-			unset($t[$k]);
-		}
+		foreach ($t as $k => $v){
+			if (
+				// enlever les key/secret/signature/certificat
+				stripos($k, "key")!==false
+				OR stripos($k, "cle")!==false
+				OR stripos($k, "secret")!==false
+				OR stripos($k, "signature")!==false
+				OR stripos($k, "certificat")!==false
+				OR stripos($k, "password")!==false
+				OR stripos($k, "token")!==false
+				// enlever les logo/advert/notice/adresse
+				OR stripos($k, "logo")!==false
+				OR stripos($k, "advert")!==false
+				OR stripos($k, "notice")!==false
+				OR stripos($k, "adresse")!==false
+			){
+				unset($t[$k]);
+			}
+			elseif (substr($k,-1) === '_' and empty($v)){
+				unset($t[$k]);
+			}
 
+		}
 	}
 	ksort($t);
 	include_spip('inc/json');
 	$t = json_encode($t);
-	#var_dump($t);
+	#var_dump($config['presta'],$t);
 	return $ids[$hash] = strtoupper(substr(md5($t), 0, 4));
 }
 
