@@ -332,7 +332,7 @@ class MoneticoPaiement_Hmac {
 // description: Renvoie le tableau des donnees / Send back the data array
 // ----------------------------------------------------------------------------
 
-function getMethode(){
+function cmcic_getMethode(){
 	if ($_SERVER["REQUEST_METHOD"]=="GET"){
 		return $_GET;
 	}
@@ -354,21 +354,21 @@ function getMethode(){
 //                           ********************
 //              Encodage des caracteres speciaux au format HTML
 // ----------------------------------------------------------------------------
-function HtmlEncode($data){
+function cmcic_HtmlEncode($data){
 	$SAFE_OUT_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890._-";
 	$encoded_data = "";
 	$result = "";
 	for ($i = 0; $i<strlen($data); $i++){
-		if (strchr($SAFE_OUT_CHARS, $data{$i})){
-			$result .= $data{$i};
+		$char = substr($data, $i, 1);
+		if (strchr($SAFE_OUT_CHARS, $char)){
+			$result .= $char;
 		} else {
-			if (($var = bin2hex(substr($data, $i, 1)))<="7F"){
+			if (($var = bin2hex($char))<="7F"){
 				$result .= "&#x" . $var . ";";
 			} else {
-				$result .= $data{$i};
+				$result .= $char;
 			}
 		}
-
 	}
 	return $result;
 }

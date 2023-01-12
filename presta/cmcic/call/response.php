@@ -275,7 +275,7 @@ function cmcic_response($config){
 	}
 
 	// Begin Main : Retrieve Variables posted by CMCIC Payment Server
-	$MoneticoPaiement_bruteVars = getMethode();
+	$MoneticoPaiement_bruteVars = cmcic_getMethode();
 	spip_log("call_response : réception des variables cmcic", $mode);
 
 	// peu de chance d'être en erreur ici, mais sait-on jamais
@@ -458,4 +458,3 @@ function cmcic_gerer_transaction_payee($config, $id_transaction, $response, $row
 	$regler_transaction($id_transaction, array('row_prec' => $row, 'lang' => $GLOBALS['spip_lang']));
 	return array($id_transaction, true);
 }
-
