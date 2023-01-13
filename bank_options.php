@@ -130,7 +130,7 @@ function bank_affiche_payer($config, $type, $id_transaction, $transaction_hash, 
 	}
 
 	$quoi = ($type=='abo' ? 'abonnement' : 'acte');
-	
+
 	// On va chercher la devise de la transaction
 	if ($devise = sql_getfetsel('devise', 'spip_transactions', 'id_transaction = '.intval($id_transaction))) {
 		$devise_info = bank_devise_info($devise);
@@ -143,18 +143,19 @@ function bank_affiche_payer($config, $type, $id_transaction, $transaction_hash, 
 	else {
 		$devise_info = bank_devise_defaut();
 	}
-	
+
 	// On teste si ce prestataire sait gérer la devise demandée, sinon on ne l'affiche pas
 	if (!bank_tester_devise_presta($config, $devise_info['code'])) {
 		spip_log("bank_affiche_payer: Transaction #$id_transaction la devise " . $devise_info['code'] . 'n’est pas supportée pour presta=' . $config['presta'], 'bank' . _LOG_ERREUR);
 		return '';
 	}
-	
+
 	if (!$payer = charger_fonction($quoi, 'presta/' . $config['presta'] . '/payer', true)) {
 		spip_log("bank_affiche_payer: Transaction #$id_transaction pas de payer/$quoi pour presta=" . $config['presta'], "bank" . _LOG_ERREUR);
 		return '';
 	}
 
+	include_spip('bank_fonctions');
 	return $payer($config, $id_transaction, $transaction_hash, $options);
 }
 
@@ -182,5 +183,3 @@ function bank_affiche_gerer_abonnement($config, $abo_uid){
 
 	return "";
 }
-
-
