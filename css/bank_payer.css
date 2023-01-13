@@ -1,0 +1,11 @@
+.payer_mode .boutons form,.payer_mode .boutons form div {display: inline-block}
+.payer_mode .boutons .submit {cursor:pointer;}
+.payer_mode .submit .texte {display: none;}
+.prefer-logo .payer_mode .submit .logo {display: block;}
+.prefer-logo .payer_mode .submit .logo+.texte {display: none;}
+.prefer-texte .payer_mode .submit .logo {display: none;}
+.prefer-texte .payer_mode .submit .logo+.texte {display: inline-block;}
+.payer_mode .submit.disabled {opacity: 50%;cursor: default}
+.payer_mode .bouton_action_post.processing-submitted-form{position: relative}
+.payer_mode .bouton_action_post.processing-submitted-form::after{content:'';display: block;position: absolute;left:0;right: 0;top:0;bottom: 0;background: rgba(255,255,255,0.5); background-repeat: no-repeat; background-position: center;background-size: contain;}
+.payer_mode .bouton_action_post.processing-submitted-form::after{background-image: url(img/loader.svg);}

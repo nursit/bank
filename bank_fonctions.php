@@ -241,6 +241,13 @@ function bank_traduire_statut_bank_recurrence($statut) {
 	return $statut;
 }
 
+
+function bank_payer_css($dummy = null) {
+	$fichier_css = find_in_path("css/bank_payer.css");
+	$css = file_get_contents($fichier_css);
+	$css = urls_absolues_css($css, $fichier_css);
+	return $css;
+}
 /**
  * Declarer les CRON
  *
