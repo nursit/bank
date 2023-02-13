@@ -122,3 +122,36 @@ function autoriser_transaction_encaissersimu_dist($faire, $type, $id_transaction
 function autoriser_transaction_rembourser_dist($faire, $type, $id_transaction, $qui, $opt){
 	return autoriser('webmestre');
 }
+
+/**
+ * @param $faire
+ * @param $mode
+ * @param $id
+ * @param $qui
+ * @param $opt
+ * @return false
+ */
+function autoriser_transaction_abandonner_dist($faire, $mode = '', $id = 0, $qui = NULL, $opt = NULL){
+
+	if (!$id) {
+		return false;
+	}
+
+	$transaction = sql_fetsel('id_auteur, statut', 'spip_transactions', 'id_transaction='.intval($id));
+	if (empty($opt['statut'])) {
+		$statut = $transaction['statut'];
+	}
+	else {
+		$statut = $opt['statut'];
+	}
+
+	if ($statut === 'commande' and in_array($transaction['id_auteur'], array(0, $qui['id_auteur']))) {
+		return true;
+	}
+
+	if ($statut === 'attente') {
+		return autoriser('webmestre');
+	}
+
+	return false;
+}

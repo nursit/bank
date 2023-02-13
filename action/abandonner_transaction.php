@@ -21,8 +21,8 @@ function action_abandonner_transaction_dist($id_transaction = null){
 	}
 
 	if ($id_transaction = intval($id_transaction)
-		AND $row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction))
-		AND $row["statut"]=="commande"){
+	  and $row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction))
+	  and autoriser('abandonner', 'transaction', $id_transaction, null, array('statut' => $row["statut"]))) {
 
 		sql_updateq('spip_transactions', array('statut' => 'abandon'), "id_transaction=" . intval($id_transaction));
 

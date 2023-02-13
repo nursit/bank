@@ -4,8 +4,9 @@
 
 	#SET{url_retour,#VAL{transactions}|generer_url_ecrire{id_transaction=#ID_TRANSACTION,0,#EVAL{true}}}
 
-	[(#URL_ACTION_AUTEUR{abandonner_transaction,#ID_TRANSACTION,#GET{url_retour}}|icone_horizontale{<:bank:bouton_abondonner_transaction:>,transaction,del})]
-
+	[(#AUTORISER{abandonner,transaction,#ID_TRANSACTION}|oui)
+		[(#URL_ACTION_AUTEUR{abandonner_transaction,#ID_TRANSACTION,#GET{url_retour}}|icone_horizontale{<:bank:bouton_abondonner_transaction:>,transaction,del})]
+	]
 #BOITE_FERMER
 
 #PIPELINE{afficher_config_objet,#ARRAY{args,#ARRAY{type,transaction,id,#ID_TRANSACTION},data,''}}
