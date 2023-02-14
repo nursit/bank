@@ -82,14 +82,31 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	$parm['PBX_LANGUE'] = "FRA";
 	$parm['PBX_DEVISE'] = (string)$devise_info['code_num'];
 	$parm['PBX_TOTAL'] = $montant;
-	$parm['PBX_PORTEUR'] = defined('_PBX_PORTEUR') ? _PBX_PORTEUR : $mail;
+	$parm['PBX_PORTEUR'] = $mail;
 	$parm['PBX_CMD'] = intval($id_transaction);
 
-	// si le porteur est generique, on ajoute l'email au numero de commande
-	// pour la tracabilite dans l'admin paybox
-	if (defined('_PBX_PORTEUR')){
-		$parm['PBX_CMD'] .= "/" . $mail;
+	// on renseigne un PBX_SHOPPINGCART qui est obligatoire, mais avec le minimum requis
+	$parm['PBX_SHOPPINGCART'] = '<'.'?xml version="1.0" encoding="utf-8"?'."><shoppingcart><total><totalQuantity>1</totalQuantity></total></shoppingcart>";
+
+	$prenom = $billing['prenom'];
+	$nom = $billing['nom'];
+	$cp = $billing['code_postal'];
+	$code_pays_num = bank_code_pays($billing['pays'], 'iso_num');
+	$city = $billing['ville'];
+	if ($GLOBALS['meta']['charset'] !== 'utf-8') {
+		include_spip('inc/charsets');
+		$prenom = unicode2charset(charset2unicode($prenom, $GLOBALS['meta']['charset']), 'utf-8');
+		$nom = unicode2charset(charset2unicode($nom, $GLOBALS['meta']['charset']), 'utf-8');
+		$city = unicode2charset(charset2unicode($city, $GLOBALS['meta']['charset']), 'utf-8');
 	}
+	$parm['PBX_BILLING'] = '<'.'?xml version="1.0" encoding="utf-8"?'.'><Billing><Address>'
+		."<FirstName>$prenom</FirstName>"
+		."<LastName>$nom</LastName>"
+		."<Address1></Address1>"
+		."<ZipCode>$cp</ZipCode>"
+		."<City>$city</City>"
+		."<CountryCode>$code_pays_num</CountryCode>"
+		."</Address></Billing>";
 
 	// temps de validite de la page de paiement paybox (par defaut 900s)
 	if (defined('_PBX_DISPLAY')){
@@ -164,9 +181,14 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	$cartes_possibles = paybox_available_cards($config);
 	foreach ($cartes as $carte){
 		if (isset($cartes_possibles[$carte])){
-			$parm['PBX_TYPEPAIEMENT'] = 'CARTE';
-			$parm['PBX_TYPECARTE'] = $carte;
-			$contexte['hidden'][$carte] = paybox_form_hidden($parm);
+			$parm_carte = $parm;
+			$parm_carte['PBX_TYPEPAIEMENT'] = 'CARTE';
+			$parm_carte['PBX_TYPECARTE'] = $carte;
+			if ($carte === 'AMEX' and isset($parm_carte['PBX_BILLING'])) {
+				include_spip('inc/charsets');
+				$parm_carte['PBX_BILLING'] = translitteration_rapide($parm_carte['PBX_BILLING'], 'utf-8');
+			}
+			$contexte['hidden'][$carte] = paybox_form_hidden($parm_carte);
 			$contexte['logo'][$carte] = $cartes_possibles[$carte];
 		}
 	}
