@@ -419,13 +419,16 @@ function paybox_traite_reponse_transaction($config, $response){
 
 	// type et numero de carte ?
 	if (isset($response['carte']) OR isset($response['BIN6'])){
-		// par defaut on note carte et BIN6 dans refcb
+		// par defaut on note carte et BIN6 dans refcb + le type de 3DS utilisé
 		$set['refcb'] = '';
 		if (isset($response['carte'])){
 			$set['refcb'] .= $response['carte'];
 		}
 		if (isset($response['BIN6'])){
 			$set['refcb'] .= " " . $response['BIN6'];
+		}
+		if (isset($response['3DS'])){
+			$set['refcb'] .= " 3DS:" . $response['3DS'];
 		}
 		$set['refcb'] = trim($set['refcb']);
 	}
