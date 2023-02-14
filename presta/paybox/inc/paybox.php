@@ -357,10 +357,10 @@ function paybox_traite_reponse_transaction($config, $response){
 			)
 		);
 	}
-	
+
 	// On peut maintenant connaître la devise et ses infos
 	$devise_fraction = bank_devise_info($row['devise'], 'fraction');
-	
+
 	// ok, on traite le reglement
 	$date = $_SERVER['REQUEST_TIME'];
 	$date_paiement = sql_format_date(
@@ -521,8 +521,18 @@ function paybox_response_code($code){
 		197 => 'Echeance de la temporisation de surveillance globale',
 		198 => 'Serveur inacessible (positionne par le serveur)',
 		199 => 'Incident domaine initiateur',
+
+		'001A1' => 'Replis VADS (Soft Decline)',
+		'001R1' => 'Révocation paiement récurrent pour la carte chez le commerçant ou pour le MCC (Merchant Category Code) et la carte',
+		'001R3' => 'Révocation tous paiements récurrents pour la carte',
+		'001A4' => 'Utilisation incorrecte du TRA (Transaction Risk Analysis)',
 	);
-	if (isset($codes[intval($code)])){
+	if (!is_numeric($code)) {
+		if (isset($codes[$code])){
+			return $pre . $codes[$code];
+		}
+	}
+	elseif (isset($codes[intval($code)])){
 		return $pre . $codes[intval($code)];
 	}
 	return $pre ? $pre : false;
