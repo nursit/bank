@@ -11,7 +11,7 @@
 		<label for="#GET{name}">IDENTITY_TOKEN</label>[
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[IDENTITY_TOKEN]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{IDENTITY_TOKEN,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
-		<p class="explication"><a href="https://developer.paypal.com/webapps/developer/docs/classic/paypal-payments-standard/integration-guide/paymentdatatransfer/">Payment Data Transfer Documentation</a></p>
+		<p class="explication"><a href="https://developer.paypal.com/api/nvp-soap/payment-data-transfer/#link-getstarted">Payment Data Transfer Documentation</a></p>
 	</li>
 	<INCLURE{fond=formulaires/inc-bank-config-mode_test,env} />
 </ul>
