@@ -86,7 +86,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	$parm['PBX_CMD'] = intval($id_transaction);
 
 	// on renseigne un PBX_SHOPPINGCART qui est obligatoire, mais avec le minimum requis
-	$parm['PBX_SHOPPINGCART'] = '<'.'?xml version="1.0" encoding="utf-8"?'."><shoppingcart><total><totalQuantity>1</totalQuantity></total></shoppingcart>";
+	$parm['PBX_SHOPPINGCART'] = '<'.'?xml version=\'1.0\' encoding=\'utf-8\'?'."><shoppingcart><total><totalQuantity>1</totalQuantity></total></shoppingcart>";
 
 	$prenom = $billing['prenom'];
 	$nom = $billing['nom'];
@@ -99,7 +99,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 		$nom = unicode2charset(charset2unicode($nom, $GLOBALS['meta']['charset']), 'utf-8');
 		$city = unicode2charset(charset2unicode($city, $GLOBALS['meta']['charset']), 'utf-8');
 	}
-	$parm['PBX_BILLING'] = '<'.'?xml version="1.0" encoding="utf-8"?'.'><Billing><Address>'
+	$parm['PBX_BILLING'] = '<'.'?xml version=\'1.0\' encoding=\'utf-8\'?'.'><Billing><Address>'
 		."<FirstName>$prenom</FirstName>"
 		."<LastName>$nom</LastName>"
 		."<Address1></Address1>"
