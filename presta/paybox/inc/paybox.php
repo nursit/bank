@@ -215,7 +215,8 @@ function paybox_form_hidden($params){
 		$params_att = array();
 		foreach ($params as $k => $v){
 			if (strncmp($k, "PBX_", 4)==0){
-				$params_att[$k] = str_replace('"', '&#034;', $v);
+				// il faut urlencoder les quotes en %22 et pas les echapper en entites html
+				$params_att[$k] = str_replace('"', '%22', $v);
 				$message[] = "$k=" . $params_att[$k];
 			}
 		}
