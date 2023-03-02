@@ -531,10 +531,8 @@ function paybox_response_code($code){
 		'001R3' => 'Révocation tous paiements récurrents pour la carte',
 		'001A4' => 'Utilisation incorrecte du TRA (Transaction Risk Analysis)',
 	);
-	if (!is_numeric($code)) {
-		if (isset($codes[$code])){
-			return $pre . $codes[$code];
-		}
+	if (!is_numeric($code) and isset($codes[$code])) {
+		return $pre . $codes[$code];
 	}
 	elseif (isset($codes[intval($code)])){
 		return $pre . $codes[intval($code)];
