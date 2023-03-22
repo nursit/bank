@@ -929,7 +929,7 @@ function bank_simple_call_resilier_abonnement($uid, $config){
 
 		$trans = sql_allfetsel("id_transaction,date_paiement,montant,devise", "spip_transactions", "abo_uid=" . sql_quote($uid) . " AND statut=" . sql_quote('ok') . " AND mode LIKE " . sql_quote($config['presta'] . '%'));
 		foreach ($trans as $tran){
-			$message .= "#" . $tran['id_transaction'] . " " . $tran['date_paiement'] . " " . bank_affiche_montant($tran['montant'],$tran['devise']) . "\n";
+			$message .= "#" . $tran['id_transaction'] . " " . $tran['date_paiement'] . " " . bank_affiche_montant($tran['montant'],$tran['devise'], true, true) . "\n";
 		}
 
 		$envoyer_mail = charger_fonction("envoyer_mail", "inc");
