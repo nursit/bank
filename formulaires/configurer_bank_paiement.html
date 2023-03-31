@@ -49,7 +49,7 @@
 			]
 			<select name="#GET{name}" class="select" id="#GET{name}" style="width: 70%">
 				<option value=""></option>
-				<BOUCLE_prestas(POUR){tableau #REM|bank_lister_prestas}>
+				<BOUCLE_prestas(DATA){source table,#REM|bank_lister_prestas}>
 					#SET{val,#VALEUR}
 					<option value="#GET{val}">[(#VAL{bank:label_presta_}|concat{#VALEUR}|_T|textebrut)]</option>
 				</BOUCLE_prestas>
@@ -57,7 +57,7 @@
 			<input type="submit" class="btn" name="action_append" value="<:bouton_ajouter|attribut_html:>" style="float:right;" />
 		</div>
 	</div>
-	<BOUCLE_configs(POUR){tableau #REM|bank_lister_configs}>
+	<BOUCLE_configs(DATA){source table,#REM|bank_lister_configs}>
 		<fieldset>
 			<legend>[(#VAL{bank:label_presta_}|concat{#VALEUR{presta}}|_T)][ \(<tt>(#VALEUR|bank_config_id)</tt>\)]</legend>
 			<div class="editer-groupe">

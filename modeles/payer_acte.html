@@ -24,7 +24,7 @@
 					[(#ENV*{title,#GET{compteur_modes_actifs}|singulier_ou_pluriel{bank:paiement_securise,bank:titre_mode_paiement_securise}})]
 				</h3>
 				<div class="payer_modes">
-					<BOUCLE_modes(POUR){tableau #VAL{acte}|bank_lister_configs}>[(#VALEUR{actif}|oui)
+					<BOUCLE_modes(DATA){source table,#VAL{acte}|bank_lister_configs}>[(#VALEUR{actif}|oui)
 						#SET{options,#ARRAY{'payer_par_title',#ENV{payer_par_title_#VALEUR{presta},#ENV{payer_par_title,''}}}}
 						#PAYER_ACTE{#VALEUR,#ID_TRANSACTION,#TRANSACTION_HASH,#GET{options}}
 						#SET{compteur_modes_actifs,#GET{compteur_modes_actifs}|plus{1}}

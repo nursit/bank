@@ -10,7 +10,7 @@
 			</thead>
 			<tbody>
 				#SET{items,#CONTENU*|appliquer_filtre{paniers_explique_cookie}}
-				<BOUCLE_detail(POUR){tableau #GET{items}}>
+				<BOUCLE_detail(DATA){source table,#GET{items}}>
 				<tr class="[(#COMPTEUR_BOUCLE|alterner{odd,even})]">
 					<td class="produit">[(#VALEUR{id}|appliquer_filtre{affiche_produit_clair,#VALEUR{quantity}})]</td>
 					<td class="prix">[(#VALEUR{net_price}|bank_affiche_montant{#DEVISE})]</td>

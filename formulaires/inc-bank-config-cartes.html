@@ -1,7 +1,7 @@
 #SET{name,#ENV{casier,''}_cartes}#SET{obli,''}#SET{defaut,#LISTE{}}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
 <li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
 	<label>[(#ENV{label,''}|sinon{<:bank:label_configuration_cartes:>})]</label>
-	<BOUCLE_cards(POUR){tableau #ENV{cartes}}>
+	<BOUCLE_cards(DATA){source table,#ENV{cartes}}>
 	#SET{val,#CLE}
 	<span class="choix">
 		<input type="checkbox" name="#ENV{casier,''}[cartes][]" class="checkbox" id="#GET{name}_#GET{val}" value="#GET{val}"[(#GET{val}|in_any{#ENV*{#ENV{casier,''}}|table_valeur{cartes,#GET{defaut}}}|oui)checked="checked"] />

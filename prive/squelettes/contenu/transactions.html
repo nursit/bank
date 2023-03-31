@@ -1,7 +1,7 @@
 [(#AUTORISER{menu,_transactions}|sinon_interdire_acces)]
 <div class='onglets_simple clearfix'>
 	<ul>
-		<BOUCLE_filtres(POUR){tableau #REM|bank_transactions_statuts}>
+		<BOUCLE_filtres(DATA){source table,#REM|bank_transactions_statuts}>
 		<li>[(#SELF|parametre_url{statut,#CLE}|parametre_url{id_transaction,''}
 			|lien_ou_expose{[(#VAL{bank:label_filtre_statut_#CLE}|_T|concat{[(#CLE|?{[ <span class='small'>\((#VALEUR)\)</span>],''})]})],[(#ENV{statut}|=={#CLE}|et{#ENV{id_transaction,''}|non})],ajax})]</li>
 		</BOUCLE_filtres>

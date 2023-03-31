@@ -14,7 +14,7 @@
 	<h4 class="titre h4">[(#ENV{payer_par_title,<:bank:payer_par_carte_bancaire:>})]</h4>
 	[<p class="explication">(#ENV{config/presta}|bank_explication_mode_paiement)</p>]
 	<div class='boutons'>
-		<BOUCLE_cb(POUR){tableau #ENV{cards}}>
+		<BOUCLE_cb(DATA){source table,#ENV{cards}}>
 		[(#INCLURE{fond=presta/ogone/payer/inc-choix-paiement,env,brand=#CLE,pm=CreditCard,logobrand=[(#VAL{ogone}|bank_trouver_logo{#VALEUR}|bank_label_bouton_img_ou_texte{[(#CLE|bank_label_payer_par_carte)]})]})]
 		</BOUCLE_cb>
 	</div>

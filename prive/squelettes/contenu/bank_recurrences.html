@@ -1,7 +1,7 @@
 [(#AUTORISER{menu,_recurrences}|sinon_interdire_acces)]
 <div class='onglets_simple clearfix'>
 	<ul>
-		<BOUCLE_filtres(POUR){tableau #REM|bank_recurrences_statuts}>
+		<BOUCLE_filtres(DATA){source table,#REM|bank_recurrences_statuts}>
 		<li>[(#SELF|parametre_url{statut,#CLE}|parametre_url{id_bank_recurrence,''}
 			|lien_ou_expose{[(#VAL{bank:label_filtre_recurrence_statut_#CLE}|_T|concat{[(#CLE|?{[ <span class='small'>\((#VALEUR)\)</span>],''})]})],[(#ENV{statut}|=={#CLE}|et{#ENV{id_bank_recurrence,''}|non})],ajax})]</li>
 		</BOUCLE_filtres>
