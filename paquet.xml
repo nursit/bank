@@ -1,9 +1,9 @@
 <paquet
 	prefix="bank"
 	categorie="outil"
-	version="6.0.6"
+	version="6.0.7"
 	etat="test"
-	compatibilite="[3.2.0;4.1.*]"
+	compatibilite="[3.2.0;4.2.*]"
 	logo="prive/themes/spip/images/bank-64.png"
 	documentation="http://contrib.spip.net/4627"
 	schema="2.1.4"
