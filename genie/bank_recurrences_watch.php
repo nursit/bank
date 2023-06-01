@@ -30,7 +30,7 @@ function genie_bank_recurrences_watch_dist($t) {
 	$nb = count($actions);
 	spip_log("genie_bank_recurrences_watch_dist: $nb actions", "recurrences" . _LOG_DEBUG);
 
-	while (time() > $timeout and count($actions)) {
+	while (time() < $timeout and count($actions)) {
 		$action = array_shift($actions);
 		$display = implode(' ', $action);
 		spip_log("genie_bank_recurrences_watch_dist: $display", "recurrences" . _LOG_DEBUG);
