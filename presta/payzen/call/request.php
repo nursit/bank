@@ -146,6 +146,12 @@ function presta_payzen_call_request_dist($id_transaction, $transaction_hash, $co
 			$parm[$vads_key] = str_replace("\n", " ", $billing[$billing_key]);
 		}
 	}
+	
+	// s'il y a un pays, Payzen attend qu'il soit normalisé au format ISO *deux* lettres
+	if (!empty($parm['vads_cust_country'])) {
+		include_spip('inc/bank');
+		$parm['vads_cust_country'] = bank_code_pays($parm['vads_cust_country'], 'iso_alpha2');
+	}
 
 	// nom et url de la boutique
 	$parm['vads_shop_url'] = $GLOBALS['meta']['adresse_site'];
