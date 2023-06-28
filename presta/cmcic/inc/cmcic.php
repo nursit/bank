@@ -135,7 +135,9 @@ function cmcic_concat_response_fields($vars, $oTpe){
  *
  *****************************************************************************/
 
-define("_MONETICOPAIEMENT_VERSION", "3.0");
+if (!defined('_MONETICOPAIEMENT_VERSION')){
+	define("_MONETICOPAIEMENT_VERSION", "3.0");
+}
 define("_MONETICOPAIEMENT_CTLHMAC", "V%s.sha1.php--[CtlHmac%s%s]-%s");
 define("_MONETICOPAIEMENT_CTLHMACSTR", "CtlHmac%s%s");
 define("_MONETICOPAIEMENT_PHASE2BACK_RECEIPT", "version=2\ncdr=%s");
