@@ -47,9 +47,18 @@ function inc_bank_editer_ticket_admin_dist($id_transaction, $sujet = "Transactio
 		$description_html = nl2br($description_html);
 
 		$montant = $row['montant_regle'];
-		$ticket .= "<h2>Transaction $id_transaction</h2>\n<p>$description_html</p>\n<table border='1'>";
-		foreach ($row as $k => $v)
-			$ticket .= "<tr><td>$k</td><td>$v</td></tr>";
+		$ticket .= "<h2>Transaction $id_transaction</h2>\n<p>$description_html</p>\n<table>\n";
+		foreach ($row as $k => $v) {
+			$ticket .= "<tr><td class='first'><b>$k</b></td><td>$v</td></tr>\n";
+		}
+
+		if ($billing = bank_porteur_infos_facturation($row)) {
+			$ticket .= "<tr><td colspan='2' bgcolor='#eee' style='background-color:#eee;padding:5px 1em;text-align:center;'><b>Facturation</b></td></tr>";
+			foreach ($billing as $k => $v) {
+				$ticket .= "<tr><td class='first'><b>$k</b></td><td>$v</td></tr>";
+			}
+		}
+
 		$ticket .= "</table>";
 	}
 
@@ -59,7 +68,18 @@ function inc_bank_editer_ticket_admin_dist($id_transaction, $sujet = "Transactio
 			'data' => $ticket)
 	);
 
-	$ticket = "<html>$ticket</html>";
+	$ticket = <<<html
+<html>
+<head>
+<style type="text/css">
+table {border: 4px solid #888;border-collapse: collapse;}
+table td {padding: 2px 0.5em; border: 2px solid #ccc;}
+table td.first {width:12em;}
+</style>
+</head>
+<body>$ticket</body>
+</html>
+html;
 	$header = "MIME-Version: 1.0\n" .
 		"Content-Type: text/html; charset=" . $GLOBALS['meta']['charset'] . "\n" .
 		"Content-Transfer-Encoding: 8bit\n";
