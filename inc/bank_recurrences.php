@@ -301,6 +301,9 @@ function bank_recurrence_creer($id_transaction, $mode, $echeance = null) {
 		bank_recurrence_tracer($id_bank_recurrence, "création de la récurrence selon transaction #$id_transaction " . json_encode($ins));
 		$recurrence = sql_fetsel('*', 'spip_bank_recurrences', 'id_bank_recurrence=' . intval($id_bank_recurrence));
 	}
+	else {
+		$id_bank_recurrence = $recurrence['id_bank_recurrence'];
+	}
 
 	// verifier qu'on est bien en statut prepa, sinon problème
 	if ($recurrence['statut'] !== 'prepa') {
