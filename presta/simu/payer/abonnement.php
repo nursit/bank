@@ -26,7 +26,7 @@ function presta_simu_payer_abonnement_dist($config, $id_transaction, $transactio
 	$contexte = array(
 		'id_transaction' => $id_transaction,
 		'transaction_hash' => $transaction_hash,
-		'abo' => 'oui',
+		'abo' => 'creation',
 	);
 	$contexte['sign'] = bank_sign_response_simple($config['presta'], $contexte);
 

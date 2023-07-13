@@ -820,6 +820,12 @@ function bank_simple_call_response($config, $response = null){
 	// est-ce un abonnement ?
 	if (isset($response['abo_uid']) AND $response['abo_uid']){
 		$set['abo_uid'] = $response['abo_uid'];
+		if (isset($response['pay_id']) AND $response['pay_id']){
+			$set['pay_id'] = $response['pay_id'];
+		}
+		if (isset($response['auteur_id']) AND $response['auteur_id']){
+			$set['auteur_id'] = $response['auteur_id'];
+		}
 	}
 
 	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
@@ -857,41 +863,6 @@ function bank_simple_call_response($config, $response = null){
 		);
 
 		$res = 'wait';
-	}
-
-	// Si c'est un abonnnement, activer ou resilier
-	if ($id_transaction
-		AND $row = sql_fetsel("*", "spip_transactions", "id_transaction=" . intval($id_transaction))
-		AND $abo_uid = $row['abo_uid']){
-
-		// c'est un paiement reussi ou en 'wait'
-		if ($res){
-			// date de fin de mois de validite de la carte
-			$date_fin = "0000-00-00 00:00:00";
-			if ($row['validite']){
-				list($year, $month) = explode('-', $row['validite']);
-				$date_fin = bank_date_fin_mois($year, $month);
-			}
-
-			if ($activer_abonnement = charger_fonction('activer_abonnement', 'abos', true)){
-				$activer_abonnement($id_transaction, $abo_uid, $mode, $date_fin);
-			}
-		}
-
-		// c'est un echec, il faut le resilier, que ce soit la premiere ou la Nieme transaction
-		if (!$res){
-
-			if ($resilier = charger_fonction('resilier', 'abos', true)){
-				$options = array(
-					'notify_bank' => false, // pas la peine : abo deja resilie vu paiement refuse
-					'immediat' => true,
-					'message' => "[bank] Transaction #$id_transaction refusee",
-					'erreur' => true,
-				);
-				$resilier("uid:" . $abo_uid, $options);
-			}
-		}
-
 	}
 
 	return array($id_transaction, $res);
