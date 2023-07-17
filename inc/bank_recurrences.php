@@ -371,7 +371,7 @@ function bank_recurrence_activer($id_transaction, $abo_uid, $mode, $payment_data
 	}
 
 	// initialiser les echeances
-	$now = time();
+	$now = $_SERVER['REQUEST_TIME'];
 	$set = [
 		'count_echeance' => 1,
 		'date_start' => date('Y-m-d H:i:s', $now),
