@@ -224,6 +224,21 @@ function bank_affiche_auteurs_interventions($flux){
 				'quoi' => 'auteur',
 			));
 
+		if (sql_countsel('spip_bank_recurrences')) {
+			$id_transactions = sql_allfetsel('id_transaction', 'spip_transactions', 'id_auteur='.intval($id_auteur));
+			if (!empty($id_transactions)) {
+				$id_transactions = array_column($id_transactions, 'id_transaction');
+				$id_bank_recurrences = sql_allfetsel('id_bank_recurrence', 'spip_bank_recurrences', sql_in('id_transaction', $id_transactions) . ' OR '. sql_in('id_transaction_echeance', $id_transactions));
+				if (!empty($id_bank_recurrences)) {
+					$id_bank_recurrences = array_column($id_bank_recurrences, 'id_bank_recurrence');
+					$flux['data'] .= '<!--bank-->' . recuperer_fond('prive/squelettes/inclure/liste-bank_recurrences', array(
+							'id_bank_recurrence' => $id_bank_recurrences,
+							'quoi' => 'auteur',
+						));
+				}
+			}
+		}
+
 	}
 	return $flux;
 }
