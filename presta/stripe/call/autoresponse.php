@@ -9,6 +9,9 @@
  * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
+
+use Stripe\Exception\ApiErrorException;
+
 if (!defined('_ECRIRE_INC_VERSION')){
 	return;
 }
@@ -146,7 +149,7 @@ function stripe_retrieve_event($config, $auto = 'auto'){
 			// Verify the event by fetching it from Stripe
 			$event = \Stripe\Event::retrieve($event_id);
 
-		} catch (Exception $e) {
+		} catch (ApiErrorException $e) {
 			if ($body = $e->getJsonBody()){
 				$err = $body['error'];
 				list($erreur_code, $erreur) = stripe_error_code($err);
@@ -330,7 +333,7 @@ function stripe_webhook_invoice_payment_result($raison, $config, $event){
 						and $charge = end($payment->charges->data)){
 						$response['charge_id'] = $charge->id;
 					}
-				} catch (Exception $e) {
+				} catch (ApiErrorException $e) {
 					if ($body = $e->getJsonBody()){
 						$err = $body['error'];
 						list($erreur_code, $erreur) = stripe_error_code($err);
@@ -359,7 +362,7 @@ function stripe_webhook_invoice_payment_result($raison, $config, $event){
 							$response['transaction_hash'] = $product->metadata->transaction_hash;
 							break;
 						}
-					} catch (Exception $e) {
+					} catch (ApiErrorException $e) {
 						if ($body = $e->getJsonBody()){
 							$err = $body['error'];
 							list($erreur_code, $erreur) = stripe_error_code($err);

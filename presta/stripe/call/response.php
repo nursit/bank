@@ -9,6 +9,9 @@
  * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
+
+use Stripe\Exception\ApiErrorException;
+
 if (!defined('_ECRIRE_INC_VERSION')){
 	return;
 }
@@ -106,7 +109,7 @@ function presta_stripe_call_response_dist($config, $response = null){
 				$response['payment_id'] = $session->payment_intent;
 				//$payment = \Stripe\PaymentIntent::retrieve($response['payment_id']);
 			}
-		} catch (Exception $e) {
+		} catch (ApiErrorException $e) {
 			if ($body = $e->getJsonBody()){
 				$err = $body['error'];
 				list($erreur_code, $erreur) = stripe_error_code($err);
