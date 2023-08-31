@@ -64,7 +64,7 @@ function stripe_locale($lang) {
  */
 function stripe_init_api($config){
 
-	include_spip('presta/stripe/lib/stripe-php-7/init');
+	require_once dirname(__DIR__) . '/vendor/autoload.php';
 
 	// Set secret key
 	// See keys here: https://dashboard.stripe.com/account/apikeys
@@ -81,8 +81,7 @@ function stripe_init_api($config){
 
 /**
  * Creer/updater un webhook pour ce site
- * @param $config
- * @throws \Stripe\Error\Api
+ * @param array $config
  */
 function stripe_set_webhook($config){
 	stripe_init_api($config);
