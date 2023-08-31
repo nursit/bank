@@ -1,4 +1,5 @@
 <?php
+
 /*
  * Paiement Bancaire
  * module de paiement bancaire multi prestataires
@@ -9,6 +10,9 @@
  * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
+
+use Stripe\Exception\ApiErrorException;
+
 if (!defined('_ECRIRE_INC_VERSION')){
 	return;
 }
@@ -18,24 +22,24 @@ include_spip('inc/bank');
 
 /**
  * Liste des cartes moyens de paiement possibles selon la config
- * @param $config
+ *
+ * @param array $config
  * @return array
  */
-function stripe_available_cards($config){
+function stripe_available_cards($config) {
 
-	$mode = $config['presta'];
 	// https://stripe.com/docs/api/payment_methods/object#payment_method_object-type
 
-	$cartes_possibles = array(
+	$cartes_possibles = [
 		'card' => "CARD.gif",
 		'bancontact' => "BANCONTACT.gif",
 		'ideal' => "IDEAL.gif",
 		// a tester
 		//'sepa_debit' => "SEPA_SDD.gif",
-	);
+	];
 
 	// pas de bancontact ni de ideal en abonnement
-	if ($config['type']=='abo'){
+	if ($config['type'] === 'abo') {
 		unset($cartes_possibles['bancontact']);
 		unset($cartes_possibles['ideal']);
 	}
@@ -87,7 +91,7 @@ function stripe_set_webhook($config){
 	stripe_init_api($config);
 	$mode = $config['presta'];
 	$key_webhook_secret = (($config['mode_test']) ? 'WEBHOOK_SECRET_KEY_test' : 'WEBHOOK_SECRET_KEY');
-	$has_secret = ((isset($config[$key_webhook_secret]) and $config[$key_webhook_secret]) ? true : false);
+	$has_secret = ((isset($config[$key_webhook_secret]) && $config[$key_webhook_secret]) ? true : false);
 
 	$url_endpoint = bank_url_api_retour($config, "autoresponse");
 	$event_endpoint = ["*"];
@@ -111,30 +115,37 @@ function stripe_set_webhook($config){
 		spip_log("stripe_set_webhook: Impossible de lister les endpoints :: " . $e->getMessage(), $mode . _LOG_ERREUR);
 		$list = [];
 		// si secret connu, on presume qu'on a deja un endpoint configure
-		if ($has_secret){
+		if ($has_secret) {
 			return;
 		}
 	}
 
-	foreach ($list->data as $endpoint){
-		if ($endpoint->status=='enabled'){
-			if (strpos($endpoint->url, $GLOBALS['meta']['adresse_site'] . '/')===0
-				OR strpos($endpoint->url, $base_endpoint)===0){
+	foreach ($list->data as $endpoint) {
+		if ($endpoint->status=='enabled') {
+			if (
+				strpos($endpoint->url, $GLOBALS['meta']['adresse_site'] . '/') === 0
+				|| strpos($endpoint->url, $base_endpoint) === 0
+			) {
 				// si on ne connait pas le secret du webhook on le disabled et on en cree un nouveau
-				if ($has_secret
-					and $endpoint->url===$url_endpoint
-					and is_array($endpoint->enabled_events)
-					and (!array_diff($endpoint->enabled_events, $event_endpoint) or in_array('*', $endpoint->enabled_events))){
+				if (
+					$has_secret
+					&& $endpoint->url === $url_endpoint
+					&& is_array($endpoint->enabled_events)
+					&& (
+						!array_diff($endpoint->enabled_events, $event_endpoint)
+						|| in_array('*', $endpoint->enabled_events)
+					)
+				) {
 					// endpoint OK, rien a faire
 					spip_log("stripe_set_webhook: OK endpoint " . $endpoint->id, $mode);
 					return;
 				} else {
-					if ($has_secret){
+					if ($has_secret) {
 						// Update endpoint
 						$new_events = (is_array($endpoint->enabled_events) ? array_merge($event_endpoint, $endpoint->enabled_events) : $event_endpoint);
 						// Stripe: * should be alone in the array
-						if (in_array("*", $new_events)){
-							$new_events = ["*"];
+						if (in_array('*', $new_events)) {
+							$new_events = ['*'];
 						}
 						$set = ['url' => $url_endpoint, 'enabled_events' => $new_events];
 					} else {
@@ -146,7 +157,7 @@ function stripe_set_webhook($config){
 					} catch (Exception $e) {
 						spip_log("stripe_set_webhook: Impossible de modifier le endpoint " . $endpoint->id . " " . json_encode($set) . ' :: ' . $e->getMessage(), $mode . _LOG_ERREUR);
 					}
-					if ($has_secret){
+					if ($has_secret) {
 						return;
 					}
 				}
@@ -164,7 +175,7 @@ function stripe_set_webhook($config){
 		spip_log("stripe_set_webhook: ADDED endpoint " . $endpoint->id . " " . json_encode($set), $mode);
 		$secret = $endpoint->secret;
 
-		$config_meta = lire_config("bank_paiement/", array());
+		$config_meta = lire_config("bank_paiement/", []);
 		$key_ref = (($config['mode_test']) ? 'SECRET_KEY_test' : 'SECRET_KEY');
 		if (is_array($config_meta)){
 			foreach ($config_meta as $k => $v){
@@ -186,57 +197,58 @@ function stripe_set_webhook($config){
 
 /**
  * Gerer la reponse du POST JS sur paiement/abonnement
+ *
  * @param array $config
  * @param array $response
  * @return array
  */
-function stripe_traite_reponse_transaction($config, &$response){
+function stripe_traite_reponse_transaction($config, &$response) {
 
 	$mode = $config['presta'];
-	if (isset($config['mode_test']) AND $config['mode_test']){
+	if (isset($config['mode_test']) && $config['mode_test']) {
 		$mode .= "_test";
 	}
 	$config_id = bank_config_id($config);
-	$is_abo = (isset($response['abo']) and $response['abo']);
+	$is_abo = (isset($response['abo']) && $response['abo']);
 
-	if (!isset($response['id_transaction']) OR !isset($response['transaction_hash'])){
+	if (!isset($response['id_transaction']) || !isset($response['transaction_hash'])) {
 		return bank_transaction_invalide(0,
-			array(
+			[
 				'mode' => $mode,
 				'erreur' => "transaction inconnue",
 				'log' => var_export($response, true),
-			)
+			]
 		);
 	}
-	if ((!isset($response['payment_id']) OR !$response['payment_id'])){
+	if ((!isset($response['payment_id']) || !$response['payment_id'])) {
 		return bank_transaction_invalide(0,
-			array(
+			[
 				'mode' => $mode,
 				'erreur' => "payment_id absent dans la reponse",
 				'log' => var_export($response, true),
-			)
+			]
 		);
 	}
 
 	$id_transaction = $response['id_transaction'];
 	$transaction_hash = $response['transaction_hash'];
 
-	if (!$row = sql_fetsel('*', 'spip_transactions', 'id_transaction=' . intval($id_transaction))){
+	if (!$row = sql_fetsel('*', 'spip_transactions', 'id_transaction=' . intval($id_transaction))) {
 		return bank_transaction_invalide($id_transaction,
-			array(
+			[
 				'mode' => $mode,
 				'erreur' => "transaction non trouvee",
 				'log' => var_export($response, true),
-			)
+			]
 		);
 	}
-	if ($transaction_hash!=$row['transaction_hash']){
+	if ($transaction_hash != $row['transaction_hash']) {
 		return bank_transaction_invalide($id_transaction,
-			array(
+			[
 				'mode' => $mode,
 				'erreur' => "hash $transaction_hash non conforme",
 				'log' => var_export($response, true),
-			)
+			]
 		);
 	}
 
@@ -247,17 +259,16 @@ function stripe_traite_reponse_transaction($config, &$response){
 	$date = $_SERVER['REQUEST_TIME'];
 	$date_paiement = date('Y-m-d H:i:s', $date);
 
-	$erreur = "";
+	$erreur = '';
 	$erreur_code = 0;
 
 	// charger l'API Stripe avec la cle
 	stripe_init_api($config);
 
-
 	try {
 		$payment = \Stripe\PaymentIntent::retrieve($response['payment_id']);
-	} catch (Exception $e) {
-		if ($body = $e->getJsonBody()){
+	} catch (ApiErrorException $e) {
+		if ($body = $e->getJsonBody()) {
 			$err = $body['error'];
 			list($erreur_code, $erreur) = stripe_error_code($err);
 		} else {
@@ -266,26 +277,26 @@ function stripe_traite_reponse_transaction($config, &$response){
 		}
 	}
 
-	if (!$payment or !in_array($payment->status, array(/*'processing', */ 'succeeded'))){
+	if (!$payment || !in_array($payment->status, [/*'processing', */ 'succeeded'])) {
 		// regarder si l'annulation n'arrive pas apres un reglement (internaute qui a ouvert 2 fenetres de paiement)
-		if ($row['reglee']=='oui'){
-			return array($id_transaction, true);
+		if ($row['reglee'] === 'oui') {
+			return [$id_transaction, true];
 		}
 		// sinon enregistrer l'absence de paiement et l'erreur
 		return bank_transaction_echec($id_transaction,
-			array(
+			[
 				'mode' => $mode,
 				'config_id' => $config_id,
 				'date_paiement' => $date_paiement,
 				'erreur' => ($payment ? "Status PaymentIntent=" . $payment->status : "PaymentIntent " . $response['payment_id'] . " non valide") . ($erreur ? "\n$erreur" : ""),
 				'code_erreur' => $erreur_code,
 				'log' => var_export($response, true),
-			)
+			]
 		);
 	}
 
 	// essayer de retrouver ou creer un customer pour l'id_auteur
-	if (empty($response['pay_id']) and $customer_id = $payment->customer) {
+	if (empty($response['pay_id']) && ($customer_id = $payment->customer)) {
 		$response['pay_id'] = $customer_id;
 	}
 
@@ -303,60 +314,66 @@ function stripe_traite_reponse_transaction($config, &$response){
 	$authorisation_id = $payment->id;
 	$transaction = "";
 	$charge = null;
-	if ($payment->charges
-		and $payment->charges->data
-		and $charge = end($payment->charges->data)){
+	if (
+		$payment->charges
+		&& $payment->charges->data
+		&& ($charge = end($payment->charges->data))
+	) {
 		$transaction = $charge['balance_transaction'];
 		$date_paiement = date('Y-m-d H:i:s', $charge['created']);
 	}
 
-	$set = array(
+	$set = [
 		"autorisation_id" => "$transaction/$authorisation_id",
 		"mode" => "$mode/$config_id",
 		"montant_regle" => $montant_regle,
 		"date_paiement" => $date_paiement,
 		"statut" => 'ok',
 		"reglee" => 'oui'
-	);
+	];
 
-	if (isset($response['pay_id'])){
+	if (isset($response['pay_id'])) {
 		$set['pay_id'] = $response['pay_id'];
 	}
-	if (isset($response['abo_uid'])){
+	if (isset($response['abo_uid'])) {
 		$set['abo_uid'] = $response['abo_uid'];
 	}
 
 	// type et numero de carte ?
 	$card = null;
-	if ($charge
-		and isset($charge['payment_method_details'])
-		and $charge['payment_method_details']['type']=='card'){
+	if (
+		$charge
+		&& isset($charge['payment_method_details'])
+		&& $charge['payment_method_details']['type'] === 'card'
+	) {
 		$card = $charge['payment_method_details']['card'];
 	}
-	if (!$card
-		and $charge
-		and isset($charge['source'])
-		and $charge['source']['object']=='card'){
+	if (
+		!$card
+		&& $charge
+		&& isset($charge['source'])
+		&& $charge['source']['object'] === 'card'
+	) {
 		$card = $charge['source'];
 	}
-	if (!$card){
+	if (!$card) {
 		// TODO utiliser $payment->payment_method
 	}
 
-	if ($card){
+	if ($card) {
 		// par defaut on note carte et BIN6 dans refcb
 		$set['refcb'] = '';
-		if (isset($card['brand'])){
+		if (isset($card['brand'])) {
 			$set['refcb'] .= $card['brand'];
 		}
 
-		if (isset($card['last4']) and $card['last4']){
+		if (isset($card['last4']) && $card['last4']) {
 			$set['refcb'] .= ' ****' . $card['last4'];
 		}
 
 		$set['refcb'] = trim($set['refcb']);
 		// validite de carte ?
-		if (isset($card['exp_month']) AND isset($card['exp_year'])){
+		if (isset($card['exp_month']) && isset($card['exp_year'])) {
 			$set['validite'] = $card['exp_year'] . "-" . str_pad($card['exp_month'], 2, '0', STR_PAD_LEFT);
 		}
 	}
@@ -368,17 +385,17 @@ function stripe_traite_reponse_transaction($config, &$response){
 
 	// faire les updates chez Stripe, *apres* avoir mis la transaction a jour
 	// pour faire au plus vite et mieux gerer les concurrences
-	if (!empty($response['pay_id'])){
+	if (!empty($response['pay_id'])) {
 		try {
 			$customer = \Stripe\Customer::retrieve($response['pay_id']);
 
 			// si customer retrouve, on ajoute la source et la transaction
-			if ($customer){
+			if ($customer) {
 				$metadata = $customer->metadata;
 				if (!$metadata){
-					$metadata = array();
+					$metadata = [];
 				}
-				if (isset($metadata['id_transaction'])){
+				if (isset($metadata['id_transaction'])) {
 					$metadata['id_transaction'] .= ',' . $id_transaction;
 				} else {
 					$metadata['id_transaction'] = $id_transaction;
@@ -392,14 +409,14 @@ function stripe_traite_reponse_transaction($config, &$response){
 					$metadata['id_transaction'] = implode(',', $t);
 				}
 
-				if ($row['id_auteur']>0){
+				if ($row['id_auteur']>0) {
 					$metadata['id_auteur'] = $row['id_auteur'];
 					$customer->metadata = $metadata;
 					$customer->description = sql_getfetsel('nom', 'spip_auteurs', 'id_auteur=' . intval($row['id_auteur']));
 				}
 				$customer->save();
 			}
-		} catch (Exception $e) {
+		} catch (ApiErrorException $e) {
 			if ($body = $e->getJsonBody()){
 				$err = $body['error'];
 				list($erreur_code, $erreur) = stripe_error_code($err);
@@ -410,7 +427,7 @@ function stripe_traite_reponse_transaction($config, &$response){
 		}
 	}
 
-	if ($charge and $payment){
+	if ($charge && $payment){
 		try {
 			\Stripe\Charge::update($charge->id, ['description' => $payment->description,]);
 		} catch (Exception $e) {
@@ -419,7 +436,7 @@ function stripe_traite_reponse_transaction($config, &$response){
 	}
 
 
-	$options = array('row_prec' => $row);
+	$options = ['row_prec' => $row];
 	if (!empty($response['lang'])) {
 		$options['lang'] = $response['lang'];
 	}
@@ -439,15 +456,15 @@ function stripe_traite_reponse_transaction($config, &$response){
 		$payment->description = $description;
 		$metadata = $payment->metadata;
 		if (!$metadata){
-			$metadata = array();
+			$metadata = [];
 		}
 		$metadata['id_transaction'] = $id_transaction;
 		$metadata['id_auteur'] = $row['id_auteur'];
 		$metadata['nom_site'] = $nom_site;
 		$metadata['url_site'] = $GLOBALS['meta']['adresse_site'];
 		$payment->save();
-	} catch (Exception $e) {
-		if ($body = $e->getJsonBody()){
+	} catch (ApiErrorException $e) {
+		if ($body = $e->getJsonBody()) {
 			$err = $body['error'];
 			list($erreur_code, $erreur) = stripe_error_code($err);
 		} else {
@@ -457,17 +474,17 @@ function stripe_traite_reponse_transaction($config, &$response){
 		spip_log("Echec update payment metadata/description transaction #$id_transaction $erreur", $mode . _LOG_ERREUR);
 	}
 
-	return array($id_transaction, true);
+	return [$id_transaction, true];
 
 }
 
 
-function stripe_error_code($err){
+function stripe_error_code($err) {
 	$message = $err['message'];
 	$code = $err['type'];
-	if ($code==='card_error'){
+	if ($code === 'card_error') {
 		$code = $err['code'];
 	}
 
-	return array($code, $message);
+	return [$code, $message];
 }

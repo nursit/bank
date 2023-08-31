@@ -9,10 +9,10 @@
  * (c) 2012-2019 - Distribue sous licence GNU/GPL
  *
  */
+
 if (!defined('_ECRIRE_INC_VERSION')){
 	return;
 }
-
 
 include_spip('presta/stripe/inc/stripe');
 
