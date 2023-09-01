@@ -243,6 +243,17 @@ function bank_affiche_auteurs_interventions($flux){
 	return $flux;
 }
 
+function bank_affiche_parrain($id_transaction, $parrain, $tracking_id) {
+	if (empty($parrain)) {
+		return '';
+	}
+	if ($f = charger_filtre('bank_affiche_parrain_'.$parrain, '')
+	  and $s = $f($id_transaction, $tracking_id)) {
+		return $s;
+	}
+	return trim("$parrain<br />\n$tracking_id");
+}
+
 function bank_traduire_statut_transaction($statut) {
 	$statut = explode("[", $statut);
 	$statut_clair = array_shift($statut);

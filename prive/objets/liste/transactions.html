@@ -51,7 +51,7 @@
 				<td class="regle">[(#MONTANT_REGLE|sinon{[(#STATUT|in_array{#LISTE{commande,attente}}|et{#AUTORISER{regler,transaction,#ID_TRANSACTION}})<a class="btn btn_mini btn_secondaire btn_pay" href="[(#URL_ECRIRE{payer,id_transaction=#ID_TRANSACTION}|parametre_url{transaction_hash,#TRANSACTION_HASH})]"><:bank:payer:></a>]})]</td>
 				<td class="date">[(#DATE_PAIEMENT|intval|oui)<abbr title="Paid on #DATE_PAIEMENT">][(#DATE_TRANSACTION|replace{' ',' <small>'}|concat{'</small>'})][(#DATE_PAIEMENT|intval|oui)</abbr>]</td>
 				<td class="tstatut">[(#STATUT|match{echec|ok|rembourse}|et{#MESSAGE|trim|strlen}|?{[<abbr title="[(#MESSAGE|attribut_html)[ - (#ERREUR|attribut_html)]]">(#STATUT|bank_traduire_statut_transaction)</abbr>],#STATUT|bank_traduire_statut_transaction})]</td>
-				<td class="parrain">[(#PARRAIN)<br />#TRACKING_ID#SET{has_parrain,' '}]</td>
+				<td class="parrain">[(#ID_TRANSACTION|bank_affiche_parrain{#PARRAIN,#TRACKING_ID})#SET{has_parrain,' '}]</td>
 				<td class="id_commande">[<a href='[(#ID_COMMANDE|generer_url_entite{commande})]'(#ID_COMMANDE|oui)>#ID_COMMANDE</a>#SET{has_commande,' '}]</td>
 				<td class="id_facture">[<a href='[(#URL_PAGE{facture}|parametre_url{id_facture,#ID_FACTURE}|parametre_url{hash,#INFO_DETAILS{facture,#ID_FACTURE}|md5})]'(#ID_FACTURE|oui)>#ID_FACTURE</a>#SET{has_facture,' '}]</td>
 			</tr>
