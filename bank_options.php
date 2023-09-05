@@ -71,7 +71,7 @@ function bank_affiche_montant($montant, $code_devise = null, $unite = true, $raw
 	}
 
 	// falback : la veille fonction affiche_monnaie
-	return affiche_monnaie($montant, $devise['fraction'], $unite ? '&nbsp;'.$devise['code'] : '');
+	return affiche_monnaie($montant, $devise['fraction'], $unite ? ($raw ? ' ' : '&nbsp;') . $devise['code'] : '');
 }
 
 
