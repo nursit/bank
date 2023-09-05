@@ -311,7 +311,7 @@ function stripe_traite_reponse_transaction($config, &$response) {
 		spip_log($t, $mode . '_reglements_partiels');
 	}
 
-	$authorisation_id = $payment->id;
+	$autorisation_id = $payment->id;
 	$transaction = "";
 	$charge = null;
 	if (
@@ -324,7 +324,7 @@ function stripe_traite_reponse_transaction($config, &$response) {
 	}
 
 	$set = [
-		"autorisation_id" => "$transaction/$authorisation_id",
+		"autorisation_id" => "$transaction/$autorisation_id",
 		"mode" => "$mode/$config_id",
 		"montant_regle" => $montant_regle,
 		"date_paiement" => $date_paiement,
