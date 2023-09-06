@@ -109,6 +109,8 @@ function abos_resilier_notify_bank($abonne_uid, $mode_paiement = null){
 			}
 		} else {
 			spip_log("abos/resilier_notify_bank : pas de methode resilier_abonnement pour le presta $presta", "abos_resil" . _LOG_INFO_IMPORTANTE);
+			// declencher un traitement fallback via bank_simple_call_resilier_abonnement
+			$ok = false;
 		}
 
 		if (!$ok){
