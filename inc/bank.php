@@ -826,6 +826,8 @@ function bank_simple_call_response($config, $response = null){
 		if (isset($response['auteur_id']) AND $response['auteur_id']){
 			$set['auteur_id'] = $response['auteur_id'];
 		}
+		// on met une date de validite factice sur le paiement pour pouvoir tester sa prise en compte de
+		$set['validite'] = date('Y-m', strtotime('+15month'));
 	}
 
 	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
