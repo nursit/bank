@@ -266,7 +266,10 @@ function stripe_traite_reponse_transaction($config, &$response) {
 	stripe_init_api($config);
 
 	try {
-		$payment = \Stripe\PaymentIntent::retrieve($response['payment_id']);
+		$payment = \Stripe\PaymentIntent::retrieve([
+			'id' => $response['payment_id'],
+			'expand' => ['latest_charge'],
+		]);
 	} catch (ApiErrorException $e) {
 		if ($body = $e->getJsonBody()) {
 			$err = $body['error'];
@@ -314,11 +317,8 @@ function stripe_traite_reponse_transaction($config, &$response) {
 	$autorisation_id = $payment->id;
 	$transaction = "";
 	$charge = null;
-	if (
-		$payment->charges
-		&& $payment->charges->data
-		&& ($charge = end($payment->charges->data))
-	) {
+	if ($payment->latest_charge) {
+		$charge = $payment->latest_charge;
 		$transaction = $charge['balance_transaction'];
 		$date_paiement = date('Y-m-d H:i:s', $charge['created']);
 	}
