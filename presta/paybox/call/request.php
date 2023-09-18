@@ -88,21 +88,26 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	// on renseigne un PBX_SHOPPINGCART qui est obligatoire, mais avec le minimum requis
 	$parm['PBX_SHOPPINGCART'] = '<'.'?xml version=\'1.0\' encoding=\'utf-8\'?'."><shoppingcart><total><totalQuantity>1</totalQuantity></total></shoppingcart>";
 
-	$prenom = $billing['prenom'];
-	$nom = $billing['nom'];
-	$cp = $billing['code_postal'];
-	$code_pays_num = bank_code_pays($billing['pays'], 'iso_num');
-	$city = $billing['ville'];
-	if ($GLOBALS['meta']['charset'] !== 'utf-8') {
-		include_spip('inc/charsets');
-		$prenom = unicode2charset(charset2unicode($prenom, $GLOBALS['meta']['charset']), 'utf-8');
-		$nom = unicode2charset(charset2unicode($nom, $GLOBALS['meta']['charset']), 'utf-8');
-		$city = unicode2charset(charset2unicode($city, $GLOBALS['meta']['charset']), 'utf-8');
-	}
+	// decouper l'adresse en 2 parties uniquement
+	$lignes = explode("\n", $billing['adresse']);
+	$adresse1 = array_shift($lignes);
+	$adresse2 = count($lignes) ? implode(' ', $lignes) : '';
+
+	// mettre les différents éléments de l'adresse aux formats imposés
+	// le charset va etre transliterre et on aura que de l'ascii en sortie
+	$prenom 		= paybox_format_ans($billing['prenom'], 22, true);
+	$nom 			= paybox_format_ans($billing['nom'], 22, true);
+	$adresse1 		= paybox_format_ans($adresse1, 50, false);
+	$adresse2 		= paybox_format_ans($adresse2, 50, false);
+	$cp 			= paybox_format_ans($billing['code_postal'], 16, false);
+	$city 			= paybox_format_ans($billing['ville'], 50, false);
+	$code_pays_num  = bank_code_pays($billing['pays'], 'iso_num');
+
 	$parm['PBX_BILLING'] = '<'.'?xml version=\'1.0\' encoding=\'utf-8\'?'.'><Billing><Address>'
 		."<FirstName>$prenom</FirstName>"
 		."<LastName>$nom</LastName>"
-		."<Address1></Address1>"
+		."<Address1>$adresse1</Address1>"
+		.($adresse2 ? "<Address2>$adresse2</Address2>" : '')
 		."<ZipCode>$cp</ZipCode>"
 		."<City>$city</City>"
 		."<CountryCode>$code_pays_num</CountryCode>"
