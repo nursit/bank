@@ -90,6 +90,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 
 	$prenom = $billing['prenom'];
 	$nom = $billing['nom'];
+	$adresse = $billing['adresse'];
 	$cp = $billing['code_postal'];
 	$code_pays_num = bank_code_pays($billing['pays'], 'iso_num');
 	$city = $billing['ville'];
@@ -97,12 +98,13 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 		include_spip('inc/charsets');
 		$prenom = unicode2charset(charset2unicode($prenom, $GLOBALS['meta']['charset']), 'utf-8');
 		$nom = unicode2charset(charset2unicode($nom, $GLOBALS['meta']['charset']), 'utf-8');
+		$adresse = unicode2charset(charset2unicode($adresse, $GLOBALS['meta']['charset']), 'utf-8');
 		$city = unicode2charset(charset2unicode($city, $GLOBALS['meta']['charset']), 'utf-8');
 	}
 	$parm['PBX_BILLING'] = '<'.'?xml version=\'1.0\' encoding=\'utf-8\'?'.'><Billing><Address>'
 		."<FirstName>$prenom</FirstName>"
 		."<LastName>$nom</LastName>"
-		."<Address1></Address1>"
+		."<Address1>$adresse</Address1>"
 		."<ZipCode>$cp</ZipCode>"
 		."<City>$city</City>"
 		."<CountryCode>$code_pays_num</CountryCode>"
