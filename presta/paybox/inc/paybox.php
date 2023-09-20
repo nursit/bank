@@ -539,3 +539,27 @@ function paybox_response_code($code){
 	}
 	return $pre ? $pre : false;
 }
+
+/**
+ * retourne une chaine de caractères au format imposé pour PBX_BILLING : 
+ * Alpha Numérique avec caractères spéciaux (sans caractères accentués)
+ * (cf https://www.ca-moncommerce.com/espace-client-mon-commerce/up2pay-e-transactions/ma-documentation/manuel-dintegration-focus-3ds-v2/principes-generaux/#integration-3dsv2-developpeur-webmaster)
+ * 
+ * @param int $nbcar : le nombre de caractères demandé
+ * @param bool $speciaux : autoriser les caractères /-'
+ * @return string 
+ * 
+ **/
+function paybox_format_ans($texte, $nbcar=0, $speciaux=false) {
+	// remplacement approximatif des caractères accentués et assimilés par leur équivalent
+	$texte = htmlentities($texte);
+	$texte = preg_replace(',&(.)[^;]+;,', '$1', $texte);
+
+	$autorises = $speciaux ? ",[^A-Za-z0-9 \-/']," : ",[^A-Za-z0-9 ],";
+	$texte = preg_replace($autorises, "", $texte);
+	if ($nbcar) {
+		$texte = substr($texte, 0, $nbcar);
+	}
+	
+	return $texte;
+}

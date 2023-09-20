@@ -90,21 +90,35 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 
 	$prenom = $billing['prenom'];
 	$nom = $billing['nom'];
-	$adresse = $billing['adresse'];
+	$lignes = explode("\n", $billing['adresse']);
+	$adresse1 = array_shift($lignes);
+	$adresse2 = count($lignes) ? implode(' ', $lignes) : '';
 	$cp = $billing['code_postal'];
-	$code_pays_num = bank_code_pays($billing['pays'], 'iso_num');
+	$code_pays_num = mb_strtoupper(substr($billing['pays'], 0, 2));
 	$city = $billing['ville'];
 	if ($GLOBALS['meta']['charset'] !== 'utf-8') {
 		include_spip('inc/charsets');
 		$prenom = unicode2charset(charset2unicode($prenom, $GLOBALS['meta']['charset']), 'utf-8');
 		$nom = unicode2charset(charset2unicode($nom, $GLOBALS['meta']['charset']), 'utf-8');
-		$adresse = unicode2charset(charset2unicode($adresse, $GLOBALS['meta']['charset']), 'utf-8');
+		$adresse1 = unicode2charset(charset2unicode($adresse1, $GLOBALS['meta']['charset']), 'utf-8');
+		$adresse2 = unicode2charset(charset2unicode($adresse2, $GLOBALS['meta']['charset']), 'utf-8');
 		$city = unicode2charset(charset2unicode($city, $GLOBALS['meta']['charset']), 'utf-8');
 	}
+
+	// mettre les différents éléments au formats imposés
+	$prenom 		= paybox_format_ans($prenom, 22, true);
+	$nom 			= paybox_format_ans($nom, 22, true);
+	$adresse1 		= paybox_format_ans($adresse1, 50, false);
+	$adresse2 		= paybox_format_ans($adresse2, 50, false);
+	$cp 			= paybox_format_ans($cp, 16, false);
+	$city 			= paybox_format_ans($city, 50, false);
+	$code_pays_num 	= bank_code_pays($code_pays_num, 'iso_num');
+
 	$parm['PBX_BILLING'] = '<'.'?xml version=\'1.0\' encoding=\'utf-8\'?'.'><Billing><Address>'
 		."<FirstName>$prenom</FirstName>"
 		."<LastName>$nom</LastName>"
-		."<Address1>$adresse</Address1>"
+		."<Address1>$adresse1</Address1>"
+		."<Address2>$adresse2</Address2>"
 		."<ZipCode>$cp</ZipCode>"
 		."<City>$city</City>"
 		."<CountryCode>$code_pays_num</CountryCode>"
