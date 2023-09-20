@@ -12,6 +12,8 @@
 			]
 			#SET{val,scelliusv3}
 			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>Scellius v3 Banque Postale</option>
+			#SET{val,sogecommerce}
+			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>Sogecommerce</option>
 			#SET{val,systempay}
 			<option value="#GET{val}"[(#ENV{#ENV{casier,''}/service,#GET{defaut}}|=={#GET{val}}|oui)selected="selected"]>Systempay</option>
 			#SET{val,spplus}

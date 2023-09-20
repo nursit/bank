@@ -35,6 +35,9 @@ function payzen_url_serveur($config){
 				case "scelliusv3":
 					$host = "https://scelliuspaiement.labanquepostale.fr";
 					break;
+				case "sogecommerce":
+					$host = "https://sogecommerce.societegenerale.eu";
+					break;
 				case "systempay":
 				case "cyberplus":
 				case "spplus":
@@ -47,13 +50,6 @@ function payzen_url_serveur($config){
 		case "clicandpay":
 			$host = "https://clicandpay.groupecdn.fr";
 			break;
-
-		/*
-		Provision. A voir si ce sont des presta ou des services...
-		case "sogecommerce":
-			$host = "https://sogecommerce.societegenerale.eu";
-			break;
-		*/
 
 		case "payzen":
 		default:
