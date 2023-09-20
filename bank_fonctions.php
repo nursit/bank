@@ -257,7 +257,12 @@ function bank_affiche_parrain($id_transaction, $parrain, $tracking_id) {
 	if (empty($parrain)) {
 		return '';
 	}
-	if ($f = charger_filtre('bank_affiche_parrain_'.$parrain, '')
+	// si le parrain contient des : on ne prend que ce qui est avant (ie 'formidable:3')
+	$filtre_affiche_parrain = explode(':', $parrain);
+	$filtre_affiche_parrain = reset($filtre_affiche_parrain);
+	if ($filtre_affiche_parrain
+	  and $filtre_affiche_parrain = 'bank_affiche_parrain_' . preg_replace(',\W,', '_', $filtre_affiche_parrain)
+	  and $f = charger_filtre($filtre_affiche_parrain, '')
 	  and $s = $f($id_transaction, $tracking_id)) {
 		return $s;
 	}
