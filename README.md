@@ -22,6 +22,12 @@ Pour les plugins de gestion d'abonnement reposant sur le plugin bank le fonction
 
 ### Changelog
 
+* Version 6.2
+  * Mise à jour de la librairie Stripe + Support corrigé du 3DSv2 pour Paybox
+
+* Version 6.1
+  * Support des paiements récurrents en simulation, permet de tester complètement les abonnements sans presta bancaire
+
 * Version 6.0
   * Ajout d'une gestion des recurrences pour permettre de faire de la gestion d'abonnement avec les plateformes bancaires qui proposent du paiement direct par empreinte de carte mais pas d'API abonnement
 
