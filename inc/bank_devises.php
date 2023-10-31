@@ -86,6 +86,15 @@ function bank_devise_info($code, $info='') {
 		if (isset($devises[$code])) {
 			$retour = $devises[$code];
 		}
+		else {
+			$retour = [
+				'code' => $code,
+				'code_num' => 000,
+				'nom' => $code,
+				'fraction' => 2,
+				'symbole' => $code
+			];
+		}
 	}
 	else {
 		$retour = bank_devise_defaut();
