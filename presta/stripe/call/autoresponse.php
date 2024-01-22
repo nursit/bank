@@ -324,26 +324,6 @@ function stripe_webhook_invoice_payment_result($raison, $config, $event){
 		}
 		if ($invoice->payment_intent){
 			$response['payment_id'] = $invoice->payment_intent;
-			if (!isset($response['charge_id'])){
-				try {
-					$payment = \Stripe\PaymentIntent::retrieve($response['payment_id']);
-					spip_log("$raison: ".var_export($payment,true), "stripe_db");
-					if ($payment->charges
-						and $payment->charges->data
-						and $charge = end($payment->charges->data)){
-						$response['charge_id'] = $charge->id;
-					}
-				} catch (ApiErrorException $e) {
-					if ($body = $e->getJsonBody()){
-						$err = $body['error'];
-						list($erreur_code, $erreur) = stripe_error_code($err);
-					} else {
-						$erreur = $e->getMessage();
-						$erreur_code = 'error';
-					}
-					spip_log("stripe_webhook_invoice_payment_result:$raison: Erreur #$erreur_code $erreur", $mode . _LOG_ERREUR);
-				}
-			}
 		}
 		// retrouver le id_transaction grace aux metadata du product si possible, uniquement a la creation de la subscription
 		// pour les renouvelleemnt on va creer une transaction
@@ -385,7 +365,8 @@ function stripe_webhook_invoice_payment_result($raison, $config, $event){
 
 	spip_log("$raison: ".var_export($event,true), "stripe_db");
 
-	if (isset($response['charge_id'])
+	if (
+		(isset($response['charge_id']) or isset($response['payment_id']))
 		and isset($response['abo_uid'])
 		and isset($response['pay_id'])){
 		$call_response = charger_fonction('response', 'presta/stripe/call');
