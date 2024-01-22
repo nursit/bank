@@ -285,6 +285,11 @@ function stripe_traite_reponse_transaction($config, &$response) {
 		if ($row['reglee'] === 'oui') {
 			return [$id_transaction, true];
 		}
+		if (!empty($payment) and !empty($payment->last_payment_error)
+		) {
+			$erreur = trim((implode(' ', [$payment->last_payment_error->code ?? '', $payment->last_payment_error->doc_url ?? '', $payment->last_payment_error->message ?? ''])))
+			 . ($erreur ? "\n$erreur" : "");
+		}
 		// sinon enregistrer l'absence de paiement et l'erreur
 		return bank_transaction_echec($id_transaction,
 			[
