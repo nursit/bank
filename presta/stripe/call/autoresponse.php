@@ -164,13 +164,16 @@ function stripe_retrieve_event($config, $auto = 'auto'){
 	return [$event, $erreur, $erreur_code];
 }
 
+
 /**
- * Callback called after a checkout payment (paiement simple)
+ * Traitement des events
+ * checkout_session.completed
+ * checkout_session.expired
  * @param $config
  * @param $event
  * @return bool
  */
-function stripe_webhook_checkout_session_completed_dist($config, $event){
+function _stripe_webhook_checkout_session_result($config, $event){
 	$mode = $config['presta'] . 'auto';
 	if (isset($config['mode_test']) AND $config['mode_test']){
 		$mode .= "_test";
@@ -180,30 +183,33 @@ function stripe_webhook_checkout_session_completed_dist($config, $event){
 	$session = $event->data->object;
 	// il faut recuperer $charge, pay_id et abo_uid, creer un id_transaction
 	if ($session->object=="checkout.session"
-	  and $session->payment_status == "paid"){
+	  and in_array($session->payment_status, ['paid', 'unpaid'])){
 		$response['checkout_session_id'] = $session->id;
-		if ($session->payment_intent){
+		if (!empty($session->payment_intent)){
 			$response['payment_id'] = $session->payment_intent;
 		}
-		if ($session->subscription){
+		if (!empty($session->subscription)){
 			$response['abo_uid'] = $session->subscription;
 		}
-		if ($session->customer){
+		if (!empty($session->customer)){
 			$response['pay_id'] = $session->customer;
 		}
-		if ($session->locale) {
+		if (!empty($session->locale)) {
 			$response['lang'] = $session->locale;
 		}
 
-		if ($session->success_url){
+		if (
+			(!empty($session->success_url) and $url = $session->success_url)
+			or (!empty($session->cancel_url) and $url = $session->cancel_url)
+		){
 			// get id_transaction & transaction_hash from success_url if valid for this website (case of multiples webhooks)
-			$qs = explode('?', $session->success_url);
+			$qs = explode('?', $url);
 			$qs = end($qs);
 			parse_str($qs, $c);
 			// verifier la signature
 			$r = bank_response_simple($config['presta'] . ((isset($config['mode_test']) and $config['mode_test']) ? '_test' : ''), $c);
 			if ($r===false){
-				spip_log("Echec verification signature success_url ".$session->success_url . " ".json_encode($c), $mode . _LOG_ERREUR);
+				spip_log("Echec verification signature url ".$url . " ".json_encode($c), $mode . _LOG_ERREUR);
 				return false;
 			}
 
@@ -224,6 +230,28 @@ function stripe_webhook_checkout_session_completed_dist($config, $event){
 	return false;
 }
 
+
+/**
+ * Callback called after a checkout payment (paiement simple)
+ * @param $config
+ * @param $event
+ * @return bool
+ */
+function stripe_webhook_checkout_session_completed_dist($config, $event){
+	return _stripe_webhook_checkout_session_result($config, $event);
+}
+
+/**
+ * Callback called after a checkout expired
+ * @param $config
+ * @param $event
+ * @return bool
+ */
+function stripe_webhook_checkout_session_expired_dist($config, $event) {
+	return _stripe_webhook_checkout_session_result($config, $event);
+}
+
+
 /**
  * @param $config
  * @param $event
@@ -236,6 +264,7 @@ function stripe_webhook_customer_subscription_created_dist($config, $event) {
 	}
 
 	// TODO ?
+	spip_log($event, "stripe_db");
 
 	return null;
 }
@@ -375,4 +404,103 @@ function stripe_webhook_invoice_payment_result($raison, $config, $event){
 	}
 
 	return false;
+}
+
+
+/**
+ * payment_intent_created : peut arriver independamment du checkout
+ * peut arriver *apres* payment_intent.requires_action
+ * il faut retrouver la transaction qui va avec
+ * @param array $config
+ * @param object $event
+ * @return bool|array
+ */
+function stripe_webhook_payment_intent_created_dist($config, $event){
+	// TODO ?
+	spip_log($event, "stripe_db" . _LOG_ERREUR);
+	return null;
+}
+
+
+/**
+ * payment_intent.payment_failed : peut arriver independamment du checkout
+ * il faut retrouver la transaction qui va avec la mettre en echec
+ * @param array $config
+ * @param object $event
+ * @return bool|array
+ */
+function stripe_webhook_payment_intent_payment_failed_dist($config, $event){
+	$mode = $config['presta'] . 'auto';
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
+
+	$payment_intent = $event->data->object;
+	// il faut recuperer payment_id, pay_id et abo_uid, creer ou retrouver un id_transaction
+	if ($payment_intent->object=="payment_intent"){
+		if (!empty($payment_intent->id)
+		  and !empty($payment_intent->created)
+		  and !empty($payment_intent->customer)
+		) {
+
+			$date_payment = date('Y-m-d H:i:s', $payment_intent->created);
+			$customer_id = $payment_intent->customer;
+			$payment_intent_id = $payment_intent->id;
+
+			if ($res = stripe_retrouve_transaction_par_payment_et_customer($config, $customer_id, $payment_intent_id, $date_payment)) {
+				[$transaction, $checkout_session_id] = $res;
+				// enregistrer l'echec du paiement sur la transaction
+				$response = [
+					'payment_id' => $payment_intent_id,
+					'pay_id' => $customer_id,
+					'id_transaction' => $transaction['id_transaction'],
+					'transaction_hash' => $transaction['transaction_hash'],
+				];
+				$call_response = charger_fonction('response', 'presta/stripe/call');
+				$res = $call_response($config, $response);
+				return $res;
+			}
+		}
+	}
+	return null;
+}
+
+/**
+ * payment_intent.requires_action : peut arriver independamment du checkout
+ * peut arriver *avant* payment_intent.created
+ * il faut retrouver la transaction qui va avec
+ * @param array $config
+ * @param object $event
+ * @return bool|array
+ */
+function stripe_webhook_payment_intent_requires_action_dist($config, $event){
+	$mode = $config['presta'] . 'auto';
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
+
+	$response = array();
+	$payment_intent = $event->data->object;
+	// il faut recuperer $charge, pay_id et abo_uid, creer ou retrouver un id_transaction
+	if ($payment_intent->object=="payment_intent"){
+		if (!empty($payment_intent->id)
+		  and !empty($payment_intent->created)
+		  and !empty($payment_intent->customer)
+		) {
+
+			$date_payment = date('Y-m-d H:i:s', $payment_intent->created);
+			$customer_id = $payment_intent->customer;
+			$payment_intent_id = $payment_intent->id;
+
+			if ($res = stripe_retrouve_transaction_par_payment_et_customer($config, $customer_id, $payment_intent_id, $date_payment)) {
+				[$transaction, $checkout_session_id] = $res;
+				$id_transaction = $transaction['id_transaction'];
+				spip_log("stripe_webhook_payment_requires_action_dist: payment_intent.requires_action sur transaction #$id_transaction", $mode . _LOG_DEBUG);
+				// doit on faire quelque chose ? a priori non, c'est purement informatif
+			}
+		}
+	}
+
+	spip_log($event, "stripe_db" . _LOG_ERREUR);
+	return null;
 }
