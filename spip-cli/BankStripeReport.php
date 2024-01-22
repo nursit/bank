@@ -210,7 +210,7 @@ class BankStripeReport extends Command {
 					$add[] = $transaction;
 				} else {
 					$this->io->error("Pas de transaction pour le paiement $transaction_id");
-					return false;
+					//return false;
 				}
 			}
 		}
