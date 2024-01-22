@@ -392,6 +392,15 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		}
 	}
 
+	// si on a généré un checkout_session_id le noter dans le champ token pour pouvoir traiter la transaction au retour
+	// d'un webhook incomplet avec seulement le payment_intent par exemple
+	// on note dans un tableau json_encode car la transaction peut avoir plusieurs tentative de paiement avec plusieurs checkout_session
+	// et on reçoit ensuite des webhooks asynchrones sur ces différents essais
+	if (!empty($contexte['checkout_session_id'])) {
+		$tokens_deja = (json_decode($row['token'], true) ?: []);
+		array_unshift($tokens_deja, $contexte['checkout_session_id']);
+		sql_updateq("spip_transactions", ['token' => json_encode($tokens_deja)], 'id_transaction='.intval($id_transaction));
+	}
 
 	//ray("call_request stripe", $contexte);
 	return $contexte;

@@ -196,6 +196,43 @@ function stripe_set_webhook($config){
 }
 
 /**
+ * Retrouver une transaction par son customer_id + payment_intent_id + date payment_intent
+ * necessaire pour traiter les webhooks sur les payment_intent qui ne donnent pas d'autres information
+ * on a stocké le(s) checkout_session_id généré pour une transaction dans le champ token
+ * @param array $config
+ * @param string $customer_id
+ * @param string $payment_intent_id
+ * @param string $date
+ * @return array|false
+ */
+function stripe_retrouve_transaction_par_payment_et_customer($config, $customer_id, $payment_intent_id, $date) {
+
+	if (!empty($customer_id) and !empty($payment_intent_id) and $t = strtotime($date)) {
+
+		$where = [
+			"date_transaction>=".sql_quote(date('Y-m-d H:i:s', strtotime('-48hours', $t))),
+			"date_transaction<=".sql_quote(date('Y-m-d H:i:s', strtotime('+2hours', $t))),
+			'pay_id='.sql_quote($customer_id),
+		];
+		$transactions = sql_allfetsel('*', 'spip_transactions', $where, '', 'date_transaction');
+		foreach ($transactions as $transaction) {
+			if (!empty($transaction['token']) and $tokens = json_decode($transaction['token'], true)) {
+				foreach ($tokens as $checkout_session_id) {
+					if ($session = \Stripe\Checkout\Session::retrieve($checkout_session_id)) {
+						if (!empty($session->payment_intent)
+						  and $session->payment_intent === $payment_intent_id) {
+							return [$transaction, $checkout_session_id];
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return false;
+}
+
+/**
  * Gerer la reponse du POST JS sur paiement/abonnement
  *
  * @param array $config
