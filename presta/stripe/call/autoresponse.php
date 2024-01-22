@@ -465,6 +465,56 @@ function stripe_webhook_payment_intent_payment_failed_dist($config, $event){
 	return null;
 }
 
+
+/**
+ * payment_intent.succeeded : arrive avant le checkout.completed
+ * il faut retrouver la transaction qui va avec et enregistrer le succes du paiement si possible
+ * @param array $config
+ * @param object $event
+ * @return bool|array
+ */
+function stripe_webhook_payment_intent_succeeded_dist($config, $event){
+	$mode = $config['presta'] . 'auto';
+	if (isset($config['mode_test']) AND $config['mode_test']){
+		$mode .= "_test";
+	}
+
+	$payment_intent = $event->data->object;
+	// il faut recuperer payment_id, pay_id et abo_uid, creer ou retrouver un id_transaction
+	if ($payment_intent->object=="payment_intent"){
+		if (!empty($payment_intent->id)
+		  and !empty($payment_intent->created)
+		  and !empty($payment_intent->customer)
+		) {
+
+			$date_payment = date('Y-m-d H:i:s', $payment_intent->created);
+			$customer_id = $payment_intent->customer;
+			$payment_intent_id = $payment_intent->id;
+
+			if ($res = stripe_retrouve_transaction_par_payment_et_customer($config, $customer_id, $payment_intent_id, $date_payment)) {
+				[$transaction, $checkout_session] = $res;
+				// enregistrer le succes du paiement sur la transaction
+				$response = [
+					'payment_id' => $payment_intent_id,
+					'pay_id' => $customer_id,
+					'id_transaction' => $transaction['id_transaction'],
+					'transaction_hash' => $transaction['transaction_hash'],
+				];
+				if (!empty($session->subscription)){
+					$response['abo_uid'] = $session->subscription;
+				}
+				if (!empty($session->locale)) {
+					$response['lang'] = $session->locale;
+				}
+				$call_response = charger_fonction('response', 'presta/stripe/call');
+				$res = $call_response($config, $response);
+				return $res;
+			}
+		}
+	}
+	return null;
+}
+
 /**
  * payment_intent.requires_action : peut arriver independamment du checkout
  * peut arriver *avant* payment_intent.created
