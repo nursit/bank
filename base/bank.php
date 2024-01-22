@@ -71,7 +71,7 @@ function bank_declarer_tables_objets_sql($tables){
 			"cadeau_message" => "TEXT NOT NULL DEFAULT ''",  // achat a l'attention d'une tierce personne
 
 			"url_retour" => "text DEFAULT '' NOT NULL", // retour sur un site externe en fin de transaction
-			"token" => "VARCHAR(25) DEFAULT '' NOT NULL",  // jeton perissable fourni au retour externe
+			"token" => "text DEFAULT '' NOT NULL",  // jeton perissable fourni au retour externe
 
 			"maj" => "TIMESTAMP"
 		),

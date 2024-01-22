@@ -147,6 +147,10 @@ function bank_upgrade($nom_meta_base_version, $version_cible){
 		array('maj_tables', array('spip_bank_recurrences')),
 	);
 
+	$maj['2.1.5'] = array(
+		array("sql_alter", "TABLE spip_transactions CHANGE token token text DEFAULT '' NOT NULL"),
+	);
+
 	include_spip('base/upgrade');
 	maj_plugin($nom_meta_base_version, $version_cible, $maj);
 
