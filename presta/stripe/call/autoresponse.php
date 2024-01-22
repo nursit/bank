@@ -448,7 +448,7 @@ function stripe_webhook_payment_intent_payment_failed_dist($config, $event){
 			$payment_intent_id = $payment_intent->id;
 
 			if ($res = stripe_retrouve_transaction_par_payment_et_customer($config, $customer_id, $payment_intent_id, $date_payment)) {
-				[$transaction, $checkout_session_id] = $res;
+				[$transaction, $checkout_session] = $res;
 				// enregistrer l'echec du paiement sur la transaction
 				$response = [
 					'payment_id' => $payment_intent_id,
@@ -493,7 +493,7 @@ function stripe_webhook_payment_intent_requires_action_dist($config, $event){
 			$payment_intent_id = $payment_intent->id;
 
 			if ($res = stripe_retrouve_transaction_par_payment_et_customer($config, $customer_id, $payment_intent_id, $date_payment)) {
-				[$transaction, $checkout_session_id] = $res;
+				[$transaction, $checkout_session] = $res;
 				$id_transaction = $transaction['id_transaction'];
 				spip_log("stripe_webhook_payment_requires_action_dist: payment_intent.requires_action sur transaction #$id_transaction", $mode . _LOG_DEBUG);
 				// doit on faire quelque chose ? a priori non, c'est purement informatif

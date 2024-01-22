@@ -218,10 +218,10 @@ function stripe_retrouve_transaction_par_payment_et_customer($config, $customer_
 		foreach ($transactions as $transaction) {
 			if (!empty($transaction['token']) and $tokens = json_decode($transaction['token'], true)) {
 				foreach ($tokens as $checkout_session_id) {
-					if ($session = \Stripe\Checkout\Session::retrieve($checkout_session_id)) {
-						if (!empty($session->payment_intent)
-						  and $session->payment_intent === $payment_intent_id) {
-							return [$transaction, $checkout_session_id];
+					if ($checkout_session = \Stripe\Checkout\Session::retrieve($checkout_session_id)) {
+						if (!empty($checkout_session->payment_intent)
+						  and $checkout_session->payment_intent === $payment_intent_id) {
+							return [$transaction, $checkout_session];
 						}
 					}
 				}
