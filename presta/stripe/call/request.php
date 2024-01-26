@@ -170,32 +170,29 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 		stripe_init_api($config);
 		stripe_set_webhook($config);
 
-		$checkout_customer = null;
+		$checkout_customer_id = null;
 		// essayer de retrouver un customer existant pour l'id_auteur
-		// sinon Stripe creera un nouveau customer
 		if ($row['id_auteur']){
 			$config_id = bank_config_id($config);
 			$customer_id = sql_getfetsel('pay_id', 'spip_transactions',
 				'pay_id!=' . sql_quote('') . ' AND id_auteur=' . intval($row['id_auteur']) . ' AND statut=' . sql_quote('ok') . ' AND mode=' . sql_quote("$mode/$config_id"),
 				'', 'date_paiement DESC', '0,1');
-			if ($customer_id){
-				try {
-					$customer = \Stripe\Customer::retrieve($customer_id);
-					if ($customer and $customer->email===$contexte['email']){
-						$checkout_customer = $customer_id;
-					}
-				} catch (Exception $e) {
-					// On ignore silencieusement cette erreur
-				}
+			if ($customer_id
+				and $customer = stripe_customer($mode, ['id' => $customer_id])
+				and $customer->email === $contexte['email']
+			){
+				$checkout_customer_id = $customer_id;
 			}
 		}
-		if (!$checkout_customer){
-			// TODO : creer un customer avec les billing infos
+
+		if (!$checkout_customer_id
+		  and $customer = stripe_customer($mode, ['email' => $contexte['email'], 'nom' => trim($billing['prenom'] . ' ' . $billing['nom'])])){
+			$checkout_customer_id = $customer->id;
 		}
 
 		// mettre le customer id en base dans la transaction pour aider a la retrouver en cas d'echec
-		if ($checkout_customer and empty($row['pay_id'])) {
-			$row['pay_id'] = $customer->id;
+		if ($checkout_customer_id and empty($row['pay_id'])) {
+			$row['pay_id'] = $checkout_customer_id;
 			sql_updateq("spip_transactions", ['pay_id' => $row['pay_id']], 'id_transaction='.intval($id_transaction));
 		}
 
@@ -237,10 +234,10 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 				$session_desc['line_items'][0]['price_data']['product_data']['images'] = $item['images'];
 			}
 
-			if (!$checkout_customer){
+			if (!$checkout_customer_id){
 				$session_desc['customer_email'] = $contexte['email'];
 			} else {
-				$session_desc['customer'] = $checkout_customer;
+				$session_desc['customer'] = $checkout_customer_id;
 			}
 
 			try {
@@ -303,10 +300,10 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 					'cancel_url' => $url_success, // on revient sur success aussi car response gerera l'echec du fait de l'absence de session_id
 					'locale' => stripe_locale($GLOBALS['spip_lang']),
 				];
-				if (!$checkout_customer){
+				if (!$checkout_customer_id){
 					$session_desc['customer_email'] = $contexte['email'];
 				} else {
-					$session_desc['customer'] = $checkout_customer;
+					$session_desc['customer'] = $checkout_customer_id;
 				}
 
 
