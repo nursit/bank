@@ -264,9 +264,7 @@ function stripe_webhook_customer_subscription_created_dist($config, $event) {
 	}
 
 	// TODO ?
-	spip_log($event, "stripe_db");
-
-	return null;
+	return false;
 }
 
 function stripe_webhook_customer_subscription_deleted_dist($config, $event) {
@@ -417,8 +415,7 @@ function stripe_webhook_invoice_payment_result($raison, $config, $event){
  */
 function stripe_webhook_payment_intent_created_dist($config, $event){
 	// TODO ?
-	spip_log($event, "stripe_db" . _LOG_ERREUR);
-	return null;
+	return false;
 }
 
 
@@ -462,7 +459,8 @@ function stripe_webhook_payment_intent_payment_failed_dist($config, $event){
 			}
 		}
 	}
-	return null;
+
+	return false;
 }
 
 
@@ -512,7 +510,8 @@ function stripe_webhook_payment_intent_succeeded_dist($config, $event){
 			}
 		}
 	}
-	return null;
+
+	return false;
 }
 
 /**
@@ -551,6 +550,5 @@ function stripe_webhook_payment_intent_requires_action_dist($config, $event){
 		}
 	}
 
-	spip_log($event, "stripe_db" . _LOG_ERREUR);
-	return null;
+	return false;
 }
