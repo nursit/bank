@@ -229,8 +229,105 @@ function stripe_retrouve_transaction_par_payment_et_customer($config, $customer_
 		}
 	}
 
+	spip_log("stripe_retrouve_transaction_par_payment_et_customer: rien trouvé pour [$customer_id, $payment_intent_id, $date]", "stripeauto" . _LOG_DEBUG);
+
 	return false;
 }
+
+
+/**
+ * @param string $mode
+ * @param array $c
+ *   string $id
+ *   string $email
+ *   string $nom
+ * @return false|\Stripe\Customer
+ */
+function stripe_customer($mode, $c) {
+	if (!function_exists('email_valide')){
+		include_fichiers_fonctions();
+	}
+
+	$email = '';
+	if (!empty($c['email'])){
+		$email = email_valide($c['email']);
+	}
+	$nom = (empty($c['nom']) ? '' : trim($c['nom']));
+
+	$customer = null;
+	// creation ? il nous faut un email
+	if (empty($c['id'])){
+		if (empty($email)){
+			spip_log("Email requis pour la création du Stripe\Customer", $mode . _LOG_ERREUR);
+			return false;
+		}
+
+		try {
+			$customer_list = \Stripe\Customer::all(['email' => $email]);
+			foreach ($customer_list->data as $c) {
+				if ($c->email === $email) {
+					$customer = $c;
+					break;
+				}
+			}
+
+		} catch (Exception $e) {
+			spip_log("Erreur lors de la récupération de la liste des Stripe\Customer : " . $e->getMessage(), $mode . _LOG_ERREUR);
+			return false;
+		}
+
+		if ($customer === null) {
+			try {
+				$who = ['email' => $email];
+				if ($nom) {
+					$who['name'] = $nom;
+				}
+				$customer = \Stripe\Customer::create($who);
+				return $customer;
+			}
+			catch (Exception $e) {
+				spip_log("Erreur lors de la création du Stripe\Customer : " . $e->getMessage(), $mode . _LOG_ERREUR);
+				return false;
+			}
+		}
+	}
+
+	// mise a jour d'un customer connu
+	if ($customer === null and !empty($c['id'])){
+		try {
+			$customer = \Stripe\Customer::retrieve($c['id']);
+		} catch (Exception $e) {
+			spip_log("Erreur lors de la récupération du Stripe\Customer " . $c['id'] . " : " . $e->getMessage(), $mode . _LOG_ERREUR);
+			return false;
+		}
+	}
+
+	if ($customer !== null) {
+		try {
+			$update = [];
+			if (!empty($email) and $customer->email !== $email){
+				$customer->email = $email;
+				$update['email'] = $email;
+			}
+			if (strlen($nom) and $customer->name !== $nom){
+				$customer->name = $nom;
+				$update['name'] = $nom;
+			}
+			if ($update) {
+				\Stripe\Customer::update($customer->id, $update);
+			}
+		} catch (Exception $e) {
+			spip_log("Erreur lors de la modification du Stripe\Customer " . $c['id'] . " : " . $e->getMessage(), $mode . _LOG_ERREUR);
+			return false;
+		}
+
+		return $customer;
+	}
+
+	spip_log("Impossible de creer/mettre a jour le Stripe\Customer ???", $mode . _LOG_ERREUR);
+	return false;
+}
+
 
 /**
  * Gerer la reponse du POST JS sur paiement/abonnement
