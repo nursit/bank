@@ -418,7 +418,7 @@ function cmcic_gerer_transaction_payee($config, $id_transaction, $response, $row
 		and $authentification = json_decode($authentification_json, true)){
 
 		if (isset($authentification['details']['transactionID']) and $authentification['details']['transactionID']){
-			$transaction = $authentification['details']['transactionID'];
+			$transaction .= '/' . $authentification['details']['transactionID'];
 		}
 	}
 
