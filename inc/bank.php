@@ -187,6 +187,86 @@ function bank_config($presta, $abo = false){
 }
 
 /**
+ * Pour s'assurer qu'un site de dev (copie d'un site de prod) ne génère pas de paiements intempestifs
+ * il faut un define spécifique par presta pour pouvoir avoir le mode de paiement "produdction" actif
+ * (utilisé uniquement sur les presta qui utilisent les récurrences du plugin bank et du paiement par jeton)
+ *
+ * @see bank_config_security_prod_status()
+ * @param string $presta
+ * @return array
+ */
+function bank_config_security_prod_define_value($presta) {
+	$presta = strtoupper($presta);
+	$name = "_BANK_" . strtoupper($presta) . "_PAIEMENTS_PROD_AUTORISES";
+	$domain = explode('://', $GLOBALS['meta']['adresse_site'], 2);
+	$domain = end($domain);
+	$value = md5(implode('::', [_ROOT_RACINE, $domain, $presta]));
+	return [$name, $value];
+}
+
+/**
+ * Regarde si la constante de sécurité est définie et a la bonne valeur
+ * @uses bank_config_security_prod_define_value()
+ * @param string $presta
+ * @return ?bool
+ */
+function bank_config_security_prod_status($presta, $envoyer_mail_si_erreur = false) {
+	static $deja_mail_presta = [];
+	$c = bank_config_security_prod_define_value($presta);
+	$name = reset($c);
+	$value = end($c);
+	if (!defined($name)) {
+		return null;
+	}
+	if (constant($name) !== $value) {
+		spip_log("Constante '$name' n'a pas la bonne valeur pour autoriser le passage en production pour $presta", "bank" . _LOG_ERREUR);
+		// on envoie un seul mail par hit et par presta...
+		if ($envoyer_mail_si_erreur and empty($deja_mail_presta[$presta][$value])) {
+			// avertir le webmestre
+			$envoyer_mail = charger_fonction('envoyer_mail', 'inc');
+			$t = bank_config_security_prod_affiche_status($presta);
+			include_spip('inc/filtres');
+			$t = textebrut($t);
+			$t =  $GLOBALS['meta']['adresse_site'] . "\n\n" . $t;
+			$envoyer_mail($GLOBALS['meta']['email_webmaster'], "[$presta] Constante $name en erreur pour paiement en production", $t);
+			$deja_mail_presta[$presta] = (empty($deja_mail_presta[$presta]) ? [] : $deja_mail_presta[$presta]);
+			$deja_mail_presta[$presta][$value] = true;
+		}
+		return false;
+	}
+	return true;
+}
+
+
+/**
+ * Afficher un message adhoc dans la configuration du presta pour indiquer la constante à définir pour autoriser le mode prod
+ * @param string $presta
+ * @return string
+ */
+function bank_config_security_prod_affiche_status($presta) {
+	$c = bank_config_security_prod_define_value($presta);
+	$name = reset($c);
+	$value = end($c);
+	$code = "defined('$name') || define('$name', '$value');";
+	$status = bank_config_security_prod_status($presta);
+	if ($status === null) {
+		$message = _L("Ajoutez la ligne suivante à votre fichier <tt>mes_options.php</tt> pour autoriser le paiement en production : \n<pre>$code</pre>");
+		$class = "info";
+	}
+	elseif ($status === false) {
+		$message = _L("La constante <tt>$name</tt> est définie avec une valeur incorrecte.") . "<br />";
+		$message .= _L("Corrigez avec la ligne suivante dans votre fichier <tt>mes_options.php</tt> pour autoriser le paiement en production : \n<pre>$code</pre>");
+		$class = "error";
+	}
+	else {
+		$message = _L("Le paiement en production est autorisé par la constante <tt>$name</tt>");
+		$class = "success";
+	}
+	$message = "<div class='msg-alert {$class}'>$message</div>";
+	return $message;
+}
+
+/**
  * Calculer un ID de config unique (qui change si un ID significatif change)
  * pour differencier 2 config du meme prestataire
  * @param array $config
