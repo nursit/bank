@@ -183,3 +183,23 @@ function bank_affiche_gerer_abonnement($config, $abo_uid){
 
 	return "";
 }
+
+/**
+ * Afficher le bouton pour changer de moyen de paiement d'un abonnement
+ * @param array|string $config
+ * @param string $abo_uid
+ * @return array|string
+ */
+function bank_changer_paiement($id_abo, $id_trans){
+	// $config de type string ?
+	include_spip('inc/bank');
+
+	if ($trans = sql_fetsel("*", "spip_transactions", $w = "id_transaction=" . sql_quote($id_trans))){
+		$config = bank_config($trans['mode']);
+		if ($configurer = charger_fonction('configurer', 'presta/'.$config['presta'] . '/payer', true)){
+			return $configurer($id_trans, $trans['transaction_hash']);
+		}
+	}
+
+	return "";
+}
