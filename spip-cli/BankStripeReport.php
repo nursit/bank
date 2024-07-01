@@ -99,6 +99,7 @@ class BankStripeReport extends Command {
 				'gte' => strtotime($from),
 				'lte' => strtotime($to),
 			],
+			'limit' => 100,
 		]);
 
 		$this->io->care(sprintf('%s payouts', count($payouts)));
