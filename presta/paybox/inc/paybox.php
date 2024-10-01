@@ -260,7 +260,7 @@ function paybox_response($response = 'response'){
 		$sign = _request('sign');
 		$sign = base64_decode($sign);
 		// recuperer les variables
-		$vars = $url['query'];
+		$vars = $url['query'] ?? '';
 
 		// cas ou l'on rejoue une transaction a une date anterieure
 		// on peut y ajouter un &var_replay_date=2016-03-25 pour prendre en compte cette date
@@ -374,7 +374,7 @@ function paybox_traite_reponse_transaction($config, $response){
 	);
 
 	$erreur = paybox_response_code($response['erreur']);
-	$authorisation_id = $response['auth'];
+	$authorisation_id = $response['auth'] ?? '';
 	$transaction = $response['trans'];
 
 	if (!$transaction
@@ -567,4 +567,29 @@ function paybox_format_ans($texte, $nbcar=0, $speciaux=false) {
 	}
 
 	return $texte;
+}
+
+/**
+ * retourne une chaîne de caractères au format imposé pour le téléphone de PBX_BILLING : 10 chiffres
+ * 
+ * @return string | false 
+ **/
+function paybox_format_tel($telephone) {
+	$telephone = preg_replace('/[^0-9]/', '', $telephone);
+	$telephone = substr($telephone, 0, 10);
+	return strlen($telephone) < 10 ? false : $telephone;
+}
+
+/**
+ * retourne une chaîne de caractères au format imposé pour l'indicatif du téléphone de PBX_BILLING : 1 à 3 chiffres précédés de +
+ * 
+ * @return string | false
+ **/
+function paybox_format_indicatif($indicatif) {
+	$indicatif = preg_replace('/[^0-9]/', '', $indicatif);
+	if (preg_match('/^00.*/', $indicatif, $match)) {
+		$indicatif = substr($indicatif, 2);
+	}
+	$indicatif = substr($indicatif, 0, 3);
+	return !strlen($indicatif) ? false : '+' . $indicatif;
 }

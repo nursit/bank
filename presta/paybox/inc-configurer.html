@@ -38,4 +38,20 @@
 		<span class='erreur_message'>(#GET{erreurs})</span>
 		]<input type="text" name="#ENV{casier,''}[PBX_HMAC_KEY_test]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{PBX_HMAC_KEY_test,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
 	</li>
+
+	#SET{name,#ENV{casier,''}_telephone_defaut}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}"><:bank:label_telephone_par_defaut:> :</label>
+		<p class="explication"><:bank:explication_telephone_par_defaut:> :</p>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[telephone_defaut]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{telephone_defaut,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+	#SET{name,#ENV{casier,''}_indicatif_defaut}#SET{obli,''}#SET{defaut,''}#SET{erreurs,#ENV**{erreurs}|table_valeur{#GET{name}}}
+	<li class="editer editer_[(#GET{name})][ (#GET{obli})][ (#GET{erreurs}|oui)erreur]">
+		<label for="#GET{name}"><:bank:label_indicatif_par_defaut:> :</label>
+		<p class="explication"><:bank:explication_indicatif_par_defaut:> :</p>[
+		<span class='erreur_message'>(#GET{erreurs})</span>
+		]<input type="text" name="#ENV{casier,''}[indicatif_defaut]" class="text" value="[(#ENV*{#ENV{casier,''}}|table_valeur{indicatif_defaut,#GET{defaut}})]" id="#GET{name}" [(#HTML5|et{#GET{obli}})required='required']/>
+	</li>
+
 </ul>
