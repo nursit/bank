@@ -46,6 +46,8 @@ $GLOBALS[$GLOBALS['idx_lang']] = array(
 	'erreur_ressayer_plus_tard' => 'Ré-essayez dans quelques minutes',
 	'explication_enregistrer_reglement_montant' => 'Corriger si ne correspond pas au montant effectivement payé',
 	'explication_page_configurer_paiement' => 'Configurez les systèmes de paiement actifs',
+	'explication_telephone_par_defaut' => 'Numéro à utiliser si le téléphone du client n\'est pas fourni (de la forme 0612345678)',
+	'explication_indicatif_par_defaut' => 'Indicatif du téléphone par défaut (de la forme +33)',
 
 // I
     'info_liee_a_qui' => "Liée à :",
@@ -241,6 +243,8 @@ _ Compte bancaire :
 	'label_type_paiement_simu' => 'Paiement fictif',
 	'label_type_paiement_virement' => 'Virement',
 	'legend_sips_logo_page_paiement' => 'Logos page de paiement',
+	'label_telephone_par_defaut' => 'Téléphone par défaut',
+	'label_indicatif_par_defaut' => 'Indicatif par défaut',
 
 // P
 	'payer' => 'Payer',

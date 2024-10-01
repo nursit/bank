@@ -67,7 +67,7 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 
 	$billing = bank_porteur_infos_facturation($row);
 	$mail = $billing['email'];
-
+	
 	// passage en centimes et formattage
 	$montant = bank_formatter_montant_selon_fraction($row['montant'], $devise_info['fraction'], 3);
 
@@ -103,6 +103,21 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 	$city 			= paybox_format_ans($billing['ville'], 50, false);
 	$code_pays_num  = bank_code_pays($billing['pays'], 'iso_num');
 
+	// ajouter téléphone + indicatif si ils sont présents et OK sinon récup de la config par défaut
+	$telephone = $indicatif = false;
+	if (!empty($billing['telephone'])) {
+		$telephone = paybox_format_tel($billing['telephone']);
+	}
+	if (!$telephone) {
+		$telephone = lire_config('bank_paiement/config_paybox')['telephone_defaut'];
+	} 
+	if (!empty($billing['indicatif'])) {
+		$indicatif = paybox_format_indicatif($billing['indicatif']);
+	}
+	if (!$indicatif) {
+		$indicatif = lire_config('bank_paiement/config_paybox')['indicatif_defaut'];
+	}
+
 	$parm['PBX_BILLING'] = '<'.'?xml version=\'1.0\' encoding=\'utf-8\'?'.'><Billing><Address>'
 		."<FirstName>$prenom</FirstName>"
 		."<LastName>$nom</LastName>"
@@ -111,6 +126,8 @@ function presta_paybox_call_request_dist($id_transaction, $transaction_hash, $co
 		."<ZipCode>$cp</ZipCode>"
 		."<City>$city</City>"
 		."<CountryCode>$code_pays_num</CountryCode>"
+		."<CountryCodeMobilePhone>$indicatif</CountryCodeMobilePhone>"
+		."<MobilePhone>$telephone</MobilePhone>"
 		."</Address></Billing>";
 
 	// temps de validite de la page de paiement paybox (par defaut 900s)
