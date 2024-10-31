@@ -30,6 +30,10 @@ function paybox_is_sandbox($config){
 	return $test;
 }
 
+function paybox_list_keys_for_id(){
+	return ['PBX_IDENTIFIANT', 'PBX_SITE', 'PBX_RANG'];
+}
+
 /**
  * Determiner le host pour les appels Paybox : sandbox, host principal ou host fallback
  * @param $config
