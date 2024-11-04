@@ -56,8 +56,11 @@ function formulaires_payer_acte_charger_dist($montant, $options = array()){
 	// ni ne provoquent d'acces en base pour rien
 	// (pour le cas ou ils arriveraient ici)
 	// mais on mets un message au cas ou, pour ne pas empecher un humain de payer
+	// mais si il y a une session utilisateur SPIP, c'est une fausse detection de bot
 
-	if (defined('_IS_BOT') AND _IS_BOT){
+	if (empty($GLOBALS['visiteur_session']['id_auteur'])
+	  and defined('_IS_BOT') and _IS_BOT){
+		spip_log("Tentative de paiement bloquée pour un robot", 'bankbot' . _LOG_INFO_IMPORTANTE);
 		$message = _L('Le paiement n\'est pas accessible aux robots. Si vous n\'êtes pas un robot, essayez avec un autre navigateur.');
 		return "<div class='info'>$message</div>";
 	}
