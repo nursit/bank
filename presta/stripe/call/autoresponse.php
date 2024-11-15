@@ -110,7 +110,7 @@ function stripe_retrieve_event($config, $auto = 'auto'){
 	if (isset($config[$key_webhook_secret]) and $config[$key_webhook_secret]){
 		$endpoint_secret = $config[$key_webhook_secret];
 		$payload = @file_get_contents('php://input');
-		$sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];
+		$sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'] ?? '';
 
 		try {
 			\Stripe\WebhookSignature::verifyHeader($payload, $sig_header, $endpoint_secret, 300);
