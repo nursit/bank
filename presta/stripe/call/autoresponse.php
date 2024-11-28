@@ -286,6 +286,7 @@ function stripe_webhook_customer_subscription_deleted_dist($config, $event) {
 			$options = array(
 				'notify_bank' => false, // pas la peine : stripe a deja resilie l'abo vu paiement refuse
 				'immediat' => true,
+				'graceful' => true, // uniquement si abo pas deja résilié, pour ne pas faire quoi que ce soit si c'est un feedback après résiliation par le plugin abos
 				'message' => "[bank] Abonnement resilie par Stripe ",
 				'erreur' => true,
 			);
