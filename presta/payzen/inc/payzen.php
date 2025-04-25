@@ -680,7 +680,7 @@ function payzen_traite_reponse_transaction($config, $response){
 
 
 function payzen_response_code($code){
-	if ($code==0){
+	if (empty($code) || $code == 0){
 		return '';
 	}
 	$pre = 'Erreur : ';
@@ -699,7 +699,7 @@ function payzen_response_code($code){
 }
 
 function payzen_auth_response_code($code){
-	if ($code==0){
+	if (empty($code) || $code == 0){
 		return '';
 	}
 	$pre = 'Autorisation refusee : ';

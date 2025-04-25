@@ -462,7 +462,7 @@ function paybox_traite_reponse_transaction($config, $response){
 }
 
 function paybox_response_code($code){
-	if ($code==0){
+	if (empty($code) || $code == 0){
 		return true;
 	}
 	$pre = "";
