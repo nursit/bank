@@ -8,7 +8,7 @@
 		<BOUCLE_auteur(AUTEURS){id_auteur}{tout}>
 		<div class="champ qui contenu_qui">
 			<div class='label'><:bank:info_liee_a_qui:></div>
-			<div class='valeur'>[<a href='[(#ID_AUTEUR|generer_url_entite{auteur})]'>(#NOM)</a>[ \((#EMAIL)\)]]</div>
+			<div class='valeur'>[<a href='[(#ID_AUTEUR|generer_objet_url{auteur})]'>(#NOM)</a>[ \((#EMAIL)\)]]</div>
 		</div>
 		</BOUCLE_auteur>
 			<B_auteuralt>
@@ -17,7 +17,7 @@
 				<div class='valeur'>#AUTEUR</div>
 				<BOUCLE_auteuralt(AUTEURS){email=#AUTEUR}{si #ID_AUTEUR|non|et{#AUTEUR|email_valide}|et{#STATUT|=={ok}}|et{#AUTORISER{webmestre}}}{tout}{0,10}{!par id_auteur}>
 				<div class="msg-alert notice">
-					<p>Cet email correspond à l'auteur <a href='[(#ID_AUTEUR|generer_url_entite{auteur})]'>##ID_AUTEUR[ (#NOM)]</a></p>
+					<p>Cet email correspond à l'auteur <a href='[(#ID_AUTEUR|generer_objet_url{auteur})]'>##ID_AUTEUR[ (#NOM)]</a></p>
 					#BOUTON_ACTION{Associer la transaction à cet auteur,#URL_ACTION_AUTEUR{attribuer_transaction,#ID_TRANSACTION-#ID_AUTEUR,#SELF}}
 				</div>
 				</BOUCLE_auteuralt>
@@ -93,7 +93,7 @@
 		[(#ID_COMMANDE|oui)
 		<div class="champ id_commande contenu_id_commande">
 			<div class='label'><:bank:info_commande:> :</div>
-			<div class='valeur'><a href='[(#ID_COMMANDE|generer_url_entite{commande})]'>##ID_COMMANDE[ - (#INFO_TITRE{commande,#ID_COMMANDE})]</a></div>
+			<div class='valeur'><a href='[(#ID_COMMANDE|generer_objet_url{commande})]'>##ID_COMMANDE[ - (#INFO_TITRE{commande,#ID_COMMANDE})]</a></div>
 		</div>]
 
 		[(#ID_FACTURE|oui)
