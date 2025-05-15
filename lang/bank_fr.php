@@ -1,15 +1,8 @@
 <?php
 
 // Ceci est un fichier langue de SPIP -- This is a SPIP language file
-// Produit automatiquement par le plugin LangOnet à partir de la langue source fr
-// Module: bank
-// Langue: fr
-// Date: 29-05-2015 10:11:27
-// Items: 109
 
-if (!defined('_ECRIRE_INC_VERSION')) return;
-
-$GLOBALS[$GLOBALS['idx_lang']] = array(
+return [
 
 // A
 	'abonnement_avec' => 'Abonnement par <i>@nom@</i>',
@@ -278,4 +271,4 @@ _ Compte bancaire :
 	'titre_bank_recurrences' => 'Paiments récurrents',
 	'titre_transaction' => 'Transaction',
 	'titre_transactions' => 'Transactions',
-);
+];

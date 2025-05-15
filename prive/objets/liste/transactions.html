@@ -42,7 +42,7 @@
 			{tri #ENV{par,id_transaction},#GET{defaut_tri}}{pagination #ENV{nb,10}}{0,200000}>
 			<tr class="[(#COMPTEUR_BOUCLE|alterner{row_odd,row_even})][(#ENV{id_transaction}|is_array|non)[ (#EXPOSE)]] [row_(#STATUT|match{'\w+?'})]">
 				<td class="id"><a href="#URL_ECRIRE{transaction,id_transaction=#ID_TRANSACTION}" class="popin">#ID_TRANSACTION</a></td>
-				<td class="id_auteur">[(#ID_AUTEUR|?{[<a href='[(#ID_AUTEUR|generer_url_entite{auteur})]' title="[(#INFO_NOM{auteur,#ID_AUTEUR}|attribut_html)][ - (#INFO_EMAIL{auteur,#ID_AUTEUR}|attribut_html)]">(#ID_AUTEUR)</a>],[<abbr title="(#AUTEUR|attribut_html)">@</abbr>]})]</td>
+				<td class="id_auteur">[(#ID_AUTEUR|?{[<a href='[(#ID_AUTEUR|generer_objet_url{auteur})]' title="[(#INFO_NOM{auteur,#ID_AUTEUR}|attribut_html)][ - (#INFO_EMAIL{auteur,#ID_AUTEUR}|attribut_html)]">(#ID_AUTEUR)</a>],[<abbr title="(#AUTEUR|attribut_html)">@</abbr>]})]</td>
 				<td class="mode">[(#MODE|bank_afficher_mode)]</td>
 				<td class="autorisation_id"><abbr title="#AUTORISATION_ID">[(#AUTORISATION_ID|couper{50,''})]</abbr></td>
 				<td class="devise">#DEVISE</td>
@@ -52,7 +52,7 @@
 				<td class="date">[(#DATE_PAIEMENT|intval|oui)<abbr title="Paid on #DATE_PAIEMENT">][(#DATE_TRANSACTION|replace{' ',' <small>'}|concat{'</small>'})][(#DATE_PAIEMENT|intval|oui)</abbr>]</td>
 				<td class="tstatut">[(#STATUT|match{echec|ok|rembourse}|et{#MESSAGE|trim|strlen}|?{[<abbr title="[(#MESSAGE|attribut_html)[ - (#ERREUR|attribut_html)]]">(#STATUT|bank_traduire_statut_transaction)</abbr>],#STATUT|bank_traduire_statut_transaction})]</td>
 				<td class="parrain">[(#ID_TRANSACTION|bank_affiche_parrain{#PARRAIN,#TRACKING_ID})#SET{has_parrain,' '}]</td>
-				<td class="id_commande">[<a href='[(#ID_COMMANDE|generer_url_entite{commande})]'(#ID_COMMANDE|oui)>#ID_COMMANDE</a>#SET{has_commande,' '}]</td>
+				<td class="id_commande">[<a href='[(#ID_COMMANDE|generer_objet_url{commande})]'(#ID_COMMANDE|oui)>#ID_COMMANDE</a>#SET{has_commande,' '}]</td>
 				<td class="id_facture">[<a href='[(#URL_PAGE{facture}|parametre_url{id_facture,#ID_FACTURE}|parametre_url{hash,#INFO_DETAILS{facture,#ID_FACTURE}|md5})]'(#ID_FACTURE|oui)>#ID_FACTURE</a>#SET{has_facture,' '}]</td>
 			</tr>
 		</BOUCLE_transactions>

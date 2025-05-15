@@ -7,7 +7,7 @@
 
 	<div class="champ id_transaction contenu_id_transaction">
 		<div class='label'><:bank:info_liee_a_qui:></div>
-		<div class='valeur'>[<a href='[(#ID_TRANSACTION|generer_url_entite{transaction})]' class="popin"><:bank:titre_transaction:> #(#ID_TRANSACTION) [(#INFO_MONTANT{transaction,#ID_TRANSACTION}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION}})]</a>]</div>
+		<div class='valeur'>[<a href='[(#ID_TRANSACTION|generer_objet_url{transaction})]' class="popin"><:bank:titre_transaction:> #(#ID_TRANSACTION) [(#INFO_MONTANT{transaction,#ID_TRANSACTION}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION}})]</a>]</div>
 	</div>
 
 	<div class="formulaire_spip formulaire_dater">
@@ -42,7 +42,7 @@
 	</div>]
 	<div class="champ contenu_id_transaction_echeance">
 		<div class='label'><:bank:info_liee_a_qui:></div>
-		<div class='valeur'>[<a href='[(#ID_TRANSACTION_ECHEANCE|generer_url_entite{transaction})]' class="popin"><:bank:titre_transaction:> #(#ID_TRANSACTION_ECHEANCE) [(#INFO_MONTANT{transaction,#ID_TRANSACTION_ECHEANCE}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION_ECHEANCE}})]</a>]</div>
+		<div class='valeur'>[<a href='[(#ID_TRANSACTION_ECHEANCE|generer_objet_url{transaction})]' class="popin"><:bank:titre_transaction:> #(#ID_TRANSACTION_ECHEANCE) [(#INFO_MONTANT{transaction,#ID_TRANSACTION_ECHEANCE}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION_ECHEANCE}})]</a>]</div>
 	</div>
 
 	[(#BOITE_PIED)]
@@ -59,7 +59,7 @@
 	[(#ID_TRANSACTION_ECHEANCE_NEXT|intval|oui)
 	<div class="champ contenu_id_transaction_echeance_next">
 		<div class='label'><:bank:info_liee_a_qui:></div>
-		<div class='valeur'>[<a href='[(#ID_TRANSACTION_ECHEANCE_NEXT|generer_url_entite{transaction})]' class="popin"><:bank:titre_transaction:> #(#ID_TRANSACTION_ECHEANCE_NEXT) [(#INFO_MONTANT{transaction,#ID_TRANSACTION_ECHEANCE_NEXT}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION_ECHEANCE_NEXT}})]</a>]</div>
+		<div class='valeur'>[<a href='[(#ID_TRANSACTION_ECHEANCE_NEXT|generer_objet_url{transaction})]' class="popin"><:bank:titre_transaction:> #(#ID_TRANSACTION_ECHEANCE_NEXT) [(#INFO_MONTANT{transaction,#ID_TRANSACTION_ECHEANCE_NEXT}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION_ECHEANCE_NEXT}})]</a>]</div>
 	</div>
 	]
 	[<div class="champ contenu_echeances">
