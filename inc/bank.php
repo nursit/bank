@@ -534,6 +534,10 @@ function bank_porteur_infos_facturation($transaction){
 	$lignes = array_filter($lignes);
 	$infos['adresse'] = implode("\n", $lignes);
 
+	// importer les entites dans le charset si possible,
+	// c'est préférable pour les envois vers les presta bancaires
+	include_spip('inc/filtres');
+	$infos = array_map('filtrer_entites', $infos);
 	#spip_log("bank_porteur_infos_facturation:".$transaction['id_transaction'].":".json_encode($infos),'dspdbg');
 
 	return $infos;
