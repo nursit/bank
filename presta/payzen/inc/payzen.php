@@ -240,10 +240,13 @@ function payzen_available_cards($config){
  * @return string
  */
 function payzen_form_hidden($config, $parms){
+	include_spip('inc/filtres_mini');
 	$parms['signature'] = payzen_signe_contexte($parms, payzen_key($config), payzen_sign_algorithm($config));
 	$hidden = "";
 	foreach ($parms as $k => $v){
-		$hidden .= "<input type='hidden' name='$k' value='" . str_replace("'", "&#39;", $v) . "' />";
+		// il faut passer en entité les &,",<,> pour qu'ils soient reçus à l'identique
+		$v_s = spip_htmlspecialchars($v);
+		$hidden .= "<input type=\"hidden\" name=\"$k\" value=\"$v_s\" />";
 	}
 
 	return $hidden;
