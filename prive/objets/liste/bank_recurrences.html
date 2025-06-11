@@ -38,8 +38,9 @@
 			{where?}
 			{recherche?}
 			{statut==#ENV{statut,'.'}}
-			{tri #ENV{par,id_bank_recurrence},#GET{defaut_tri}}{pagination #ENV{nb,10}}{0,200000}>
-			<tr class="[(#COMPTEUR_BOUCLE|alterner{row_odd,row_even})][(#ENV{id_bank_recurrence}|is_array|non)[ (#EXPOSE)]][ row_(#STATUT)][(#STATUT|=={valide}|et{#DATE_ECHEANCE_NEXT|<{#ENV{date}}}|oui)row_late]">
+			{tri #ENV{par,id_bank_recurrence},#GET{defaut_tri}}{pagination #ENV{nb,10}}>
+			<BOUCLE_larecurrence(bank_recurrences){id_bank_recurrence}>
+			<tr class="[(#_bank_recurrences:COMPTEUR_BOUCLE|alterner{row_odd,row_even})][(#ENV{id_bank_recurrence}|is_array|non)[ (#EXPOSE)]][ row_(#STATUT)][(#STATUT|=={valide}|et{#DATE_ECHEANCE_NEXT|<{#ENV{date}}}|oui)row_late]">
 				<td class="id"><a href="[(#ID_BANK_RECURRENCE|generer_url_entite{bank_recurrence})]">#ID_BANK_RECURRENCE</a></td>
 				<td class="id_transaction">[<a href='[(#ID_TRANSACTION|generer_url_entite{transaction})]' class="popin" title="[(#INFO_MONTANT{transaction,#ID_TRANSACTION}|bank_affiche_montant{#INFO_DEVISE{transaction,#ID_TRANSACTION}}|attribut_html)]">(#ID_TRANSACTION)</a>]</td>
 				<td class="uid">[<tt>(#UID)</tt>]</td>
@@ -58,6 +59,7 @@
 				<td class="tstatut">[(#STATUT|bank_traduire_statut_bank_recurrence)]</td>
 				<td class="date_fin">[(#DATE_FIN|intval|oui)[(#DATE_FIN|replace{' ',' <small>'}|concat{'</small>'})]]</td>
 			</tr>
+			</BOUCLE_larecurrence>
 		</BOUCLE_bank_recurrences>
 		</tbody>
 	</table>
