@@ -1,0 +1,28 @@
+[(#REM)
+/*
+* Paiement Bancaire
+* module de paiement bancaire multi prestataires
+* stockage des transactions
+*
+* Auteurs :
+ * Laurent Lefebvre largement inspiré du code de Cedric Morin / Nursit.com
+ * (c) 2012-2024 - Distribue sous licence GNU/GPL
+*
+*/
+]#CACHE{0}
+<BOUCLE_trans(TRANSACTIONS){id_transaction}{transaction_hash}>
+	  <div class='boutons[ (#ENV{autosubmit}|?{loading})]'>
+		  [(#SET{id,[setup(#ID_TRANSACTION)]})]
+		  [(#BOUTON_ACTION{
+		  	Modifier le moyen de paiement pour cet abonnement,
+		  	#ENV*{action},
+		  	[stripe_button_(#GET{id}) btn btn-defaut btn-petit btn-fleche],
+		  	'',
+		  	'',
+		  	[stripe_button_(#GET{id})_callback\(\)]
+		  })]
+		  [<script src="https://js.stripe.com/v3/"></script>
+		  <script type="text/javascript">(#INCLURE{fond=presta/stripe/payer/inc-checkout-js,env,id=#GET{id}}|compacte{js})</script>]
+		  <style type="text/css">.payer_stripe .loading .bouton_action_post{position: relative} .payer_stripe .loading .bouton_action_post::after{content:'';display: block;position: absolute;left:0;right: 0;top:0;bottom: 0;background: rgba(255,255,255,0.5) url([(#CHEMIN{images/loader.svg})]) no-repeat center;background-size: contain;}</style>
+	  </div>
+</BOUCLE_trans>
