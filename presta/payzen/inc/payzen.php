@@ -77,11 +77,17 @@ function payzen_url_api($config){
 	$host = explode('.', $host);
 	$subhost = array_shift($host);
 
-	if (in_array($subhost, [ 'clicandpay' ])) {
-		array_unshift($host, 'api-' . $subhost);
-	}
-	else {
-		array_unshift($host, 'api');
+	switch ($subhost) {
+		case 'clicandpay':
+		case 'sogecommerce':
+			array_unshift($host, 'api-' . $subhost);
+			break;
+		default:
+			if (in_array(reset($host), ['osb', 'labanquepostale'])) {
+				array_unshift($host, $subhost);
+			}
+			array_unshift($host, 'api');
+			break;
 	}
 	$host = implode('.', $host);
 
