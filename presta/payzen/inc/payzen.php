@@ -640,6 +640,12 @@ function payzen_traite_reponse_transaction($config, $response){
 		}
 	}
 
+	// stocker le uuid et la response dans les data
+	$data = json_decode($row['data'], true) ?? [];
+	$data['uuid'] = $response['vads_trans_uuid'] ?? '';
+	$data['response'] = $response;
+	$set['data'] = json_encode($data);
+
 	// OK on met a jour la transaction en base
 	sql_updateq("spip_transactions", $set, "id_transaction=" . intval($id_transaction));
 	spip_log("call_response : id_transaction $id_transaction, reglee", $mode);
