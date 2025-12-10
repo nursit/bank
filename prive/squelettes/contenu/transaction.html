@@ -95,7 +95,7 @@
 
 		[<div class="champ parrain contenu_parrain">
 			<div class='label'><:bank:label_tri_parrain:> :</div>
-			<div class='valeur'>(#PARRAIN) <tt>#TRACKING_ID</tt></div>
+			<div class='valeur'>(#ID_TRANSACTION|bank_affiche_parrain{#PARRAIN,#TRACKING_ID})</div>
 		</div>]
 
 		[(#ID_COMMANDE|oui)
@@ -137,4 +137,7 @@
 
 	#FORMULAIRE_REMBOURSER_TRANSACTION{#ID_TRANSACTION}
 </div>
+<style>
+	.contenu_parrain .valeur br {display: none;}
+</style>
 </BOUCLE_transaction>
