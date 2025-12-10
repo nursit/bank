@@ -23,7 +23,10 @@
 				</BOUCLE_auteuralt>
 			</div>
 			</B_auteuralt>
-			[<div class="qui">Liée à (#AUTEUR)</div>]
+			[<div class="champ qui contenu_qui">
+				<div class='label'><:bank:info_liee_a_qui:></div>
+				<div class='valeur'>(#AUTEUR)</div>
+			</div>]
 			<//B_auteuralt>
 		<//B_auteur>
 
@@ -57,8 +60,13 @@
 			<div class='valeur'><tt>(#STATUT|bank_traduire_statut_transaction)</tt></div>
 		</div>]
 
-		[(#STATUT|=={ok}|oui)
-		<div class="msg-alert success">
+		[(#STATUT|=={rembourse}|oui)
+			<div class="msg-alert error">
+				<:bank:info_statut_rembourse:>
+			</div>
+		]
+		[(#STATUT|in_array{#LISTE{ok,rembourse}}|oui)
+		<div class="msg-alert [(#STATUT|=={ok}|?{success,info})]">
 			<div class="champ date_paiement contenu_date_paiement">
 				<div class='label'><:bank:info_date_paiement:></div>
 				<div class='valeur'>[(#DATE_PAIEMENT|affdate_heure)]</div>
