@@ -7,7 +7,7 @@
  * Auteurs :
  * Cedric Morin, Nursit.com
  * (c) 2012-2019 - Distribue sous licence GNU/GPL
- * Lyra 
+ * Lyra
  *
  */
 if (!defined('_ECRIRE_INC_VERSION')){
@@ -59,4 +59,9 @@ function presta_clicandpay_titre_type_paiement_dist($mode, $id_transaction){
 	}
 
 	return "";
+}
+
+function presta_clicandpay_inc_affiche_transaction_data_dist($data, $row) {
+	$affiche_transaction_data = charger_fonction("affiche_transaction_data", "presta/payzen/inc");
+	return $affiche_transaction_data($data, $row);
 }
