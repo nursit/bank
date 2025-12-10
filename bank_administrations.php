@@ -151,6 +151,10 @@ function bank_upgrade($nom_meta_base_version, $version_cible){
 		array("sql_alter", "TABLE spip_transactions CHANGE token token text DEFAULT '' NOT NULL"),
 	);
 
+	$maj['2.2.0'] = array(
+		array("sql_alter", "TABLE spip_transactions ADD data mediumtext DEFAULT '' NOT NULL AFTER token"),
+	);
+
 	include_spip('base/upgrade');
 	maj_plugin($nom_meta_base_version, $version_cible, $maj);
 

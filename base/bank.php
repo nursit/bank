@@ -73,6 +73,8 @@ function bank_declarer_tables_objets_sql($tables){
 			"url_retour" => "text DEFAULT '' NOT NULL", // retour sur un site externe en fin de transaction
 			"token" => "text DEFAULT '' NOT NULL",  // jeton perissable fourni au retour externe
 
+			"data" => "mediumtext DEFAULT '' NOT NULL",  // champ dispo pour les différents presta pour stocker des données en json liées à la transaction
+
 			"maj" => "TIMESTAMP"
 		),
 		'key' => array(
