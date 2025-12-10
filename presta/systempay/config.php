@@ -24,3 +24,8 @@ function systempay_lister_cartes_config($c){
 	include_spip("presta/payzen/inc/payzen");
 	return payzen_available_cards($config);
 }
+
+function presta_systempay_inc_affiche_transaction_data_dist($data, $row) {
+	$affiche_transaction_data = charger_fonction("affiche_transaction_data", "presta/payzen/inc");
+	return $affiche_transaction_data($data, $row);
+}
