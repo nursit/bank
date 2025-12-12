@@ -42,7 +42,7 @@ function bank_rembourser_transaction_dist($id_transaction, $options = array()){
 	}
 
 	// et on le pose aussitot
-	sql_updateq('spip_transactions', array('statut' => 'rembourse'), "id_transaction=" . intval($id_transaction));
+	sql_updateq('spip_transactions', array('statut' => 'rembourse', 'montant_regle' => 0), "id_transaction=" . intval($id_transaction));
 
 	$notifier = ($notifier AND $row_prec['statut']!='rembourse');
 
