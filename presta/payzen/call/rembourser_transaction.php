@@ -55,6 +55,7 @@ function presta_payzen_call_rembourser_transaction_dist($id_transaction, $config
 	// si on a bien configurer le password API GET
 	if (payzen_api_password($config)) {
 		$response = payzen_api_call($config, "Transaction/CancelOrRefund", $args);
+		//spip_log("call_rembourser_transaction #$id_transaction $uuid (REST) : " . json_encode($response), $mode . _LOG_DEBUG);
 
 		if (!$response or empty($response['status'])) {
 			return false;
@@ -81,8 +82,9 @@ function presta_payzen_call_rembourser_transaction_dist($id_transaction, $config
 		}
 
 		$transaction_info = $response['answer'];
+
 		// ok on a reusi donc
-		spip_log("call_rembourser_transaction $uuid (REST) : SUCCESS", $mode);
+		spip_log("call_rembourser_transaction $uuid (REST) : SUCCESS " . json_encode($transaction_info), $mode . _LOG_DEBUG);
 		return $transaction_info;
 	}
 
