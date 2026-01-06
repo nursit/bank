@@ -274,17 +274,13 @@ function presta_stripe_call_response_dist($config, $response = null){
 				}
 			}
 
-			// echoue, il faut resilier l'abonnement
+			// En cas d'echec, Stripe va essayer de nouveau à +7j, +14j +21j et +22j environ
+			// si l'un des paiements réussis, l'abonnement continue
+			// en cas d'echec des 5 tentatives, Stripe envoie un event customer.subscription.deleted
+			// qui provoquera la résiliation de l'abonnement
+			// on ne fait donc rien ici, si ce n'est un log
 			if (!$success){
-				if ($resilier = charger_fonction('resilier', 'abos', true)){
-					$options = array(
-						'notify_bank' => false, // pas la peine : stripe a deja resilie l'abo vu paiement refuse
-						'immediat' => true,
-						'message' => "[bank] Transaction #$id_transaction refusee",
-						'erreur' => true,
-					);
-					$resilier("uid:$abo_uid", $options);
-				}
+				spip_log("call_response : echec paiement échéance #$id_transaction pour abo_uid=$abo_uid - pas d'appel a resilier pour l'abonnement", $mode . _LOG_DEBUG);
 			}
 		}
 
