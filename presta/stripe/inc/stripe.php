@@ -425,6 +425,10 @@ function stripe_traite_reponse_transaction($config, &$response) {
 			 . ($erreur ? "\n$erreur" : "");
 		}
 		// sinon enregistrer l'absence de paiement et l'erreur
+		$set = [];
+		if (isset($response['abo_uid'])) {
+			$set['abo_uid'] = $response['abo_uid'];
+		}
 		return bank_transaction_echec($id_transaction,
 			[
 				'mode' => $mode,
@@ -433,6 +437,7 @@ function stripe_traite_reponse_transaction($config, &$response) {
 				'erreur' => ($payment ? "Status PaymentIntent=" . $payment->status : "PaymentIntent " . $response['payment_id'] . " non valide") . ($erreur ? "\n$erreur" : ""),
 				'code_erreur' => $erreur_code,
 				'log' => var_export($response, true),
+				'set' => $set,
 			]
 		);
 	}
