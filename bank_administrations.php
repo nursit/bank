@@ -155,10 +155,32 @@ function bank_upgrade($nom_meta_base_version, $version_cible){
 		array("sql_alter", "TABLE spip_transactions ADD data mediumtext DEFAULT '' NOT NULL AFTER token"),
 	);
 
+	$maj['2.3.0'] = array(
+		array("bank_fix_abouid_echec"),
+	);
+
 	include_spip('base/upgrade');
 	maj_plugin($nom_meta_base_version, $version_cible, $maj);
 
 	bank_presta_install();
+}
+
+function bank_fix_abouid_echec() {
+	$req_id_commande_abo = sql_get_select('DISTINCT ZZZT.id_commande', 'spip_transactions AS ZZZT', "ZZZT.id_commande>0 AND ZZZT.abo_uid<>''");
+	$res = sql_select('DISTINCT id_commande', 'spip_transactions', "statut='echec' AND abo_uid='' AND id_commande>0 AND id_commande IN ($req_id_commande_abo)");
+	$nb = sql_count($res);
+	echo "$nb commandes avec abo_uid et transactions en echec sans abo_uid<br />";
+	while ($row = sql_fetch($res)) {
+		$id_commande = $row['id_commande'];
+		$abo_uid = sql_getfetsel('abo_uid', 'spip_transactions', "abo_uid<>'' AND id_commande=".intval($id_commande), '', 'id_transaction DESC');
+		//echo "C$id_commande => abo_uid=$abo_uid<br />";
+		if ($id_commande && $abo_uid) {
+			sql_updateq('spip_transactions', ['abo_uid' => $abo_uid], "abo_uid='' AND id_commande=".intval($id_commande));
+		}
+		if (time() > _TIME_OUT) {
+			return;
+		}
+	}
 }
 
 function bank_upgrade_config(){

@@ -6,7 +6,7 @@
 	compatibilite="[3.2.0;4.*]"
 	logo="prive/themes/spip/images/bank-64.png"
 	documentation="http://contrib.spip.net/4627"
-	schema="2.2.0"
+	schema="2.3.0"
 >
 
 	<nom>Banque&amp;paiement</nom>
