@@ -1,3 +1,7 @@
+# Projet archivé
+
+Le projet est désormais développé sur la forge communautaire https://git.spip.net/nursit/bank
+
 # Plugin Bank v6 pour SPIP <small>Paiement bancaire</small>
 
 Ce plugin permet de gérer les interfaces techniques avec les prestataires bancaires.
