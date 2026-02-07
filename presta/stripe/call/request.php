@@ -291,6 +291,8 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 					}
 				}
 
+				$interval_count = 1;
+
 				$session_desc = [
 					'payment_method_types' => $payment_types,
 					'mode' => 'subscription',
@@ -321,7 +323,7 @@ function presta_stripe_call_request_dist($id_transaction, $transaction_hash, $co
 						'unit_amount' => $montant_echeance,
 						'recurring' => [
 							'interval' => $interval,
-							'interval_count' => 1,
+							'interval_count' => $echeance['interval_count'],
 							//'trial_period_days' => 0, // default
 						],
 						//'billing_scheme' => 'per_unit', // implicite, non modifiable via price_data

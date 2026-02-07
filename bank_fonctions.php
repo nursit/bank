@@ -61,6 +61,24 @@ function balise_PAYER_ABONNEMENT_dist($p){
 	return $p;
 }
 
+/**
+ * #CHANGER_MOYEN_PAIEMENT{#ID_ABONNEMENT,#ID_TRANSACTION}
+ * @param $p
+ * @return mixed
+ */
+function balise_CHANGER_MOYEN_PAIEMENT_dist($p){
+
+	$_idabo = interprete_argument_balise(1, $p);
+	$_idtrans = interprete_argument_balise(2, $p);
+	$p->code = "";
+
+	if ($_idabo AND $_idtrans) {
+		$p->code = "bank_changer_paiement($_idabo,$_idtrans)";
+	}
+
+	$p->interdire_scripts = false;
+	return $p;
+}
 
 /**
  * #GERER_ABONNEMENT{#MODE_PAIEMENT,#ABO_UID}
